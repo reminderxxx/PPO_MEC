@@ -20,6 +20,7 @@ UNKNOWN = "unknown"
 NOT_APPLICABLE = "not_applicable"
 SCHEMA_VERSION = "causal_public_action_estimator_v2"
 EVENT_LABEL_SCHEMA_VERSION = "causal_public_prepare_advantage_v2"
+PUBLIC_RULE_SCHEMA_VERSION = "causal_public_rule_selection_v2"
 PRIVILEGED_REFERENCE_PROFILES = {
     "immediate_cost_rule": {
         "capability_profile": "privileged_exact_transition_clone_v1",
@@ -580,12 +581,57 @@ def _score(row: dict[str, Any]) -> tuple[Any, ...]:
     return service_rank, deadline_rank, int(known), gain_rank, -total, -bytes_total
 
 
+def classify_public_rule_candidates(estimate: dict[str, Any]) -> dict[str, str]:
+    """Classify legal rule candidates without promoting unknown raw feasibility.
+
+    The raw executor applies an atomic full-step contact gate.  Vehicle
+    fallback (action 2) is contact-independent; every other raw action must be
+    explicitly known to fit.  Non-raw profiles retain the historical scoring
+    surface because the raw gate is not applicable there.
+    """
+
+    raw_contract = any(
+        row["legal"] and row["raw_trace_fit"] == UNKNOWN
+        for row in estimate["actions"].values()
+    )
+    result: dict[str, str] = {}
+    for key, row in estimate["actions"].items():
+        action = int(key)
+        if not row["legal"]:
+            result[key] = "masked"
+        elif not raw_contract:
+            result[key] = "eligible_nonraw_contract"
+        elif action == 2:
+            result[key] = "eligible_contact_independent_fallback"
+        elif row["raw_full_step_contact_fit"] == YES:
+            result[key] = "eligible_known_raw_contact_fit"
+        elif row["raw_full_step_contact_fit"] == NO:
+            result[key] = "excluded_explicit_raw_contact_infeasible"
+        else:
+            result[key] = "excluded_unknown_raw_contact_feasibility"
+    return result
+
+
+def _eligible_public_rule_candidates(
+    estimate: dict[str, Any],
+) -> list[tuple[int, dict[str, Any]]]:
+    classification = classify_public_rule_candidates(estimate)
+    return [
+        (int(key), row)
+        for key, row in estimate["actions"].items()
+        if classification[key].startswith("eligible_")
+    ]
+
+
 class CausalPublicImmediateRule:
     """Myopic rule over the public estimator; never previews an environment."""
 
     method_name = "causal_public_immediate_rule"
     capability_profile = "public_causal_semantic_state_only_v1"
-    objective_profile = "lexicographic_service_deadline_known_readiness_cost_v1"
+    rule_schema_version = PUBLIC_RULE_SCHEMA_VERSION
+    objective_profile = (
+        "raw_feasible_then_lexicographic_service_deadline_known_readiness_cost_v2"
+    )
     public_information_matched = True
     uses_environment_preview = False
 
@@ -594,13 +640,9 @@ class CausalPublicImmediateRule:
             dict(info.get("semantic_state", {}) or {}),
             list(info.get("action_mask", []) or []),
         )
-        candidates = [
-            (action, row)
-            for action, row in ((int(key), value) for key, value in estimate["actions"].items())
-            if row["legal"]
-        ]
+        candidates = _eligible_public_rule_candidates(estimate)
         if not candidates:
-            raise RuntimeError("public action estimator received no legal action")
+            raise RuntimeError("public action estimator received no eligible action")
         return max(candidates, key=lambda item: (_score(item[1]), -item[0]))[0]
 
     def select_action(self, source: Any) -> int:
@@ -731,16 +773,19 @@ class CausalPublicTwoStepRule(CausalPublicImmediateRule):
         mask = list(info.get("action_mask", []) or [])
         first = estimate_public_actions(state, mask)
         candidates: list[tuple[tuple[Any, ...], int]] = []
-        for action, row in ((int(key), value) for key, value in first["actions"].items()):
-            if not row["legal"]:
-                continue
+        for action, row in _eligible_public_rule_candidates(first):
             projected, reason = project_public_state(state, first, action)
             if projected is None:
                 score = (_score(row), (0, 0, 0, 0, 0.0, 0))
             else:
                 second = estimate_public_actions(projected)
-                legal_second = [value for value in second["actions"].values() if value["legal"]]
-                second_score = max((_score(value) for value in legal_second), default=(0, 0, 0, 0, 0.0, 0))
+                eligible_second = [
+                    value for _, value in _eligible_public_rule_candidates(second)
+                ]
+                second_score = max(
+                    (_score(value) for value in eligible_second),
+                    default=(0, 0, 0, 0, 0.0, 0),
+                )
                 score = (_score(row), second_score)
             candidates.append((score + ((1 if reason == "causal_public_first_step_projection" else 0),), action))
         if not candidates:

@@ -11,9 +11,11 @@ from src.agents.causal_public_action_estimator import (
     CausalPublicTwoStepRule,
     NO,
     PRIVILEGED_REFERENCE_PROFILES,
+    PUBLIC_RULE_SCHEMA_VERSION,
     SCHEMA_VERSION,
     UNKNOWN,
     YES,
+    classify_public_rule_candidates,
     estimate_public_actions,
     public_prepare_advantage_label,
 )
@@ -257,13 +259,57 @@ def test_public_rules_are_deterministic_and_do_not_preview_environment() -> None
     assert _hash(state) == _hash(_state())
 
 
+def test_public_rules_fail_closed_for_known_no_and_unknown_raw_contact() -> None:
+    known_yes = _state()
+    yes_estimate = estimate_public_actions(known_yes)
+    assert yes_estimate["actions"]["4"]["raw_full_step_contact_fit"] == YES
+    assert classify_public_rule_candidates(yes_estimate)["4"] == (
+        "eligible_known_raw_contact_fit"
+    )
+
+    known_no = _state()
+    known_no["calibrated_context"]["contact_budget_seconds"] = 0.9
+    no_estimate = estimate_public_actions(known_no)
+    assert no_estimate["actions"]["4"]["raw_full_step_contact_fit"] == NO
+    assert classify_public_rule_candidates(no_estimate)["4"] == (
+        "excluded_explicit_raw_contact_infeasible"
+    )
+
+    unknown = _state()
+    unknown["calibrated_context"]["contact_budget_seconds"] = None
+    unknown_estimate = estimate_public_actions(unknown)
+    assert unknown_estimate["actions"]["4"]["raw_full_step_contact_fit"] == UNKNOWN
+    assert classify_public_rule_candidates(unknown_estimate)["4"] == (
+        "excluded_unknown_raw_contact_feasibility"
+    )
+
+    for state in (known_no, unknown):
+        info = {"semantic_state": state, "action_mask": [True] * 5}
+        assert CausalPublicImmediateRule().select_action_from_info(info) == 2
+        assert CausalPublicTwoStepRule().select_action_from_info(info) == 2
+
+
+def test_nonraw_public_rules_keep_historical_candidate_surface() -> None:
+    state = _state()
+    state["interface_profile"] = "calibrated_workflow_interface_v4_prepared_state_prefix"
+    state.pop("time_profile", None)
+    estimate = estimate_public_actions(state)
+    classification = classify_public_rule_candidates(estimate)
+    assert all(
+        status in {"eligible_nonraw_contract", "masked"}
+        for status in classification.values()
+    )
+    assert CausalPublicImmediateRule.rule_schema_version == PUBLIC_RULE_SCHEMA_VERSION
+
+
 def test_rule_capabilities_distinguish_public_baselines_from_privileged_references() -> None:
     for rule_type in (CausalPublicImmediateRule, CausalPublicTwoStepRule):
         assert rule_type.capability_profile == "public_causal_semantic_state_only_v1"
         assert rule_type.public_information_matched is True
         assert rule_type.uses_environment_preview is False
+        assert rule_type.rule_schema_version == "causal_public_rule_selection_v2"
         assert rule_type.objective_profile == (
-            "lexicographic_service_deadline_known_readiness_cost_v1"
+            "raw_feasible_then_lexicographic_service_deadline_known_readiness_cost_v2"
         )
 
     for method_name in ("immediate_cost_rule", "two_step_cost_rule"):
