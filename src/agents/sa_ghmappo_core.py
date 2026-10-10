@@ -16,6 +16,10 @@ from torch import nn
 from torch.distributions import Categorical
 
 from src.agents.base_agent import BaseAgent
+from src.agents.causal_public_action_estimator import (
+    EVENT_LABEL_SCHEMA_VERSION,
+    public_prepare_advantage_label,
+)
 from src.agents.popularity_cache_heuristic_agent import PopularityCacheHeuristicAgent
 from src.encoders import FlatSemanticEncoder, SurrogateFusionEncoder
 from src.encoders.calibrated_workflow_features import (
@@ -723,6 +727,7 @@ class 分层PPO基类(BaseAgent):
         mechanism_confidence_floor: float = 0.0,
         mechanism_aux_current_service_feasibility_gate_enabled: bool = False,
         mechanism_aux_missing_current_event_abstention_enabled: bool = False,
+        mechanism_aux_causal_public_prepare_advantage_enabled: bool = False,
         prediction_feature_dim: int = 13,
         prepared_state_features_enabled: bool = False,
         prediction_gate_min_leak: float = 0.0,
@@ -1295,12 +1300,19 @@ class 分层PPO基类(BaseAgent):
         self._mechanism_aux_missing_current_event_abstention_enabled = bool(
             mechanism_aux_missing_current_event_abstention_enabled
         )
-        if (
-            self._mechanism_aux_current_service_feasibility_gate_enabled
-            and self._mechanism_aux_missing_current_event_abstention_enabled
-        ):
+        self._mechanism_aux_causal_public_prepare_advantage_enabled = bool(
+            mechanism_aux_causal_public_prepare_advantage_enabled
+        )
+        if sum(
+            int(enabled)
+            for enabled in (
+                self._mechanism_aux_current_service_feasibility_gate_enabled,
+                self._mechanism_aux_missing_current_event_abstention_enabled,
+                self._mechanism_aux_causal_public_prepare_advantage_enabled,
+            )
+        ) > 1:
             raise ValueError(
-                "event-target hard gate and event-supervision abstention are mutually exclusive"
+                "event auxiliary supervision semantics are mutually exclusive"
             )
         self._prediction_feature_dim = int(prediction_feature_dim)
         self._prepared_state_features_enabled = bool(prepared_state_features_enabled)
@@ -4630,7 +4642,11 @@ class 分层PPO基类(BaseAgent):
             "auxiliary_loss": round(auxiliary_loss_total / denominator, 6),
             "event_aux_supervision_abstention_enabled": (
                 self._mechanism_aux_missing_current_event_abstention_enabled
+                or self._mechanism_aux_causal_public_prepare_advantage_enabled
             ),
+            "event_aux_supervision_semantics": self._checkpoint_config()[
+                "mechanism_aux_event_target_semantics"
+            ],
             "event_aux_supervision_eligible_count": (
                 event_aux_supervision_eligible_total
             ),
@@ -5681,20 +5697,42 @@ class 分层PPO基类(BaseAgent):
                 False,
             )
         )
-        if saved_service_feasible_target and saved_event_abstention:
+        saved_causal_public_prepare_advantage = bool(
+            saved_config.get(
+                "mechanism_aux_causal_public_prepare_advantage_enabled",
+                False,
+            )
+        )
+        if sum(
+            int(enabled)
+            for enabled in (
+                saved_service_feasible_target,
+                saved_event_abstention,
+                saved_causal_public_prepare_advantage,
+            )
+        ) > 1:
             raise ValueError("checkpoint enables mutually exclusive event auxiliary semantics")
         if (
             saved_event_abstention
             != self._mechanism_aux_missing_current_event_abstention_enabled
         ):
             raise ValueError("mechanism auxiliary event-supervision abstention checkpoint mismatch")
+        if (
+            saved_causal_public_prepare_advantage
+            != self._mechanism_aux_causal_public_prepare_advantage_enabled
+        ):
+            raise ValueError("causal public prepare-advantage checkpoint mismatch")
         expected_event_target_semantics = (
             "current_complete_bundle_ready_v1"
             if self._mechanism_aux_current_service_feasibility_gate_enabled
             else (
                 "missing_current_event_abstention_v1"
                 if self._mechanism_aux_missing_current_event_abstention_enabled
-                else "legacy_target_timing_v1"
+                else (
+                    EVENT_LABEL_SCHEMA_VERSION
+                    if self._mechanism_aux_causal_public_prepare_advantage_enabled
+                    else "legacy_target_timing_v1"
+                )
             )
         )
         saved_event_target_semantics = str(
@@ -5706,7 +5744,11 @@ class 分层PPO基类(BaseAgent):
                     else (
                         "missing_current_event_abstention_v1"
                         if saved_event_abstention
-                        else "legacy_target_timing_v1"
+                        else (
+                            EVENT_LABEL_SCHEMA_VERSION
+                            if saved_causal_public_prepare_advantage
+                            else "legacy_target_timing_v1"
+                        )
                     )
                 ),
             )
@@ -15713,13 +15755,20 @@ class 分层PPO基类(BaseAgent):
             "mechanism_aux_missing_current_event_abstention_enabled": (
                 self._mechanism_aux_missing_current_event_abstention_enabled
             ),
+            "mechanism_aux_causal_public_prepare_advantage_enabled": (
+                self._mechanism_aux_causal_public_prepare_advantage_enabled
+            ),
             "mechanism_aux_event_target_semantics": (
                 "current_complete_bundle_ready_v1"
                 if self._mechanism_aux_current_service_feasibility_gate_enabled
                 else (
                     "missing_current_event_abstention_v1"
                     if self._mechanism_aux_missing_current_event_abstention_enabled
-                    else "legacy_target_timing_v1"
+                    else (
+                        EVENT_LABEL_SCHEMA_VERSION
+                        if self._mechanism_aux_causal_public_prepare_advantage_enabled
+                        else "legacy_target_timing_v1"
+                    )
                 )
             ),
             "prediction_feature_dim": self._prediction_feature_dim,
@@ -16562,10 +16611,42 @@ class 分层PPO基类(BaseAgent):
 class SAGHMAPPOBaseAgent(分层PPO基类):
     """? surrogate 控制头动作语义控制头动作语义??"""
 
+    def _event_auxiliary_target(
+        self,
+        semantic_state: dict[str, Any],
+        pseudo_targets: dict[str, float | int],
+    ) -> dict[str, float | int | str]:
+        if not self._mechanism_aux_causal_public_prepare_advantage_enabled:
+            return {
+                "event_target": int(pseudo_targets["event_target"]),
+                "event_soft_target": float(
+                    pseudo_targets.get("event_soft_target", 0.0)
+                ),
+                "supervision_weight": self._event_auxiliary_supervision_weight(
+                    semantic_state
+                ),
+                "decision": "legacy",
+                "reason": "configured_legacy_event_auxiliary_semantics",
+            }
+        label = public_prepare_advantage_label(semantic_state)
+        return {
+            "event_target": int(label["event_target"]),
+            "event_soft_target": float(label["event_soft_target"]),
+            "supervision_weight": float(label["supervision_weight"]),
+            "decision": str(label["decision"]),
+            "reason": str(label["reason"]),
+        }
+
     def _event_auxiliary_supervision_weight(
         self,
         semantic_state: dict[str, Any],
     ) -> float:
+        if self._mechanism_aux_causal_public_prepare_advantage_enabled:
+            return float(
+                public_prepare_advantage_label(semantic_state)[
+                    "supervision_weight"
+                ]
+            )
         if not self._mechanism_aux_missing_current_event_abstention_enabled:
             return 1.0
         if (
@@ -16630,20 +16711,28 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
             confidence = float(pseudo_targets["confidence_weight"])
             if confidence <= 1e-6:
                 continue
+            event_auxiliary_target = self._event_auxiliary_target(
+                semantic_state,
+                pseudo_targets,
+            )
             slow_target = torch.tensor([pseudo_targets["slow_target"]], dtype=torch.long, device=self._device)
             fast_target = torch.tensor([pseudo_targets["fast_target"]], dtype=torch.long, device=self._device)
-            event_target = torch.tensor([pseudo_targets["event_target"]], dtype=torch.long, device=self._device)
+            event_target = torch.tensor(
+                [event_auxiliary_target["event_target"]],
+                dtype=torch.long,
+                device=self._device,
+            )
             slow_loss = nn.functional.cross_entropy(policy_output["slow_logits"].unsqueeze(0), slow_target)
             fast_loss = nn.functional.cross_entropy(policy_output["fast_logits"].unsqueeze(0), fast_target)
             event_loss = nn.functional.cross_entropy(policy_output["event_logits"].unsqueeze(0), event_target)
-            event_supervision_weight = self._event_auxiliary_supervision_weight(
-                semantic_state
+            event_supervision_weight = float(
+                event_auxiliary_target["supervision_weight"]
             )
             temporal_consistency_loss = torch.tensor(0.0, dtype=torch.float32, device=self._device)
             if self._temporal_consistency_coef > 0.0:
                 prepare_margin = (policy_output["event_logits"][1] - policy_output["event_logits"][0]).unsqueeze(0)
                 soft_event_target = torch.tensor(
-                    [float(pseudo_targets.get("event_soft_target", 0.0))],
+                    [float(event_auxiliary_target["event_soft_target"])],
                     dtype=torch.float32,
                     device=self._device,
                 )

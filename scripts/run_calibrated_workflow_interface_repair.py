@@ -115,6 +115,12 @@ def _build_agent(
                         False,
                     )
                 ),
+                "mechanism_aux_causal_public_prepare_advantage_enabled": bool(
+                    config.get(
+                        "mechanism_aux_causal_public_prepare_advantage_enabled",
+                        False,
+                    )
+                ),
             }
         )
     if method in {"sa_ghmappo", "mappo", "dt_handoff_drl"}:
