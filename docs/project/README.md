@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `cscwd_fast_aux_gradient_probe_plan_20261010.md`、`cscwd_fast_aux_gradient_probe_20261010.md`：事前冻结的 20 checkpoint/1,200 步 fast/slow/event CE 与执行动作 PPO 同状态梯度探针；历史训练冲突和科学晋级仍未验证。
+
 - `cscwd_abstention_cost_causal_audit_plan_20261010.md`、`cscwd_abstention_cost_causal_audit_20261010.md` 与 `cscwd_abstention_cost_causal_summary_20261010.json`：候选 `MIXED_STOPPED` 后的事前选择、11 起点/26 分支、模型字节守恒、PPO fallback 对称成本与训练日志 ready 字段缺陷；无新训练或论文结论。
 
 - `cscwd_conditional_abstention_independent_gate_20261010.md`：旧 `MIXED` 分支的时间合同与两处反例对账、B 条件弃权实现的独立无训练 PASS 门禁；不代表科学效果或论文晋级。

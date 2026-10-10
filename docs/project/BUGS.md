@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：fast target 固定零的局部梯度压力已确认，训练因果未证实
+
+- `OBSERVED / fixed-policy probe`：20 槽 1,200 个新 train transition 的 fast target 全 0，fast CE 的 fast_actor 梯度非零，action2 概率对 fast_logit[1] 的局部偏导为正；候选 fast CE/PPO encoder 负点积 selected/fixed96 各仅 3/5 seed。旧/新 checkpoint 文件虽有 20 个，网络参数只有 13 个唯一 SHA。
+- `OPEN / historical causality`：历史 training minibatch 未保存 per-head 梯度，不能把新固定策略探针当作原训练更新，也不能断言删 fast CE 会改善按期率或加载字节。ready/missing 梯度可核验；bytes/deadline/contact 仅计数、bin 内梯度方向 `UNVERIFIED`。旧成本/时间反例并存，科学 verdict 仍 `MIXED_STOPPED`。见 `cscwd_fast_aux_gradient_probe_20261010.md`。
+
 ## 2026-10-10：训练 current-bundle-ready 信号记录恒假（确定日志缺陷）
 
 - `CONFIRMED / logging producer`：`_training_signal_row` 用缺失的 `semantic_state.current_rsu_id` 查 RSU，而 v4 公开合同以 primary vehicle 的 `associated_rsu_id` 表示当前 RSU。候选 28,800 行及旧 v4 四 learned 115,200 行训练信号 `current_bundle_ready` 均为 `False`；实际 ready 状态最小见证为 `True` 而记录 `False`。这使历史训练行为按 ready 分层不可用；不能依据该日志推断全体训练状态都缺模型。

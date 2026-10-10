@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-10：fast auxiliary 冻结策略梯度探针完成，学习根因仍未证实
+
+- 事前计划 commit `900c79e`；旧 v4/条件弃权 SA 各 5 seed×selected/update96，每 checkpoint 一批 60 个 train transition，共 20 槽/1,200 env.step、13 个唯一网络参数状态、0 训练/参数更新/正式 split。实际执行动作新旧 logprob 最大差 `5.07e-7`，参数前后 SHA 全同；固定公开 reset 状态的 action2 fast-logit 偏导与有限差分 20/20 同向。
+- fast target `1,200/1,200` 为 0，但候选 selected/fixed96 的 fast CE 与 executed PPO 在共享 encoder 的负点积均仅 `3/5` seed，fast actor 分别 `3/5`、`2/5`；方向不跨 seed 稳定。ready/missing 由公开 primary vehicle RSU 重建，不使用旧错误训练日志；其余 bytes/deadline/contact bin 只留计数，bin 内梯度方向未验证。历史训练 minibatch 不存在，历史冲突仍 `UNVERIFIED`。
+- 报告 `cscwd_fast_aux_gradient_probe_20261010.md`、manifest 和逐槽 JSON 完整列出 denominator、原系数梯度与零范数。旧科学 verdict `MIXED_STOPPED`、优秀基线/论文判断 `Unverifiable` 均不变；若另立实验，只能单独变 fast CE 权重并事前冻结，不同时删除 slow/event。
+
 ## 2026-10-10：条件弃权后加载与时效退化已做有界因果定位
 
 - 事前选择计划 commit `5102b48`；B candidate 与旧 v4 SA/PPO 原件分别 40/40、119/119 hash+size 通过。相同 episode 双视角配对并重放 600 episode/4,203 记录动作；对象模型字节与每步 clock 分项全守恒。11 个确定顺序首次共同状态起点实际执行 26 条合法 clone 分支、105 额外 env.step，低于 36/864 上限；0 新训练、0 formal/holdout。

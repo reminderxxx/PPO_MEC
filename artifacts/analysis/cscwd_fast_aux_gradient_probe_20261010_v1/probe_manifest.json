@@ -1,0 +1,148 @@
+{
+  "action2_sensitivity_validation": {
+    "environment_steps": 0,
+    "name": "action2_sensitivity_validation.json",
+    "sha256": "4bf26b08ba45abca68780a092856dfdc3a0fb9c9bf670bce6022b65f62d5c29f"
+  },
+  "aggregate_summary": {
+    "name": "aggregate_summary.json",
+    "sha256": "b71c36da5d12e41fb933dd85157695866e6ba3435339e00ca40178a536e7f98e"
+  },
+  "plan_commit": "900c79e",
+  "protocol_sha256": "61295f49d03ce2f9c4f2b8cf644bc66d6a0436f43b10a61ad9b846776b54b6c4",
+  "schema_version": "cscwd_fast_aux_gradient_probe_v1",
+  "slots": [
+    {
+      "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+      "name": "control_seed7_selected.json",
+      "sha256": "f16f570754bc362de21cc1a32bfd60c6245df84c66428b6b32ca68b4c2f5ed2a",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "21899b85f8ca9cb06f11b13e5f18db4678e22d8ace64f3814f48b79953ba0203",
+      "name": "control_seed7_update96.json",
+      "sha256": "4ff825fc3b1f21791f1f9b287ff122c5537383f230d20f70da67d05ce674a3d0",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "60553b0cbe930355a6abeebb05dde54faaed3b0722169d912c263c72714d80b5",
+      "name": "control_seed17_selected.json",
+      "sha256": "d3f1f8ee2f12a1da5e59349584239761919364f8e1c1f2deae2a3f6a3773577c",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "c70c8b78b494ebf4b0b174e042be24e12b0a7ca83d2bc7337efffa933059a589",
+      "name": "control_seed17_update96.json",
+      "sha256": "aaac8df20867c27f3e583aecccb4d1bbb635036a2e3d153d6224f70f50debef5",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "143572731acc01b3cc3a7c300052c1669ef501ba734aae1a9dc1fedccbc9d4e5",
+      "name": "control_seed29_selected.json",
+      "sha256": "45c37f8bd6f773eae824ad03471e5ceb764fda0edaf09deeedc34ed44088a14c",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "e5a075de5f6c52bdd30aa0f5689bd26081b17f69ea9e676e94af92266f375e96",
+      "name": "control_seed29_update96.json",
+      "sha256": "fac403656ba95973b6335db51f8904bfe2057bc15685325d9efe6ffd51cbd3ae",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "10e98fe428a86ff4b83d7585e61a1cde53e1befbb326df8c11bd1c244cdf3d46",
+      "name": "control_seed43_selected.json",
+      "sha256": "ab00233144d38640a60dfec8bf1a8dfe7e0fe99c8251c11ddc8c411e3e3ad976",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "75b5c1131da2d94d03a8972609f88b75765f821aa78403e9df26d147977f25f0",
+      "name": "control_seed43_update96.json",
+      "sha256": "5b180ed00d868070b778560baba161ebe90654bb1644b9b4bff866d4d175e1c8",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "0504d0271e5acc6914a3349e1dfccaf215e9c4efe0683c0a399b1c65c1beb84d",
+      "name": "control_seed61_selected.json",
+      "sha256": "bb0547a14cfede377bd41cc265021d07dbb408f3870c0065b24b5b19651c7872",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "d5b18b6ef02b22937bf7a8abf5d48f2b31d917b1e6b795b0551c4b751869d65d",
+      "name": "control_seed61_update96.json",
+      "sha256": "06549ef8c15e13348a480d5c307e4a4da5a0f91e2a138c8ad8512717fc2f35fb",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+      "name": "candidate_seed7_selected.json",
+      "sha256": "3073e954f3697ea78c9466b16a497815213be68e88d935c55689ea665995c0ba",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "8f4703a47f98b51e11a38d90ec6f3019226cb93fcddcc7c2b497a1b0fbcef804",
+      "name": "candidate_seed7_update96.json",
+      "sha256": "1405e99590ce5e8a215c2a06d46a131cd57868ef5bc3ff8c4adf9e37202eda38",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "b4d1d6f42ce45d8e049de9873bd1bf05fb4f5be190fe494a6f2ab6bfedbdda5c",
+      "name": "candidate_seed17_selected.json",
+      "sha256": "25f7d549420fb0c7f4ad24a7a2dec3ba9effe3ee7eee7ea7f6cc72ec3ac12ab2",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "83e7b349a31711b65529c5b4fde8678fd100dd06723d783f06fb9a8488d9727b",
+      "name": "candidate_seed17_update96.json",
+      "sha256": "5f22ba63c441996f575b9a9adde333a8e04d8621da6a8f1de7ceb003f85bf3fd",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "787e20a6ab10e036b545e484cda8a3c6630090cdd9d3e1a45e15f13410c390eb",
+      "name": "candidate_seed29_selected.json",
+      "sha256": "e467a87a9767b23f92ab08101a5c8194d5d97bb7dbafaaf96969c6556d9168e5",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "ddb08ea56d972aaaa224579d284cd16b4c7633410b534f8a89bec1f6b9c3f10c",
+      "name": "candidate_seed29_update96.json",
+      "sha256": "8fc2d79717e4ad9444a3f368348fae44bad49a1f57628deaf7c18cb84ae31be1",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "952c6da3ce11f366f77447b0eac59cc881d5910fe0b8a0bcafb14dc043d4eed7",
+      "name": "candidate_seed43_selected.json",
+      "sha256": "5c08d8efd46151e115d3ac15fc87009e53c641eabd7cf78dc00cee68ae7beeee",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "96ca05ad18d2ac831d0e3533b9b9b459345a8f3a6e2454777e9a41e03b71ba98",
+      "name": "candidate_seed43_update96.json",
+      "sha256": "3f08c0739244518da62e20abf783b582fb33c4db084b4486bf8f26629cf765d5",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "6e29f2ed8d94b91b1a248f19ba665d06391f170aaaa91ff68950a0ecc8844d70",
+      "name": "candidate_seed61_selected.json",
+      "sha256": "45af15ee7c7fabdd759aa39bd9f3083c027ccafb52f8c6d96032bc83fc2d18c9",
+      "steps": 60
+    },
+    {
+      "checkpoint_sha256": "103397b98f36e41a0d848a1d709cb214407533efd637e3ab2399b8737a1b3af7",
+      "name": "candidate_seed61_update96.json",
+      "sha256": "4f098b0542bd32f92405de926bd5b7de3298b066425073c8d0e72e3443898726",
+      "steps": 60
+    }
+  ],
+  "source_artifact_integrity_sha256": {
+    "candidate": "fa03b3fe9eed9af66f96e10e10d90db380b13a28893716071a395a8e4eb129cc",
+    "control": "b66dfb946d2fef8c8e93b3ffacd7f332c1280635c7c635ef1f58f7eb8c4e2ac1"
+  },
+  "source_commit": "8176c8c7d96d3d1d360b49a928a9e29cd5ab2aaf",
+  "source_root": "/Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC",
+  "source_run_manifest_sha256": {
+    "candidate": "d9f256b6277c6b358b7eafd329f118f1f56884b67d94640bfcb8775d29fa880c",
+    "control": "48718e48dc55e6958c03b676634dca53e84fd21be251115d4809380a1441c615"
+  },
+  "status": "complete",
+  "total_environment_steps": 1200
+}
