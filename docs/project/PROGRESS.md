@@ -5,6 +5,15 @@
 
 ﻿# Progress
 
+## 2026-10-10：training signal current readiness 生产者错误已最小修复
+
+- A 独立执行 4,203 记录动作成本重放及 11 起点/26 分支/105 新分支步，逐对象模型字节和 clock 守恒；新增字节主要被后续
+  服务使用，PPO action2 也完整支付 fallback/node compute/input。没有确认模型加载或 fallback 漏费。
+- 唯一确定实现缺陷是 `_training_signal_row` 读取不存在的 `semantic_state.current_rsu_id`，令候选 28,800 行和旧 v4
+  115,200 行 `current_bundle_ready` 全 False。修复为 primary vehicle `associated_rsu_id`，并覆盖 ready/missing 与非首位 primary。
+- 该字段未进入 agent abstention、loss、optimizer receipt、selection、评价或 event candidate finalizer，故不改变 checkpoint 和
+  `MIXED_STOPPED`。旧 CSV 保留；create-only sidecar 只标记字段无效，0 training/evaluation/reselection。
+
 ## 2026-10-10：event auxiliary abstention 科学 run 完成；MIXED 后停止
 
 - hard-zero predecessor 保持 `MIXED_STOPPED`。新候选不把 current-missing event target 改成 0，只令 event CE 和依赖同一

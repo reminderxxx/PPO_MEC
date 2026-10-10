@@ -1,5 +1,11 @@
 ﻿# Directory Structure
 
+## 2026-10-10 training signal readiness 日志纠错
+
+- `scripts/audit_calibrated_workflow_training_signal_readiness_correction.py`：核验两个冻结原件及历史字段缺陷，生成不覆盖原件的
+  correction sidecar；0 training/evaluation/reselection。
+- `docs/project/cscwd_training_signal_readiness_correction_20261010.md`：缺陷、消费者影响、验收与不重训边界。
+
 ## 2026-10-10 event auxiliary abstention 候选
 
 - `configs/experiment/calibrated_workflow_event_aux_abstention_ab_v1.json`：唯一变量、旧 MIXED predecessor、v4 control hashes、

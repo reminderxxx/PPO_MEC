@@ -18,6 +18,7 @@ from scripts.run_calibrated_workflow_value_normalization_ab import (
     _analyze_gates,
     _collect_exact_update_batch,
     _selection_score,
+    _training_signal_row,
     _validate_intervals,
 )
 
@@ -111,6 +112,54 @@ def test_checkpoint_selection_score_does_not_use_reward() -> None:
     }
     changed = dict(row, reward=10_000.0)
     assert _selection_score([row]) == _selection_score([changed])
+
+
+def _training_signal_fixture(current_rsu_id: str) -> dict:
+    semantic_state = {
+        "primary_vehicle_id": "primary",
+        "vehicles": [
+            {"vehicle_id": "other", "associated_rsu_id": "rsu_missing"},
+            {"vehicle_id": "primary", "associated_rsu_id": current_rsu_id},
+        ],
+        "rsus": [
+            {"rsu_id": "rsu_ready", "cached_adapter_ids": ["adapter_a"]},
+            {"rsu_id": "rsu_missing", "cached_adapter_ids": []},
+        ],
+        "current_workflow_node": {"required_adapter": "adapter_a"},
+    }
+    return {
+        "action_info": {"env_action_log_prob": -0.5, "env_action_probs": [1.0]},
+        "decision_info": {"semantic_state": semantic_state},
+        "training_episode_index": 1,
+        "rollout_segment_index": 0,
+        "action": 0,
+        "reward": 1.0,
+        "terminated": False,
+        "truncated": False,
+        "value": 0.0,
+        "return": 1.0,
+        "advantage": 1.0,
+        "log_prob": -0.5,
+    }
+
+
+@pytest.mark.parametrize(
+    ("current_rsu_id", "expected_ready"),
+    (("rsu_ready", True), ("rsu_missing", False)),
+)
+def test_training_signal_resolves_primary_vehicle_current_bundle_readiness(
+    current_rsu_id: str,
+    expected_ready: bool,
+) -> None:
+    signal = _training_signal_row(
+        arm="candidate",
+        method="sa_ghmappo",
+        seed=7,
+        update_index=1,
+        global_step=1,
+        row=_training_signal_fixture(current_rsu_id),
+    )
+    assert signal["current_bundle_ready"] is expected_ready
 
 
 def test_interval_validator_uses_raw_identity_and_rejects_overlap() -> None:

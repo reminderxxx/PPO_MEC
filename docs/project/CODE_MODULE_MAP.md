@@ -1,5 +1,9 @@
 # Code Module Map
 
+`scripts/run_calibrated_workflow_value_normalization_ab.py::_training_signal_row` 通过 primary vehicle 的 `associated_rsu_id` 计算
+current bundle readiness；它只生产训练行为日志，不参与 agent loss。`scripts/audit_calibrated_workflow_training_signal_readiness_correction.py`
+核验候选/旧 v4 integrity 与历史全 False 见证，并发布 create-only invalid-field correction sidecar，不重放环境或改旧行。
+
 `src/agents/sa_ghmappo_core.py` 的 opt-in `mechanism_aux_missing_current_event_abstention_enabled` 只给 current-missing 样本的
 event CE/temporal-margin 乘 0 权重，保留 legacy confidence-eligible 分母，并把 eligible/supervised/abstained 计数写入 optimizer
 日志与 update summary；checkpoint 记录 `missing_current_event_abstention_v1`。`scripts/run_calibrated_workflow_interface_repair.py`

@@ -5,6 +5,19 @@
 
 # Runbook
 
+## Training signal readiness correction sidecar（2026-10-10）
+
+先提交并 push 生产者修复，再在 clean commit 上运行一次：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/audit_calibrated_workflow_training_signal_readiness_correction.py \
+  --expected-git-commit <FIX_COMMIT>
+```
+
+输出固定为 `artifacts/analysis/cscwd_training_signal_readiness_correction_20261010_v1/`，create-only。不得覆盖候选/v4 的旧
+`training_signal_rows.csv`，不得用 correction sidecar 重判 checkpoint 或触发训练。
+
 ## Event auxiliary abstention 条件执行（2026-10-10；独立门禁已 PASS）
 
 唯一 scientific run 已完成且判为 `MIXED_STOPPED`，以下 launch 命令仅作历史记录，不得再次执行。最终只读结果位于

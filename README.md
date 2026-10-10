@@ -5,6 +5,10 @@
 
 # PPO_MEC
 
+2026-10-10 已修复 training signal 日志的 current-RSU 地址错误：历史候选 28,800 行和 v4 115,200 行
+`current_bundle_ready` 全 False，现只标记为无效、不覆盖原件；agent 训练和 event candidate 的 `MIXED_STOPPED` 未见受影响。
+见[纠错报告](docs/project/cscwd_training_signal_readiness_correction_20261010.md)。
+
 2026-10-10 新冻结的 [event auxiliary abstention 候选](docs/project/cscwd_event_aux_abstention_candidate_20261010.md)
 只在 SA current-missing 样本上令 event CE/temporal-margin 监督权重为 0，不重标 target，保留 PPO 对 action4 长期收益的学习。
 它与已被 MIXED 否决的 hard-zero 候选分离；唯一 development A/B 已完成并按预注册门槛判为 `MIXED_STOPPED`：selected

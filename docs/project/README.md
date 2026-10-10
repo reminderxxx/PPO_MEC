@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `cscwd_training_signal_readiness_correction_20261010.md`：训练信号日志 current RSU 地址纠错、历史 144,000 行无效字段标记、
+  消费者影响与 0-training correction sidecar；不改变 event candidate 的 `MIXED_STOPPED`。
+
 - `cscwd_event_aux_abstention_{candidate,results,claim_change}_20261010.md`：hard-zero MIXED 后的唯一弱干预、完成的匹配开发
   A/B 与论文禁行边界。结果为 `MIXED_STOPPED`：失败可靠性改善，但 fixed96 seed gate 与传输/重算成本不支持整体成功。
 

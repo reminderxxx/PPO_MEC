@@ -5,6 +5,15 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：training signal readiness 错误已修生产者；历史字段保持无效
+
+- `RESOLVED PRODUCER`：`_training_signal_row` 现从 primary vehicle 的 `associated_rsu_id` 解析当前 RSU；ready/missing 和 primary
+  不在首位的回归覆盖。未来 `value_normalization` behavior gate 将消费正确字段。
+- `HISTORICAL INVALID FIELD`：候选 28,800 行与旧 v4 115,200 行的 `current_bundle_ready` 不可用于 readiness 分层；不覆盖
+  原 CSV，也不伪造修正值。目前无证据表明 agent loss、optimizer、checkpoint、评价或 `MIXED_STOPPED` 受影响。
+- `UNKNOWN`：fast/slow CE 与 executed-action PPO 的同 minibatch per-head 梯度方向仍缺日志，不得据当前行为删除 slow/fast、
+  调 reward 或加 action guard；需要时只能做固定 checkpoint/rollout、无参数更新的单一 probe。
+
 ## 2026-10-10：event abstention 是待审计学习候选，不是已证修复
 
 - `IMPLEMENTED DEFAULT-OFF`：current-missing 只 abstain event CE/temporal-margin，不重标 hard/soft target；current-ready 和

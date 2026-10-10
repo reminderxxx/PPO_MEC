@@ -332,7 +332,18 @@ def _training_signal_row(
     projection = dict(action_info.get("action_projection", {}))
     decision_info = dict(row.get("decision_info", {}))
     semantic = dict(decision_info.get("semantic_state", {}))
-    current_rsu = rsu_by_id(semantic, semantic.get("current_rsu_id"))
+    vehicles = list(semantic.get("vehicles", []) or [])
+    primary_vehicle_id = semantic.get("primary_vehicle_id")
+    primary_vehicle = next(
+        (
+            vehicle
+            for vehicle in vehicles
+            if primary_vehicle_id is not None
+            and str(vehicle.get("vehicle_id", "")) == str(primary_vehicle_id)
+        ),
+        vehicles[0] if vehicles else {},
+    )
+    current_rsu = rsu_by_id(semantic, primary_vehicle.get("associated_rsu_id"))
     current_ready = bundle_ready(
         semantic,
         current_rsu,

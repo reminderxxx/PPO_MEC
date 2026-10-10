@@ -1,5 +1,11 @@
 ﻿# Decision Log
 
+## 2026-10-10：只修训练信号日志地址，不修改成本或算法
+
+- A 原生事件账证明 object bytes、step clock 和 action2 fallback 计费守恒；可靠性—成本交换是合法 Pareto 结果，不作为 bug。
+- 只纠正 `_training_signal_row` 的 current RSU 地址，保留旧 artifact 并发布 invalid-field sidecar；不重训、不重评、不重选模。
+- fast/slow 梯度冲突仍为 Unknown；若未来继续，只允许预注册无参数更新 probe，不能直接关 loss 或搜索新候选。
+
 ## 2026-10-10：hard-zero MIXED 后只冻结 event-supervision abstention
 
 - 多步反例否定 current-missing 一律重标为 0，但不要求继续保留短期 event 伪标签监督。唯一候选因此改为 current-missing

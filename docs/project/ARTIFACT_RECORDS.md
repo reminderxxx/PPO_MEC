@@ -5,6 +5,16 @@
 
 # Artifact Records
 
+## 2026-10-10 abstention cost causal audit 与 training-signal correction
+
+- A audit commit/tree=`7734d5807feaa66ac3f40e89ca8ff86f911f0783`/
+  `210c1727c7947ba80dce6066fc158f969b6496f5`；报告/摘要/有界/补充 SHA-256=`3354ee27…`/`45498f30…`/
+  `859abe71…`/`ee49c70b…`。11 起点、26 分支、105 新分支步、4,203 记录动作重放，0 training/formal/holdout。
+- 对象级 `110,983,569,096` bytes 与 transition 汇总守恒，step clock 逐项守恒；PPO 762 个 action2 均支付 8s fallback、
+  node compute 与 input。未确认加载/计费 bug，candidate verdict 仍 `MIXED_STOPPED`。
+- 确认日志生产者缺陷：candidate 28,800/28,800 与旧 v4 115,200/115,200 training-signal rows 的 readiness 全 False。
+  旧原件不覆盖；correction sidecar 在生产者修复 commit 后 create-only 生成并另行登记 hash。
+
 ## 2026-10-10 event auxiliary abstention independent-gate preflight（无 scientific run）
 
 - 协议：`configs/experiment/calibrated_workflow_event_aux_abstention_ab_v1.json`；run ID 仅预留为
