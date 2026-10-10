@@ -12,11 +12,25 @@
 ```bash
 /Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/freeze_cscwd_new_development_source.py \
   --raw-csv-path '/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
-  --output-root artifacts/analysis/cscwd_new_development_source_20261011_v1
+  --output-root artifacts/analysis/cscwd_new_development_source_20261011_v2
 /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_cscwd_new_development_source.py
 ```
 
 只有 `source_manifest.json` 给出合格窗口且后续可达性与公共 planner 门独立通过，才允许 B 的一次条件训练。旧 formal/hidden/sealed 结果和匿名计划均不读作筛选依据。
+本机 v1 目录是数字文本修复后 JSON 序列化失败留下的未完成输出；结论只以 v2 为准，不覆盖 v1。
+
+在已核验的固定来源 manifest 上，`scripts/audit_cscwd_new_development_reachability.py` 只读导入 B 分支 SHA 固定的公共估计器规则；原始坐标只在内存中重建，不写结果文件。create-only 命令如下，不能把 `source_manifest` 指向旧 24 帧资格清单：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_cscwd_new_development_reachability.py \
+  --raw-csv-path '/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
+  --source-manifest artifacts/analysis/cscwd_new_development_source_20261011_v2/source_manifest.json \
+  --public-estimator-path /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/src/agents/causal_public_action_estimator.py \
+  --output-root artifacts/analysis/cscwd_new_development_reachability_20261011_v1
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_cscwd_new_development_reachability.py
+```
+
+`actual_contact_budget_seconds_privileged_diagnostic` 仅进只读逐步 ledger，不传给公共规则；`preview_count_upper_bound` 包含 raw executor 的 native 预览与公共估计器调用上界。实验上限固定为 60 episode/1,440 实际 step/5,000 preview。
 
 ## CSCWD 已授权 development 原始区间资格（2026-10-11；已完成）
 
