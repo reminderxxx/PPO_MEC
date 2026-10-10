@@ -12,6 +12,8 @@ fail-closed，并将 create-only analysis 与只读 scientific root 分离。`sc
 `scripts/run_calibrated_workflow_prepared_state_visibility_matched.py` 绑定 A 实现、历史 scientific/checkpoint/rule hashes、共同预算
 和 selected/update-96 角色；`scripts/analyze_calibrated_workflow_prepared_state_visibility_matched.py` 只读显式键配对两 arm，
 `scripts/launch_calibrated_workflow_prepared_state_visibility_matched.py` 负责单次持久监督和 create-only 自动分析。
+`scripts/finalize_calibrated_workflow_prepared_state_visibility_matched.py` 在科学 run 完成后只读生成 v2：逐 seed/split 原始计数、
+完整 800 配对、规则引用、服务失败定义与预注册双视角门禁；不训练、不评价、不覆盖 v1。
 
 `scripts/diagnose_cscwd_sa_long_budget_cost.py` 只读 B 长预算原件，用 A 的相同因果环境代码重放已记录动作并分解 node/fallback/failure/load/三类网络传输/restore/recompute；同实例 seed 配对但不将首次分叉之后的不同状态当作单动作因果。`scripts/audit_cscwd_long_budget_state_alias.py` 只读上述重放和原 ledger，核验未公开的 prepared-state 有效性造成的同公开状态别名；两者均不训练、不修改 B 或论文。
 
