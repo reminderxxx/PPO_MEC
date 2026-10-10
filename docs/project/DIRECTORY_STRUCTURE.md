@@ -1,5 +1,14 @@
 ﻿# Directory Structure
 
+## 2026-10-11 public estimator phase-accounting fix
+
+- `src/agents/causal_public_action_estimator.py`：`v2` fail-closed action phase、public raw full-step contact 表达与 actual-cost
+  unavailable 边界；不调用 env clone/step。
+- `scripts/audit_cscwd_public_estimator_phase_conformance.py`：生成 6-case synthetic conformance 与 manifest/hash，0 raw rows、
+  0 training/evaluation。
+- `artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v1/`：轻量 JSON 回执，不含数据或权重。
+- `docs/project/cscwd_public_estimator_phase_accounting_fix_20261011.md`：实现、验证、训练停止门与未覆盖风险。
+
 ## 2026-10-10 causal public action advantage
 
 - `src/agents/causal_public_action_estimator.py`：共同 public action 成本/可行性估计、public immediate/two-step rules 与

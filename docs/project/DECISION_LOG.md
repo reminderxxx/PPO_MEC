@@ -1,5 +1,14 @@
 ﻿# Decision Log
 
+## 2026-10-11：完成 estimator 纠错；数据资格失败前不训练
+
+- 已按唯一变量完成 `v2` fail-closed 阶段核算，保留 raw executor/mask/reward/label 原则和所有训练预算；这是公共接口纠错，
+  不是算法创新或性能证据。
+- synthetic conformance 只验证 native action4 顺序、失败 rollback、unknown 和公共 contact 表达；不将实际未来 trace/contact
+  作为 online 输入。exact clone 的权限缺陷继续单列 blocker。
+- 条件训练仍需独立 development 数据资格。现有授权的 40 个 train/dev interval 均为 24 帧/2.3 s，当前资格检查为 0 个可用
+  长窗；因此不启动 4 方法×5 seed 训练，不扩预算、换窗口或读取 sealed 结果。
+
 ## 2026-10-11：先修公共 estimator 的 fail-closed phase accounting，不扩窗或训练
 
 - 只读账本确认 raw 短窗与 full-step atomic gate 足以解释当前零 workflow/零成功 prepare；prepare 阶段本身存在 contact 内可行

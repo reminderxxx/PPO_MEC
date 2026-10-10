@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `cscwd_public_estimator_phase_accounting_fix_20261011.md`：`v2` fail-closed phase accounting、6-case synthetic
+  estimator↔native conformance、artifact hash 与训练继续关闭的边界。
+
 - `cscwd_public_estimator_executor_consistency_20261011.md`：v4 30 个 raw 决策的 requested/legal/executed/rejection 账本、
   action4 阶段语义、公共 estimator↔native/raw executor 差异、最小反例与唯一 fail-closed phase-accounting 下一改动；0 训练。
 

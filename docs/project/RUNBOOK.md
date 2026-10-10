@@ -5,6 +5,19 @@
 
 # Runbook
 
+## Public estimator phase conformance（2026-10-11）
+
+只生成合成接口回执，不读 raw 数据、checkpoint 或评价结果，也不训练：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/audit_cscwd_public_estimator_phase_conformance.py
+```
+
+输出固定为 `artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v1/`。运行后须核验 manifest 的
+`source_commit`、文件 SHA-256、6 个 case 以及 raw/training/optimizer/evaluation 计数全为 `0`。该命令不授权条件训练；
+development 数据资格未通过时必须停止。
+
 ## Training signal readiness correction sidecar（2026-10-10）
 
 以下命令已在修复 commit 上运行一次，只作历史记录，不得重跑或覆盖：

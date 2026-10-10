@@ -1,5 +1,9 @@
 # CSCWD action mask 与公共估计器—执行端一致性审查（2026-10-11）
 
+> 2026-10-11 后续实现：本报告定位的 phase-accounting 缺陷已由
+> `cscwd_public_estimator_phase_accounting_fix_20261011.md` 在 commit `ce20727e…` 最小修复并通过合成 conformance；
+> 本报告的 v4 历史账本和“候选未测试”边界不变。
+
 ## 审查身份与结论
 
 - `reviewed_at`: 2026-10-11 Asia/Shanghai

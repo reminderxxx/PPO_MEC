@@ -1,0 +1,216 @@
+{
+  "cases": [
+    {
+      "case": "ready_action4_commit",
+      "estimated_matches_native_cost": true,
+      "native_transition": {
+        "migration_success": true,
+        "model_transfer_bytes": 1024667776,
+        "service_completed": true,
+        "state_transfer_bytes": 2195,
+        "state_transfer_status": "prepared_after_current_node_completion",
+        "step_cost_seconds": 12.610111768
+      },
+      "public_estimate": {
+        "cost_status": "known_conditional_estimate",
+        "current_service": "yes",
+        "deadline_fit": "yes",
+        "estimated_phase_seconds": {
+          "current_model_prepare": null,
+          "current_service": 3.798119,
+          "target_model_prepare": 8.787563208,
+          "target_state_commit": 0.02442956
+        },
+        "estimated_total_seconds": 12.610111768,
+        "model_transfer_bytes": 1024667776,
+        "phase_status": {
+          "current_model_prepare": "not_applicable",
+          "current_service": "known_estimate",
+          "target_model_prepare": "known_estimate",
+          "target_state_commit": "known_estimate"
+        },
+        "raw_execution_fit": "no",
+        "raw_full_step_contact_fit": "no",
+        "raw_trace_fit": "unknown",
+        "state_transfer_bytes": 2195,
+        "target_prepare": "yes",
+        "target_prepare_contact_fit": "yes",
+        "target_state_commit": "yes",
+        "unknown_reasons": []
+      }
+    },
+    {
+      "case": "missing_current_action4_failure",
+      "estimated_matches_native_cost": true,
+      "native_transition": {
+        "migration_success": false,
+        "model_transfer_bytes": 1024667776,
+        "service_completed": false,
+        "state_transfer_bytes": 0,
+        "state_transfer_status": "staged_pending_current_node_completion",
+        "step_cost_seconds": 10.787563208
+      },
+      "public_estimate": {
+        "cost_status": "known_conditional_estimate",
+        "current_service": "no",
+        "deadline_fit": "yes",
+        "estimated_phase_seconds": {
+          "current_model_prepare": null,
+          "current_service": 2.0,
+          "target_model_prepare": 8.787563208,
+          "target_state_commit": null
+        },
+        "estimated_total_seconds": 10.787563208,
+        "model_transfer_bytes": 1024667776,
+        "phase_status": {
+          "current_model_prepare": "not_applicable",
+          "current_service": "known_failure_estimate",
+          "target_model_prepare": "known_estimate",
+          "target_state_commit": "skipped_current_service_failed"
+        },
+        "raw_execution_fit": "no",
+        "raw_full_step_contact_fit": "no",
+        "raw_trace_fit": "unknown",
+        "state_transfer_bytes": 0,
+        "target_prepare": "yes",
+        "target_prepare_contact_fit": "yes",
+        "target_state_commit": "no",
+        "unknown_reasons": []
+      }
+    },
+    {
+      "case": "prepare_contact_rollback",
+      "estimated_matches_native_cost": true,
+      "native_transition": {
+        "migration_success": false,
+        "model_transfer_bytes": 0,
+        "service_completed": true,
+        "state_transfer_bytes": 0,
+        "state_transfer_status": "not_ready_before_handoff",
+        "step_cost_seconds": 3.798119
+      },
+      "public_estimate": {
+        "cost_status": "known_conditional_estimate",
+        "current_service": "yes",
+        "deadline_fit": "yes",
+        "estimated_phase_seconds": {
+          "current_model_prepare": null,
+          "current_service": 3.798119,
+          "target_model_prepare": null,
+          "target_state_commit": null
+        },
+        "estimated_total_seconds": 3.798119,
+        "model_transfer_bytes": 0,
+        "phase_status": {
+          "current_model_prepare": "not_applicable",
+          "current_service": "known_estimate",
+          "target_model_prepare": "rolled_back_contact",
+          "target_state_commit": "skipped_target_prepare"
+        },
+        "raw_execution_fit": "unknown",
+        "raw_full_step_contact_fit": "yes",
+        "raw_trace_fit": "unknown",
+        "state_transfer_bytes": 0,
+        "target_prepare": "no",
+        "target_prepare_contact_fit": "no",
+        "target_state_commit": "no",
+        "unknown_reasons": []
+      }
+    },
+    {
+      "case": "prepare_feasible_full_step_contact_insufficient",
+      "estimated_matches_native_cost": true,
+      "native_transition": {
+        "migration_success": true,
+        "model_transfer_bytes": 1024667776,
+        "service_completed": true,
+        "state_transfer_bytes": 2195,
+        "state_transfer_status": "prepared_after_current_node_completion",
+        "step_cost_seconds": 12.610111768
+      },
+      "public_estimate": {
+        "cost_status": "known_conditional_estimate",
+        "current_service": "yes",
+        "deadline_fit": "yes",
+        "estimated_phase_seconds": {
+          "current_model_prepare": null,
+          "current_service": 3.798119,
+          "target_model_prepare": 8.787563208,
+          "target_state_commit": 0.02442956
+        },
+        "estimated_total_seconds": 12.610111768,
+        "model_transfer_bytes": 1024667776,
+        "phase_status": {
+          "current_model_prepare": "not_applicable",
+          "current_service": "known_estimate",
+          "target_model_prepare": "known_estimate",
+          "target_state_commit": "known_estimate"
+        },
+        "raw_execution_fit": "no",
+        "raw_full_step_contact_fit": "no",
+        "raw_trace_fit": "unknown",
+        "state_transfer_bytes": 2195,
+        "target_prepare": "yes",
+        "target_prepare_contact_fit": "yes",
+        "target_state_commit": "yes",
+        "unknown_reasons": []
+      }
+    },
+    {
+      "case": "private_eviction_order_unknown",
+      "expected_contract": {
+        "cost_status": "unknown_required_phase",
+        "deadline_fit": "unknown",
+        "estimated_total_seconds": null
+      },
+      "public_estimate": {
+        "cost_status": "unknown_required_phase",
+        "current_service": "yes",
+        "deadline_fit": "unknown",
+        "estimated_phase_seconds": {
+          "current_model_prepare": null,
+          "current_service": 3.798119,
+          "target_model_prepare": null,
+          "target_state_commit": null
+        },
+        "estimated_total_seconds": null,
+        "model_transfer_bytes": null,
+        "phase_status": {
+          "current_model_prepare": "not_applicable",
+          "current_service": "known_estimate",
+          "target_model_prepare": "unknown",
+          "target_state_commit": "conditional_unknown"
+        },
+        "raw_execution_fit": "unknown",
+        "raw_full_step_contact_fit": "unknown",
+        "raw_trace_fit": "unknown",
+        "state_transfer_bytes": null,
+        "target_prepare": "unknown",
+        "target_prepare_contact_fit": "unknown",
+        "target_state_commit": "unknown",
+        "unknown_reasons": [
+          "requires_private_eviction_order"
+        ]
+      }
+    },
+    {
+      "case": "hidden_trace_end",
+      "estimates_equal": true,
+      "forbidden_fields": [
+        "instance.rsu_sequence",
+        "actual link",
+        "realized future position/contact",
+        "environment clone/step",
+        "reward/outcome label"
+      ],
+      "raw_trace_fit": "unknown"
+    }
+  ],
+  "evaluation_episodes": 0,
+  "evidence_scope": "synthetic_contract_only_not_algorithm_performance",
+  "optimizer_steps": 0,
+  "raw_rows_read": 0,
+  "run_id": "cscwd_public_estimator_phase_conformance_20261011_v1",
+  "schema_version": "cscwd_public_estimator_phase_conformance_v1",
+  "training_steps": 0
+}

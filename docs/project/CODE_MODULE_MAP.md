@@ -1,11 +1,15 @@
 # Code Module Map
 
 `src/agents/causal_public_action_estimator.py` 从共同 public semantic state/action mask 估算 action 0–4 的服务、准备、deadline 与
-字节/时间成本；不可识别时返回 unknown，不访问 env/instance/实际未来/结果。它同时提供 public immediate/two-step rules 和
-`causal_public_prepare_advantage_v1` 三态标签。`src/agents/sa_ghmappo_core.py` 的 default-off
+字节/时间成本；`v2` 按 target model/current service/state commit 做 fail-closed 阶段核算，不可识别时完整 total/fit 返回
+unknown，并分列 public prepare-contact 与 raw full-step-contact 条件，不访问 env/instance/实际未来/结果。它同时提供 public immediate/two-step rules 和
+`causal_public_prepare_advantage_v2` 三态标签；原则不变，版本递增用于拒绝加载旧 estimator 语义的候选 checkpoint。
+`src/agents/sa_ghmappo_core.py` 的 default-off
 `mechanism_aux_causal_public_prepare_advantage_enabled` 只在 auxiliary loss 内替换 event hard/soft target 与 supervision weight；
 slow/fast、固定分母和 raw inference path 不变。`scripts/run_calibrated_workflow_interface_repair.py` 只向 SA 传该 flag，PPO/MAPPO
-身份不变；相关合同见 `tests/test_causal_public_action_estimator.py` 与 `test_causal_public_prepare_advantage_auxiliary.py`。
+身份不变；`scripts/audit_cscwd_public_estimator_phase_conformance.py` 生成 0-training 六例回执；相关合同见
+`tests/test_causal_public_action_estimator.py`、`test_cscwd_public_estimator_executor_diagnosis.py` 与
+`test_causal_public_prepare_advantage_auxiliary.py`。
 
 `scripts/run_calibrated_workflow_value_normalization_ab.py::_training_signal_row` 通过 primary vehicle 的 `associated_rsu_id` 计算
 current bundle readiness；它只生产训练行为日志，不参与 agent loss。`scripts/audit_calibrated_workflow_training_signal_readiness_correction.py`

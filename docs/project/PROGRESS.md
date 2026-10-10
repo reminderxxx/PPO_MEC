@@ -5,6 +5,15 @@
 
 ﻿# Progress
 
+## 2026-10-11：public estimator fail-closed phase accounting 已最小修复
+
+- `causal_public_action_estimator_v2` 按 target model staging→current service→成功后 state commit 拆分 action4；必需阶段
+  unknown 时完整 total/deadline/contact 均 unknown，current service 失败时 state bytes/restore 为 0。
+- raw full-step contact 只按公共预测 budget 输出条件 fit；实际未来 trace/contact 不进入 estimator，隐藏 trace 保持 unknown。
+  raw executor、mask、reward、网络、候选 loss 与预算均未改。
+- 6 个合成 conformance 原件、44 项相邻回归与 smoke 通过；0 raw rows、0 training/update/evaluation。数据资格门仍独立关闭，
+  候选保持 `UNTESTED`。见 `cscwd_public_estimator_phase_accounting_fix_20261011.md`。
+
 ## 2026-10-11：raw action mask／公共估计器与执行端只读一致性审查完成
 
 - v4 的 30 个 raw 决策中有 10 个 fixed request 被 mask 回退为 action2；执行 action0/1/2/3/4=`5/2/16/5/2`，没有

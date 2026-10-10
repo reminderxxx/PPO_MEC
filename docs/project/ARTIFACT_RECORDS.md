@@ -5,6 +5,18 @@
 
 # Artifact Records
 
+## 2026-10-11 public estimator phase-accounting conformance（无 scientific run）
+
+- implementation commit=`ce20727ee29cfbb02f992204065c5da853fef5ae`；schema=
+  `causal_public_action_estimator_v2`，候选三态标签原则不变但 checkpoint 语义递增为 `causal_public_prepare_advantage_v2`。
+- root=`artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v1/`；manifest SHA-256=
+  `d7af3b3fc50b7a361a4f4701b54521afe6ff7b4f49dea907905dad655e040193`，conformance SHA-256=
+  `c601f6278819553a6540a72465bf8156da4184269f99e1226f4e880ef1eeb87b`。
+- 6 synthetic cases；raw rows/training/optimizer/evaluation=`0/0/0/0`。ready/missing、rollback、prepare-only contact、unknown 与
+  hidden trace 合同通过；不登记算法收益、checkpoint 或 paper-ready 结论。
+- 独立数据资格 manifest SHA-256=`e0e3dfdbeb35da5f99a4aa00f985983273efe364c5a014dafd6bd310e3cc5daa`；
+  合法 train/dev 区间 `0/40` 通过持续时间门，因此本实现没有触发条件训练。
+
 ## 2026-10-11 raw time root-cause 与 estimator/executor 一致性审查（无 scientific run）
 
 - 上游只读账本：`artifacts/analysis/cscwd_raw_time_root_cause_20261011_v2/diagnosis.json`，SHA-256=

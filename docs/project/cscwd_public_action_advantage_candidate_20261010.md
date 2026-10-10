@@ -23,6 +23,10 @@ action mask 改写；因此本报告中“无 prepare/serve 即否定候选”�
 current contact，但加入当前 node 服务后整步超过 `2.2 s` raw trace 并被回滚。因此历史“0 成功 prepare”同时受 raw
 整步原子准入语义约束，不能解释为候选没有生成可行准备动作。
 
+后续实现已在 `causal_public_action_estimator_v2` 修复 fail-closed phase accounting，并通过 6-case synthetic
+conformance；见 `cscwd_public_estimator_phase_accounting_fix_20261011.md`。但既有合法 development 区间资格为 `0/40`，
+所以 candidate 仍是 `UNTESTED`，没有启动训练。
+
 ## 结论
 
 当前最值得补足的是 **event head 的 action-conditioned 信用分配**：现有 timing-only event auxiliary 并不比较 action 4

@@ -7,15 +7,15 @@
 
 ## 2026-10-11：公共估计器阶段聚合缺陷与 raw preview 权限风险
 
-- `CONFIRMED IMPLEMENTATION DEFECT`：public estimator 在必需 target phase unknown 时仍输出有限 partial total/deadline fit；
-  current service 失败时还会计入 executor 不提交的 state bytes/restore。该缺陷未参与 v4 fixed-policy 执行，不能归因 28 次
-  raw rejection 或任何历史训练结果。
+- `RESOLVED IMPLEMENTATION DEFECT`：commit `ce20727e…` 已令必需 target phase unknown 时完整 total/deadline/contact
+  fail-closed，并使 current-service 失败分支不计 executor 未提交的 state bytes/restore。6-case synthetic conformance 通过；
+  该纠错未参与 v4 fixed-policy 执行，不能倒推改变 28 次 raw rejection 或历史训练结果。
 - `EXECUTION CONTRACT MISMATCH`：raw profile 对 full coupled step 做 current-contact/trace 原子准入，而 native prepare 合同可在
   current contact 内完成目标阶段。短窗口因此只能判执行资格不足，不能把零 prepare 作为算法否证或扩窗依据。
 - `PERMISSION RISK`：raw `clone_for_decision_model().step()` 的物理 contact 仍会读取真实未来轨迹；public estimator/rule 不调用
   该路径。exact clone 必须标为 privileged reference，在另立修复前不得用于同权限方法排名。
-- `NEXT ONE CHANGE`：只把 public estimator 改为 fail-closed phase accounting 并做 estimator↔native 合成 conformance；不同时
-  修改 raw 环境、mask、窗口、reward、标签或训练。
+- `TRAINING BLOCKED`：接口修复已完成，但既有 40 个合法 train/dev raw window 均仅 2.3 s，尚无满足 workflow 与
+  prepare/serve 可达性的独立 development 集合；候选保持 `UNTESTED`，不得自动扩窗或训练。
 
 ## 2026-10-10：公共动作优势监督可审计，但 source-grounded 可达性阻断训练
 
