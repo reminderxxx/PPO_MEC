@@ -6,7 +6,8 @@
   unavailable 边界；不调用 env clone/step。
 - `scripts/audit_cscwd_public_estimator_phase_conformance.py`：生成 6-case synthetic conformance 与 manifest/hash，0 raw rows、
   0 training/evaluation。
-- `artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v1/`：轻量 JSON 回执，不含数据或权重。
+- `artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v2/`：canonical 轻量 JSON 回执，不含数据或权重；v1
+  保留为 synthetic interface 覆盖造成的接线失败见证。
 - `docs/project/cscwd_public_estimator_phase_accounting_fix_20261011.md`：实现、验证、训练停止门与未覆盖风险。
 
 ## 2026-10-10 causal public action advantage

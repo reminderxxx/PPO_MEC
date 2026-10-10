@@ -5,9 +5,10 @@
 - `reviewed_at`: 2026-10-11 Asia/Shanghai
 - `literature_cutoff`: 2026-10-11（本轮未检索新文献）
 - `target_venue`: IEEE TMC
-- `artifact_run_id`: `cscwd_public_estimator_phase_conformance_20261011_v1`
+- `artifact_run_id`: `cscwd_public_estimator_phase_conformance_20261011_v2`
 - `policy_version`: `tmc_review_policy_v3_20260621`
-- `Git commit`: implementation `ce20727ee29cfbb02f992204065c5da853fef5ae`
+- `Git commit`: phase fix `ce20727ee29cfbb02f992204065c5da853fef5ae`；raw profile wiring correction
+  `3afeeac678329d4e885954f2cf3d172de1fac8c2`
 - `evidence_level`: `E1_DOCUMENTED / synthetic contract evidence`；不是 formal/holdout、算法效果或 paper-ready 证据
 - `verdict`: `IMPLEMENTATION_DEFECT_FIXED / SYNTHETIC_CONFORMANCE_PASS / CANDIDATE_UNTESTED`
 
@@ -33,6 +34,9 @@ auxiliary loss、数据窗口、训练预算或 checkpoint 选择，也没有读
 - 对 raw profile 输出 `target_prepare_contact_fit` 与 `raw_full_step_contact_fit` 两个不同字段。后者只用公共预测的 current-contact
   budget 表达现有 full-step gate；真实 trace 终点继续不可见，`raw_trace_fit=unknown`。public label 在“prepare 可行但公开
   full-step contact 不足”时 abstain，不使用实际未来真值。
+- raw 合同以公开 `time_profile=raw_ngsim_event_time_v1` 识别，同时兼容同名 `interface_profile`；保留 prepared-state
+  `interface_profile`，不再由审计脚本人工覆盖。A 独立用实际 `RawNGSIMEventTimeEnv._info()` 发现并复现了旧接线缺口，修复后
+  跨分支实测 action0/1/3/4 均产生 raw full-step fit、action2 保持 not-applicable、合法动作 trace fit 均为 unknown。
 - estimator schema 从 `causal_public_action_estimator_v1` 升为 `v2`；候选的 prepare/serve/abstain 原则不变，但 checkpoint
   语义递增为 `causal_public_prepare_advantage_v2`，旧 v1 候选 checkpoint 必须 fail-closed 拒绝加载。
 
@@ -51,12 +55,14 @@ auxiliary loss、数据窗口、训练预算或 checkpoint 选择，也没有读
 
 ## Artifact 与验证
 
-- root: `artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v1/`
-- `manifest.json` SHA-256: `d7af3b3fc50b7a361a4f4701b54521afe6ff7b4f49dea907905dad655e040193`
-- `conformance.json` SHA-256: `c601f6278819553a6540a72465bf8156da4184269f99e1226f4e880ef1eeb87b`
-- manifest source commit: `ce20727ee29cfbb02f992204065c5da853fef5ae`
+- root: `artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v2/`
+- `manifest.json` SHA-256: `2679d4ddc4d31b8a9a802655d1eea8c2a1310d471cbe66bd3fcaae09c16dc267`
+- `conformance.json` SHA-256: `9d5a1dc0c92fcf5e7ed477f6f7495eed496b89ef478b6c8c087f92ed0dcd99f0`
+- manifest source commit: `3afeeac678329d4e885954f2cf3d172de1fac8c2`
 - counts: 6 synthetic cases；raw rows/training steps/optimizer steps/evaluation episodes 均为 0
-- 相邻回归：`44 passed`；`scripts/smoke_test.py` 完成 6/6 toy DAG nodes。
+- v1 原件保留为接线失败见证：其审计脚本人工把 `interface_profile` 改成 raw，未覆盖实际 raw env 的
+  prepared-state interface + raw time-profile 组合，不再作为 canonical conformance。
+- 相邻回归：`46 passed`；`scripts/smoke_test.py` 完成 6/6 toy DAG nodes。
 
 ## 训练状态与剩余 blocker
 

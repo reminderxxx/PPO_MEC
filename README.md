@@ -7,7 +7,8 @@
 
 2026-10-11 已完成 [public estimator fail-closed 阶段核算修复](docs/project/cscwd_public_estimator_phase_accounting_fix_20261011.md)：
 必需阶段 unknown 不再产生有限 partial total；action4 current-service 失败不再计未提交的 state transfer/restore；prepare-contact
-与 raw public-predicted full-step contact 分列，隐藏 trace 继续 unknown。6 个合成 conformance、44 项相邻回归及 smoke 通过；
+与 raw public-predicted full-step contact 分列，隐藏 trace 继续 unknown。实际 raw `time_profile` 接线经独立复核修正后，
+6 个合成 conformance、46 项相邻回归及 smoke 通过；
 该证据仅为接口纠错，候选仍 `UNTESTED`，没有启动训练。
 
 2026-10-11 的[action mask／公共估计器—执行端一致性审查](docs/project/cscwd_public_estimator_executor_consistency_20261011.md)

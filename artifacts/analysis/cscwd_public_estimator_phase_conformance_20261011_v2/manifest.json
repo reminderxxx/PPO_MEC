@@ -1,0 +1,19 @@
+{
+  "counts": {
+    "evaluation_episodes": 0,
+    "optimizer_steps": 0,
+    "raw_rows_read": 0,
+    "synthetic_cases": 6,
+    "training_steps": 0
+  },
+  "files": [
+    {
+      "path": "conformance.json",
+      "sha256": "9d5a1dc0c92fcf5e7ed477f6f7495eed496b89ef478b6c8c087f92ed0dcd99f0"
+    }
+  ],
+  "run_id": "cscwd_public_estimator_phase_conformance_20261011_v2",
+  "schema_version": "cscwd_public_estimator_phase_conformance_manifest_v1",
+  "source_commit": "3afeeac678329d4e885954f2cf3d172de1fac8c2",
+  "status": "complete"
+}

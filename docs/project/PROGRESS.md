@@ -13,6 +13,9 @@
   raw executor、mask、reward、网络、候选 loss 与预算均未改。
 - 6 个合成 conformance 原件、44 项相邻回归与 smoke 通过；0 raw rows、0 training/update/evaluation。数据资格门仍独立关闭，
   候选保持 `UNTESTED`。见 `cscwd_public_estimator_phase_accounting_fix_20261011.md`。
+- A 独立发现实际 raw env 保留 prepared-state `interface_profile`、另用 `time_profile` 标识 raw 时间合同；v1 synthetic audit
+  覆盖 interface 掩盖了接线缺口。commit `3afeeac…` 已改为识别公开 `time_profile`，v2 artifact 与实际 raw `_info()` 跨分支
+  验收通过；相邻回归更新为 `46 passed`。v1 原件保留但降级，未训练。
 
 ## 2026-10-11：raw action mask／公共估计器与执行端只读一致性审查完成
 

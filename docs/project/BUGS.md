@@ -16,6 +16,9 @@
   该路径。exact clone 必须标为 privileged reference，在另立修复前不得用于同权限方法排名。
 - `TRAINING BLOCKED`：接口修复已完成，但既有 40 个合法 train/dev raw window 均仅 2.3 s，尚无满足 workflow 与
   prepare/serve 可达性的独立 development 集合；候选保持 `UNTESTED`，不得自动扩窗或训练。
+- `RESOLVED RAW WIRING`：初版只检查 `interface_profile=raw_ngsim_event_time_v1`，而真实 raw env 用 prepared-state interface
+  加 `time_profile=raw_ngsim_event_time_v1`；v1 synthetic audit 又人工覆盖 interface，形成假 PASS。commit `3afeeac…` 改为
+  消费公开 time profile，v2 synthetic artifact 与实际 raw `_info()` 跨分支验收通过。旧 v1 原件保留并标记 superseded。
 
 ## 2026-10-10：公共动作优势监督可审计，但 source-grounded 可达性阻断训练
 

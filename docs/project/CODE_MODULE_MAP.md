@@ -2,7 +2,8 @@
 
 `src/agents/causal_public_action_estimator.py` 从共同 public semantic state/action mask 估算 action 0–4 的服务、准备、deadline 与
 字节/时间成本；`v2` 按 target model/current service/state commit 做 fail-closed 阶段核算，不可识别时完整 total/fit 返回
-unknown，并分列 public prepare-contact 与 raw full-step-contact 条件，不访问 env/instance/实际未来/结果。它同时提供 public immediate/two-step rules 和
+unknown，并分列 public prepare-contact 与 raw full-step-contact 条件；raw 时间合同读取公开 `time_profile`，不覆盖
+prepared-state `interface_profile`，也不访问 env/instance/实际未来/结果。它同时提供 public immediate/two-step rules 和
 `causal_public_prepare_advantage_v2` 三态标签；原则不变，版本递增用于拒绝加载旧 estimator 语义的候选 checkpoint。
 `src/agents/sa_ghmappo_core.py` 的 default-off
 `mechanism_aux_causal_public_prepare_advantage_enabled` 只在 auxiliary loss 内替换 event hard/soft target 与 supervision weight；

@@ -14,9 +14,9 @@
   scripts/audit_cscwd_public_estimator_phase_conformance.py
 ```
 
-输出固定为 `artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v1/`。运行后须核验 manifest 的
+输出固定为 `artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v2/`。运行后须核验 manifest 的
 `source_commit`、文件 SHA-256、6 个 case 以及 raw/training/optimizer/evaluation 计数全为 `0`。该命令不授权条件训练；
-development 数据资格未通过时必须停止。
+development 数据资格未通过时必须停止。v1 人工覆盖了 `interface_profile`，仅保留为 superseded 失败见证，不得作为验收原件。
 
 ## Training signal readiness correction sidecar（2026-10-10）
 

@@ -9,9 +9,11 @@
 
 - implementation commit=`ce20727ee29cfbb02f992204065c5da853fef5ae`；schema=
   `causal_public_action_estimator_v2`，候选三态标签原则不变但 checkpoint 语义递增为 `causal_public_prepare_advantage_v2`。
-- root=`artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v1/`；manifest SHA-256=
-  `d7af3b3fc50b7a361a4f4701b54521afe6ff7b4f49dea907905dad655e040193`，conformance SHA-256=
-  `c601f6278819553a6540a72465bf8156da4184269f99e1226f4e880ef1eeb87b`。
+- v1 root 保留但 superseded：审计脚本人工覆盖 `interface_profile`，未覆盖真实 raw env 的 `time_profile` 接线。canonical v2
+  wiring commit=`3afeeac678329d4e885954f2cf3d172de1fac8c2`，root=
+  `artifacts/analysis/cscwd_public_estimator_phase_conformance_20261011_v2/`；manifest SHA-256=
+  `2679d4ddc4d31b8a9a802655d1eea8c2a1310d471cbe66bd3fcaae09c16dc267`，conformance SHA-256=
+  `9d5a1dc0c92fcf5e7ed477f6f7495eed496b89ef478b6c8c087f92ed0dcd99f0`。
 - 6 synthetic cases；raw rows/training/optimizer/evaluation=`0/0/0/0`。ready/missing、rollback、prepare-only contact、unknown 与
   hidden trace 合同通过；不登记算法收益、checkpoint 或 paper-ready 结论。
 - 独立数据资格 manifest SHA-256=`e0e3dfdbeb35da5f99a4aa00f985983273efe364c5a014dafd6bd310e3cc5daa`；
