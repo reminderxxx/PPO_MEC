@@ -9,6 +9,10 @@ fail-closed，并将 create-only analysis 与只读 scientific root 分离。`sc
 
 `src/envs/core/calibrated_continuous_workflow_env.py` 在 opt-in v4 profile 从已提交 `prepared_state` 与当前已完成 DAG prefix 产生公共状态摘要，继续沿用 v3 因果前缀预测；`src/encoders/calibrated_workflow_features.py` 冻结七维 flat 映射，`fusion_encoder.py`/`rsu_state_encoder.py` 分别让三 flat 方法与 SA graph 方法读入；`sa_ghmappo_core.py`/`dt_handoff_agent.py` 绑定网络宽度与 checkpoint 身份，`scripts/run_calibrated_workflow_interface_repair.py` 仅按显式 profile 构造共同 agent。合成合同见 `tests/test_calibrated_workflow_prepared_state_prefix.py`。
 
+`scripts/run_calibrated_workflow_prepared_state_visibility_matched.py` 绑定 A 实现、历史 scientific/checkpoint/rule hashes、共同预算
+和 selected/update-96 角色；`scripts/analyze_calibrated_workflow_prepared_state_visibility_matched.py` 只读显式键配对两 arm，
+`scripts/launch_calibrated_workflow_prepared_state_visibility_matched.py` 负责单次持久监督和 create-only 自动分析。
+
 `scripts/diagnose_cscwd_sa_long_budget_cost.py` 只读 B 长预算原件，用 A 的相同因果环境代码重放已记录动作并分解 node/fallback/failure/load/三类网络传输/restore/recompute；同实例 seed 配对但不将首次分叉之后的不同状态当作单动作因果。`scripts/audit_cscwd_long_budget_state_alias.py` 只读上述重放和原 ledger，核验未公开的 prepared-state 有效性造成的同公开状态别名；两者均不训练、不修改 B 或论文。
 
 `scripts/diagnose_cscwd_sa_behavior.py` 仅消费已完成的因果强基线原件与 selected checkpoint：先重放已记录动作校验物理/缓存账本，再按事前规则从 train/dev 采共同状态，只读前向并核对参数不变；不调用训练、选模或新正式评价，也不写原 run。

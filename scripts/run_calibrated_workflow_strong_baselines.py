@@ -307,7 +307,10 @@ def _run_learned_cell(
             gae_lambda=float(config["training"]["gae_lambda"]),
         )
         environment_steps += len(batch)
-        if config.get("interface_profile") == "calibrated_workflow_interface_v3_prefix_only":
+        if config.get("interface_profile") in {
+            "calibrated_workflow_interface_v3_prefix_only",
+            "calibrated_workflow_interface_v4_prepared_state_prefix",
+        }:
             training_signals.extend(
                 {**_training_signal_row(
                     arm="original_reward_v1", method=method, seed=seed,

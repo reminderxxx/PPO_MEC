@@ -290,6 +290,12 @@ def _run_evaluation_episode(
     ledger: list[dict[str, Any]] = []
     while not env.terminated and env.step_index < step_cap:
         semantic = info["semantic_state"]
+        prepared_prefix = (
+            (semantic.get("calibrated_context") or {}).get("prepared_state_prefix")
+            or {}
+        )
+        current_prepared = prepared_prefix.get("current") or {}
+        target_prepared = prepared_prefix.get("predicted_target") or {}
         node = semantic.get("current_workflow_node") or {}
         vehicle = (semantic.get("vehicles") or [{}])[0]
         current_rsu_id = vehicle.get("associated_rsu_id")
@@ -370,8 +376,29 @@ def _run_evaluation_episode(
                 "predicted_next_rsu_id": semantic.get("predictions", {}).get("predicted_next_rsu_by_vehicle", {}).get("veh_pilot"),
                 "actual_next_rsu_id": (
                     instance["rsu_sequence"][min(int(transition.get("step_index", 0)) + 1, len(instance["rsu_sequence"]) - 1)]
-                    if semantic.get("interface_profile") == "calibrated_workflow_interface_v3_prefix_only"
+                    if semantic.get("interface_profile") in {
+                        "calibrated_workflow_interface_v3_prefix_only",
+                        "calibrated_workflow_interface_v4_prepared_state_prefix",
+                    }
                     else None
+                ),
+                "current_prepared_known": current_prepared.get("known", ""),
+                "current_prepared_exists": current_prepared.get("exists", ""),
+                "current_prepared_valid": current_prepared.get("valid", ""),
+                "current_prepared_missing_completed_count": current_prepared.get(
+                    "missing_completed_count", ""
+                ),
+                "current_prepared_missing_completed_fraction": current_prepared.get(
+                    "missing_completed_fraction", ""
+                ),
+                "target_prepared_known": target_prepared.get("known", ""),
+                "target_prepared_exists": target_prepared.get("exists", ""),
+                "target_prepared_valid": target_prepared.get("valid", ""),
+                "target_prepared_missing_completed_count": target_prepared.get(
+                    "missing_completed_count", ""
+                ),
+                "target_prepared_missing_completed_fraction": target_prepared.get(
+                    "missing_completed_fraction", ""
                 ),
                 "current_bundle_ready": current_ready,
                 "target_bundle_ready": target_ready,

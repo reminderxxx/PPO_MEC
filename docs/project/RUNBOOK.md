@@ -9,6 +9,22 @@
 
 原 base config `configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json` 和 manifest 先照旧 hash 核验；仅新实验显式设置运行时 `interface_profile=calibrated_workflow_interface_v4_prepared_state_prefix`，由现有 `_build_agent` 同时给四 learned 方法启用匹配编码宽度。字段合同、参数量、旧新 checkpoint 拒绝和验收命令见 `cscwd_prepared_state_prefix_interface_20261010.md`。A 仅实现接口和合成测试；B 负责独立 preflight/匹配训练，此入口自身不启动训练、不读旧 holdout。
 
+只读预检命令：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_calibrated_workflow_prepared_state_visibility_matched.py --preflight
+```
+
+仅当配置已切换为 `authorized_after_independent_preflight`、冻结提交已 push 且 checkout clean 后，执行一次：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/launch_calibrated_workflow_prepared_state_visibility_matched.py \
+  --mode launch --expected-commit <FROZEN_COMMIT>
+```
+
+run、analysis、supervisor 分别使用 `cscwd_causal_prepared_state_visibility_matched_20261010_v1`、同名
+`_analysis_v1` 与 `_supervisor`；不得 retry、追加 seed 或让最终评价参与选模。
+
 ## 长预算 SA 逾期/成本只读诊断（2026-10-09；已完成）
 
 事前规则和唯一完整报告在 `cscwd_sa_long_budget_cost_diagnosis_plan_20261009.md`、

@@ -15,7 +15,9 @@
     "checkpoint_selection_sha256": "27e36308d1b33586e9458236c1f16d74a953faeb8c0d543775725730fa72659b",
     "training_summary_sha256": "d9ca64404cb2d104a36b693729b72eb8ced9396b5cff24769a5acad14eccc255",
     "selected_evaluation_mode": "reuse_exact_hash_no_reevaluation",
-    "fixed_update96_evaluation_mode": "read_only_local_checkpoint_new_evaluation"
+    "fixed_update96_evaluation_mode": "read_only_local_checkpoint_new_evaluation",
+    "rule_source_run_id": "cscwd_causal_strong_baselines_dev_20261009_v1",
+    "rule_source_evaluation_rows_sha256": "62438befe510da39c9e5cdc1d5b5d88c0ffbca5c7dd7e31fa10de66449b2322f"
   },
   "historical_analysis": {
     "analysis_commit": "c27692966b643a9a6f908951ed9636fa42db427d",
@@ -35,8 +37,11 @@
     "past_and_current_information_only": true,
     "future_actual_rsu_suffix_forbidden": true,
     "old_profile_unchanged": true,
-    "implementation_commit": null,
-    "implementation_config_sha256": null,
+    "implementation_commit": "709746bc1f1ea3037f27497bdb51cf6f45c8963c",
+    "implementation_tree": "f63e7508af56581657aff05c7d8cee50645ee816",
+    "implementation_document_sha256": "110bfffd8b829d133d741b6ad948fda0d3c053b4c56afd93c2a49e453deeed1b",
+    "implementation_env_sha256": "c6ded6ce84230519160a40f29e276b5823eb204a35e31c35f914d1c6bfee3a59",
+    "integration_test_fix_commit": "517053949d916c476843f48769799e3854810d32",
     "parameter_count_change_must_be_reported": true,
     "strict_pure_information_single_variable_claim_allowed": false
   },

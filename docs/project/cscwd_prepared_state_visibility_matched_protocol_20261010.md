@@ -2,8 +2,8 @@
 
 ## 状态与目的
 
-本协议已冻结科学变量，但**尚未授权启动**：`execution_authorized=false`。启动必须等待 A 线给出确切实现 commit/config/hash，
-并由 B 线独立通过全部前置门禁。不存在的交付、未提交工作树或口头字段说明均不能作为启动依据。
+本协议已冻结科学变量，A 实现交接与 B 独立前置门禁已经通过；冻结 runner 提交、push 和 clean checkout 完成前仍
+**不授权启动**：`execution_authorized=false`。授权只通过配置单独切换，不能用口头说明替代。
 
 已确认的 first-order 问题是：相同公共 observation/semantic/mask、相同合法 action 的状态可具有不同
 prepared-state readiness 与 DAG 重算成本。该别名对所有 feedforward learned methods 共享；它不证明该缺口单独造成
@@ -37,6 +37,10 @@ B 线在训练前独立验收：
    接口；不得称严格纯信息单变量。
 
 任一门禁失败即退回 A 线。本轮禁止边训练边修复。
+
+实现身份为 `709746bc1f1ea3037f27497bdb51cf6f45c8963c`；交接测试依赖修正为 `517053949d916c476843f48769799e3854810d32`。
+B 已复验 43 tests、474 个 public-prefix 后缀篡改点、20 个历史 update-96 checkpoint 与 40 条规则来源；预检为 0 训练、
+0 新评价。新输入投影参数增量为 SA `+192`，MAPPO/PPO/DT 各 `+448`，因此不作严格纯信息单变量主张。
 
 ## 固定训练与选模
 
