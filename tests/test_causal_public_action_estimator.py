@@ -199,6 +199,34 @@ def test_raw_full_step_contact_failure_abstains_without_future_truth() -> None:
     assert label["reason"] == "raw_full_step_contact_insufficient"
 
 
+def test_raw_time_profile_activates_gate_without_overwriting_interface() -> None:
+    state = _state()
+    state["interface_profile"] = (
+        "calibrated_workflow_interface_v4_prepared_state_prefix"
+    )
+    state["time_profile"] = "raw_ngsim_event_time_v1"
+    state["calibrated_context"]["contact_budget_seconds"] = 0.9
+    estimate = estimate_public_actions(state)
+    action4 = estimate["actions"]["4"]
+    assert state["interface_profile"] == (
+        "calibrated_workflow_interface_v4_prepared_state_prefix"
+    )
+    assert action4["target_prepare_contact_fit"] == YES
+    assert action4["raw_full_step_contact_fit"] == NO
+    assert action4["raw_trace_fit"] == UNKNOWN
+
+
+def test_nonraw_prepared_state_profile_does_not_invent_raw_gate() -> None:
+    state = _state()
+    state["interface_profile"] = (
+        "calibrated_workflow_interface_v4_prepared_state_prefix"
+    )
+    state.pop("time_profile", None)
+    estimate = estimate_public_actions(state)["actions"]["4"]
+    assert estimate["raw_full_step_contact_fit"] == "not_applicable"
+    assert estimate["raw_trace_fit"] == "not_applicable"
+
+
 class _PublicOnlySource:
     def __init__(self, info: dict) -> None:
         self.info = info

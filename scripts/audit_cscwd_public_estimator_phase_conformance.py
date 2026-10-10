@@ -29,7 +29,7 @@ from src.envs.core.calibrated_continuous_workflow_env import (
 )
 from src.envs.core.causal_rsu_predictor import fit_predictor
 
-RUN_ID = "cscwd_public_estimator_phase_conformance_20261011_v1"
+RUN_ID = "cscwd_public_estimator_phase_conformance_20261011_v2"
 
 
 def _sha256(path: Path) -> str:
@@ -68,7 +68,7 @@ def _public_input(
 ) -> tuple[dict[str, Any], list[bool]]:
     info = env._info()
     state = deepcopy(info["semantic_state"])
-    state["interface_profile"] = "raw_ngsim_event_time_v1"
+    state["time_profile"] = "raw_ngsim_event_time_v1"
     context = state["calibrated_context"]
     if contact_seconds is not None:
         context["contact_budget_seconds"] = float(contact_seconds)

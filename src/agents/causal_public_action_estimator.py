@@ -238,9 +238,10 @@ def estimate_public_actions(
     time_contract = dict(context.get("time_contract", {}) or {})
     remaining_deadline = _nonnegative(time_contract.get("remaining_deadline_seconds"))
     recompute, recompute_reason = _known_recompute_seconds(state)
-    raw_full_step_contact_contract = (
-        str(state.get("interface_profile", "")) == "raw_ngsim_event_time_v1"
-    )
+    raw_full_step_contact_contract = "raw_ngsim_event_time_v1" in {
+        str(state.get("interface_profile", "")),
+        str(state.get("time_profile", "")),
+    }
 
     current_model_network = _network_seconds(current_bundle["transfer_bytes"], mbps, fixed)
     current_model_prepare = _sum_known([current_model_network, current_bundle["load_seconds"]])
@@ -481,6 +482,7 @@ def estimate_public_actions(
             "calibrated_context estimated link/contact/node costs",
             "calibrated_context time_contract deadline fields",
             "calibrated_context vehicle_fallback_seconds/failed_service_seconds",
+            "interface_profile/time_profile contract identity",
         ],
         "forbidden_fields": [
             "instance.rsu_sequence",
