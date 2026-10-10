@@ -18,7 +18,10 @@ from torch.distributions import Categorical
 from src.agents.base_agent import BaseAgent
 from src.agents.popularity_cache_heuristic_agent import PopularityCacheHeuristicAgent
 from src.encoders import FlatSemanticEncoder, SurrogateFusionEncoder
-from src.encoders.calibrated_workflow_features import CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX
+from src.encoders.calibrated_workflow_features import (
+    CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX,
+    bundle_ready,
+)
 from src.encoders.fusion_encoder import (
     build_graph_continuity_critic_features,
     build_prediction_reliability_summary,
@@ -718,6 +721,7 @@ class 分层PPO基类(BaseAgent):
         head_credit_protocol: str = "aggregation_reason_weighted_ppo_v2",
         mechanism_logit_bias_strength: float = 0.0,
         mechanism_confidence_floor: float = 0.0,
+        mechanism_aux_current_service_feasibility_gate_enabled: bool = False,
         prediction_feature_dim: int = 13,
         prepared_state_features_enabled: bool = False,
         prediction_gate_min_leak: float = 0.0,
@@ -1284,6 +1288,9 @@ class 分层PPO基类(BaseAgent):
         self._head_credit_protocol = str(head_credit_protocol or "aggregation_reason_weighted_ppo_v2")
         self._mechanism_logit_bias_strength = float(mechanism_logit_bias_strength)
         self._mechanism_confidence_floor = float(mechanism_confidence_floor)
+        self._mechanism_aux_current_service_feasibility_gate_enabled = bool(
+            mechanism_aux_current_service_feasibility_gate_enabled
+        )
         self._prediction_feature_dim = int(prediction_feature_dim)
         self._prepared_state_features_enabled = bool(prepared_state_features_enabled)
         self._prediction_gate_min_leak = max(0.0, min(float(prediction_gate_min_leak), 1.0))
@@ -5598,9 +5605,38 @@ class 分层PPO基类(BaseAgent):
 
     def load(self, path: str) -> None:
         checkpoint = torch.load(Path(path), map_location=self._device)
-        saved_prepared = bool((checkpoint.get("config") or {}).get("prepared_state_features_enabled", False))
+        saved_config = checkpoint.get("config") or {}
+        saved_prepared = bool(saved_config.get("prepared_state_features_enabled", False))
         if saved_prepared != self._prepared_state_features_enabled:
             raise ValueError("prepared-state observation profile checkpoint mismatch")
+        saved_service_feasible_target = bool(
+            saved_config.get(
+                "mechanism_aux_current_service_feasibility_gate_enabled",
+                False,
+            )
+        )
+        if (
+            saved_service_feasible_target
+            != self._mechanism_aux_current_service_feasibility_gate_enabled
+        ):
+            raise ValueError("mechanism auxiliary event-target semantics checkpoint mismatch")
+        expected_event_target_semantics = (
+            "current_complete_bundle_ready_v1"
+            if self._mechanism_aux_current_service_feasibility_gate_enabled
+            else "legacy_target_timing_v1"
+        )
+        saved_event_target_semantics = str(
+            saved_config.get(
+                "mechanism_aux_event_target_semantics",
+                (
+                    "current_complete_bundle_ready_v1"
+                    if saved_service_feasible_target
+                    else "legacy_target_timing_v1"
+                ),
+            )
+        )
+        if saved_event_target_semantics != expected_event_target_semantics:
+            raise ValueError("mechanism auxiliary event-target checkpoint label mismatch")
         network_state = checkpoint["network_state_dict"]
         current_state = self._network.state_dict()
         missing_keys = set(current_state) - set(network_state)
@@ -15583,6 +15619,14 @@ class 分层PPO基类(BaseAgent):
             "head_credit_protocol": self._head_credit_protocol,
             "mechanism_logit_bias_strength": self._mechanism_logit_bias_strength,
             "mechanism_confidence_floor": self._mechanism_confidence_floor,
+            "mechanism_aux_current_service_feasibility_gate_enabled": (
+                self._mechanism_aux_current_service_feasibility_gate_enabled
+            ),
+            "mechanism_aux_event_target_semantics": (
+                "current_complete_bundle_ready_v1"
+                if self._mechanism_aux_current_service_feasibility_gate_enabled
+                else "legacy_target_timing_v1"
+            ),
             "prediction_feature_dim": self._prediction_feature_dim,
             "prepared_state_features_enabled": self._prepared_state_features_enabled,
             "prediction_gate_min_leak": self._prediction_gate_min_leak,
@@ -16624,6 +16668,17 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
             confidence_weight = max(confidence_weight, self._latency_fallback_confidence_floor)
         if steady_rsu_candidate:
             confidence_weight = max(confidence_weight, self._steady_rsu_confidence_floor)
+        if self._mechanism_aux_current_service_feasibility_gate_enabled:
+            if (
+                semantic_state.get("interface_profile")
+                != CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX
+            ):
+                raise ValueError(
+                    "service-feasible event target requires the v4 public observation profile"
+                )
+            if not bool(bundle_ready(semantic_state, current_rsu, current_node)):
+                event_target = 0
+                event_soft_target = 0.0
 
         return {
             "slow_target": slow_target,

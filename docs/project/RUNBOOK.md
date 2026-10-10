@@ -5,6 +5,28 @@
 
 # Runbook
 
+## Service-feasible event target 条件执行（2026-10-10；当前仅预检）
+
+先运行只读预检：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_calibrated_workflow_service_feasible_event_target_ab.py --preflight
+```
+
+预检必须显示 `execution_authorized=false`、`branch_gate_status=pending_a_handoff`、0 scientific step 和 0 新评价。当前不得执行
+`--run` 或 launcher。只有 A 的 action0/2/4 对称分支交付明确 `PASS`，且其 frozen-policy suffix、正例不变性、manifest/report
+hash 经独立核验后，才可把新协议改为 `authorized_after_symmetric_branch_pass`，绑定实现 commit 并在 clean checkout push。
+
+届时仅允许一次：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/launch_calibrated_workflow_service_feasible_event_target_ab.py \
+  --mode launch --expected-commit <FROZEN_COMMIT>
+```
+
+固定 run/analysis/supervisor root 分别为 `cscwd_service_feasible_event_target_ab_20261010_v1`、同名 `_analysis_v1` 和
+`_supervisor`。禁止 retry、追加 seed、重训 control、用最终评价选 checkpoint 或在 run 中修代码。A 门禁 FAIL/MIXED 时不启动。
+
 ## CSCWD prepared-state v4 公共观测接口（2026-10-10）
 
 匹配 run 已完成且不得重跑。scientific root 的 terminal=`PASS`；canonical post-analysis 是同名

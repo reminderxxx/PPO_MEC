@@ -2,9 +2,10 @@
 
 ## 状态
 
-`FROZEN_CANDIDATE_ONLY / execution_authorized=false`。本文件不是实现或训练授权。A 的只读事件链支持“实际生效标签与 action4
-当前服务条件存在语义缺口”，但未执行动作分支或训练消融，尚不能证明它单独造成 SA 与 baseline 差距。按照一次只改一个因素
-的边界，本轮停在候选说明，不盲目训练。
+`IMPLEMENTED_DEFAULT_OFF / execution_authorized=false / awaiting symmetric branch gate`。中央后续给出条件授权：B 可先实现并冻结
+target-only 协议；只有 A 的 action0/2/4 对称分支门禁明确 `PASS` 且 B 独立核验后，才能执行一次已冻结 SA-only A/B。
+截至当前，A 门禁仍在执行中，因此没有启动训练。本文件的旧 candidate-only 结论保留为历史阶段，不再表示“不得实现”，但仍
+表示“不得绕过门禁训练”。
 
 ## 已确认的近端失败机制
 
@@ -49,9 +50,10 @@ optimizer、数据或预算；不得移除整个 auxiliary loss。该候选只�
    显示“立即失败的 action4”仍稳定具有更低预声明多步服务代价，则否定把 hard target 置 0 的候选。
 5. feature flag 关闭时 target 与 checkpoint 行为 byte-equivalent；打开时除 event hard/soft target 外的训练字段逐项相同。
 
-目前 A 执行的 action branch=`0/24`，因此以上门禁尚未完成，训练保持未授权。
+A 已在独立工作树预注册门禁计划（commit=`eefc4a2`）并开始生成状态映射；尚未交付 PASS/FAIL/MIXED、manifest 或报告 hash。
+因此训练保持未授权。
 
-## 门禁通过后的唯一 A/B 草案（未授权）
+## 门禁通过后的唯一 A/B 协议（已实现、条件未满足）
 
 - 只训练 SA：seeds `[7,17,29,43,61]` × 5,760 steps=`28,800`，96 updates，候选 updates `[24,48,72,96]`。
 - 精确复用本轮 v4 原 SA 为 control，以及同 v4 PPO/MAPPO/DT/规则结果；不得重训其他方法。
@@ -60,5 +62,10 @@ optimizer、数据或预算；不得移除整个 auxiliary loss。该候选只�
   与 coverage。低传输伴随更多失败不算改善。
 - 若 completion 下降、on-time/failure 不在两视角保持方向、只个别 seed 改善，或任一身份字段漂移，则否定候选并停止；不自动
   找第二个改法、追加预算或筛 seed。
+
+实现使用默认关闭的 `mechanism_aux_current_service_feasibility_gate_enabled`；关闭时保持旧 target，打开时只把 current complete
+bundle readiness 合取到 event hard/soft target。checkpoint 显式记录 `mechanism_aux_event_target_semantics`，跨语义加载拒绝；
+网络结构、参数量与初始化张量不变，推理仍为 `raw_policy`。配置
+`configs/experiment/calibrated_workflow_service_feasible_event_target_ab_v1.json` 当前保持 `execution_authorized=false`。
 
 全部实例仍为已暴露 development；即使未来 A/B 通过，也不能直接形成 formal/holdout、稳定领先、novelty 或 paper-ready 主张。

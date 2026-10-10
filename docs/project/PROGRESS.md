@@ -5,14 +5,25 @@
 
 ﻿# Progress
 
+## 2026-10-10：service-feasible event target 已 default-off 实现；等待 A 对称分支门禁
+
+- 后续条件授权允许先实现唯一 target-only 候选，但科学训练仍以 A 的 action0/2/4 有界后缀门禁明确 `PASS` 为前置；A 已提交
+  事前计划 `eefc4a2`，当前尚未交付 verdict/manifest/report hash。
+- B 新增默认关闭开关；打开后只把 `current_complete_bundle_ready` 合取到 event hard/soft target。slow/fast target、auxiliary
+  系数、网络、reward、critic、action、optimizer、数据和推理路径不变；checkpoint 显式区分 target 语义并拒绝跨语义加载。
+- 冻结 SA-only 5 seed×5,760 step、selected + fixed-96、最多 200 新评价的单变量协议和一次性 launcher；历史 v4 控制按 hash
+  复用。预检确认参数量均为 165,512、60 个 state keys 初始化逐张量相同，0 scientific step/0 新评价。
+- 当前配置仍为 `execution_authorized=false`；未训练、未创建候选 run、未读 formal/holdout。A 若 FAIL/MIXED 则停止，若 PASS
+  仍须独立核验其对称正例、冻结策略后缀及完整性后才可单次启动。
+
 ## 2026-10-10：事件链定位到合法策略次优与 auxiliary 标签语义缺口；训练未授权
 
 - A 对 new selected/update-96 的 800 episode、5,632 step 做确定性记录动作重放，原账本完全一致；SA 首次失败
   `32/100`、`26/100` 全为当前 bundle missing 时选择非修复动作，未确认 env/ledger 实现 bug。
 - 3,840/3,840 SA optimizer step 的 auxiliary loss/weighted gradient 非零；有界 24 条首次失败探测中 22 条现有
   `event_target=1`，但 24 条当前 bundle 均缺失。该方向支持机制候选，不构成因果消融。
-- 已冻结唯一 service-feasible event target 候选及 action0/2/4 对称反事实门禁；A 未执行 action branch（0/24），因此本轮不
-  实现、不训练。见 `cscwd_prepared_state_event_chain_diagnosis_20261010.md` 与
+- 已冻结唯一 service-feasible event target 候选及 action0/2/4 对称反事实门禁；当时 action branch 为 `0/24`。后续条件授权
+  已允许 default-off 实现，但截至本条更新仍未授权训练。见 `cscwd_prepared_state_event_chain_diagnosis_20261010.md` 与
   `cscwd_service_feasible_aux_target_candidate_20261010.md`。
 
 ## 2026-10-10：prepared-state v4 匹配实验完成；接口接受，性能候选拒绝

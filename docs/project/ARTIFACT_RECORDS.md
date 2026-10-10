@@ -5,6 +5,15 @@
 
 # Artifact Records
 
+## 2026-10-10 service-feasible event-target 条件执行预检（无科学 run）
+
+- 协议：`configs/experiment/calibrated_workflow_service_feasible_event_target_ab_v1.json`；当前
+  `execution_authorized=false`、`symmetric_branch_gate.status=pending_a_handoff`，未绑定 A manifest/report hash。
+- runner/analyzer/launcher 已冻结本地实现；预检只读复核历史 v4 scientific control 的 119-file integrity、400 selected、400
+  fixed-96、40 rule rows，以及 474 个因果前缀扰动点。0 training、0 evaluation、0 formal/holdout。
+- target flag 默认关闭；候选与旧版均 165,512 参数、60 state keys，固定 seed 初始化张量完全相同。无候选 checkpoint、run
+  artifact 或结果可登记；A 门禁 PASS 前不得创建 scientific run root。
+
 ## 2026-10-10 prepared-state event-chain read-only diagnosis
 
 - A 诊断 commit=`855d67f`；机器 root=

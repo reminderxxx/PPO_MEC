@@ -1,6 +1,15 @@
 ﻿# Decision Log
 
-## 2026-10-10：只冻结 service-feasible event target，不直接实现或训练
+## 2026-10-10：条件实现 service-feasible target，门禁 PASS 前 fail-closed
+
+- 新条件授权只扩大到 default-off 实现与协议冻结；科学训练仍取决于 A 的对称 action0/2/4 冻结策略后缀门禁，不以即时
+  action4 失败或单步 reward 决定。
+- 唯一变量是 event hard/soft target 合取当前完整 bundle readiness。保留 current-ready 正例，不改变 slow/fast target、
+  auxiliary 权重、网络、reward、critic、动作权限、推理、数据、optimizer 或预算；该项是学习监督纠偏候选，不是实现 bug
+  修复或算法创新。
+- 门禁 PASS 后也只执行一次 SA 五 seed 匹配 A/B；FAIL/MIXED 或明确多步反例即停止，不转向第二候选、扩预算或筛 seed。
+
+## 2026-10-10：只冻结 service-feasible event target，不直接实现或训练（历史阶段）
 
 - 事件链没有确认环境/账本 bug；失败来自当前 bundle 缺失时选择 action1/3/4。辅助 event label 确实生效且不检查 action4
   当前服务可行性，支持唯一 target-only 候选，但 0/24 action branch 意味着尚无反事实授权。
