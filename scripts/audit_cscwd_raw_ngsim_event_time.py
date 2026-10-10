@@ -65,6 +65,10 @@ def main() -> None:
                        else RawNGSIMEventTimeEnv(config, row, traces[design_id]))
                 _, _ = env.reset()
                 reasons: Counter[str] = Counter()
+                executed_actions: Counter[int] = Counter()
+                masked_request_count = 0
+                service_completed_events = 0
+                migration_success_events = 0
                 terminated = truncated = False
                 for _ in range(min(int(row["max_steps"]), 24)):
                     _, _, terminated, truncated, info = env.step(fixed_action)
@@ -72,6 +76,11 @@ def main() -> None:
                     if profile == "raw_ngsim_event_time_v1":
                         preview_calls += 1
                     reason = info["transition"].get("admission_rejection_reason")
+                    executed = int(info["transition"]["action"])
+                    executed_actions[executed] += 1
+                    masked_request_count += int(executed != fixed_action)
+                    service_completed_events += int(bool(info["transition"]["service_completed"]))
+                    migration_success_events += int(bool(info["transition"].get("migration_success", False)))
                     if reason:
                         reasons[str(reason)] += 1
                     if terminated or truncated:
@@ -79,6 +88,10 @@ def main() -> None:
                 summary = env.summary()
                 results.append({"design_id": design_id, "split": row["split"], "profile": profile,
                                 "fixed_action": fixed_action, "terminated": terminated, "truncated": truncated,
+                                "executed_action_counts": dict(executed_actions),
+                                "masked_request_count": masked_request_count,
+                                "service_completed_events": service_completed_events,
+                                "migration_success_events": migration_success_events,
                                 "admission_rejections": dict(reasons), "steps": summary["steps"],
                                 "completed_nodes": summary["completed_nodes"],
                                 "workflow_completed": summary["workflow_completed"],
