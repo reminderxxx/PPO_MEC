@@ -11,13 +11,12 @@ import torch
 
 from scripts.freeze_calibrated_continuous_workflow_pilot import _load_experiment_config
 from scripts.run_calibrated_workflow_strong_baselines import _build_learned
-from scripts.diagnose_cscwd_sa_behavior import _public_state_hash
 from src.encoders.calibrated_workflow_features import prepared_state_prefix_features
 from src.envs.core.calibrated_continuous_workflow_env import (
     CalibratedContinuousWorkflowEnv,
     PREPARED_STATE_PREFIX_PROFILE,
 )
-from src.envs.core.causal_rsu_predictor import fit_predictor
+from src.envs.core.causal_rsu_predictor import canonical_hash, fit_predictor
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,7 +53,11 @@ def test_original_same_public_state_alias_is_separated_without_changing_cost() -
     old_missing = _env(config, instance, OLD_PROFILE, missing_history)
     assert old_ready._observation().tolist() == old_missing._observation().tolist()
     assert old_ready._info() == old_missing._info()
-    assert _public_state_hash(old_ready._observation(), old_ready._info()) == (
+    assert canonical_hash({
+        "observation": [float(item) for item in old_ready._observation()],
+        "semantic_state": old_ready._info()["semantic_state"],
+        "action_mask": old_ready._info()["action_mask"],
+    }) == (
         "86206ccfda557199bb67a41c0d3a7bcfc3b98a3817aa7de3875e71e6c971d62d"
     )
 
