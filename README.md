@@ -6,6 +6,7 @@
 # PPO_MEC
 
 2026-10-11 的 [CSCWD 接触与阶段阻断诊断](docs/project/cscwd_new_development_contact_phase_diagnosis_20261011.md)复用原 40 episode：68 次接触拒绝中 6 次公开预测乐观；12 次 action 4 全部超当前 RSU 整步 contact，8 次准备阶段本可完成但被回滚。下一步须先冻结跨接触相位合同，不能直接放宽当前门槛或启动训练。
+待决策的 [raw 逐相位合同实施方案](docs/project/cscwd_raw_phase_contract_implementation_plan_20261011.md)列出原子服务与远端连续服务两种明确物理语义、事件/字节守恒和合成验收门；它尚未授权环境改动。
 
 2026-10-11 新增 [CSCWD 长原始 development 来源与有界可达性审查](docs/project/cscwd_new_development_source_reachability_20261011.md)：事前冻结的两个 118.8 秒窗口完成 40 次开发 episode，4 次按期、0 次成功迁移。数据时长已足够，当前整步接触合同仍阻断迁移机制；训练与论文主张不晋级。
 

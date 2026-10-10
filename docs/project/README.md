@@ -10,6 +10,7 @@
 ## Live 文档
 
 - `cscwd_new_development_contact_diagnosis_plan_20261011.md`、`cscwd_new_development_contact_phase_diagnosis_20261011.md`：原 320 步接触拒绝账本与固定 12 次 action 4 阶段诊断，0/20 额外环境步，区分预测误差、准备预算和整步回滚；不直接修物理合同。
+- `cscwd_raw_phase_contract_implementation_plan_20261011.md`：待决策的 raw v2 逐相位执行与跨接触服务方案、producer/consumer 和合成验收；不是已授权的环境改动。
 
 - `cscwd_new_development_source_reachability_20261011.md`：新原始长轨迹的严格区间隔离、固定 40 episode 公共可达性、独立基线权限复核与机制阻断；训练门仍关闭。
 

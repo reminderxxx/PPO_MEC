@@ -9,6 +9,7 @@
 
 - 对冻结 40 episode/320 step 的 68 次 contact 拒绝做 0 步账本复算：43 个去重尝试，68/68 起点有正 contact 且 trace 剩余足够；6 次 action 0/3 公开 contact 预测可行而真实拒绝，action 4 无此类预测误判。12 次 action 4 对应 10 个去重尝试，planned 整步 1.523–6.121 s 全部超过 public/actual 当前 RSU contact；账本 SHA-256 `f35fe1ded86663488568864790c523a24a62ae66ad517c592d7aa75481d76b93`。
 - 固定 12 次 action 4 前缀与 native preview 仅新增 20 env.step：4 次准备阶段自身超 contact，8 次准备可完成；其中 4 次 native preview 会成功迁移（仅 2 个去重状态），但完整当前服务跨出接触，raw 门统一回滚为 0 模型/状态字节。不能直接放宽整步门。public immediate/two-step 各在同一 `raw_full_step_contact_fit=no` 状态选 action 4，B 线应独立修 consumer，不能据此开启训练。阶段原件 SHA-256 `b3f0634ad0c305fdd9f0cb5780c3b0120c94aa8b4e3600ce175f5fd601d44554`；完整归因见 `cscwd_new_development_contact_phase_diagnosis_20261011.md`。
+- 待决策的 `cscwd_raw_phase_contract_implementation_plan_20261011.md` 将原子服务与远端连续服务、目标 RSU 交付、分相位 commit/rollback 和共同公开输入拆为可验收条款；未把建议写成已授权合同或真实链路证据。
 
 ## 2026-10-11：新长原始 development 来源合格，固定可达性未兑现迁移
 
