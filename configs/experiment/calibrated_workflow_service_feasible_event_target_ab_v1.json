@@ -10,7 +10,8 @@
     "legacy_event_target": "target_ready_and_prepare_timing",
     "candidate_event_target": "legacy_event_target_and_current_complete_bundle_ready",
     "candidate_event_soft_target": "legacy_soft_target_if_current_complete_bundle_ready_else_zero",
-    "implementation_commit": null,
+    "implementation_commit": "d17c374911b4fdcad1c37b11b4087be0f7fa0e22",
+    "implementation_tree": "31e9d438ef0ac57b6d1a186e6007d3a926ad4de2",
     "network_parameter_change": 0,
     "inference_override": false
   },

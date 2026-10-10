@@ -66,6 +66,7 @@ A 已在独立工作树预注册门禁计划（commit=`eefc4a2`）并开始生�
 实现使用默认关闭的 `mechanism_aux_current_service_feasibility_gate_enabled`；关闭时保持旧 target，打开时只把 current complete
 bundle readiness 合取到 event hard/soft target。checkpoint 显式记录 `mechanism_aux_event_target_semantics`，跨语义加载拒绝；
 网络结构、参数量与初始化张量不变，推理仍为 `raw_policy`。配置
-`configs/experiment/calibrated_workflow_service_feasible_event_target_ab_v1.json` 当前保持 `execution_authorized=false`。
+`configs/experiment/calibrated_workflow_service_feasible_event_target_ab_v1.json` 绑定 implementation commit=`d17c374`，当前保持
+`execution_authorized=false`。
 
 全部实例仍为已暴露 development；即使未来 A/B 通过，也不能直接形成 formal/holdout、稳定领先、novelty 或 paper-ready 主张。

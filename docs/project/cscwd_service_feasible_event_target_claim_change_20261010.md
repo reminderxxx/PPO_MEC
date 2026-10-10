@@ -30,6 +30,6 @@
 `reviewed_at=2026-10-10`；`literature_cutoff=2026-10-10`；`target_venue=IEEE TMC`；
 `artifact_run_id=none_preflight_only_awaiting_action_branch_gate`；
 `policy_version=tmc_review_policy_v3_20260621`；
-`git_commit=TO_BE_BOUND_AFTER_IMPLEMENTATION_FREEZE`；
+`git_commit=d17c374911b4fdcad1c37b11b4087be0f7fa0e22`；
 `evidence_level=E1_IMPLEMENTATION_AND_DEVELOPMENT_DIAGNOSIS_NO_CANDIDATE_RUN`；
 `verdict=Unverifiable_for_performance_or_paper_claim`。

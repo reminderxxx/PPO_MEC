@@ -12,7 +12,8 @@
 - runner/analyzer/launcher 已冻结本地实现；预检只读复核历史 v4 scientific control 的 119-file integrity、400 selected、400
   fixed-96、40 rule rows，以及 474 个因果前缀扰动点。0 training、0 evaluation、0 formal/holdout。
 - target flag 默认关闭；候选与旧版均 165,512 参数、60 state keys，固定 seed 初始化张量完全相同。无候选 checkpoint、run
-  artifact 或结果可登记；A 门禁 PASS 前不得创建 scientific run root。
+  artifact 或结果可登记；implementation commit=`d17c374911b4fdcad1c37b11b4087be0f7fa0e22`、tree=`31e9d438`；A 门禁
+  PASS 前不得创建 scientific run root。
 
 ## 2026-10-10 prepared-state event-chain read-only diagnosis
 
