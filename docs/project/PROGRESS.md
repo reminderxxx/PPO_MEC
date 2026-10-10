@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-10：原始 NGSIM 事件时间合同落地，旧短窗口不足以训练优秀基线
+
+- 冻结合同 `79ce5ab`、环境实现 `ade1561`、最终运行代码 `0704937`；本地 `cscwd_raw_ngsim_event_time_20261010_v4` 只读核验 11,850,526 原始行、3 个已暴露且原始时间互斥的 development 窗口，各 24 帧/2.3 s。公共 actor 只见前缀位置/恒速预测及共同 clock/deadline/fallback/failure 字段；轨迹终点仅在环境诊断，继承自合成路由的预测 confidence 被固定的未校准 0.5 取代。B 已独立指出并促成移除公共剩余轨迹时长。
+- opt-in 保守接触准入与显式 `truncated=True, terminated=False` 通过 6 项合成测试；30 固定动作 episode、147 真实 step、30 预览，0 训练/正式/holdout。原始剖面 15/15 截断、2 节点、0 workflow、28 失败、0 三类传输字节，10 次请求被 action mask 改写；旧决策步 13/15 workflow 仅显示时间语义差异，不能排名。没有成功 prepare，B 按预冻门不启动匹配训练。完整原件 hash、边界、审查字段见 `cscwd_raw_ngsim_event_time_development_check_20261010.md`；paper-ready 与 SA 算法贡献仍 `Unverifiable`。
+
 ## 2026-10-10：移动 modeled-clock 合成时间敏感性完成；不改科学 verdict
 
 - 事前计划 commit `428cdc4`，固定 8 个已消费开发实例、seed7 的旧 SA/条件弃权 SA/PPO/MAPPO selected checkpoint 与额外权限 two-step；旧默认 vs opt-in `synthetic_elapsed_5s_atomic_v1` 共 80 episode、528 真实 step、2,094 two-step 模型预览 step，0 训练/选模/正式 split。旧 profile 与原 selected ledger 24 episode/144 step 全字段 0 mismatch；全部真实动作 mask 合法、逐步成本/clock 与 episode bytes 守恒。

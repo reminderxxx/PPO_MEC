@@ -13,7 +13,7 @@
 /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_raw_ngsim_event_time_env.py
 /Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_cscwd_raw_ngsim_event_time.py \
   --raw-csv-path '/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
-  --output-root artifacts/analysis/cscwd_raw_ngsim_event_time_20261010_v2
+  --output-root artifacts/analysis/cscwd_raw_ngsim_event_time_20261010_v4
 ```
 
 入口核验原 manifest/config hash 与精确原始时间/帧，最多 30 episode、720 真实步、10,000 预览步；输出 `source_manifest.json` 和 `summary.json`，不含原始坐标。`truncated=True` 表示轨迹结束，value learner 应 bootstrap。本检查不生成 checkpoint，不训练，不读取封存 holdout；短轨迹结果不作算法排名。若需要可检验的 prepare/service 两类状态，须另行冻结较长且时间互斥的开发窗口协议，不能本轮换窗口。

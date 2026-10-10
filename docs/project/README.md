@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `cscwd_raw_ngsim_event_time_contract_20261010.md`、`cscwd_raw_ngsim_event_time_development_check_20261010.md`：冻结 NGSIM 原始时间/位置、共同因果公共状态和接触准入；3 个短开发窗口的固定动作检查因全部截断而停止匹配训练，非算法或论文结果。
+
 - `cscwd_mobility_elapsed_sensitivity_plan_20261010.md`、`cscwd_mobility_elapsed_sensitivity_20261010.md`：旧决策步时间合同与独立 opt-in 5s 合成 elapsed/原子动作敏感性，固定 checkpoint 80 episode、逐步成本、失败等待反例与真实物理/规则能力边界；非论文或公平新排名。
 
 - `cscwd_fast_aux_gradient_probe_plan_20261010.md`、`cscwd_fast_aux_gradient_probe_20261010.md`：事前冻结的 20 checkpoint/1,200 步 fast/slow/event CE 与执行动作 PPO 同状态梯度探针；历史训练冲突和科学晋级仍未验证。

@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：原始事件时间开发窗口过短，准备/服务联合标签不可达
+
+- `OBSERVED / open experimental blocker`：冻结三窗口各仅 2.3 s，首帧作历史后可执行源区间 2.2 s；原始剖面 15/15 轨迹截断，28 拒绝中 24 个因 trace end、4 个因 current-RSU 接触，0 次成功模型/状态准备。当前固定策略检查不能支持新 learned/强规则公平训练或优秀基线排序，不能从本轮挑更长窗口替换。
+- `CAPABILITY LIMIT`：现有 calibrated env 无部分传输/跨界远端服务相位，新 opt-in 用完整服务在当前接触内完成的保守准入；RSU 圆形几何为模拟，NGSIM 只实测位置/时间。不存在无线/队列/部署真实性证据；独立较长开发窗口和跨界能力合同须另轮冻结。见 `cscwd_raw_ngsim_event_time_development_check_20261010.md`。
+
 ## 2026-10-10：决策步移动与 modeled elapsed 分离是开放物理合同风险
 
 - `OBSERVED / not implementation bug`：旧合同每决策推进 RSU，4 个纯 2s 失败后换 RSU 中有 3 个未跨对应 modeled 5s 边界；opt-in 合成 elapsed 语义使这类切换为 0。固定策略后果正负混合，不能以一次旧 SA `dev_00` 反例宣称总体收益失效或新语义是真实物理。

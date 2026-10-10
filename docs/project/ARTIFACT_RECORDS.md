@@ -5,6 +5,12 @@
 
 # Artifact Records
 
+## 2026-10-10 CSCWD raw NGSIM event-time development check
+
+- 本地 create-only root：`artifacts/analysis/cscwd_raw_ngsim_event_time_20261010_v4/`；运行代码 `0704937742ec9218094f380a1b541c4bd2159bcb`，只读原始 NGSIM 3 个已暴露窗口、30 固定动作 episode/147 step，0 训练/正式/holdout/checkpoint。
+- `source_manifest.json` SHA-256 `c0b64fd64c602ef5351c5686d2f315bbd5784e63ebbd08902b297fc5bacc883f`；`summary.json` SHA-256 `62c1f4c2c7fbb2e2763f6946c0fad29b4cd6a3705ebf01501a7d905d8b1fe30f`；原始 2,118,175,938-byte CSV SHA-256 `ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c`，未复制/上传。
+- 原始剖面 15/15 轨迹截断、0 workflow/0 prepare，10 次固定动作请求被 mask 改写；不晋级算法或论文主张。完整审查见 `cscwd_raw_ngsim_event_time_development_check_20261010.md`。早期 `v1/v2/v3` 不作为报告结果。
+
 ## 2026-10-09 calibrated workflow service-reward learning diagnosis
 
 - root：`artifacts/analysis/calibrated_workflow_service_reward_learning_diagnosis_20261009_v1/`；只读消费 10 月 6 日
