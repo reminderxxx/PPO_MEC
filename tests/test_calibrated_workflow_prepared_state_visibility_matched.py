@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_preflight_binds_sources_without_training_or_evaluation() -> None:
     receipt = preflight(ROOT / DEFAULT_PROTOCOL, DEFAULT_HISTORICAL_ROOT, DEFAULT_RULE_ROOT)
     assert receipt["status"] == "preflight_passed"
-    assert receipt["execution_authorized"] is False
+    assert receipt["execution_authorized"] is True
     assert receipt["scientific_steps"] == receipt["new_evaluation_episodes"] == 0
     assert receipt["historical_selected_rows"] == 400
     assert receipt["historical_rule_rows"] == 40

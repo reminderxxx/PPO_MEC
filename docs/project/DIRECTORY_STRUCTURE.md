@@ -3,7 +3,7 @@
 ## 2026-10-09 因果前缀强基线版本
 
 - `configs/experiment/calibrated_workflow_prepared_state_visibility_matched_protocol_v1.json`：prepared-state 共同信息修复的
-  冻结协议、A 实现身份与历史原件 hashes；正式授权在 clean frozen commit 后单独切换。
+  冻结协议、A 实现身份与历史原件 hashes；已在 frozen runner push 后通过独立配置提交授权一次启动。
 - `scripts/run_calibrated_workflow_prepared_state_visibility_matched.py`：只读复用历史 selected/rule，训练新 v4 四方法，并只对
   历史/新 update-96 与新 selected 执行预声明的 1,200 个评价 episode。
 - `scripts/analyze_calibrated_workflow_prepared_state_visibility_matched.py`、`scripts/launch_calibrated_workflow_prepared_state_visibility_matched.py`：

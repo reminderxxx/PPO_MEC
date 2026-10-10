@@ -16,7 +16,7 @@
 - frozen SA `39/40` 完成、`5/40` 按期，PPO `40/40`、`4/40`，DT `40/40`、`11/40`；39 个双方完成配对上，SA−PPO 时延 `+28.39 s`（重算 `+39.15 s`，model network `+10.99 s`，fallback `−23.18 s`），SA−DT `+22.63 s`（重算 `+24.48 s`）。SA 97/121 个非 fallback handoff state 未就绪；重复模型准备和预测目标不匹配均非主导项。
 - 同一公开状态+action 的 10 组 handoff 记录出现不同 state readiness，含 1 组 SA 自身不同 seed；`prepared_state` 有效性未公开。唯一后续候选是所有 learned 方法共享的 prepared-state prefix validity/freshness 观察合同纠错，尚未实现/训练，不称创新。完整诊断见 `cscwd_sa_long_budget_cost_diagnosis_20261009.md`；论文与论文表未动。
 
-## 2026-10-10：共同 prepared-state 可见性匹配 runner 冻结，等待最终授权提交
+## 2026-10-10：共同 prepared-state 可见性匹配 runner 已冻结并授权单次启动
 
 - A 的长预算成本诊断确认共同公共状态别名：相同 observation/semantic/mask 与相同动作可能对应不同 state readiness/
   recompute；本轮优先级由 selection-cohort 建议调整为共享 observation contract 纠错。
@@ -25,8 +25,8 @@
 - A 交接 `709746b` 与自包含测试修正 `5170539` 已核验；B 复验 43 tests、474 个后缀篡改点、20 个历史 update-96
   checkpoint 和 40 条规则来源，参数增量 SA `+192`、其余各 `+448`。预检为 0 训练、0 新评价。
 - 新协议固定四 learned×五 seed×5,760 steps、同 reward/raw critic/optimizer/dev selector，主 selected 与辅助 update-96
-  两个预声明视角，新增评价上限 1,200 episodes。runner/analyzer/launcher 已实现；当前 `execution_authorized=false`，须先
-  提交、push、clean checkout，再以独立授权提交切换一次。
+  两个预声明视角，新增评价上限 1,200 episodes。runner commit=`f9fb832` 已 push；配置现授权一次持久启动，仍禁止 retry、
+  追加 seed、最终评价选模或边训练修复。
 - 协议见 `cscwd_prepared_state_visibility_matched_protocol_20261010.md`；本轮不修改论文。
 
 ## 2026-10-09：因果强基线统一 4× 预算延长完成；改善 completion，不支持 SA 领先

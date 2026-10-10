@@ -2,8 +2,9 @@
 
 ## 状态与目的
 
-本协议已冻结科学变量，A 实现交接与 B 独立前置门禁已经通过；冻结 runner 提交、push 和 clean checkout 完成前仍
-**不授权启动**：`execution_authorized=false`。授权只通过配置单独切换，不能用口头说明替代。
+本协议已冻结科学变量，A 实现交接、B 独立前置门禁、冻结 runner 提交与 push 均已通过；现以独立配置提交
+**授权一次启动**：`execution_authorized=true`、`authorization_state=authorized_after_independent_preflight`。授权不包含 retry、
+追加 seed、边训练修复或结果导向扩展。
 
 已确认的 first-order 问题是：相同公共 observation/semantic/mask、相同合法 action 的状态可具有不同
 prepared-state readiness 与 DAG 重算成本。该别名对所有 feedforward learned methods 共享；它不证明该缺口单独造成

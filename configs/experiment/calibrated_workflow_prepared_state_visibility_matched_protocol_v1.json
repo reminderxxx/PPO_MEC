@@ -1,7 +1,7 @@
 {
   "schema_version": "calibrated_workflow_prepared_state_visibility_matched_protocol_v1",
-  "execution_authorized": false,
-  "authorization_state": "awaiting_a_implementation_handoff_and_independent_preflight",
+  "execution_authorized": true,
+  "authorization_state": "authorized_after_independent_preflight",
   "run_id": "cscwd_causal_prepared_state_visibility_matched_20261010_v1",
   "scope": "consumed_36_instance_development_only",
   "historical_arm": {
@@ -42,6 +42,7 @@
     "implementation_document_sha256": "110bfffd8b829d133d741b6ad948fda0d3c053b4c56afd93c2a49e453deeed1b",
     "implementation_env_sha256": "c6ded6ce84230519160a40f29e276b5823eb204a35e31c35f914d1c6bfee3a59",
     "integration_test_fix_commit": "517053949d916c476843f48769799e3854810d32",
+    "matched_runner_commit": "f9fb832a498a050a2d39f5254e7344f367e83632",
     "parameter_count_change_must_be_reported": true,
     "strict_pure_information_single_variable_claim_allowed": false
   },
@@ -106,7 +107,7 @@
     "old_profile_byte_equivalent": true,
     "missing_expired_new_prefix_prepare_failure_rsu_switch_negative_cases": true,
     "exact_optimizer_and_budget_receipt": true,
-    "implementation_identity_frozen": false
+    "implementation_identity_frozen": true
   },
   "primary_metrics": [
     "workflow_completion_rate",
