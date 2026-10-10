@@ -16,10 +16,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.diagnose_cscwd_sa_behavior import _bool, _public_state_hash
 from scripts.run_calibrated_workflow_interface_repair import _sha256, _write_json
 from scripts.run_calibrated_workflow_strong_baselines import _load_inputs, _load_json
 from src.envs.core.calibrated_continuous_workflow_env import CalibratedContinuousWorkflowEnv
+from src.envs.core.causal_rsu_predictor import canonical_hash
 
 B_ROOT = Path("/Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC")
 SOURCE = B_ROOT / "artifacts/experiments/cscwd_causal_prepared_state_visibility_matched_20261010_v1"
@@ -30,6 +30,21 @@ SCIENCE_COMMIT = "f46ec72b15f534ac44768a83ef6316c1cfcb6b58"
 PROFILE = "calibrated_workflow_interface_v4_prepared_state_prefix"
 VIEWS = ("selected", "update96")
 METHODS = ("sa_ghmappo", "mappo", "ppo", "dt_handoff_drl")
+
+
+def _bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if str(value) not in {"True", "False"}:
+        raise RuntimeError(f"invalid recorded boolean: {value}")
+    return str(value) == "True"
+
+
+def _public_state_hash(observation: Any, info: dict[str, Any]) -> str:
+    return canonical_hash({
+        "observation": [float(item) for item in observation],
+        "semantic_state": info["semantic_state"], "action_mask": info["action_mask"],
+    })
 
 
 def _csv(path: Path) -> list[dict[str, str]]:
