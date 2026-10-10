@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：长原始来源可执行完整 DAG，但迁移机制受当前整步接触合同阻断
+
+- `CONFIRMED / bounded development mechanism limit`：两段新冻结轨迹各 118.8 s，40/40 workflow 最终完成且 4/40 按期；但 12/12 执行 action4 在 `current_rsu_contact_expires_before_commit` 拒绝，68 次同类拒绝，0 模型/状态字节和成功迁移。源时间不足已非本轮主因，当前 RSU 几何与整步（准备+节点计算）接触准入共同限制机制可达性。不能把零迁移归因于算法决策质量，也不能直接放宽正式科学合同。
+- `OPEN / phase semantics`：已知旧 raw 整步门可回滚本可在接触内完成的准备阶段，但本轮尚未逐项分解 12 次 action4 的准备/计算/目标接触、几何与预测误差。因此具体占比及最小修复路径未验证；下一步只能在原 40 episode ledger 上做预登记的有界阶段诊断，另立物理语义决策后才可修环境或训练。详见 `cscwd_new_development_source_reachability_20261011.md`。
+
 ## 2026-10-11：授权原始 development 区间不足以承载完整 DAG
 
 - v28 strict split 已授权的 40 个 train/dev 区间各仅 24 帧/2.3 s，首帧后可决策 2.2 s；最短 workload 纯计算和 16.298588 s。结果盲资格 0/40，不能用任意算法胜负或放松时间/成本合同绕过，也不能自行延长到未授权 NGSIM 行。需先另行批准隔离的长 development 原始区间，并独立关闭公共未来接触 clone 与 phase 估计一致性门，再考虑可达性/匹配训练。证据见 `cscwd_development_window_eligibility_20261011.md`。

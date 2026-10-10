@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-11：新长原始 development 来源合格，固定可达性未兑现迁移
+
+- 事前冻结 Lankershim/US101 最多 3 个来源，扫描 NGSIM 11,850,526 行后只得到两个 1,189 帧/118.8 s 连续窗口；与 strict formal/hidden 的原始时间区间及 24 帧 embargo 零重叠，最近保护端点间隔 68,100/2,500 ms。两窗各有既有 train/dev 暴露 1/2，故仅为开发来源，不是独立确认性 split。来源清单 SHA-256 `34eee3a8d16f2dfe89f3a8d8dcd27f20159c0488e2f1a9ebc77be3aac747abde`。
+- 固定四任务×五方法共 40 episode/320 真实 step/565 preview 上界，40/40 workflow 完成、仅 4/40 按期；68 次整步 contact expiry、12/12 执行 action4 被拒、0 成功迁移/模型/状态字节。全量 ledger 对账通过；可达性清单 SHA-256 `481dd42489dbb9bab30f297237b4373fee9b1b3823082031ed308532f2332e0c`。数据时长阻断解除，但冻结几何与当前 RSU 整步接触合同阻断机制；不根据结果换窗或启动训练。
+- A 独立复核 B 的公共规则隐藏后缀反例：public immediate/two-step 动作、状态与 0-update PPO 数值概率不变；旧 exact-clone 规则随隐藏未来改变，应只标 privileged reference。该权限验收不是性能比较。0 formal/holdout、0 checkpoint/新论文主表；优秀基线、SA 贡献、paper-ready 均 `Unverifiable`。详见 `cscwd_new_development_source_reachability_20261011.md`。
+
 ## 2026-10-11：授权 development 原始区间资格为 0/40；后续原始时间训练暂停
 
 - 事前方案 `1c18b43` 仅授权 v28 strict split 的 20 train+20 dev 原始区间。只读扫描 NGSIM 11,850,526 行及 formal/hidden 的 split manifest 区间元数据，40/40 有 24 个 100 ms 时间戳、最长授权连续源时长 2.3 s，首帧后 2.2 s，短于 36 个 workload 中最短纯计算和 16.298588 s；0 合格、0 formal/hidden 重叠。工程目标 118.8 s/1,189 帧仅用于另行授权方案，不是服务保证。

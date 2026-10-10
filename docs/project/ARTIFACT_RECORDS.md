@@ -5,6 +5,11 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD frozen long development source and bounded reachability
+
+- 本地 create-only 来源 root `artifacts/analysis/cscwd_new_development_source_20261011_v2/`：`source_manifest.json` SHA-256 `34eee3a8d16f2dfe89f3a8d8dcd27f20159c0488e2f1a9ebc77be3aac747abde`，`candidate_fragments.jsonl` SHA-256 `560cd95930b6b558b84ddb0e8b4d7973c63f889302219ec3b4a21b720f3f8c08`。全 CSV 11,850,526 行，2 个入选长窗；formal/hidden 原始区间及 24 帧 embargo 外。失败的 `v1` 只留部分原件，不引用。
+- 本地 create-only 可达性 root `artifacts/analysis/cscwd_new_development_reachability_20261011_v1/`：`reachability_manifest.json` SHA-256 `481dd42489dbb9bab30f297237b4373fee9b1b3823082031ed308532f2332e0c`，`step_ledger.jsonl` SHA-256 `679942ac74cc618127142abc89a5eaa0cd109ff38cad213dfd77dd850a67bacb`。40 episode/320 step/565 preview 上界、4 次按期、12/12 action4 接触拒绝、0 迁移/模型/状态字节；ledger 守恒通过。0 训练、0 formal/hidden 结果；报告 `cscwd_new_development_source_reachability_20261011.md`，原件按数据规则仅本地保留。
+
 ## 2026-10-11 CSCWD authorized development-window eligibility
 
 - 本地 create-only root `artifacts/analysis/cscwd_development_window_eligibility_20261011_v1/`；`eligibility_manifest.json` SHA-256 `e0e3dfdbeb35da5f99a4aa00f985983273efe364c5daa`。核验原始 NGSIM CSV 11,850,526 行、20 train+20 dev 授权区间、formal/hidden 仅区间元数据；40/40 为 2.3 s，0 合格，0 episode/训练/holdout 结果。事前方案和解释见 `cscwd_development_window_eligibility_plan_20261011.md`、`cscwd_development_window_eligibility_20261011.md`；清单不进入 Git。

@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `cscwd_new_development_source_reachability_20261011.md`：新原始长轨迹的严格区间隔离、固定 40 episode 公共可达性、独立基线权限复核与机制阻断；训练门仍关闭。
+
 - `cscwd_new_development_source_plan_20261011.md`：新授权的 NGSIM 长轨迹 development 来源资格、历史 sealed/匿名区间隔离及固定公共可达性预算；不改变旧 split。
 
 - `cscwd_development_window_eligibility_plan_20261011.md`、`cscwd_development_window_eligibility_20261011.md`：事前冻结的授权原始区间/静态成本资格与 40 窗只读审计；0 个合格窗口，后续数据扩展需另行授权。
