@@ -48,7 +48,11 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     if not rows:
         raise RuntimeError(f"refusing to write empty table: {path.name}")
     with path.open("x", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=list(rows[0]),
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
 
