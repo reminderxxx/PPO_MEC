@@ -1068,3 +1068,6 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - `OPEN`：public 规则使用 service/deadline/readiness/cost lexicographic objective，learned methods 使用冻结 reward；输入权限
   已匹配不等于目标函数完全匹配。后续表格必须显式列此差异，不能把 privileged 或 objective-mismatched 结果写成公平性能优势。
 - 数据资格仍由 A 线独立门控制；本修复无训练、checkpoint selection 或性能证据。
+- `OPEN / mechanism reachability`：A 线新长窗口虽满足来源与 strict interval 排除，但固定可达性 40 episode 中
+  migration/model bytes/state bytes 均为 0，12 次 action4 全部 contact expiry，仅 4/40 按期；当前冻结几何与 full-step
+  contact 不能支撑迁移机制学习。该门阻止训练，不能通过换窗口、放宽 gate 或改 reward 绕过。

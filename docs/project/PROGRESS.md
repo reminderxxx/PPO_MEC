@@ -2420,3 +2420,6 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - artifact：`artifacts/analysis/cscwd_public_rule_raw_fairness_20261011_v1/`；报告：
   `cscwd_public_baseline_fairness_change_note_20261011.md`。训练仍等待 A 线新 development source 可达性最终门，不以公平性
   合同通过代替数据资格或性能证据。
+- A 线最终可达性门结论为 STOP：2 窗口 × 4 workload × 5 固定方法共 40 episode/320 steps，40/40 workflow 完成但仅
+  4/40 按期，migration/model bytes/state bytes 全为 0，12 次 action4 全部 contact expiry，累计 68 次 contact rejection。
+  因此未启动授权的 4 方法 × 5 seed pilot，也未换窗、改几何、扩预算或重试。

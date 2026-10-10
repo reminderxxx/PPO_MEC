@@ -64,5 +64,9 @@ A 论文线可作的变更仅为：
 
 ## 启动门
 
-公平性合同门已通过，但训练门尚未因此自动打开。A 线新 result-blind development source 已生成来源清单，仍须完成
-固定预算可达性、formal/hidden 区间排除和 identity manifest 的最终交接。未取得该交接前不得启动 pilot。
+公平性合同门已通过，但 A 线随后完成的固定预算可达性门失败，因此训练门保持关闭：2 个 result-blind 长窗口 × 4 个
+workload × 5 个冻结规则方法共 40 episode、320 个真实 step，40/40 workflow 完成但仅 4/40 按期；model/state
+transfer bytes 与 migration success 均为 0，12 次实际 action 4 全部因 contact expiry，累计 68 次 contact rejection。
+reachability manifest SHA-256=`481dd42489dbb9bab30f297237b4373fee9b1b3823082031ed308532f2332e0c`，step ledger
+SHA-256=`679942ac74cc618127142abc89a5eaa0cd109ff38cad213dfd77dd850a67bacb`。这表明当前冻结几何和 full-step contact 下
+迁移机制不可达；按停止条件不启动 4 方法 × 5 seed pilot，不换窗口、不改几何、不延长预算。

@@ -83,3 +83,8 @@ exact-clone immediate/two-step 的动作和 action3 preview 会随隐藏 contact
 reference，公共规则才是下一轮信息权限匹配候选。为保持既有 prepared-state 协议的源码 hash，没有改写旧环境文件；能力
 标签集中在 `PRIVILEGED_REFERENCE_PROFILES`。完整主张变更见
 `docs/project/cscwd_public_baseline_fairness_change_note_20261011.md`。本补充仍无训练或性能结论。
+
+A 线随后完成新长窗口来源与固定预算可达性门：来源/strict interval 排除通过，但 40 个 bounded episode 中仅 4 个按期，
+migration/model transfer/state transfer 全为 0，12 次 action4 全部 contact expiry。因此最终训练门为 STOP，未启动
+4 方法 × 5 seed pilot。该结果不否定 estimator 阶段核算修复，而是说明当前冻结 Raw 几何与 full-step contact 下迁移机制
+缺少可学习的可达事件。

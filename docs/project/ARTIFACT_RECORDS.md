@@ -1928,3 +1928,15 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
   change with hidden future. Evidence level=`E2_ARTIFACT_AUDITED / bounded actual-environment contract audit`；不是性能、formal、
   holdout、SA 优势或 paper-ready 证据。
 - Report：`docs/project/cscwd_public_baseline_fairness_change_note_20261011.md`。
+
+## 2026-10-11 CSCWD new development source reachability stop
+
+- Producer branch：`codex/cscwd-sa-cost-diagnosis-20261009`；source manifest SHA-256=
+  `34eee3a8d16f2dfe89f3a8d8dcd27f20159c0488e2f1a9ebc77be3aac747abde`。
+- Reachability manifest SHA-256=`481dd42489dbb9bab30f297237b4373fee9b1b3823082031ed308532f2332e0c`；step ledger
+  SHA-256=`679942ac74cc618127142abc89a5eaa0cd109ff38cad213dfd77dd850a67bacb`。
+- Scope：2 result-blind development windows × 4 frozen workloads × 5 frozen rule methods；40 episodes、320 real steps、
+  565 preview upper bound；无 learned training、checkpoint、formal/hidden performance。
+- Result：40/40 workflow completed、4/40 on-time；migration success/model bytes/state bytes=`0/0/0`；12 action4
+  attempts 全部 contact expiry；68 contact rejections。Classification=`STOP / FROZEN GEOMETRY AND FULL-STEP CONTACT
+  MECHANISM UNREACHABLE`，未启动 4-method × 5-seed pilot。
