@@ -168,6 +168,14 @@ class RawNGSIMEventTimeEnv(CalibratedContinuousWorkflowEnv):
         for rsu, (_, x, y, radius) in zip(state["rsus"], self.geometry):
             rsu.update(position_x=x, position_y=y, coverage_radius=radius,
                        active_vehicle_ids=["veh_pilot"] if rsu["rsu_id"] == association else [])
+        state["predictions"]["prediction_confidence_by_vehicle"] = {"veh_pilot": 0.5}
+        state["predictions"]["prediction_uncertainty_by_vehicle"] = {"veh_pilot": 0.5}
+        state["predictions"]["causal_provenance"] = {
+            "source": "observed_position_prefix_constant_velocity",
+            "observed_sample_count": self._observed_index() + 1,
+            "actual_future_used": False,
+            "confidence_calibrated": False,
+        }
         context = state["calibrated_context"]
         context.update(time_contract={"schema_version": PROFILE,
                                       "clock_seconds": self.clock_seconds,

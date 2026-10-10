@@ -115,4 +115,6 @@ def test_future_trajectory_and_end_do_not_change_public_state(workload):
     public_second = second._info()
     assert public_first == public_second
     assert "trace_remaining_seconds" not in public_first["semantic_state"]["calibrated_context"]["time_contract"]
+    assert public_first["semantic_state"]["predictions"]["prediction_confidence_by_vehicle"] == {"veh_pilot": 0.5}
+    assert public_first["semantic_state"]["predictions"]["causal_provenance"]["actual_future_used"] is False
     assert first._physical_contact_budget_seconds() != second._physical_contact_budget_seconds()
