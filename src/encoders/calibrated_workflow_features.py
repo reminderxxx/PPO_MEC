@@ -8,13 +8,47 @@ from typing import Any
 
 CALIBRATED_WORKFLOW_INTERFACE_V2 = "calibrated_workflow_interface_v2"
 CALIBRATED_WORKFLOW_INTERFACE_V3_PREFIX_ONLY = "calibrated_workflow_interface_v3_prefix_only"
+CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX = "calibrated_workflow_interface_v4_prepared_state_prefix"
 
 
 def uses_calibrated_workflow_interface_v2(semantic_state: dict[str, Any]) -> bool:
     return str(semantic_state.get("interface_profile", "")) in {
         CALIBRATED_WORKFLOW_INTERFACE_V2,
         CALIBRATED_WORKFLOW_INTERFACE_V3_PREFIX_ONLY,
+        CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX,
     }
+
+
+def prepared_state_prefix_features(semantic_state: dict[str, Any]) -> list[float]:
+    """Current/forecast target state existence, exact prefix validity and gap.
+
+    The last scalar is a target-known mask. Unknown targets carry zeros rather
+    than an implied invalid state at a real RSU.
+    """
+    if semantic_state.get("interface_profile") != CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX:
+        raise ValueError("prepared-state features require the v4 public profile")
+    public = (semantic_state.get("calibrated_context") or {}).get("prepared_state_prefix")
+    if not isinstance(public, dict) or public.get("schema_version") != "prepared_state_prefix_v1":
+        raise ValueError("prepared-state public contract is missing or incompatible")
+    current, target = public.get("current"), public.get("predicted_target")
+    if not isinstance(current, dict) or not isinstance(target, dict):
+        raise ValueError("prepared-state current/target status is missing")
+    if current.get("known") is not True or not isinstance(target.get("known"), bool):
+        raise ValueError("prepared-state known masks are invalid")
+    values = []
+    for row in (current, target):
+        if not row["known"]:
+            if row.get("exists") or row.get("valid") or row.get("missing_completed_fraction") != 0.0:
+                raise ValueError("unknown target must have zero state features")
+            values.extend((0.0, 0.0, 0.0))
+            continue
+        if not isinstance(row.get("exists"), bool) or not isinstance(row.get("valid"), bool):
+            raise ValueError("prepared-state existence/validity must be boolean")
+        gap = float(row.get("missing_completed_fraction"))
+        if not 0.0 <= gap <= 1.0 or (row["valid"] and (not row["exists"] or gap != 0.0)):
+            raise ValueError("prepared-state prefix gap is inconsistent")
+        values.extend((float(row["exists"]), float(row["valid"]), gap))
+    return [*values, float(target["known"])]
 
 
 def primary_vehicle(semantic_state: dict[str, Any]) -> dict[str, Any]:

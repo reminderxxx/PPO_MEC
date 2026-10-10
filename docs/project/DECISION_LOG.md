@@ -1,5 +1,9 @@
 ﻿# Decision Log
 
+## 2026-10-10：共同 prepared-state prefix 观测作为显式 v4 接口修复
+
+- 决定：只公开当前与因果预测目标 RSU 上已提交状态的存在、与已完成 DAG 前缀的有效性及缺失比例；未知目标显式 mask。四 learned 方法同权消费，旧 profile/旧 checkpoint 不自动迁移。增加的输入投影参数单列；不改 reward、transition、mask、action guard 或核心 actor/critic。该项属于共同接口纠错，收益由 B 独立匹配训练判定，不作 SA 独有贡献。见 `cscwd_prepared_state_prefix_interface_20261010.md`。
+
 ## 2026-10-09：长预算后仅提出共享 prepared-state 可观测性纠错候选
 
 - 决定：完整原轨迹的成本差距由 DAG 重算主导；SA 少用 fallback，却有更多未准备的非 fallback handoff。公开状态同 hash+同 action 仍能产生不同 state readiness/重算，因此只冻结一个所有 learned 方法共享的 prepared-state freshness 字段候选；属于接口可观测性纠错，不自动实施、训练或称创新。

@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-10：prepared-state 公共观测 v4 最小修复通过接口验收
+
+- 在单独 A 工作树加入显式 opt-in `calibrated_workflow_interface_v4_prepared_state_prefix`；当前/公开预测目标的 state 存在、已完成前缀有效性和缺失比例均进入 PPO/MAPPO/DT flat 与 SA RSU 编码，旧 profile/旧 checkpoint 保持原语义，跨 profile load 显式拒绝。
+- B 原 `regression_08` SA 跨 seed 同公开 hash、同 action 的 `0/30.2107 s` 重算反例在新状态动作前分离；旧新相同动作序列的物理 transition、奖励、成本一致。目标链 21 test、smoke、语法及 diff 检查通过；0 训练、0 科学比较、0 旧 holdout 读取。参数量与本机推理计时见 `cscwd_prepared_state_prefix_interface_20261010.md`。B 需独立 preflight；SA 优势仍未验证。
+
 ## 2026-10-09：长预算 SA 完成改善，但逾期/成本由重算主导；公共 prepared-state 不可辨识
 
 - B 长预算科学原件完成 `115,200` 步、400 episode/2,811 决策；后处理 Python 兼容故障使 supervisor terminal FAIL，科学完成回执仍为 complete，B 已单独修复后处理。本 A 分支只读重放 400/2,811 并逐步把九项代价加回原 step/episode，总计 200 个 SA−PPO/DT 配对；0 新训练、0 额外 checkpoint 前向/局部分支。

@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：prepared-state 别名接口已修；学习收益仍待匹配实验
+
+- `RESOLVED IN OPT-IN V4`：原同公开状态+同动作、prepared-state 不同的具体反例可辨识，四方法共同消费；旧 profile 原样保留。
+- `OPEN`：本轮只验证接口和同动作物理等价，未训练、未证明按期/成本收益；新输入投影增加 SA 192、其他 learned 方法各 448 参数。原 B 成本缺口和独立 formal/holdout/support 风险继续有效，不得称 SA 算法创新或 paper-ready。见 `cscwd_prepared_state_prefix_interface_20261010.md`。
+
 ## 2026-10-09：长预算主 blocker 转为逾期重算与隐藏 prepared-state
 
 - `OBSERVED`：长预算 SA frozen `39/40` 完成但仅 `5/40` 按期；与 PPO/DT 的 39 个共同完成配对分别慢 `28.39/22.63 s`，额外 DAG 重算是主要分量。SA 少用 vehicle fallback，但 97/121 次非 fallback handoff 的 state 未就绪。模型重复准备/预测目标错位不是当前主因。

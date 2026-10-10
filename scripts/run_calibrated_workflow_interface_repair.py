@@ -98,6 +98,7 @@ def _build_agent(
         "batch_size": 32,
         "train_epochs": 4,
         "deterministic_action": False,
+        "prepared_state_features_enabled": config.get("interface_profile") == "calibrated_workflow_interface_v4_prepared_state_prefix",
     }
     if method in {"sa_ghmappo", "mappo", "dt_handoff_drl"}:
         interface = config["learning_interface"]

@@ -18,6 +18,7 @@ from torch.distributions import Categorical
 from src.agents.base_agent import BaseAgent
 from src.agents.popularity_cache_heuristic_agent import PopularityCacheHeuristicAgent
 from src.encoders import FlatSemanticEncoder, SurrogateFusionEncoder
+from src.encoders.calibrated_workflow_features import CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX
 from src.encoders.fusion_encoder import (
     build_graph_continuity_critic_features,
     build_prediction_reliability_summary,
@@ -239,6 +240,7 @@ class 分层策略网络(nn.Module):
         prediction_gate_min_leak: float = 0.0,
         graph_continuity_critic_enabled: bool = False,
         uncertainty_aware_critic_enabled: bool = False,
+        prepared_state_features_enabled: bool = False,
         event_logit_temperature: float = 1.0,
         option_gate_enabled: bool = False,
         option_gate_count: int = 4,
@@ -265,6 +267,7 @@ class 分层策略网络(nn.Module):
         self.hierarchical_conditioning = bool(hierarchical_conditioning)
         self.centralized_critic = bool(centralized_critic)
         self.encoder_kind = str(encoder_kind)
+        self.prepared_state_features_enabled = bool(prepared_state_features_enabled)
         self.event_logit_temperature = max(float(event_logit_temperature), 0.25)
         self.option_gate_enabled = bool(option_gate_enabled)
         self.option_gate_count = max(int(option_gate_count), 1)
@@ -301,7 +304,10 @@ class 分层策略网络(nn.Module):
         )
 
         if self.encoder_kind == "flat":
-            self.encoder = FlatSemanticEncoder(hidden_dim=self.hidden_dim)
+            self.encoder = FlatSemanticEncoder(
+                hidden_dim=self.hidden_dim,
+                prepared_state_features_enabled=self.prepared_state_features_enabled,
+            )
         else:
             self.encoder = SurrogateFusionEncoder(
                 hidden_dim=self.hidden_dim,
@@ -312,6 +318,7 @@ class 分层策略网络(nn.Module):
                 prediction_gate_min_leak=prediction_gate_min_leak,
                 graph_continuity_critic_enabled=graph_continuity_critic_enabled,
                 uncertainty_aware_critic_enabled=uncertainty_aware_critic_enabled,
+                prepared_state_features_enabled=self.prepared_state_features_enabled,
             )
 
         if self.use_hierarchy:
@@ -712,6 +719,7 @@ class 分层PPO基类(BaseAgent):
         mechanism_logit_bias_strength: float = 0.0,
         mechanism_confidence_floor: float = 0.0,
         prediction_feature_dim: int = 13,
+        prepared_state_features_enabled: bool = False,
         prediction_gate_min_leak: float = 0.0,
         slow_entropy_coef_scale: float = 1.0,
         fast_entropy_coef_scale: float = 1.0,
@@ -1277,6 +1285,7 @@ class 分层PPO基类(BaseAgent):
         self._mechanism_logit_bias_strength = float(mechanism_logit_bias_strength)
         self._mechanism_confidence_floor = float(mechanism_confidence_floor)
         self._prediction_feature_dim = int(prediction_feature_dim)
+        self._prepared_state_features_enabled = bool(prepared_state_features_enabled)
         self._prediction_gate_min_leak = max(0.0, min(float(prediction_gate_min_leak), 1.0))
         self._slow_entropy_coef_scale = max(float(slow_entropy_coef_scale), 0.0)
         self._fast_entropy_coef_scale = max(float(fast_entropy_coef_scale), 0.0)
@@ -2744,6 +2753,7 @@ class 分层PPO基类(BaseAgent):
             use_uncertainty_signal=self._use_uncertainty_signal,
             use_dependency_aware=self._use_dependency_aware,
             prediction_feature_dim=self._prediction_feature_dim,
+            prepared_state_features_enabled=self._prepared_state_features_enabled,
             prediction_gate_min_leak=self._prediction_gate_min_leak,
             graph_continuity_critic_enabled=self._graph_continuity_critic_enabled,
             uncertainty_aware_critic_enabled=self._uncertainty_aware_critic_enabled,
@@ -5588,6 +5598,9 @@ class 分层PPO基类(BaseAgent):
 
     def load(self, path: str) -> None:
         checkpoint = torch.load(Path(path), map_location=self._device)
+        saved_prepared = bool((checkpoint.get("config") or {}).get("prepared_state_features_enabled", False))
+        if saved_prepared != self._prepared_state_features_enabled:
+            raise ValueError("prepared-state observation profile checkpoint mismatch")
         network_state = checkpoint["network_state_dict"]
         current_state = self._network.state_dict()
         missing_keys = set(current_state) - set(network_state)
@@ -5633,6 +5646,9 @@ class 分层PPO基类(BaseAgent):
         semantic_state = (info or {}).get("semantic_state")
         if semantic_state is None:
             raise ValueError(f"{self.agent_name} 需要 info['semantic_state'] 才能做图结构编码。")
+        new_profile = semantic_state.get("interface_profile") == CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX
+        if new_profile != self._prepared_state_features_enabled:
+            raise ValueError("prepared-state observation profile and agent encoder mismatch")
         algorithm_memory = (info or {}).get("algorithm_memory")
         if not isinstance(algorithm_memory, dict):
             return semantic_state
@@ -15568,6 +15584,7 @@ class 分层PPO基类(BaseAgent):
             "mechanism_logit_bias_strength": self._mechanism_logit_bias_strength,
             "mechanism_confidence_floor": self._mechanism_confidence_floor,
             "prediction_feature_dim": self._prediction_feature_dim,
+            "prepared_state_features_enabled": self._prepared_state_features_enabled,
             "prediction_gate_min_leak": self._prediction_gate_min_leak,
             "slow_policy_credit_floor": self._slow_policy_credit_floor,
             "fast_policy_credit_floor": self._fast_policy_credit_floor,

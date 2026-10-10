@@ -5,6 +5,10 @@
 
 # Runbook
 
+## CSCWD prepared-state v4 公共观测接口（2026-10-10）
+
+原 base config `configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json` 和 manifest 先照旧 hash 核验；仅新实验显式设置运行时 `interface_profile=calibrated_workflow_interface_v4_prepared_state_prefix`，由现有 `_build_agent` 同时给四 learned 方法启用匹配编码宽度。字段合同、参数量、旧新 checkpoint 拒绝和验收命令见 `cscwd_prepared_state_prefix_interface_20261010.md`。A 仅实现接口和合成测试；B 负责独立 preflight/匹配训练，此入口自身不启动训练、不读旧 holdout。
+
 ## 长预算 SA 逾期/成本只读诊断（2026-10-09；已完成）
 
 事前规则和唯一完整报告在 `cscwd_sa_long_budget_cost_diagnosis_plan_20261009.md`、
