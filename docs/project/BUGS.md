@@ -945,3 +945,9 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - 新 matched development run 的 selected/update96 SA 首次服务失败分别 `32/100`、`26/100` episode，全部在当前 bundle 缺失时选择 action1/3/4；action4 目标可准备时也可能因当前节点服务失败而无法 state commit。环境与原 ledger 的 5,632 步重放一致，暂不标实现 bug。
 - SA 辅助 `event_target` 的代码条件不含当前 bundle readiness；24 条有界首次失败探测中 `22/24` 给 prepare 目标，且训练辅助损失确实参与更新。缺少独立消融，不能断言此标签是性能差距的唯一或充分原因。
 - selected 冻结视图失败 episode 从历史 `8/40` 升至 `13/40`，fixed96 仍为 `9/40`，按期完成 fixed96 仍为 `11/40`；双视图和无 formal/holdout 边界下不得晋级或固定论文 claim。详见 `cscwd_prepared_state_event_chain_diagnosis_20261010.md`。
+
+## 2026-10-10 MIXED / current-ready auxiliary target 的多步反例
+
+- 独立授权的 action0/2/4 对称门禁已执行，完整状态与冻结策略后缀均保留。24/24 原失败来源的一步 action4 失败、action0/2 成功，6/6 正例 action4 服务与 state commit 成功；这只确认当前服务可行性语义。
+- 在 22 个受影响 checkpoint 分支状态中，11 个 action4 多指标非支配，3 个 action4 终局服务排序严格优于两个立即成功替代（对应 2 个完整环境状态）。模拟器失败步仍推进 mobility，目标 cache/后续状态与策略动作随之改变；“禁止 current-missing event 标签”缺少统一多步收益支持。
+- 按事前门禁总体 `MIXED`；B target-only 条件训练不得由这项门禁启动。不得隐去 `regression_00` seed17 的 action4 先失败却唯一按期反例，也不得将这些重复 development 分支当正式独立样本。见 `cscwd_service_feasible_action_branch_gate_20261010.md`。

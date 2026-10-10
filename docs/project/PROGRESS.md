@@ -2269,3 +2269,10 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - SA 首次服务失败 selected `32/100`、update96 `26/100`，全部为当前 bundle 缺失而选择未修复当前 bundle 的合法动作；action4 占 `28/32` 与 `23/26`。成功目标准备须待当前节点完成才提交 state，此链路不是已确认实现 bug。车辆 fallback 的 `state_ready=True` 已从有效 state 复用口径剔除。
 - 有界 24 条首次失败伪标签探测中，`22/24` 给 `event_target=1`；SA 训练 `3840/3840` optimizer step 的辅助损失/加权梯度均非零，raw evaluation 无运行时机制 logit bias。标签未检验当前服务可行性是机制疑点，尚无因果消融。
 - 冻结 `frozen_check` 中 selected SA 的按期完成 `5/40→9/40`，但有服务失败 `8/40→13/40`；fixed96 按期 `11/40→11/40`、失败 `9/40→9/40`。双视图不支持晋级或固定论文贡献。完整报告：`cscwd_prepared_state_event_chain_diagnosis_20261010.md`；paper-ready 仍为 `Unverifiable`。
+
+## 2026-10-10 action0/2/4 有界反事实门禁
+
+- 新独立执行授权下，事前计划 commit `eefc4a2` 冻结 24 条原首次失败映射、按排序取 6 条正例、完整 env+policy 输入状态去重、90 分支与 2,160 步/forward 上限，以及服务优先、无权重 Pareto 门禁。
+- 科学源 119/119 文件与旧诊断 7 文件 hash 通过。30 条来源映射为 9 个完整环境状态、30 个包含 checkpoint 身份的分支状态；90/90 action0/2/4 合法，实际 463 步、373 policy forward，0 formal/holdout/训练。
+- 一步语义：24/24 失败来源中 action4 失败、action0/2 成功；6/6 正例 action4 成功并 commit。多步中 22 个受影响 checkpoint 分支状态有 11 个 action4 非支配、3 个严格优于两个立即成功替代的终局服务排序（对应 2 个完整环境状态）。总体门禁 `MIXED`，未授权 B 的条件 target-only 训练启动。
+- 全状态原件/映射、90 条分支及逐步后缀、SHA、反例与报告见 `artifacts/analysis/cscwd_service_feasible_action_branches_20261010_v1/` 和 `cscwd_service_feasible_action_branch_gate_20261010.md`。仅为有界 development 机制证据，论文贡献/顶刊 readiness 仍 `Unverifiable`。
