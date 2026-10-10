@@ -1071,3 +1071,9 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - `OPEN / mechanism reachability`：A 线新长窗口虽满足来源与 strict interval 排除，但固定可达性 40 episode 中
   migration/model bytes/state bytes 均为 0，12 次 action4 全部 contact expiry，仅 4/40 按期；当前冻结几何与 full-step
   contact 不能支撑迁移机制学习。该门阻止训练，不能通过换窗口、放宽 gate 或改 reward 绕过。
+- `RESOLVED / public rule feasibility consumer`：旧 deterministic public rules 不消费 estimator 的 raw full-step fit，曾在两个
+  method row 的同一 exact 状态上明知 `no` 仍选 action4。`causal_public_rule_selection_v2` 将 raw `no` 与 `unknown` 显式排除，
+  并退到 contact-independent action2；修复不作用于 learned policies。
+- `OPEN / physical contract`：当前 atomic full-step gate 把模型传输/加载、current compute/recompute、state transfer/restore 等
+  全计入 current contact。8/12 prepare 阶段可达但 0/12 full step 可达。若要 phase-split/cross-boundary execution，必须另立
+  物理与状态机合同并给应用依据，不能静默放宽现有 gate。

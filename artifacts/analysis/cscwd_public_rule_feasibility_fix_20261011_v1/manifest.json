@@ -1,0 +1,28 @@
+{
+  "artifact_run_id": "cscwd_public_rule_feasibility_fix_20261011_v1",
+  "claim_boundary": {
+    "checkpoint_selection": false,
+    "environment_steps_run": 0,
+    "performance_claim": false,
+    "raw_rows_read": 0,
+    "training_steps": 0
+  },
+  "evidence_level": "E2_ARTIFACT_AUDITED / exact public-state regression",
+  "files": {
+    "exact_state_audit.json": "dd49f9442d857373f780455fb99c97e74fc09f8d49039dc975b61d68ed4223b0",
+    "scripts/audit_cscwd_public_rule_feasibility_fix.py": "1f9b976876613f93724d453a65d1d802bc85823042686d3a0a861447e7091591",
+    "src/agents/causal_public_action_estimator.py": "adc4de5f7fb86e6cfcc7ceb4a8ba0bdb31f5a0b84b24df92be8953cf3541e35b",
+    "tests/test_causal_public_action_estimator.py": "6cdf53cc14080b7cae1160614c9b4845c7aa4562a64830e4b36e49e73aaa0946"
+  },
+  "git_commit": "c9eb64f4f7ada882eb76ca2f0223ea92dec4b054",
+  "inputs": {
+    "action4_phase_audit_sha256": "b3f0634ad0c305fdd9f0cb5780c3b0120c94aa8b4e3600ce175f5fd601d44554",
+    "frozen_public_info_sha256": "4036254c97db4bad48936d8b5f8276931ca2985523250a6385e697b1ab8e8f98",
+    "original_full_info_sha256": "049de83dba0218565999c821d7b053391f9ae1f32f45e4c01079358e12028fa8"
+  },
+  "literature_cutoff": "2026-10-11",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-10-11 Asia/Shanghai",
+  "schema_version": "cscwd_public_rule_feasibility_fix_manifest_v1",
+  "target_venue": "IEEE TMC"
+}

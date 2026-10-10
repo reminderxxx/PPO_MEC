@@ -2423,3 +2423,8 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - A 线最终可达性门结论为 STOP：2 窗口 × 4 workload × 5 固定方法共 40 episode/320 steps，40/40 workflow 完成但仅
   4/40 按期，migration/model bytes/state bytes 全为 0，12 次 action4 全部 contact expiry，累计 68 次 contact rejection。
   因此未启动授权的 4 方法 × 5 seed pilot，也未换窗、改几何、扩预算或重试。
+- 后续合并诊断确认 12 次 action4 中 8 次 prepare 阶段可在 actual contact 内、4 次 native preview 可完成 service+migration，
+  但 12 次完整 step 均跨出 contact 并按冻结原子合同回滚；当前机制覆盖仍为 0。
+- 独立发现并修复 public rule consumer：旧 `_score` 忽略已知 `raw_full_step_contact_fit=no`，导致 exact US-101 状态上
+  immediate/two-step 各一次错误选择 action4。规则 v2 对 raw `no/unknown` 均 fail-closed 到合法 action2，非 Raw 行为不变；
+  exact 状态回归、43 tests 与 smoke 通过。该纠错不改变 learned policy、mask 或迁移可达性。

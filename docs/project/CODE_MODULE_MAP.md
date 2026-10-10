@@ -4,13 +4,18 @@
 字节/时间成本；`v2` 按 target model/current service/state commit 做 fail-closed 阶段核算，不可识别时完整 total/fit 返回
 unknown，并分列 public prepare-contact 与 raw full-step-contact 条件；raw 时间合同读取公开 `time_profile`，不覆盖
 prepared-state `interface_profile`，也不访问 env/instance/实际未来/结果。它同时提供 public immediate/two-step rules 和
-`causal_public_prepare_advantage_v2` 三态标签；原则不变，版本递增用于拒绝加载旧 estimator 语义的候选 checkpoint。
+`causal_public_prepare_advantage_v2` 三态标签；`causal_public_rule_selection_v2` 让两条规则在 Raw 合同下只消费明确
+full-step-contact feasible 的非 fallback 动作，`no/unknown` 统一退到合法 action2，非 Raw 候选面不变。标签版本递增用于拒绝
+加载旧 estimator 语义的候选 checkpoint。
 `src/agents/sa_ghmappo_core.py` 的 default-off
 `mechanism_aux_causal_public_prepare_advantage_enabled` 只在 auxiliary loss 内替换 event hard/soft target 与 supervision weight；
 slow/fast、固定分母和 raw inference path 不变。`scripts/run_calibrated_workflow_interface_repair.py` 只向 SA 传该 flag，PPO/MAPPO
 身份不变；`scripts/audit_cscwd_public_estimator_phase_conformance.py` 生成 0-training 六例回执；相关合同见
 `tests/test_causal_public_action_estimator.py`、`test_cscwd_public_estimator_executor_diagnosis.py` 与
 `test_causal_public_prepare_advantage_auxiliary.py`。
+`scripts/diagnose_cscwd_public_reachability_coverage.py` 只读既有 reachability ledger 做 mask、requested/executed、contact 与
+zero-byte rollback 原因分类，不重扫 raw data；`scripts/audit_cscwd_public_rule_feasibility_fix.py` 用冻结纯公共 exact state 验证
+规则 v2 的 before/after 行为，不执行环境或读取隐藏未来。
 
 `scripts/run_calibrated_workflow_value_normalization_ab.py::_training_signal_row` 通过 primary vehicle 的 `associated_rsu_id` 计算
 current bundle readiness；它只生产训练行为日志，不参与 agent loss。`scripts/audit_calibrated_workflow_training_signal_readiness_correction.py`

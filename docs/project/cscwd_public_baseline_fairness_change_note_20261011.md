@@ -18,12 +18,12 @@
 
 | 方法 | 信息权限 | 决策目标 | 公平性用途 |
 |---|---|---|---|
-| `causal_public_immediate_rule` | 仅公共 `semantic_state`、公共 causal prediction、公共 mask | service → deadline → known estimate → readiness gain → time/bytes | 可作为公开一阶规则候选 |
-| `causal_public_two_step_rule` | 同上；第二步只用冻结 `next_rsu_sequence` 投影，未知 contact 保持 unknown | 同一公开 lexicographic score 的两步组合 | 可作为公开两步规则候选 |
+| `causal_public_immediate_rule` | 仅公共 `semantic_state`、公共 causal prediction、公共 mask | Raw known-feasible → service → deadline → known estimate → readiness gain → time/bytes | 可作为公开一阶规则候选 |
+| `causal_public_two_step_rule` | 同上；第二步只用冻结 `next_rsu_sequence` 投影，未知 contact 保持 unknown | 同一公开 fail-closed score 的两步组合 | 可作为公开两步规则候选 |
 | `immediate_cost_rule` | `clone_for_decision_model().step()`，可读隐藏实际 contact/transition | completed nodes → failures → deadline → elapsed → bytes | 只能作为 privileged reference |
 | `two_step_cost_rule` | 两层 exact clone/step，可读隐藏实际 contact/transition | 同上 | 只能作为 privileged reference |
 
-公开规则与学习方法实现了输入权限匹配，但目标函数不完全相同：规则是显式 lexicographic service/deadline/readiness/cost，
+公开规则与学习方法实现了输入权限匹配，但目标函数不完全相同：规则是 Raw feasibility 优先的显式 lexicographic service/deadline/readiness/cost，
 学习方法优化冻结 reward。后续结果必须把这种 objective mismatch 单列，不能把“公共信息相同”写成“优化目标完全相同”。
 
 为保护旧 evidence identity，没有改写 `calibrated_continuous_workflow_env.py` 中历史类的字节或既有协议 hash；新的
@@ -70,3 +70,8 @@ transfer bytes 与 migration success 均为 0，12 次实际 action 4 全部因 
 reachability manifest SHA-256=`481dd42489dbb9bab30f297237b4373fee9b1b3823082031ed308532f2332e0c`，step ledger
 SHA-256=`679942ac74cc618127142abc89a5eaa0cd109ff38cad213dfd77dd850a67bacb`。这表明当前冻结几何和 full-step contact 下
 迁移机制不可达；按停止条件不启动 4 方法 × 5 seed pilot，不换窗口、不改几何、不延长预算。
+
+后续独立诊断发现本报告对应的 v1 public rule scorer 未消费 estimator 已生成的 `raw_full_step_contact_fit`，在同一 exact
+US-101 状态上两规则各一次明知 `no` 仍选 action4。该 consumer 缺陷已在
+`causal_public_rule_selection_v2` 修复：Raw `no/unknown` 非 fallback 动作均 fail-closed，合法 action2 为明确退路；learned
+policy、mask 和物理语义不变。完整诊断与修复见 `cscwd_raw_contact_reachability_diagnosis_and_rule_fix_20261011.md`。

@@ -1,0 +1,68 @@
+{
+  "claim_boundary": {
+    "checkpoint_selection": false,
+    "environment_steps": 0,
+    "performance_claim": false,
+    "raw_rows_read": 0,
+    "training_steps": 0
+  },
+  "created_at": "2026-10-10T18:46:53.703726+00:00",
+  "inputs": {
+    "design_id": "dev_01",
+    "estimator_sha256": "adc4de5f7fb86e6cfcc7ceb4a8ba0bdb31f5a0b84b24df92be8953cf3541e35b",
+    "original_full_info_sha256": "049de83dba0218565999c821d7b053391f9ae1f32f45e4c01079358e12028fa8",
+    "phase_audit_sha256": "b3f0634ad0c305fdd9f0cb5780c3b0120c94aa8b4e3600ce175f5fd601d44554",
+    "public_info_sha256": "4036254c97db4bad48936d8b5f8276931ca2985523250a6385e697b1ab8e8f98",
+    "step": 0,
+    "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+  },
+  "interpretation": {
+    "corrected": "both public rules now reject every non-fallback action explicitly known not to fit raw full-step contact and choose legal vehicle fallback",
+    "not_corrected": "the frozen raw atomic contact contract and migration reachability remain unchanged"
+  },
+  "post_fix_exact_state": {
+    "action_classification": {
+      "0": "excluded_explicit_raw_contact_infeasible",
+      "1": "excluded_explicit_raw_contact_infeasible",
+      "2": "eligible_contact_independent_fallback",
+      "3": "excluded_explicit_raw_contact_infeasible",
+      "4": "excluded_explicit_raw_contact_infeasible"
+    },
+    "action_raw_full_step_contact_fit": {
+      "0": "no",
+      "1": "no",
+      "2": "not_applicable",
+      "3": "no",
+      "4": "no"
+    },
+    "fallback_action": 2,
+    "hidden_future_fields_consumed": false,
+    "immediate_selected_action": 2,
+    "public_info_unchanged": true,
+    "two_step_selected_action": 2
+  },
+  "pre_fix_exact_rows": [
+    {
+      "method": "causal_public_immediate_rule",
+      "public_contact_budget_seconds": 1.2483191865782175,
+      "raw_full_step_contact_fit": "no",
+      "raw_recorded_step_cost_seconds": 2.0,
+      "raw_rejection_reason": "current_rsu_contact_expires_before_commit",
+      "selected_action": 4
+    },
+    {
+      "method": "causal_public_two_step_rule",
+      "public_contact_budget_seconds": 1.2483191865782175,
+      "raw_full_step_contact_fit": "no",
+      "raw_recorded_step_cost_seconds": 2.0,
+      "raw_rejection_reason": "current_rsu_contact_expires_before_commit",
+      "selected_action": 4
+    }
+  ],
+  "rule_identity": {
+    "capability_profile": "public_causal_semantic_state_only_v1",
+    "objective_profile": "raw_feasible_then_lexicographic_service_deadline_known_readiness_cost_v2",
+    "schema_version": "causal_public_rule_selection_v2"
+  },
+  "schema_version": "cscwd_public_rule_feasibility_fix_audit_v1"
+}

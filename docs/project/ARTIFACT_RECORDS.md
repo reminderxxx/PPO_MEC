@@ -1940,3 +1940,18 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - Result：40/40 workflow completed、4/40 on-time；migration success/model bytes/state bytes=`0/0/0`；12 action4
   attempts 全部 contact expiry；68 contact rejections。Classification=`STOP / FROZEN GEOMETRY AND FULL-STEP CONTACT
   MECHANISM UNREACHABLE`，未启动 4-method × 5-seed pilot。
+
+## 2026-10-11 CSCWD public reachability cause classification and rule v2 fix
+
+- Pre-fix ledger artifact：`artifacts/analysis/cscwd_public_reachability_coverage_20261011_v1/`；diagnosis SHA-256=
+  `a1d1c6928418771a8ad2a0e6bfbdb041819144e1db6c1e69f83f2a085360a5b5`，manifest SHA-256=
+  `8e15b2242e47e9b782efceb1f9a0a8927c76267a97b07ca413772ad9e1509c6d`；0 raw rows、0 env steps。
+- A phase input：action4 audit SHA-256=`b3f0634ad0c305fdd9f0cb5780c3b0120c94aa8b4e3600ce175f5fd601d44554`；
+  pure public snapshot SHA-256=`4036254c97db4bad48936d8b5f8276931ca2985523250a6385e697b1ab8e8f98`。
+- Post-fix artifact：`artifacts/analysis/cscwd_public_rule_feasibility_fix_20261011_v1/`；exact-state audit SHA-256=
+  `dd49f9442d857373f780455fb99c97e74fc09f8d49039dc975b61d68ed4223b0`，manifest SHA-256=
+  `eeb3d8f6c291ada3590d373ea45d6ee26c80884daaa4ed43828211ab54e721ea`；rule commit=
+  `c9eb64f4f7ada882eb76ca2f0223ea92dec4b054`。
+- Result：exact state pre-fix two rules action4 → post-fix action2；known `no`/`unknown` fail-closed，known `yes` eligible，non-Raw
+  candidate surface retained。43 tests + smoke pass；无 training/checkpoint/performance claim。
+- Report：`docs/project/cscwd_raw_contact_reachability_diagnosis_and_rule_fix_20261011.md`。

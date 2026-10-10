@@ -1,0 +1,378 @@
+{
+  "action4_rows": [
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 0.4195111432954506,
+      "design_id": "dev_01",
+      "method": "prepare_if_legal_else_serve",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 2.5886738567045495,
+      "planned_minus_public_contact_seconds": 2.5107726822639975,
+      "planned_step_cost_seconds": 3.008185,
+      "public_contact_budget_seconds": 0.49741231773600275,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 2,
+      "window_id": "cscwd_newdev_lankershim_v215_t1118935795100_1118935913900"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 0.4195111432954506,
+      "design_id": "regression_04",
+      "method": "prepare_if_legal_else_serve",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 3.387722856704549,
+      "planned_minus_public_contact_seconds": 3.309821682263997,
+      "planned_step_cost_seconds": 3.807234,
+      "public_contact_budget_seconds": 0.49741231773600275,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 2,
+      "window_id": "cscwd_newdev_lankershim_v215_t1118935795100_1118935913900"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 1.2526147737006075,
+      "design_id": "regression_05",
+      "method": "prepare_if_legal_else_serve",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 1.1331047782993924,
+      "planned_minus_public_contact_seconds": 1.1374003654217824,
+      "planned_step_cost_seconds": 2.385719552,
+      "public_contact_budget_seconds": 1.2483191865782175,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 0,
+      "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 0.8693894165868388,
+      "design_id": "regression_05",
+      "method": "prepare_if_legal_else_serve",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 1.516330135413161,
+      "planned_minus_public_contact_seconds": 1.5194714296549159,
+      "planned_step_cost_seconds": 2.385719552,
+      "public_contact_budget_seconds": 0.8662481223450841,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 1,
+      "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 1.2526147737006075,
+      "design_id": "dev_00",
+      "method": "prepare_if_legal_else_serve",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 4.868385338299392,
+      "planned_minus_public_contact_seconds": 4.872680925421783,
+      "planned_step_cost_seconds": 6.121000112,
+      "public_contact_budget_seconds": 1.2483191865782175,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 0,
+      "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 0.8693894165868388,
+      "design_id": "dev_00",
+      "method": "prepare_if_legal_else_serve",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 1.516330135413161,
+      "planned_minus_public_contact_seconds": 1.5194714296549159,
+      "planned_step_cost_seconds": 2.385719552,
+      "public_contact_budget_seconds": 0.8662481223450841,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 1,
+      "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 1.2526147737006075,
+      "design_id": "dev_01",
+      "method": "causal_public_immediate_rule",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 0.9945721862993926,
+      "planned_minus_public_contact_seconds": 0.9988677734217826,
+      "planned_step_cost_seconds": 2.24718696,
+      "public_contact_budget_seconds": 1.2483191865782175,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 0,
+      "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 1.2526147737006075,
+      "design_id": "dev_01",
+      "method": "causal_public_two_step_rule",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 0.9945721862993926,
+      "planned_minus_public_contact_seconds": 0.9988677734217826,
+      "planned_step_cost_seconds": 2.24718696,
+      "public_contact_budget_seconds": 1.2483191865782175,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 0,
+      "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 1.2526147737006075,
+      "design_id": "dev_01",
+      "method": "prepare_if_legal_else_serve",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 0.9945721862993926,
+      "planned_minus_public_contact_seconds": 0.9988677734217826,
+      "planned_step_cost_seconds": 2.24718696,
+      "public_contact_budget_seconds": 1.2483191865782175,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 0,
+      "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 0.8693894165868388,
+      "design_id": "dev_01",
+      "method": "prepare_if_legal_else_serve",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 1.824872343413161,
+      "planned_minus_public_contact_seconds": 1.8280136376549159,
+      "planned_step_cost_seconds": 2.69426176,
+      "public_contact_budget_seconds": 0.8662481223450841,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 1,
+      "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 1.2526147737006075,
+      "design_id": "regression_04",
+      "method": "prepare_if_legal_else_serve",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 0.2702792262993925,
+      "planned_minus_public_contact_seconds": 0.27457481342178247,
+      "planned_step_cost_seconds": 1.522894,
+      "public_contact_budget_seconds": 1.2483191865782175,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 0,
+      "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+    },
+    {
+      "actual_contact_budget_seconds_privileged_diagnostic": 0.8693894165868388,
+      "design_id": "regression_04",
+      "method": "prepare_if_legal_else_serve",
+      "migration_success": false,
+      "model_transfer_bytes": 0,
+      "planned_minus_actual_contact_seconds": 1.1306105834131612,
+      "planned_minus_public_contact_seconds": 1.133751877654916,
+      "planned_step_cost_seconds": 2.0,
+      "public_contact_budget_seconds": 0.8662481223450841,
+      "public_mask_action4": true,
+      "rejection_reason": "current_rsu_contact_expires_before_commit",
+      "requested_equals_executed": true,
+      "state_transfer_bytes": 0,
+      "step": 1,
+      "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600"
+    }
+  ],
+  "cause_classification": {
+    "confirmed_mechanism_coverage_blocker": "all 12 action-4 executions had planned full-step cost above both public and actual contact; the atomic raw contract therefore rolled back before model/state commit",
+    "confirmed_public_rule_consumer_defect": "_score ignores raw_full_step_contact_fit, so both public rules selected action 4 in two states whose public estimated full-step cost already exceeded public contact",
+    "defect_scope": "two of 126 public-rule decisions; fixing it would avoid knowingly infeasible public-rule choices but cannot create a successful migration event",
+    "interpretation_boundary": "the atomic full-step contract is internally implemented as frozen, but its physical validity is not established: it charges compute, model load, state restore, and transfers against current-RSU contact",
+    "not_a_raw_executor_rewrite": "producer asserted event.action equals the mask-legalized action; 96 requested/executed differences came from the runner's explicit fallback legalization, and public rules had zero"
+  },
+  "claim_boundary": {
+    "checkpoint_selection": false,
+    "environment_steps_run": 0,
+    "performance_claim": false,
+    "raw_rows_read": 0,
+    "training_steps": 0
+  },
+  "counts": {
+    "action4_contact_rejections": 12,
+    "action4_executions": 12,
+    "action4_planned_exceeds_actual_contact": 12,
+    "action4_planned_exceeds_public_contact": 12,
+    "contact_rejections": 68,
+    "episodes": 40,
+    "on_time_episodes": 4,
+    "public_rule_action4_executions": 2,
+    "public_rule_legalizations": 0,
+    "public_rule_steps": 126,
+    "raw_executor_rewrites_after_legalization": 0,
+    "runner_legalizations": 96,
+    "steps": 320,
+    "workflow_completed_episodes": 40
+  },
+  "created_at": "2026-10-10T18:38:05.237228+00:00",
+  "inputs": {
+    "public_estimator_sha256": "ee6873d9b16e5b1e4ac0dcfab1eacce915d50aeeff8bf8d9a862093202984828",
+    "raw_environment_sha256": "30666d7c874717d8464a64702c811116e96b931a5db6b57287c6c11d2dcc6575",
+    "reachability_manifest_sha256": "481dd42489dbb9bab30f297237b4373fee9b1b3823082031ed308532f2332e0c",
+    "reachability_runner_sha256": "410ee88db881d15f495dfa3f9f1676d3916b84c488bde4cf0d574ab9212e3f27",
+    "step_ledger_sha256": "679942ac74cc618127142abc89a5eaa0cd109ff38cad213dfd77dd850a67bacb"
+  },
+  "method_summary": {
+    "causal_public_immediate_rule": {
+      "action4_mask_legal_count": 8,
+      "contact_rejection_count": 13,
+      "executed_actions": {
+        "0": 14,
+        "2": 48,
+        "4": 1
+      },
+      "fallback_only_mask_count": 43,
+      "migration_success_count": 0,
+      "model_transfer_bytes": 0,
+      "requested_actions": {
+        "0": 14,
+        "2": 48,
+        "4": 1
+      },
+      "runner_legalization_count": 0,
+      "service_completed_count": 50,
+      "state_transfer_bytes": 0,
+      "steps": 63
+    },
+    "causal_public_two_step_rule": {
+      "action4_mask_legal_count": 8,
+      "contact_rejection_count": 13,
+      "executed_actions": {
+        "0": 14,
+        "2": 48,
+        "4": 1
+      },
+      "fallback_only_mask_count": 43,
+      "migration_success_count": 0,
+      "model_transfer_bytes": 0,
+      "requested_actions": {
+        "0": 14,
+        "2": 48,
+        "4": 1
+      },
+      "runner_legalization_count": 0,
+      "service_completed_count": 50,
+      "state_transfer_bytes": 0,
+      "steps": 63
+    },
+    "fallback": {
+      "action4_mask_legal_count": 4,
+      "contact_rejection_count": 0,
+      "executed_actions": {
+        "2": 50
+      },
+      "fallback_only_mask_count": 42,
+      "migration_success_count": 0,
+      "model_transfer_bytes": 0,
+      "requested_actions": {
+        "2": 50
+      },
+      "runner_legalization_count": 0,
+      "service_completed_count": 50,
+      "state_transfer_bytes": 0,
+      "steps": 50
+    },
+    "prepare_if_legal_else_serve": {
+      "action4_mask_legal_count": 10,
+      "contact_rejection_count": 21,
+      "executed_actions": {
+        "2": 48,
+        "3": 14,
+        "4": 10
+      },
+      "fallback_only_mask_count": 48,
+      "migration_success_count": 0,
+      "model_transfer_bytes": 0,
+      "requested_actions": {
+        "3": 62,
+        "4": 10
+      },
+      "runner_legalization_count": 48,
+      "service_completed_count": 50,
+      "state_transfer_bytes": 0,
+      "steps": 72
+    },
+    "serve": {
+      "action4_mask_legal_count": 10,
+      "contact_rejection_count": 21,
+      "executed_actions": {
+        "2": 48,
+        "3": 24
+      },
+      "fallback_only_mask_count": 48,
+      "migration_success_count": 0,
+      "model_transfer_bytes": 0,
+      "requested_actions": {
+        "3": 72
+      },
+      "runner_legalization_count": 48,
+      "service_completed_count": 50,
+      "state_transfer_bytes": 0,
+      "steps": 72
+    }
+  },
+  "next_change_boundary": {
+    "mechanism_enabling_change_not_authorized": "a phase-split/asynchronous prepare contract would require a separately frozen action/state machine and a justified resource model specifying which transfer/load/compute phases require vehicle contact; it must not be introduced by silently relaxing the current gate",
+    "minimal_correctness_fix_for_separate_task": "make public rule selection fail closed on raw_full_step_contact_fit=no; this is a baseline consumer correction, not an algorithm innovation or a mechanism-enabling change",
+    "training_decision": "STOP"
+  },
+  "schema_version": "cscwd_public_reachability_coverage_diagnosis_v1",
+  "scope": "ledger_only_no_raw_rescan_no_training_no_environment_replay",
+  "static_contract_audit": {
+    "auxiliary_label_abstains_when_raw_full_step_contact_fit_is_no": true,
+    "estimator_produces_raw_full_step_contact_fit": true,
+    "mask_encodes_contact_duration_feasibility": false,
+    "mask_scope": "semantic action availability; raw env narrows to fallback-only when uncovered",
+    "planned_full_step_includes": [
+      "model network transfer",
+      "model load",
+      "current-node compute",
+      "prefix recompute when applicable",
+      "state network transfer after service success",
+      "state restore",
+      "input transfer when applicable"
+    ],
+    "public_rule_score_consumed_fields": [
+      "current_service",
+      "deadline_fit",
+      "estimated_total_seconds",
+      "future_readiness_gain",
+      "model/state/input transfer bytes"
+    ],
+    "public_rule_score_consumes_raw_full_step_contact_fit": false,
+    "raw_executor_gate": "planned full step must fit physical current-RSU contact",
+    "rejected_action4_zero_byte_rollback_observed": true,
+    "success_only_state_commit": true
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "artifact_run_id": "cscwd_public_reachability_coverage_20261011_v1",
+  "claim_boundary": {
+    "checkpoint_selection": false,
+    "environment_steps_run": 0,
+    "performance_claim": false,
+    "raw_rows_read": 0,
+    "training_steps": 0
+  },
+  "evidence_level": "E2_ARTIFACT_AUDITED / ledger-only cause classification",
+  "files": {
+    "diagnosis.json": "a1d1c6928418771a8ad2a0e6bfbdb041819144e1db6c1e69f83f2a085360a5b5",
+    "scripts/diagnose_cscwd_public_reachability_coverage.py": "83e83d119efab99a7bbf3f99b1ff3696363080cb9e8590acfa69b3f2da86fbaf"
+  },
+  "git_commit": "5c96998a6ce1ddcaf83725462f9b1c0d655ff7fe",
+  "inputs": {
+    "pre_fix_public_estimator_sha256": "ee6873d9b16e5b1e4ac0dcfab1eacce915d50aeeff8bf8d9a862093202984828",
+    "raw_environment_sha256": "30666d7c874717d8464a64702c811116e96b931a5db6b57287c6c11d2dcc6575",
+    "reachability_manifest_sha256": "481dd42489dbb9bab30f297237b4373fee9b1b3823082031ed308532f2332e0c",
+    "step_ledger_sha256": "679942ac74cc618127142abc89a5eaa0cd109ff38cad213dfd77dd850a67bacb"
+  },
+  "literature_cutoff": "2026-10-11",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-10-11 Asia/Shanghai",
+  "schema_version": "cscwd_public_reachability_coverage_manifest_v1",
+  "target_venue": "IEEE TMC"
+}
