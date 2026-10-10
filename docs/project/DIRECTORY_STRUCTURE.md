@@ -10,6 +10,9 @@
   双视角显式配对分析与单次 2 小时、无重试持久启动。
 - `scripts/finalize_calibrated_workflow_prepared_state_visibility_matched.py`：完成后 create-only v2 后处理，补齐计数、逐 seed、
   共同完成覆盖、规则引用和预注册 gate verdict。
+- `artifacts/analysis/cscwd_causal_prepared_state_visibility_matched_20261010_v1_analysis_v2/`：canonical create-only v2；
+  0 新训练/评价，保存双视角原始计数、800 配对、规则引用、verdict 与 integrity。
+- `docs/project/cscwd_prepared_state_visibility_matched_{results,claim_change}_20261010.md`：完整有限实验报告与 A 线只读说明。
 - `docs/project/cscwd_prepared_state_visibility_matched_protocol_20261010.md`：独立门禁、匹配预算、selected/update-96 双视角及拒绝条件。
 
 - `docs/project/cscwd_prepared_state_prefix_interface_20261010.md` 与 `tests/test_calibrated_workflow_prepared_state_prefix.py`：显式 v4 公共观测接口交接和合成验收；B runner/protocol 与实验原件不在本 A 分支改动。

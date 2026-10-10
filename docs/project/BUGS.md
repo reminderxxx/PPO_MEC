@@ -5,6 +5,15 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：v4 修复状态别名，但未形成稳定服务收益
+
+- `RESOLVED CONTRACT`：prepared-state prefix 状态别名已由共享 v4 字段消除；因果性、四方法消费、旧 profile 隔离和同动作
+  物理等价均通过。不得倒退隐藏该字段或把它包装成 SA 专属创新。
+- `OPEN LEARNING`：SA selected frozen on-time 改善但 failure episode `8/40→13/40`，fixed-96 on-time/failure 均无改善；
+  MAPPO/DT 也有视角相关 failure 恶化。说明成本下降与服务稳定性仍未闭合，performance candidate 已按预注册 gate 拒绝。
+- `BOUNDARY`：全部 36 实例已暴露，seed 复用窗口；无 independent/formal/holdout。后续最多处理一个由独立诊断支持的近端
+  学习问题，不自动扫 auxiliary、seed、预算或 reward。
+
 ## 2026-10-10：prepared-state 别名接口已修；学习收益仍待匹配实验
 
 - `RESOLVED IN OPT-IN V4`：原同公开状态+同动作、prepared-state 不同的具体反例可辨识，四方法共同消费；旧 profile 原样保留。

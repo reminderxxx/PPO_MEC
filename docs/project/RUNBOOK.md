@@ -7,6 +7,11 @@
 
 ## CSCWD prepared-state v4 公共观测接口（2026-10-10）
 
+匹配 run 已完成且不得重跑。scientific root 的 terminal=`PASS`；canonical post-analysis 是同名
+`artifacts/analysis/..._analysis_v2/`，只读原 run 生成，0 training/evaluation/reselection。v1 自动分析保留，不覆盖；结论以
+`cscwd_prepared_state_visibility_matched_results_20261010.md` 为准。后续不得用 regression/frozen 重选 checkpoint 或改变
+selected/update-96 双视角门槛。
+
 原 base config `configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json` 和 manifest 先照旧 hash 核验；仅新实验显式设置运行时 `interface_profile=calibrated_workflow_interface_v4_prepared_state_prefix`，由现有 `_build_agent` 同时给四 learned 方法启用匹配编码宽度。字段合同、参数量、旧新 checkpoint 拒绝和验收命令见 `cscwd_prepared_state_prefix_interface_20261010.md`。A 仅实现接口和合成测试；B 负责独立 preflight/匹配训练，此入口自身不启动训练、不读旧 holdout。
 
 只读预检命令：

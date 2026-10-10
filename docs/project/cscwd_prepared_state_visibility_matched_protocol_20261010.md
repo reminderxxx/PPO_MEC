@@ -1,5 +1,8 @@
 # 共同 prepared-state 可见性修复：匹配训练协议（2026-10-10）
 
+> **执行状态更新**：唯一授权 run 已在 commit `f46ec72` 完成，terminal=`PASS`；不得重跑。canonical 结果与 gate 裁决见
+> `cscwd_prepared_state_visibility_matched_results_20261010.md`，接口纠错接受、稳定性能候选拒绝。下文保留事前协议原义。
+
 ## 状态与目的
 
 本协议已冻结科学变量，A 实现交接、B 独立前置门禁、冻结 runner 提交与 push 均已通过；现以独立配置提交

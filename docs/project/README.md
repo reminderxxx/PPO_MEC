@@ -9,6 +9,10 @@
 
 ## Live 文档
 
+- `cscwd_prepared_state_visibility_matched_results_20261010.md` 与
+  `cscwd_prepared_state_visibility_matched_claim_change_20261010.md`：v4 匹配实验的双视角结果、预注册 gate 裁决和 A 论文线
+  只读主张边界；接口接受、性能候选拒绝。
+
 - `cscwd_prepared_state_prefix_interface_20261010.md`：新 prepared-state v4 共同观测字段、四方法映射、参数/推理开销、旧新物理等价和 B 独立 preflight 交接；非论文结果。
 
 - `cscwd_sa_long_budget_cost_diagnosis_plan_20261009.md`、`cscwd_sa_long_budget_cost_diagnosis_20261009.md` 与 `cscwd_sa_long_budget_cost_summary_20261009.json`：B 长预算完成后的只读逐事件成本、配对覆盖、隐藏 prepared-state 反例与唯一公平候选；不含论文表。

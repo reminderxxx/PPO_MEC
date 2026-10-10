@@ -1,5 +1,12 @@
 ﻿# Decision Log
 
+## 2026-10-10：保留 v4 接口纠错，拒绝其稳定性能候选身份
+
+- 决定：接口正确性与性能收益分开裁决。v4 因消除可复现公共状态别名而保留；但 SA on-time 未同时在 selected/fixed-96
+  改善、selected failure episode 恶化，且其他方法也出现 failure 边界恶化，故按冻结 gate 拒绝性能候选。
+- 不改门槛、不重选 checkpoint、不重复科学 run。等待独立失败链证据；只有实际生效 auxiliary target 被证明与服务条件冲突
+  时，才允许冻结一个 target-only 单因素候选，否则停在诊断说明。
+
 ## 2026-10-10：共同 prepared-state prefix 观测作为显式 v4 接口修复
 
 - 决定：只公开当前与因果预测目标 RSU 上已提交状态的存在、与已完成 DAG 前缀的有效性及缺失比例；未知目标显式 mask。四 learned 方法同权消费，旧 profile/旧 checkpoint 不自动迁移。增加的输入投影参数单列；不改 reward、transition、mask、action guard 或核心 actor/critic。该项属于共同接口纠错，收益由 B 独立匹配训练判定，不作 SA 独有贡献。见 `cscwd_prepared_state_prefix_interface_20261010.md`。

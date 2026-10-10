@@ -5,6 +5,22 @@
 
 # Artifact Records
 
+## 2026-10-10 prepared-state visibility matched development run
+
+- scientific root：`artifacts/experiments/cscwd_causal_prepared_state_visibility_matched_20261010_v1/`；commit=`f46ec72`，
+  terminal=`PASS`，20 cells / 115,200 steps / 15,360 optimizer steps / 1,200 new evaluation episodes；historical selected
+  400 与规则 40 行 hash 复用，119/119 integrity files 通过。
+- canonical analysis root：`artifacts/analysis/cscwd_causal_prepared_state_visibility_matched_20261010_v1_analysis_v2/`；
+  postprocess commit=`3dc779b`，0 training/evaluation/reselection，1,600 learned + 40 rule rows、800 配对。
+- source manifest/integrity SHA-256=`48718e48dc55e6958c03b676634dca53e84fd21be251115d4809380a1441c615` /
+  `b66dfb946d2fef8c8e93b3ffacd7f332c1280635c7c635ef1f58f7eb8c4e2ac1`；analysis manifest/integrity=
+  `13369726f5f4ddf35b3bd96a8ce1cfdadc32bf94b33623d1355511cd6c8687b0` /
+  `92e9697cc634572cd0d60d24e7c30a5e488f7ce362bbe5e9d430750f823dd32b`。
+- verdict：v4 作为 shared observation contract fix 接受；性能候选因 SA on-time 未双视角改善、selected failure episode
+  `8/40→13/40` 及其他方法 failure 边界恶化而按预注册 gate 拒绝。证据等级仅
+  `L2_complete_development_artifact_no_independent_test`；报告见
+  `cscwd_prepared_state_visibility_matched_results_20261010.md`。
+
 ## 2026-10-09 causal strong-baseline 4× budget extension
 
 - scientific root：`artifacts/experiments/cscwd_causal_strong_baselines_budget_extension_20261009_v1/`；commit=`d25ebcd`，

@@ -5,6 +5,17 @@
 
 ﻿# Progress
 
+## 2026-10-10：prepared-state v4 匹配实验完成；接口接受，性能候选拒绝
+
+- 单次 scientific run terminal=`PASS`：20 cells、115,200 steps、15,360 optimizer steps、1,200 新评价；119/119 files
+  完整。create-only v2 后处理新增 0 training/evaluation/reselection，保留 selected/update-96 双视角和 800 配对。
+- SA frozen selected 为 completion `39→40/40`、on-time `5→9/40`、failure episode `8→13/40`；fixed-96 为
+  `39→40/40`、`11→11/40`、`9→9/40`。重算与传输在两视角下降，但时效改善未双视角兑现，且 selected 服务失败
+  episode 恶化；按原门禁拒绝性能候选。
+- v4 继续作为共享 observation contract 纠错保留，不作 SA 创新/领先证据。下一步等待 A 的独立只读失败链交接；不自动
+  删除 auxiliary、不重训、不改 reward/guard/动作能力。报告与 A 线只读说明分别为
+  `cscwd_prepared_state_visibility_matched_{results,claim_change}_20261010.md`。
+
 ## 2026-10-10：prepared-state 公共观测 v4 最小修复通过接口验收
 
 - 在单独 A 工作树加入显式 opt-in `calibrated_workflow_interface_v4_prepared_state_prefix`；当前/公开预测目标的 state 存在、已完成前缀有效性和缺失比例均进入 PPO/MAPPO/DT flat 与 SA RSU 编码，旧 profile/旧 checkpoint 保持原语义，跨 profile load 显式拒绝。
