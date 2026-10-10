@@ -10,6 +10,7 @@ from src.agents.causal_public_action_estimator import (
     CausalPublicImmediateRule,
     CausalPublicTwoStepRule,
     NO,
+    PRIVILEGED_REFERENCE_PROFILES,
     SCHEMA_VERSION,
     UNKNOWN,
     YES,
@@ -254,6 +255,25 @@ def test_public_rules_are_deterministic_and_do_not_preview_environment() -> None
         assert first == second
         assert first in range(5)
     assert _hash(state) == _hash(_state())
+
+
+def test_rule_capabilities_distinguish_public_baselines_from_privileged_references() -> None:
+    for rule_type in (CausalPublicImmediateRule, CausalPublicTwoStepRule):
+        assert rule_type.capability_profile == "public_causal_semantic_state_only_v1"
+        assert rule_type.public_information_matched is True
+        assert rule_type.uses_environment_preview is False
+        assert rule_type.objective_profile == (
+            "lexicographic_service_deadline_known_readiness_cost_v1"
+        )
+
+    for method_name in ("immediate_cost_rule", "two_step_cost_rule"):
+        profile = PRIVILEGED_REFERENCE_PROFILES[method_name]
+        assert profile["capability_profile"] == "privileged_exact_transition_clone_v1"
+        assert profile["public_information_matched"] is False
+        assert profile["uses_environment_preview"] is True
+        assert profile["objective_profile"] == (
+            "lexicographic_completed_failures_deadline_elapsed_transfer_v1"
+        )
 
 
 def test_current_service_and_prepare_costs_are_action_symmetric() -> None:

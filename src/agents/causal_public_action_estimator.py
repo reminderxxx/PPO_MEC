@@ -20,6 +20,24 @@ UNKNOWN = "unknown"
 NOT_APPLICABLE = "not_applicable"
 SCHEMA_VERSION = "causal_public_action_estimator_v2"
 EVENT_LABEL_SCHEMA_VERSION = "causal_public_prepare_advantage_v2"
+PRIVILEGED_REFERENCE_PROFILES = {
+    "immediate_cost_rule": {
+        "capability_profile": "privileged_exact_transition_clone_v1",
+        "objective_profile": (
+            "lexicographic_completed_failures_deadline_elapsed_transfer_v1"
+        ),
+        "public_information_matched": False,
+        "uses_environment_preview": True,
+    },
+    "two_step_cost_rule": {
+        "capability_profile": "privileged_exact_transition_clone_v1",
+        "objective_profile": (
+            "lexicographic_completed_failures_deadline_elapsed_transfer_v1"
+        ),
+        "public_information_matched": False,
+        "uses_environment_preview": True,
+    },
+}
 
 
 def _finite(value: Any) -> float | None:
@@ -566,6 +584,10 @@ class CausalPublicImmediateRule:
     """Myopic rule over the public estimator; never previews an environment."""
 
     method_name = "causal_public_immediate_rule"
+    capability_profile = "public_causal_semantic_state_only_v1"
+    objective_profile = "lexicographic_service_deadline_known_readiness_cost_v1"
+    public_information_matched = True
+    uses_environment_preview = False
 
     def select_action_from_info(self, info: dict[str, Any]) -> int:
         estimate = estimate_public_actions(
