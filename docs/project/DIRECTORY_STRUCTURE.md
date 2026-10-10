@@ -9,6 +9,9 @@
 - `tests/test_calibrated_workflow_event_aux_abstention{,_ab}.py`：精确梯度、固定分母、PPO 长期梯度、公共 readiness、checkpoint、
   SA-only baseline identity、0-step pending gate 和文字 PASS 拒绝。
 - `docs/project/cscwd_event_aux_abstention_{candidate,claim_change}_20261010.md`：候选冻结、时间模型边界、唯一 A/B 与论文线禁行主张。
+- `scripts/finalize_calibrated_workflow_event_aux_abstention.py` 与
+  `artifacts/analysis/cscwd_event_aux_abstention_ab_20261010_v1_analysis_v2/`：完成后的 create-only 最终汇总；完整 split/seed、
+  episode/attempt 分离、监督计数和 `MIXED_STOPPED` 回执。`cscwd_event_aux_abstention_results_20261010.md` 为人类报告。
 
 ## 2026-10-09 因果前缀强基线版本
 

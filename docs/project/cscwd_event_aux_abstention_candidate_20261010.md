@@ -5,17 +5,17 @@
 - `reviewed_at`: `2026-10-10`（Asia/Shanghai）
 - `literature_cutoff`: `2026-09-28`；本轮没有新增文献检索或 novelty 评价
 - `target_venue`: `IEEE TMC`
-- `artifact_run_id`: `cscwd_event_aux_abstention_ab_20261010_v1`（预留，尚未创建 scientific root）
+- `artifact_run_id`: `cscwd_event_aux_abstention_ab_20261010_v1`
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `source_science_commit`: `f46ec72b15f534ac44768a83ef6316c1cfcb6b58`
 - `implementation_commit`: `46a68f11c289ccc304b88cdfed01c34ba5f61c3d`
 - `independent_gate_commit`: `e9b19f6ad2ec432487a0fa7fbdc6542dfb742dc1`
-- `evidence_level`: `E2_INDEPENDENT_INTERFACE_CONTRACT_AUDITED_NO_SCIENTIFIC_RUN`
-- `verdict`: `INDEPENDENT_GATE_PASS / execution_authorized=true / performance_unverified`
+- `evidence_level`: `E2_ARTIFACT_AUDITED_DEVELOPMENT_ONLY`
+- `verdict`: `MIXED_STOPPED`
 
 旧的 service-feasible hard-zero 候选保持 `MIXED_STOPPED`：不得覆盖、放宽门槛或启动其五 seed 训练。本文件冻结一个不同的、
-更弱的单变量候选。当前只有实现、合成梯度验收、历史原件 hash 预检和 0-step 回执；没有候选训练、评价、formal/holdout、
-性能提升或论文贡献证据。
+更弱的单变量候选。其唯一匹配 development A/B 已完成并按预注册门槛判为 `MIXED_STOPPED`；没有 formal/holdout、稳定性能
+提升或论文贡献证据。完整结果见 `cscwd_event_aux_abstention_results_20261010.md`。
 
 ## 为什么从 hard-zero 改为 abstention
 
@@ -58,9 +58,9 @@ report/manifest/time receipt/abstention receipt SHA-256 的 PASS。A 已在上�
 forward 相同，6/6 current-ready 梯度精确相同，24/24 current-missing event 梯度为零，0 replay/training step；B 已独立复核
 A commit/tree、四个文件 SHA-256 和全部 runner 消费字段。此 PASS 只授权冻结 A/B，不是性能或论文 PASS。
 
-## 条件 A/B（尚未授权）
+## 已执行的唯一冻结 A/B
 
-只有不可变 A 门禁 PASS 后，才允许一次无重试 SA-only matched run：seeds `[7,17,29,43,61]`，每 seed 5,760 environment
+不可变 A 门禁 PASS 后已执行一次无重试 SA-only matched run：seeds `[7,17,29,43,61]`，每 seed 5,760 environment
 steps、96 updates、768 optimizer steps，总计 28,800 steps/3,840 optimizer steps；checkpoint candidates 固定
 `[24,48,72,96]`。control 精确复用 v4 原 SA selected/update96 及强基线/规则 hashes，不重训、不重评价；candidate 只新增
 selected 100 + fixed96 100 episodes，总新评价上限 200。全部 36 实例已暴露，只能称 development A/B。
@@ -77,5 +77,6 @@ prepared-prefix reuse/stale、recompute、model/state/input bytes、共同完成
 
 当前最值得补足的是 **短期 event 伪标签与 action4 长期缓存收益之间的信用分配边界**：current-missing 时不再由该伪标签强推
 action4，也不反向强推非 action4，而让 PPO return 决定。证据是既有 event 标签在失败状态实际生效，同时 hard-zero 被多步严格
-更优反例否定。下一轮只改变这一个 event-supervision sample weight；若机制日志未显示预期 abstention，或双视角 completion/
-on-time/failure 门不通过，就否定候选并停止。
+更优反例否定。唯一 A/B 只改变了这一个 event-supervision sample weight；机制日志显示预期 abstention，但双视角 seed/cost
+门未通过，候选已判 `MIXED_STOPPED`。selected 的失败可靠性改善仍作为机制信号保留；fixed96 的 3/5 seed on-time 下降及
+传输/重算成本交换否定整体成功。当前不需要进一步训练，除非 A 另行确认固定合同与代码执行的实现违约。

@@ -5,7 +5,7 @@
 
 ﻿# Progress
 
-## 2026-10-10：event auxiliary abstention 独立门禁 PASS；科学 run 尚未启动
+## 2026-10-10：event auxiliary abstention 科学 run 完成；MIXED 后停止
 
 - hard-zero predecessor 保持 `MIXED_STOPPED`。新候选不把 current-missing event target 改成 0，只令 event CE 和依赖同一
   label 的 temporal-margin 样本权重为 0；current-ready 的 label/系数/逐张量梯度不变，PPO 仍可学习 action4 长期 return。
@@ -14,10 +14,13 @@
 - 相关 45 项回归、smoke、语法和 diff 检查通过；预检核验 400 selected + 400 update96 + 40 rule 历史行、36 split identity、
   474 prefix tamper、165,512 参数/60 state keys，并回执 `scientific_steps=0`、`new_evaluation_episodes=0`。
 - A 在 implementation commit `46a68f1…` 上确认 30/30 raw forward、6 ready 梯度精确不变、24 missing event 梯度为零；
-  B 独立复核 gate commit/tree、report/manifest/time/abstention receipt hashes 后授权唯一冻结 A/B。时间模型仍是 decision-step +
-  synthetic RSU block/人工 5 秒尺度，非逐帧真实轨迹。截至本条仍未启动训练、评价、formal/holdout。
+  B 独立复核后执行唯一 A/B。terminal=`PASS`，5 cells/28,800 steps/3,840 optimizer steps/200 新评价，40/40 scientific
+  files 完整；create-only v2 新增 0 training/evaluation/reselection。
 - 首次 launch 调用在 dispatch 前因 child argv 的局部变量名错误抛出 `NameError`；run/analysis/supervisor 三目录均未创建，
   scientific steps/updates/evaluation=`0/0/0`，不计已进入 scientific launch。只修正该引用并加入无副作用 launcher 回归。
+- completion 两视角均 100/100。selected on-time `38→45`、failure episode/attempt `32→0`/`50→0`，但平均 transfer
+  `+171.171 MB`；update96 on-time `43→44`、failure `26→2`/`39→4`，但 3/5 seed on-time 下降，elapsed/recompute/transfer
+  分别 `+2.358 s/+1.781 s/+112.669 MB`。预注册 verdict=`MIXED_STOPPED`，不重训或转第二候选。
 
 ## 2026-10-10：action0/2/4 对称分支门禁为 MIXED；target-only 训练停止
 

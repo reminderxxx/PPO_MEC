@@ -20,6 +20,16 @@
 - 首次 launcher 调用在 dispatch 前 `NameError`；run/analysis/supervisor root 均未创建，因此无 run ID、entry receipt、
   checkpoint 或可恢复状态。该操作错误不消耗协议中的唯一 scientific launch。
 
+### 完成的唯一 scientific run 与 final analysis
+
+- scientific commit=`abca7e047d672644f3e31d821831e23f80723a52`；terminal=`PASS`，5 cells、28,800 environment
+  steps、3,840 optimizer steps、200 新评价、0 retry、0 formal/holdout。run manifest/integrity SHA-256=
+  `d9f256b6277c6b358b7eafd329f118f1f56884b67d94640bfcb8775d29fa880c`/
+  `fa03b3fe9eed9af66f96e10e10d90db380b13a28893716071a395a8e4eb129cc`，40/40 files 通过。
+- create-only final root=`artifacts/analysis/cscwd_event_aux_abstention_ab_20261010_v1_analysis_v2/`；消费 1,040 evaluation、
+  3,840 optimizer、200 paired rows，新增 training/evaluation/reselection=`0/0/false`。5-file integrity 全通过。
+- verdict=`MIXED_STOPPED`：可靠性改善伴随成本交换，fixed96 seed gate 失败；不登记算法晋级、paper-ready 或新 candidate。
+
 ## 2026-10-10 service-feasible action-branch gate（MIXED，无候选训练）
 
 - 协议：`configs/experiment/calibrated_workflow_service_feasible_event_target_ab_v1.json`；当前

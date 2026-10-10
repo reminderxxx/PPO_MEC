@@ -8,6 +8,8 @@
   这是学习设计候选，不是实现纠错或算法创新。
 - A 已在 clean implementation commit 上给出独立接口/时间合同 PASS，B 逐 hash 复核后只授权一次冻结 A/B；该 PASS 不预判
   性能。若后续双视角服务门 FAIL/MIXED，立即停止，不找第二候选、不扫权重、不扩 seed/预算。
+- 唯一 run 最终为 `MIXED`：selected 服务失败清零，但 fixed96 有 3/5 seed on-time 下降，且成本交换明显。按原规则停止；
+  不以 selected 正信号覆盖固定端点，也不因失败减少把候选包装为整体算法成功。
 
 ## 2026-10-10：MIXED 反事实门禁否决统一 current-ready target 收紧训练
 

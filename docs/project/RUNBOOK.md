@@ -7,6 +7,9 @@
 
 ## Event auxiliary abstention 条件执行（2026-10-10；独立门禁已 PASS）
 
+唯一 scientific run 已完成且判为 `MIXED_STOPPED`，以下 launch 命令仅作历史记录，不得再次执行。最终只读结果位于
+`artifacts/analysis/cscwd_event_aux_abstention_ab_20261010_v1_analysis_v2/`；不得覆盖、重评、重选 checkpoint 或补 seed。
+
 只读预检：
 
 ```bash
