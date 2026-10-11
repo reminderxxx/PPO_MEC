@@ -5,6 +5,18 @@
 
 # Runbook
 
+## Positive-prepare calibration abstention（2026-10-11；未授权训练）
+
+静态重算只读取已存在 public info/snapshot 和旧 pilot manifest，不调用 `env.step()`、不加载 checkpoint、不训练。canonical
+命令及输入清单见 `cscwd_positive_prepare_calibration_abstention_implementation_20261011.md`；输出 root 为
+`artifacts/analysis/cscwd_positive_prepare_calibration_abstention_static_audit_20261011_v1/`，create-only，不得覆盖。
+
+未来匹配协议位于
+`configs/experiment/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json`。当前
+`execution_authorized=false`；不得执行 runner 的 `--run`，也不得把 `--preflight` 当科学结果。只有另行明确授权、更新并冻结
+config/code hash、push clean commit 后，才可按同一 runner 执行；不改 4 arms × 5 seeds、23,040 steps、update
+6/12/18/24、selected/update24 或服务非劣门。旧 pilot 只作描述性结果，不充当匹配 control。
+
 ## phase-v2 pilot terminal 只读核验（2026-10-11；禁止重跑）
 
 原 run、analysis、supervisor root 均为 create-only，不得补写 `scientific_execution_complete` 或覆盖 terminal。结论以

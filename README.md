@@ -7,7 +7,10 @@
 
 2026-10-11 的 [phase-v2 公共可观测性审查](docs/project/cscwd_phase_v2_public_observability_audit_20261011.md)
 确认第二次 action4 面向新目标，不是同目标重发；三处事后成本浪费无法由当前单帧公共字段确定识别。现有 candidate 会在
-`confidence_calibrated=false` 时仍给正 prepare 监督，唯一后续候选冻结为 unknown/未校准→abstain；本轮未实现、未训练。
+`confidence_calibrated=false` 时仍给正 prepare 监督。唯一后续候选已
+[默认关闭实现并完成静态覆盖](docs/project/cscwd_positive_prepare_calibration_abstention_implementation_20261011.md)：
+unknown/未校准只撤销正 prepare event supervision；当前 Raw 全 false，故实际是撤销全部正 prepare auxiliary，不是细粒度
+置信控制。匹配训练协议仍 `execution_authorized=false`，本轮未训练。
 
 2026-10-11 的 [phase-v2 pilot 终态合同独立审查](docs/project/cscwd_phase_v2_pilot_terminal_contract_audit_20261011.md)
 确认 scientific child 已完整产生 23,040 steps、3,840 optimizer steps、80 selection、320 learned evaluation 与 100 checkpoints，

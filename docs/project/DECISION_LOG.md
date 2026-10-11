@@ -1,5 +1,14 @@
 ﻿# Decision Log
 
+## 2026-10-11：只实现校准来源正 prepare abstention；当前 Raw 解释为全撤销而非自适应门
+
+- 接受 `calibration_provenance_positive_prepare_abstention_v1` 作为唯一 default-off 学习设计候选：仅在旧 label 已判
+  `prepare` 后检查 literal `confidence_calibrated=true`，不改 estimator、serve、其他 auxiliary、PPO、reward、mask、网络或规则。
+- 拒绝把 false 改 true、从 outcome 反推 calibration、加入阈值扫描或自动进入 auxiliary-target 消融。当前 Raw 全 false，故
+  科学解释必须是“撤销全部正 prepare auxiliary”的粗粒度干预。
+- 下一轮只允许原 public-v3 SA vs 新 gate SA 的单变量比较；PPO/MAPPO/public rules 在同一新身份下重建参照，旧结果只作
+  描述。总预算上限固定 23,040 steps，selected/update24 同报，服务非劣为先；配置当前未授权，禁止自动执行。
+
 ## 2026-10-11：保留历史 terminal FAIL；只修未来 receipt producer/consumer schema
 
 - 独立审查先于实现，确认 phase-v2 child 的科学文件完整但 completion receipt 缺公共 supervisor 强制字段；因此采用“两层结论”而

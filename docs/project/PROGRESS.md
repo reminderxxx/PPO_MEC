@@ -5,6 +5,17 @@
 
 ﻿# Progress
 
+## 2026-10-11：正 prepare 校准来源 abstention 已默认关闭实现；训练仍未授权
+
+- commit `f500f5ef…b75f` 完成 opt-in 单门：只有旧 public-causal label 已为 `prepare` 且
+  `confidence_calibrated is True` 才保留正 event supervision；missing/false/nonliteral 改为 `abstain, weight=0`。
+  serve、slow/fast、PPO、reward、mask、推理权限和网络参数量不变；checkpoint 与日志绑定新语义。
+- 11 个既有公共状态静态重算为旧→新 `prepare 1→0, serve 7→7, abstain 3→4`，唯一变化
+  `prepare→abstain=1`；0 env step、0 training/update/checkpoint/formal/holdout。
+- Raw producer 对全部状态固定 `confidence_calibrated=false`，所以现有训练 profile 上该候选撤销全部正 prepare auxiliary，
+  不是细粒度置信控制。匹配 A/B 已冻结为 4 arms × 5 seeds、总 23,040 steps、selected/update24，但
+  `execution_authorized=false`，本轮未启动。
+
 ## 2026-10-11：phase-v2 公共可观测性审查冻结唯一 epistemic abstention 候选
 
 - A 的 3 个公共起点／6 个分支已只读复核：第二次 action4 面向新预测目标 `rsu_2`，不是同目标重发；固定 continuation
@@ -15,7 +26,8 @@
 - 新合成单元见证确认：相同完整 public info/estimate/label/rule action 可对应 action4 成功或失败，按声明局部序分别偏好
   action4/action3。因此当前公开字段不能逐状态识别所有可避免准备。
 - 唯一下一候选冻结为 `calibration_provenance_positive_prepare_abstention_v1`：未校准/缺失/unknown 只撤销正 prepare event
-  supervision，不改 serve、slow/fast、PPO、reward、mask 或推理动作权限。本轮未实现、未训练；论文级仍 `Unverifiable`。
+  supervision，不改 serve、slow/fast、PPO、reward、mask 或推理动作权限。该段记录的是审查时点；随后已在
+  `f500f5ef…b75f` 默认关闭实现，但仍未训练，论文级仍 `Unverifiable`。
 
 ## 2026-10-11：phase-v2 pilot 科学原件 VERIFIED；原 supervisor FAIL 保留
 

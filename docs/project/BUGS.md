@@ -5,6 +5,16 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：IMPLEMENTED DEFAULT-OFF / 正 prepare 校准门；OPEN / 效果与生产校准
+
+- `IMPLEMENTED`：commit `f500f5ef…b75f` 将 literal-true calibration provenance 接到 label、SA loss、builder、checkpoint、
+  training log 和冻结 runner；missing/false/string/int 回归、serve 兼容及 event-only gradient 回归通过。
+- `COARSE INTERVENTION`：当前 Raw producer 永远写 false，故 gate 会撤销该 profile 全部正 prepare 监督；没有
+  calibrated=true producer/source-disjoint calibration record，不能称为细粒度不确定性控制。
+- `OPEN / UNTESTED`：服务非劣、failed migration、bytes、recompute 与跨 seed 效果均未知；A/B 未授权、未执行。旧 pilot
+  不兼容为匹配 control，任何新结论必须来自同一新 run 的原 candidate、新 candidate、PPO、MAPPO 与规则参照。
+- `CLAIM RISK`：实现正确性与静态 `prepare→abstain` 不等于性能因果；不得声称已修复奖励、已定位充分根因或 SA 领先。
+
 ## 2026-10-11：OPEN / 未校准 target-delivery 被提升为正 prepare 监督
 
 - `OBSERVABILITY LIMIT`：raw phase-v2 没有 target-entry/dwell/contact 的 confidence bound；只公开最近两点常速预测、点 contact
@@ -12,8 +22,9 @@
 - `LEARNING-DESIGN GAP`：estimator 用 `uncertainty × delivery_timeout` 形成点等待估计，只要 finite 即将 delivery 标为 `yes`；
   `causal_provenance.confidence_calibrated=false` 未被 actor、candidate 或 public rule 消费。A 的三个第二次 action4 起点因此仍为
   `prepare, weight=1`。这是可干预疑点，不是已证总体根因或执行器 bug。
-- `FROZEN / NOT IMPLEMENTED`：唯一候选是 positive-prepare calibration abstention；false/missing/unknown→abstain，serve 与其他
-  loss 不变。没有 calibrated=true producer/source-disjoint calibration record 前不得改成阈值、启动 confirmatory 或宣称收益。
+- `FROZEN AT REVIEW TIME / LATER IMPLEMENTED DEFAULT-OFF`：唯一候选是 positive-prepare calibration abstention；
+  false/missing/unknown→abstain，serve 与其他 loss 不变。后续 commit `f500f5ef…b75f` 已实现但未训练；没有
+  calibrated=true producer/source-disjoint calibration record 前不得改成阈值、启动 confirmatory 或宣称收益。
 - `CLAIM RISK`：A 的三处局部成本支配来自已暴露单一 US101 来源；不得当独立样本、在线识别能力、SA 优势或 paper-ready 证据。
 
 ## 2026-10-11：phase-v2 pilot terminal producer/consumer schema mismatch
