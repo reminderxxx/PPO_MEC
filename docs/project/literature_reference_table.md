@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-04
+更新日期：2026-10-11
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -12,6 +12,13 @@
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
 ## 维护规范
+
+### 2026-10-11：汇报近邻补充
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 依赖感知无回传迁移 | [Dependency-Aware Service Migration for Backhaul-Free Vehicular Edge Computing Networks](https://doi.org/10.1109/TVT.2023.3310520) | IEEE TVT, 73(1):1337–1352, 2024；[IEEE 页面](https://ieeexplore.ieee.org/document/10243639/)核验 | 将任务依赖纳入 VEC service migration；车辆沿行驶路径从原服务器获取依赖结果，再携带到动态连接的服务器，以时变 MDP 联合决定卸载和结果获取时机，目标为能耗。 | 该文已覆盖“任务依赖 + 车辆移动 + 跨边缘迁移”，因此 PPO_MEC 不得把此组合说成空白。可检验的区别是 typed base/adapter 驻留、目标端执行状态就绪与连续 DAG 完成量的联合准备；当前真实 action 4 闭环和增益尚未验证。 | Related Work 的直接迁移近邻；横向对比中的强反例。 |
+| service cache 与任务迁移 | [Deep reinforcement learning-based task offloading and service migrating policies in service caching-assisted mobile edge computing](https://doi.org/10.23919/JCC.fa.2023-0474.202404) | China Communications, 21(4):88–103, 2024；[IEEE 条目](https://ieeexplore.ieee.org/document/10507247/)核验标题；方法摘要与细节待全文核验 | 公开摘要描述 service caching-assisted MEC，联合任务卸载与跨服务器迁移，采用多智能体 DRL；正式动作、缓存语义和实验设置待全文核验。 | “缓存 + 卸载 + 迁移 + MARL”本身已有近邻。PPO_MEC 的候选区别限于跨 RSU 连续 DAG、typed base/adapter 与执行状态、handoff 预备及独立完成量评价；不能仅靠模块并列宣称新颖。 | Related Work / 审稿回应；暂不作为已核验的逐项缺失证明。 |
 
 ### 2026-10-04：任务数据源检索补充
 
