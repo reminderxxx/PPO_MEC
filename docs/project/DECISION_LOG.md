@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-10-11：保留历史 terminal FAIL；只修未来 receipt producer/consumer schema
+
+- 独立审查先于实现，确认 phase-v2 child 的科学文件完整但 completion receipt 缺公共 supervisor 强制字段；因此采用“两层结论”而
+  不是把缺字段宽松解释为 PASS，也不是把完整训练误写为训练失败。
+- 不改旧 terminal/receipt/manifest/integrity，不重跑。未来 plan 显式冻结 receipt schema，producer 写 literal true marker，consumer
+  fail-closed 验证；host acceptance 行为和已有带 marker 的 legacy scientific producer 保持兼容。
+- 该工程纠错不改变算法 `MIXED`、不授权新训练，也不增加 formal/holdout/paper-ready 证据。
+
 ## 2026-10-11：批准方案 B 后只运行一个 public-causal SA A/B
 
 - 接受 raw phase-v2：车辆只需在 input upload 阶段保持 current contact；原 RSU 可完成已接收任务；model/state 经显式模拟

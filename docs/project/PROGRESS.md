@@ -5,6 +5,17 @@
 
 ﻿# Progress
 
+## 2026-10-11：phase-v2 pilot 科学原件 VERIFIED；原 supervisor FAIL 保留
+
+- child rc=0、未 timeout，20 cells/23,040 environment steps/3,840 optimizer steps/80 selection/320 learned eval/18 rule rows
+  齐全；run 113/113、analysis 3/3、supervisor 11/11 hash 重算均 0 mismatch，100 checkpoint 和 20 selected tensor identity 通过。
+- outer terminal 仍为 `FAIL/CHILD_EXECUTION_FAILURE_NO_RETRY`：旧 completion receipt 缺
+  `scientific_execution_complete`，共享 supervisor 按既有 strict contract 判 False。旧 receipt/terminal/integrity 未修改，训练未重跑。
+- 结果为 `MIXED`：双视角 completion/on-time/failure 均无变化，5/5 seed service-neutral；reward 小幅上升和 recompute 下降
+  不构成严格服务改善或算法晋级。
+- 最小工程修复只给未来 scientific receipt 增加显式 `scientific_completion_receipt_v1` schema 与 literal-true completion marker，
+  consumer 对 missing/false/string/schema mismatch、nonzero、timeout、interrupt、partial output 全部 fail-closed。
+
 ## 2026-10-11：phase-v2 公共消费者门 PASS；一次性 pilot 已冻结待启动
 
 - A 线方案 B 的 `RawNGSIMPhaseV2Env` 已合入：input upload 受 current contact 限制，source RSU 可继续 compute，model/state

@@ -25,6 +25,7 @@ from typing import Any
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_INTERPRETER = "/Users/howen/Projects/PPO_MEC/.venv/bin/python"
 SCIENTIFIC_RUNNER = ROOT_DIR / "scripts/run_calibrated_workflow_value_normalization_ab.py"
+SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION = "scientific_completion_receipt_v1"
 
 
 def _now() -> str:
@@ -91,6 +92,59 @@ def _inventory(root: Path) -> None:
         if path.is_file()
         and path.name not in {"artifact_integrity.json", ".artifact_integrity.json.tmp"}
     )
+
+
+def _validate_scientific_completion_receipt(
+    receipt: Any,
+    *,
+    expected_schema: str | None = None,
+) -> dict[str, Any]:
+    """Fail closed on the child-owned scientific completion contract."""
+
+    errors: list[str] = []
+    if not isinstance(receipt, dict):
+        return {"complete": False, "errors": ["missing_or_non_object_receipt"]}
+    if receipt.get("status") != "complete":
+        errors.append("status_is_not_complete")
+    if receipt.get("scientific_execution_complete") is not True:
+        errors.append("scientific_execution_complete_is_not_literal_true")
+    if expected_schema is not None and receipt.get("schema_version") != expected_schema:
+        errors.append("schema_version_mismatch")
+    return {"complete": not errors, "errors": errors}
+
+
+def _terminal_decision(
+    *,
+    kind: str,
+    return_code: int | None,
+    expected_exit_code: int,
+    timed_out: bool,
+    child_receipt: Any = None,
+    expected_receipt_schema: str | None = None,
+) -> dict[str, Any]:
+    expected_exit = return_code == expected_exit_code
+    receipt_validation = (
+        _validate_scientific_completion_receipt(
+            child_receipt,
+            expected_schema=expected_receipt_schema,
+        )
+        if kind == "scientific"
+        else {"complete": True, "errors": []}
+    )
+    passed = bool(expected_exit and not timed_out and receipt_validation["complete"])
+    classification = (
+        "SCIENTIFIC_CHILD_COMPLETE"
+        if passed and kind == "scientific"
+        else "HOST_ACCEPTANCE_EXPECTED_EXIT_OBSERVED"
+        if passed
+        else "CHILD_EXECUTION_FAILURE_NO_RETRY"
+    )
+    return {
+        "passed": passed,
+        "classification": classification,
+        "expected_exit_observed": expected_exit,
+        "scientific_receipt_validation": receipt_validation,
+    }
     _write_json(
         root / "artifact_integrity.json",
         {
@@ -382,34 +436,29 @@ def _supervise(plan_path: Path) -> int:
             "automatic_retry": False,
         }
         _write_json(supervisor_root / "exit_sidecar.json", exit_sidecar)
-        expected_exit = return_code == int(plan["expected_exit_code"])
-        scientific_complete = True
         child_receipt: dict[str, Any] | None = None
         if plan["kind"] == "scientific":
             completion_path = Path(plan["output_root"]) / "completion_receipt.json"
             failure_path = Path(plan["output_root"]) / "failure_receipt.json"
             if completion_path.exists():
                 child_receipt = _read_json(completion_path)
-                scientific_complete = bool(
-                    child_receipt.get("scientific_execution_complete")
-                    and child_receipt.get("status") == "complete"
-                )
             elif failure_path.exists():
                 child_receipt = _read_json(failure_path)
-                scientific_complete = False
-            else:
-                scientific_complete = False
-        passed = bool(expected_exit and not timed_out and scientific_complete)
+        decision = _terminal_decision(
+            kind=str(plan["kind"]),
+            return_code=return_code,
+            expected_exit_code=int(plan["expected_exit_code"]),
+            timed_out=timed_out,
+            child_receipt=child_receipt,
+            expected_receipt_schema=plan.get(
+                "scientific_completion_receipt_schema_version"
+            ),
+        )
+        passed = bool(decision["passed"])
         terminal = {
             "schema_version": "persistent_ab_terminal_receipt_v1",
             "status": "PASS" if passed else "FAIL",
-            "classification": (
-                "SCIENTIFIC_CHILD_COMPLETE"
-                if passed and plan["kind"] == "scientific"
-                else "HOST_ACCEPTANCE_EXPECTED_EXIT_OBSERVED"
-                if passed
-                else "CHILD_EXECUTION_FAILURE_NO_RETRY"
-            ),
+            "classification": decision["classification"],
             "finished_at": _now(),
             "run_id": plan["run_id"],
             "kind": plan["kind"],
@@ -420,6 +469,9 @@ def _supervise(plan_path: Path) -> int:
             "timed_out": timed_out,
             "entry_acknowledged": True,
             "child_receipt": child_receipt,
+            "scientific_receipt_validation": decision[
+                "scientific_receipt_validation"
+            ],
             "automatic_retry": False,
         }
     except BaseException as error:

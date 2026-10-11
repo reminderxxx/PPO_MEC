@@ -1,5 +1,11 @@
 # Code Module Map
 
+`scripts/launch_calibrated_workflow_value_normalization_ab.py` 是 persistent scientific supervisor 的公共 receipt consumer：
+`_validate_scientific_completion_receipt` 要求 `status=complete` 且 `scientific_execution_complete is True`；plan 可进一步指定
+`scientific_completion_receipt_v1`。`_terminal_decision` 将 exit-code、timeout 与 receipt 三门合并，任何缺失/假 complete/nonzero/
+timeout/interruption/partial output 都保持 FAIL。`scripts/run_cscwd_phase_v2_causal_public_pilot.py` 只为未来 run 生产该 schema；
+历史 phase-v2 receipt 与 terminal 不回填、不改写。
+
 `src/agents/causal_public_action_estimator.py` 从共同 public semantic state/action mask 估算 action 0–4 的服务、准备、deadline 与
 字节/时间成本；当前 `v3` 在旧 v1/v2 兼容路径上增加 raw phase-v2 input/backhaul/timeout/delivery 公开阶段核算，不可识别时完整 total/fit 返回
 unknown，并分列 public prepare-contact 与 raw full-step-contact 条件；raw 时间合同读取公开 `time_profile`，不覆盖

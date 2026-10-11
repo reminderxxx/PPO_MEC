@@ -1,5 +1,15 @@
 ﻿# Directory Structure
 
+## 2026-10-11 scientific completion receipt contract
+
+- `scripts/launch_calibrated_workflow_value_normalization_ab.py`：共享 supervisor 的显式 scientific receipt validator 与纯函数 terminal
+  decision；missing marker、假 complete、schema mismatch、nonzero、timeout/interruption、partial output 全部 fail-closed。
+- `scripts/run_cscwd_phase_v2_causal_public_pilot.py`：未来 completion receipt 写
+  `scientific_completion_receipt_v1` + `scientific_execution_complete=true`；不修改旧 run root。
+- `tests/test_calibrated_workflow_value_normalization_launcher.py`、`tests/test_cscwd_phase_v2_causal_public_pilot.py`：receipt/terminal
+  正反 fixtures 与 producer schema 回归。
+- `docs/project/cscwd_phase_v2_pilot_terminal_contract_audit_20261011.{md,json}`：绑定旧原件 hash 的只读审查与机器附录。
+
 ## 2026-10-11 raw phase-v2 causal public pilot
 
 - `configs/experiment/cscwd_phase_v2_causal_public_pilot_v1.json`：唯一变量、20 cells、23,040-step 预算、两来源分工、

@@ -5,6 +5,22 @@
 
 # Runbook
 
+## phase-v2 pilot terminal 只读核验（2026-10-11；禁止重跑）
+
+原 run、analysis、supervisor root 均为 create-only，不得补写 `scientific_execution_complete` 或覆盖 terminal。结论以
+`cscwd_phase_v2_pilot_terminal_contract_audit_20261011.{md,json}` 为准：科学 artifact 完整，原 supervisor gate FAIL，算法
+`MIXED`。只允许重算已登记 SHA/行数；不得再次调用 pilot launcher。
+
+未来新 scientific runner 必须让 child receipt 与 plan 的 schema 一致。公共合同测试：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q \
+  tests/test_calibrated_workflow_value_normalization_launcher.py \
+  tests/test_cscwd_phase_v2_causal_public_pilot.py
+```
+
+测试只使用临时 fixtures，不创建科学 run，不读取 formal/holdout。
+
 ## CSCWD raw phase-v2 public-causal pilot（2026-10-11；一次性）
 
 先运行只读 actual-class preflight；它会核验 raw/source/fixture/env/estimator SHA，扫描两个冻结 raw interval，执行一个真实

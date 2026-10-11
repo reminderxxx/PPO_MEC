@@ -11,7 +11,7 @@ import torch
 
 from scripts.freeze_calibrated_continuous_workflow_pilot import _load_experiment_config
 from scripts.run_cscwd_phase_v2_causal_public_pilot import (
-    _build_cell_agent, _collect_batch, _phase_env,
+    _build_cell_agent, _collect_batch, _completion_receipt_payload, _phase_env,
 )
 from scripts.analyze_cscwd_phase_v2_causal_public_pilot import analyze
 from src.agents.causal_public_action_estimator import (
@@ -58,6 +58,20 @@ def test_protocol_freezes_one_variable_and_exact_budget():
     assert protocol["evaluation"]["final_learned_episode_count"] == 20 * 2 * 8
     assert protocol["claim_boundary"]["independent_unit_count"] == 2
     assert protocol["verdict"]["automatic_next_stage"] is False
+
+
+def test_future_pilot_completion_receipt_matches_supervisor_contract():
+    receipt = _completion_receipt_payload(
+        expected_commit="a" * 40,
+        elapsed_seconds=1.25,
+    )
+    assert receipt["schema_version"] == "scientific_completion_receipt_v1"
+    assert receipt["status"] == "complete"
+    assert receipt["scientific_execution_complete"] is True
+    assert receipt["environment_steps"] == 23040
+    assert receipt["optimizer_steps"] == 3840
+    assert receipt["checkpoint_selection_episodes"] == 80
+    assert receipt["final_evaluation_episodes"] == 320
 
 
 def test_actual_phase_v2_public_consumer_and_sa_action_likelihood():

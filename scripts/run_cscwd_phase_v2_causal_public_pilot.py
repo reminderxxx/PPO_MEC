@@ -27,6 +27,9 @@ from scripts.freeze_calibrated_continuous_workflow_pilot import _load_experiment
 from scripts.run_calibrated_workflow_interface_repair import (  # noqa: E402
     _build_agent, _git_commit, _integrity, _sha256, _write_csv, _write_json,
 )
+from scripts.launch_calibrated_workflow_value_normalization_ab import (  # noqa: E402
+    SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION,
+)
 from src.agents.causal_public_action_estimator import (  # noqa: E402
     CausalPublicImmediateRule, CausalPublicTwoStepRule,
     SCHEMA_VERSION as ESTIMATOR_SCHEMA_VERSION,
@@ -591,6 +594,26 @@ def _build_cell_agent(cell: dict[str, Any], seed: int, config: dict[str, Any]) -
     )
 
 
+def _completion_receipt_payload(
+    *, expected_commit: str, elapsed_seconds: float,
+) -> dict[str, Any]:
+    return {
+        "schema_version": SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION,
+        "status": "complete",
+        "scientific_execution_complete": True,
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "git_commit": expected_commit,
+        "elapsed_seconds": float(elapsed_seconds),
+        "learned_cells": 20,
+        "environment_steps": 23040,
+        "optimizer_steps": 3840,
+        "checkpoint_selection_episodes": 80,
+        "final_evaluation_episodes": 320,
+        "automatic_retry": False,
+        "formal_or_holdout_reads": 0,
+    }
+
+
 def execute(protocol_path: Path, output_root: Path, expected_commit: str) -> None:
     if output_root.exists():
         raise FileExistsError(f"create-only output exists: {output_root}")
@@ -794,13 +817,13 @@ def execute(protocol_path: Path, output_root: Path, expected_commit: str) -> Non
     _write_table(output_root / "behavior_rows.csv", behavior_rows)
     _write_table(output_root / "rule_evaluation_rows.csv", rule_rows)
     _write_table(output_root / "rule_behavior_rows.csv", rule_ledgers)
-    _write_json(output_root / "completion_receipt.json", {
-        "status": "complete", "completed_at": datetime.now(timezone.utc).isoformat(),
-        "git_commit": expected_commit, "elapsed_seconds": time.monotonic() - started,
-        "learned_cells": 20, "environment_steps": 23040, "optimizer_steps": 3840,
-        "checkpoint_selection_episodes": 80, "final_evaluation_episodes": 320,
-        "automatic_retry": False, "formal_or_holdout_reads": 0,
-    })
+    _write_json(
+        output_root / "completion_receipt.json",
+        _completion_receipt_payload(
+            expected_commit=expected_commit,
+            elapsed_seconds=time.monotonic() - started,
+        ),
+    )
     _integrity(output_root)
 
 

@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `cscwd_phase_v2_pilot_terminal_contract_audit_20261011.{md,json}`：绑定旧 terminal/run/analysis hash 的独立只读附录，
+  区分科学原件完整、supervisor 合同 FAIL 与算法 `MIXED`，不补造旧字段或重跑。
+
 - `cscwd_phase_v2_public_consumer_pilot_protocol_20261011.md`：真实 phase-v2 类、public estimator/rules 与四 learned cells 的接口门，
   以及 20-cell、23,040-step 一次性 development pilot、双视角裁决和停止条件。
 - `cscwd_phase_v2_paper_claim_change_note_20261011.md`：只向 A 论文线提供可用/禁用主张，不编辑主论文稿。

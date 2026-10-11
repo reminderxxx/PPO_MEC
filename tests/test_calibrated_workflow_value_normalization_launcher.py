@@ -8,9 +8,12 @@ import pytest
 from scripts.launch_calibrated_workflow_value_normalization_ab import (
     DEFAULT_INTERPRETER,
     ROOT_DIR,
+    SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION,
     _build_probe_plan,
     _build_scientific_plan,
     _frozen_interpreter,
+    _terminal_decision,
+    _validate_scientific_completion_receipt,
 )
 
 
@@ -76,3 +79,89 @@ def test_frozen_interpreter_does_not_accept_realpath_substitution() -> None:
     assert _frozen_interpreter(DEFAULT_INTERPRETER) == DEFAULT_INTERPRETER
     with pytest.raises(ValueError, match="identity drift"):
         _frozen_interpreter(str((ROOT_DIR / ".venv/bin/python").resolve()))
+
+
+def test_scientific_receipt_contract_accepts_only_explicit_true_success() -> None:
+    receipt = {
+        "schema_version": SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION,
+        "status": "complete",
+        "scientific_execution_complete": True,
+    }
+    result = _validate_scientific_completion_receipt(
+        receipt,
+        expected_schema=SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION,
+    )
+    assert result == {"complete": True, "errors": []}
+
+
+@pytest.mark.parametrize(
+    ("receipt", "expected_error"),
+    [
+        ({"status": "complete"}, "scientific_execution_complete_is_not_literal_true"),
+        (
+            {"status": "complete", "scientific_execution_complete": "true"},
+            "scientific_execution_complete_is_not_literal_true",
+        ),
+        (
+            {"status": "failed", "scientific_execution_complete": True},
+            "status_is_not_complete",
+        ),
+        (
+            {
+                "schema_version": "wrong_schema",
+                "status": "complete",
+                "scientific_execution_complete": True,
+            },
+            "schema_version_mismatch",
+        ),
+        (None, "missing_or_non_object_receipt"),
+    ],
+)
+def test_scientific_receipt_contract_fails_closed(receipt, expected_error) -> None:
+    result = _validate_scientific_completion_receipt(
+        receipt,
+        expected_schema=SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION,
+    )
+    assert result["complete"] is False
+    assert expected_error in result["errors"]
+
+
+@pytest.mark.parametrize(
+    ("return_code", "timed_out", "receipt", "case_name"),
+    [
+        (9, False, {"status": "complete", "scientific_execution_complete": True}, "nonzero"),
+        (0, True, {"status": "complete", "scientific_execution_complete": True}, "timeout"),
+        (-15, False, {"status": "complete", "scientific_execution_complete": True}, "interrupted"),
+        (0, False, None, "partial_output_missing_receipt"),
+        (0, False, {"status": "complete"}, "partial_receipt"),
+    ],
+)
+def test_terminal_decision_rejects_nonterminal_or_partial_scientific_children(
+    return_code, timed_out, receipt, case_name
+) -> None:
+    result = _terminal_decision(
+        kind="scientific",
+        return_code=return_code,
+        expected_exit_code=0,
+        timed_out=timed_out,
+        child_receipt=receipt,
+    )
+    assert result["passed"] is False, case_name
+    assert result["classification"] == "CHILD_EXECUTION_FAILURE_NO_RETRY"
+
+
+def test_terminal_decision_accepts_explicit_scientific_success() -> None:
+    result = _terminal_decision(
+        kind="scientific",
+        return_code=0,
+        expected_exit_code=0,
+        timed_out=False,
+        child_receipt={
+            "schema_version": SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION,
+            "status": "complete",
+            "scientific_execution_complete": True,
+        },
+        expected_receipt_schema=SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION,
+    )
+    assert result["passed"] is True
+    assert result["classification"] == "SCIENTIFIC_CHILD_COMPLETE"

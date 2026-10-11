@@ -5,6 +5,15 @@
 
 # Artifact Records
 
+## 2026-10-11 phase-v2 pilot terminal contract audit（0 新训练）
+
+- original terminal SHA-256=`2fbf478e…9a1e`，保持 `FAIL/CHILD_EXECUTION_FAILURE_NO_RETRY`；completion/run/integrity/eval
+  SHA-256=`88c2ac2c…c8c8`/`87502505…a28`/`1ecea21b…acb2`/`126db6fa…71f8`。
+- 只读核验 run/analysis/supervisor=`113/3/11` files，全部 hash match；20 cells、23,040 steps、3,840 optimizer、80
+  selection、320 learned eval、18 rule eval、100 checkpoints。training/reselection/new evaluation=`0/false/0`。
+- 审计附录：`cscwd_phase_v2_pilot_terminal_contract_audit_20261011.{md,json}`。科学 artifact 记为 verified complete
+  development evidence；outer contract 仍 FAIL；算法 verdict=`MIXED`，不晋级。
+
 ## 2026-10-11 raw phase-v2 public consumer gate（scientific run 尚未启动）
 
 - env/estimator SHA-256=`5a5b888f…b683`/`a6b49bd2…1790`；A fixture v3 文件/内嵌 public-info SHA-256=

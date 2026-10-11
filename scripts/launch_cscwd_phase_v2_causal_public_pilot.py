@@ -16,7 +16,8 @@ if str(ROOT) not in sys.path:
 
 from scripts.analyze_cscwd_phase_v2_causal_public_pilot import analyze  # noqa: E402
 from scripts.launch_calibrated_workflow_value_normalization_ab import (  # noqa: E402
-    DEFAULT_INTERPRETER, _dispatch, _frozen_interpreter, _sha256, _verify, _write_json,
+    DEFAULT_INTERPRETER, SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION,
+    _dispatch, _frozen_interpreter, _sha256, _verify, _write_json,
 )
 from scripts.run_cscwd_phase_v2_causal_public_pilot import DEFAULT_PROTOCOL  # noqa: E402
 
@@ -77,6 +78,9 @@ def main() -> int:
         ],
         "entry_receipt": str(RUN_ROOT / "runner_entered.json"),
         "expected_exit_code": 0, "entry_timeout_seconds": 60.0,
+        "scientific_completion_receipt_schema_version": (
+            SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION
+        ),
         "wall_clock_cap_seconds": 3600.0, "automatic_retry": False,
         "formal_or_holdout_reads": 0,
     }

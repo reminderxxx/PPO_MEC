@@ -5,6 +5,14 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：phase-v2 pilot terminal producer/consumer schema mismatch
+
+- `HISTORICAL TERMINAL FAIL / ARTIFACT VERIFIED`：旧 child completion status=complete 且预算/文件完整，但缺 supervisor 必需的
+  `scientific_execution_complete`，故 outer FAIL 是严格合同失败，不是训练失败。禁止覆盖 terminal 或补造旧字段。
+- `RESOLVED FOR FUTURE RUNS`：公共 supervisor 新增显式 receipt validator；pilot producer 写
+  `scientific_completion_receipt_v1` 和 literal boolean true。缺字段或 truthy 字符串均不放宽为成功。
+- `RESULT LIMIT`：完整性修复不改变 `MIXED`；只有两个 exposed development traces，无 formal/holdout/泛化或 paper-ready 证据。
+
 ## 2026-10-11：phase-v2 pilot 剩余风险
 
 - `RESOLVED INTERFACE GATE`：actual-class public fixture、consumer schemas、phase/clock/byte conservation、四 learned method
