@@ -14,6 +14,11 @@
 - `OPEN / UNTESTED`：服务非劣、failed migration、bytes、recompute 与跨 seed 效果均未知；A/B 未授权、未执行。旧 pilot
   不兼容为匹配 control，任何新结论必须来自同一新 run 的原 candidate、新 candidate、PPO、MAPPO 与规则参照。
 - `CLAIM RISK`：实现正确性与静态 `prepare→abstain` 不等于性能因果；不得声称已修复奖励、已定位充分根因或 SA 领先。
+- `INDEPENDENCE BLOCKER`：现有合格 Lankershim/US-101 已用于训练/选模；Peachtree 时间单位待核验、I-80 属另一封存协议，
+  均未获当前 CSCWD 118.8 s 合同资格；anonymous prefix 无 raw time mapping，sealed holdout 不获访问。当前没有可用
+  source-disjoint 独立单位；新 seed 不解决此问题。
+- `ATTRIBUTION BOUNDARY`：calibration gate 只检验一类 event 监督，不是三头结构消融，也不检验 sharing×migration factorial
+  或真实 RSU 净收益；不能用候选 A/B 的任何结果替代这三项证据。
 
 ## 2026-10-11：OPEN / 未校准 target-delivery 被提升为正 prepare 监督
 

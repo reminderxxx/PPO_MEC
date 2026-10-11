@@ -78,6 +78,34 @@ PPO 回报继续学习 action4。本门只撤销未经校准的正 event auxilia
 该设计仍只有 Lankershim/US101 两个已暴露 development 来源，不是独立 holdout；即使支持，也只能说明“撤销未校准正
 prepare 监督”值得继续研究，不能证明自适应置信机制、SA 稳定领先、正式性能或 paper-ready。
 
+## 与四项 UNVERIFIED 的关系及本地独立来源盘点
+
+本候选与“三头结构贡献”不是同一命题。它只改变 event head 的一类监督权重；即使 A/B 支持，也不能把收益归因于
+slow/fast/event 三头结构。三头贡献需要另立结构消融，使 observation、训练预算、checkpoint selection、PPO/aux 系数和
+推理权限匹配，并保留 PPO、controller-MAPPO 与 public rules；本轮不把该第二问题并入唯一变量。
+
+| 图中待证项 | 本冻结 A/B 能否消除 | 原因 |
+|---|---|---|
+| 真实跨 RSU 净收益 | 否 | phase-v2 仍是 NGSIM mobility + 冻结仿真链路/成本，不是真实 RSU 实测 |
+| sharing × migration 因果交互 | 否 | 没有冻结 2×2 sharing/migration factorial；本轮唯一变量是 label gate |
+| 三头优于公平强基线 | 否 | gate A/B 不是三头结构消融；基线不得因排名删除 |
+| 独立泛化 / paper-ready | 否 | 当前可用来源均已暴露，且无 source-disjoint untouched evaluation unit |
+
+只读 metadata 盘点结果如下；没有读取 sealed outcome、原始行或新 checkpoint：
+
+- 当前协议已经使用 Lankershim vehicle 215、时间 `[1118935795100,1118935913900]` 训练，以及 US-101 vehicle 1183、
+  `[1118849293800,1118849412600]` 选模/评价；二者不能再称独立。
+- source manifest 只授权并纳入 Lankershim/US-101；Peachtree 的 10 位时间单位未核验，I-80 属另一套 typed-cache
+  split/封存协议，均未取得当前 CSCWD 118.8 s 合同下的可用资格。因此现有 metadata 没有给出可直接使用的第三个合格
+  source-disjoint unit。
+- 五个旧来源清单被标为 `anonymous_no_raw_time_mapping`，共隔离 200,000 prefix rows；无法核验原始时间区间或车辆重叠，
+  不能恢复成独立证据。
+- 历史 strict split 中存在 sealed holdout 计划，但本轮不得解封或复用；metadata 也没有足够 vehicle ID 集合来证明与当前
+  vehicle 215/1183 不重叠。新 seed 只重复同一来源，绝不算独立单位。
+
+所以最快可运行且单一可证伪的仍只有上述 calibration-abstention development A/B。独立泛化是外部数据/新来源资格与明确
+授权 blocker；不能靠追加 seed、旧 sealed holdout 或换一个已暴露窗口消除。
+
 ## 验证
 
 ```bash

@@ -16,3 +16,8 @@ auxiliary supervision。
 下一步只有一个冻结 A/B，且当前 `execution_authorized=false`：原 public-v3 SA 与新 gate SA 单变量比较，并在同一次新 run 中
 重训 PPO/MAPPO、重评 public rules；共同 23,040 steps、5 seeds、selected/update24 双视角。任何服务恶化或 Raw 正 prepare
 仍被监督均直接否证；development 支持也不自动晋级 formal/holdout。
+
+该 A/B 不检验“三头结构优于公平基线”、真实跨 RSU 净收益或 sharing×migration 交互。现有本地 metadata 只有已暴露的
+Lankershim/US-101 合格来源；Peachtree 时间单位待核验、I-80 属另一封存协议，二者均未获得当前 CSCWD 118.8 s 合同的
+可用资格；anonymous prefix 无 raw time mapping，旧 sealed holdout 不得解封。故独立泛化仍需新 source-disjoint 数据资格与
+明确授权；新增 seed 不构成独立证据。
