@@ -31,7 +31,7 @@ CONTROL_ARM = "sa_public_v3"
 CANDIDATE_ARM = "sa_calibration_abstention"
 EXPECTED_ARMS = {CONTROL_ARM, CANDIDATE_ARM, "ppo", "mappo"}
 KEY_FIELDS = (
-    "view", "seed", "time_profile", "condition_id", "source_segment_id"
+    "view", "seed", "time_profile", "condition_id", "source_segment_id", "window_id"
 )
 EPISODE_KEY_FIELDS = ("arm",) + KEY_FIELDS
 REWARD_METRICS = (
@@ -87,20 +87,21 @@ def _mean(rows: list[dict[str, Any]], metric: str) -> float:
 
 
 def _key(row: dict[str, Any]) -> tuple[str, ...]:
-    return tuple(str(row[field]) for field in KEY_FIELDS)
+    return tuple(str(row.get(field, "")) for field in KEY_FIELDS)
 
 
 def _episode_key(row: dict[str, Any]) -> tuple[str, ...]:
-    return tuple(str(row[field]) for field in EPISODE_KEY_FIELDS)
+    return tuple(str(row.get(field, "")) for field in EPISODE_KEY_FIELDS)
 
 
 def _augment_episode_metrics(
     evaluation_rows: list[dict[str, str]],
     behavior_rows: list[dict[str, str]],
+    expected_arms: set[str],
 ) -> list[dict[str, Any]]:
     behavior: defaultdict[tuple[str, ...], list[dict[str, str]]] = defaultdict(list)
     for row in behavior_rows:
-        if row["arm"] in EXPECTED_ARMS:
+        if row["arm"] in expected_arms:
             behavior[_episode_key(row)].append(row)
     result: list[dict[str, Any]] = []
     for source in evaluation_rows:
@@ -185,22 +186,37 @@ def analyze(run_root: Path, analysis_root: Path) -> dict[str, Any]:
         raise RuntimeError(f"complete source artifact is required: {missing}")
     receipt = json.loads(required["completion_receipt.json"].read_text())
     manifest = json.loads(required["run_manifest.json"].read_text())
+    manifest_schema = manifest.get("schema_version")
     if (
         receipt.get("scientific_execution_complete") is not True
         or receipt.get("status") != "complete"
         or manifest.get("status") != "complete"
-        or manifest.get("schema_version")
-        != "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_manifest_v1"
+        or manifest_schema not in {
+            "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_manifest_v1",
+            "cscwd_phase_v2_recompute_observability_calibration_abstention_ab_manifest_v1",
+        }
     ):
         raise RuntimeError("source scientific artifact is not contract-complete")
+    postfix_run = manifest_schema == (
+        "cscwd_phase_v2_recompute_observability_calibration_abstention_ab_manifest_v1"
+    )
+    control_arm = "sa_public_v4" if postfix_run else CONTROL_ARM
+    candidate_arm = "sa_calibration_abstention_v2" if postfix_run else CANDIDATE_ARM
+    expected_arms = {control_arm, candidate_arm, "ppo", "mappo"}
     scope = manifest.get("calibration_abstention_scope") or {}
-    if scope != {
+    expected_scope = {
         "raw_producer_confidence_calibrated": False,
-        "new_arm_effect": "removes_all_positive_prepare_auxiliary_supervision",
+        "new_arm_effect": (
+            "abstains_positive_prepare_auxiliary_supervision_when_"
+            "public_prediction_confidence_is_not_calibrated"
+            if postfix_run
+            else "removes_all_positive_prepare_auxiliary_supervision"
+        ),
         "fine_grained_uncertainty_control": False,
         "three_head_structure_contribution_tested": False,
         "single_variable": "mechanism_aux_positive_prepare_calibration_abstention_enabled",
-    }:
+    }
+    if scope != expected_scope:
         raise RuntimeError("calibration-abstention claim scope drift")
 
     raw_evaluation = _read_csv(required["evaluation_rows.csv"])
@@ -211,11 +227,11 @@ def analyze(run_root: Path, analysis_root: Path) -> dict[str, Any]:
     if len(raw_evaluation) != 320 or len(signals) != 23040 or len(updates) != 480:
         raise RuntimeError("scientific row count drift")
     arm_counts = Counter(row["arm"] for row in raw_evaluation)
-    if arm_counts != Counter({arm: 80 for arm in EXPECTED_ARMS}):
+    if arm_counts != Counter({arm: 80 for arm in expected_arms}):
         raise RuntimeError(f"learned arm identity drift: {dict(arm_counts)}")
-    rows = _augment_episode_metrics(raw_evaluation, behavior)
-    control = {_key(row): row for row in rows if row["arm"] == CONTROL_ARM}
-    candidate = {_key(row): row for row in rows if row["arm"] == CANDIDATE_ARM}
+    rows = _augment_episode_metrics(raw_evaluation, behavior, expected_arms)
+    control = {_key(row): row for row in rows if row["arm"] == control_arm}
+    candidate = {_key(row): row for row in rows if row["arm"] == candidate_arm}
     if control.keys() != candidate.keys() or len(control) != 80:
         raise RuntimeError("paired SA evaluation identity drift")
 
@@ -241,7 +257,7 @@ def analyze(run_root: Path, analysis_root: Path) -> dict[str, Any]:
         paired_rows.append(output)
 
     method_view_rows: list[dict[str, Any]] = []
-    for arm in sorted(EXPECTED_ARMS):
+    for arm in sorted(expected_arms):
         for view in ("selected", "fixed_update24"):
             subset = [row for row in rows if row["arm"] == arm and row["view"] == view]
             method_view_rows.append({
@@ -315,9 +331,9 @@ def analyze(run_root: Path, analysis_root: Path) -> dict[str, Any]:
             })
 
     candidate_signals = [
-        row for row in signals if row["arm"] == CANDIDATE_ARM
+        row for row in signals if row["arm"] == candidate_arm
     ]
-    control_signals = [row for row in signals if row["arm"] == CONTROL_ARM]
+    control_signals = [row for row in signals if row["arm"] == control_arm]
     if len(candidate_signals) != 5760 or len(control_signals) != 5760:
         raise RuntimeError("SA training-signal row count drift")
     candidate_positive_prepare_supervised = sum(
@@ -330,7 +346,16 @@ def analyze(run_root: Path, analysis_root: Path) -> dict[str, Any]:
         and _float(row["event_supervision_weight"]) > 0.0
         for row in control_signals
     )
-    implementation_failure = candidate_positive_prepare_supervised != 0
+    intervention_rows = sum(
+        row["event_label"] == "abstain"
+        and row.get("event_label_reason")
+        == "positive_prepare_prediction_confidence_not_calibrated"
+        for row in candidate_signals
+    )
+    implementation_failure = (
+        candidate_positive_prepare_supervised != 0
+        or (postfix_run and intervention_rows == 0)
+    )
     supported = bool(
         not implementation_failure
         and not any_service_harm
@@ -366,8 +391,8 @@ def analyze(run_root: Path, analysis_root: Path) -> dict[str, Any]:
         "development_only": True,
         "independent_unit_count": 2,
         "statistical_significance_claim": False,
-        "control_arm": CONTROL_ARM,
-        "candidate_arm": CANDIDATE_ARM,
+        "control_arm": control_arm,
+        "candidate_arm": candidate_arm,
         "calibration_abstention_scope": scope,
         "candidate_positive_prepare_supervised_count": (
             candidate_positive_prepare_supervised
@@ -375,6 +400,7 @@ def analyze(run_root: Path, analysis_root: Path) -> dict[str, Any]:
         "control_positive_prepare_supervised_count": (
             control_positive_prepare_supervised
         ),
+        "candidate_calibration_abstention_intervention_count": intervention_rows,
         "implementation_failure": implementation_failure,
         "service_nonharm_checked_per_seed_and_view": True,
         "any_seed_view_service_harm": any_service_harm,

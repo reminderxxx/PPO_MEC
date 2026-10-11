@@ -8,6 +8,6 @@ completed nodes 与 measured reference 按 executor 相同 predecessor closure �
 旧 state 保持 fail-closed unknown。Estimator/event/calibration-event/public-rule schema 分别升至 v4/v4/v2/v4，旧 v3 scientific
 protocol 在当前代码下拒绝加载，不改旧 artifact。
 
-该改动是接口纠错，不是算法创新。只有全新 create-only v668 probe 在真实 SA consumer 上确认非零 base prepare 与实际
-prepare→abstain 后，才可进入一次匹配训练；未通过仍停止。
-
+该改动是接口纠错，不是算法创新。全新 create-only v668 probe 已在 commit `6b3fd439…b196` 首次完成：192 steps、
+base prepare=46、实际 prepare→abstain=46、consumer mismatch=0，且 selection/check 未读、optimizer/checkpoint=0。
+因此一次匹配 development 训练的覆盖门已通过；这仍不是性能证据。

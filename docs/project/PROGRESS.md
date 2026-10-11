@@ -2515,3 +2515,11 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 独立发现并修复 public rule consumer：旧 `_score` 忽略已知 `raw_full_step_contact_fit=no`，导致 exact US-101 状态上
   immediate/two-step 各一次错误选择 action4。规则 v2 对 raw `no/unknown` 均 fail-closed 到合法 action2，非 Raw 行为不变；
   exact 状态回归、43 tests 与 smoke 通过。该纠错不改变 learned policy、mask 或迁移可达性。
+
+## 2026-10-11 recompute observability 纠错后训练覆盖门
+
+- v4 public state 的已发生 execution history 接口纠错后，一次 create-only v668 probe 在 192 steps 中得到
+  abstain/prepare/serve=`131/46/15`；calibration-abstention 对 46 个 prepare 全部真实生效，consumer mismatch=0。
+- v19 selection 与 v749 check 均未读取；0 optimizer、0 checkpoint、0 formal/holdout。该门只证明候选可干预，不证明收益。
+- 已冻结一次 4 arms × 5 seeds、每 cell 1152 steps/24 updates 的匹配 development A/B；唯一 SA 变量是 calibration abstention，
+  两个评价窗口来自同一 Lankershim recording，历史 check 暴露不完整，不能称独立测试。

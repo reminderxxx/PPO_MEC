@@ -25,6 +25,16 @@
   `scripts/probe_cscwd_lankershim_v668_positive_prepare_coverage.py`：只读取 v668 train 段的一次 192-step actual-consumer 门；
   selection/check 不读，0 optimizer/checkpoint/formal/holdout。
 - `artifacts/analysis/cscwd_lankershim_event_label_coverage_probe_20261011_v1/`：已完成的 96-step 本机轻量原件；不上传 raw 或权重。
+
+## 2026-10-11 recompute-observability 纠错后匹配 A/B
+
+- `configs/experiment/cscwd_raw_phase_v2_lankershim_three_role_development_20261011.json`：同一 Lankershim recording 内
+  train/selection/check 三个时间互斥窗口的 phase-v2 物理合同。
+- `configs/experiment/cscwd_phase_v2_recompute_observability_calibration_abstention_ab_v1.json`：一次性 4 arms × 5 seeds
+  development A/B 冻结协议；唯一变量为 SA calibration abstention。
+- `scripts/launch_cscwd_lankershim_recompute_observability_ab.py`：create-only detached supervisor；无自动 retry。
+- `docs/project/cscwd_lankershim_v668_postfix_coverage_result_20261011.md`：非零 actual-consumer 覆盖门结果。
+- `docs/project/cscwd_recompute_observability_claim_evidence_change_20261011.md`：给 A 论文线的独立 claim/evidence 变更说明。
 - `artifacts/analysis/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_20261011_v1_result_review_v1/`：只读结果审查的
   全 seed/view/profile 表、SA 配对和 checkpoint tensor identity；不覆盖 scientific run。
 

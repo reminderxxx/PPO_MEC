@@ -2034,3 +2034,13 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - Result：exact state pre-fix two rules action4 → post-fix action2；known `no`/`unknown` fail-closed，known `yes` eligible，non-Raw
   candidate surface retained。43 tests + smoke pass；无 training/checkpoint/performance claim。
 - Report：`docs/project/cscwd_raw_contact_reachability_diagnosis_and_rule_fix_20261011.md`。
+
+## 2026-10-11 Lankershim v668 post-fix positive-prepare coverage
+
+- Root：`artifacts/analysis/cscwd_lankershim_v668_positive_prepare_coverage_postfix_20261011_v1/`；producer commit=
+  `6b3fd4392be230513e640d19ab826db97058b196`。
+- Scope：v668 train only、192 environment steps、0 optimizer/parameter/checkpoint/formal/holdout；selection/check rows 未读。
+- Result：base abstain/prepare/serve=`131/46/15`；candidate prepare→abstain=`46`；actual consumer mismatch=`0`；gate=`PASS`。
+- Identity：summary SHA-256=`f99e5abb43d3d6187e1141c07c667d186df566b58448f4318da5eff16ecad6c0`；integrity SHA-256=
+  `c8467c585afadd27fd3349db367d5699a4d365206aa290da33f97f2cebb23c53`。
+- Boundary：E2 bounded development qualification；非性能、独立泛化、formal/holdout 或 paper-ready 证据。

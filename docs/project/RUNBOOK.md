@@ -40,7 +40,14 @@ recompute observability 纠错后的唯一新身份协议为
 `configs/experiment/cscwd_lankershim_v668_positive_prepare_coverage_postfix_v1.json`，输出 root 固定为
 `artifacts/analysis/cscwd_lankershim_v668_positive_prepare_coverage_postfix_20261011_v1/`。它不是旧 root retry；仍只允许同一
 v668 train 段 192 steps、selection/check 不读、无 optimizer/checkpoint/formal/holdout。运行一次后按同一 nonzero 双门停止或
-进入匹配 pilot 冻结。
+进入已授权的一次匹配 development A/B。该 probe 已在 commit `6b3fd439…b196` PASS：base prepare=46、真实
+prepare→abstain=46、consumer mismatch=0；不得覆盖或 rerun。
+
+匹配 A/B 协议固定在
+`configs/experiment/cscwd_phase_v2_recompute_observability_calibration_abstention_ab_v1.json`，launcher 为
+`scripts/launch_cscwd_lankershim_recompute_observability_ab.py`。它固定 4 arms × 5 seeds、每 cell 1152 steps/24 updates，
+checkpoint selection 只读 v19，最终 selected/fixed-update24 只读 v19/v749；唯一 SA 变量为 calibration abstention。无 retry、
+追加 seed、预算扩展、reward/selection 改动或 formal/holdout 读取。
 
 ## Positive-prepare calibration abstention（2026-10-11；一次性授权）
 

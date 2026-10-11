@@ -7,6 +7,9 @@
 
 2026-10-11 已定位并最小修复 public recompute 假 unknown：v4 semantic state 公开已发生的 last-execution RSU/current-handoff，
 estimator 按 executor 同公式核算，无 future truth、reward/mask/network 改动。旧零暴露原件不改，须由新身份 coverage probe 验收。
+新身份 v668 probe 已以 192 steps 验收通过：base prepare=46、candidate prepare→abstain=46、consumer mismatch=0，且
+selection/check 未读、0 optimizer/checkpoint。由此只冻结一次 4 arms × 5 seeds 匹配 development A/B；三窗口仍同属
+Lankershim recording，不能称独立测试或论文性能证据。
 
 2026-10-11 的 [calibration-abstention 结果审查](docs/project/cscwd_positive_prepare_calibration_abstention_results_20261011.md)
 确认一次性 run 完整但 A/B 零处理暴露：四 arms 的训练 label 全为 abstain，SA 两臂网络张量和评价完全相同。96-step

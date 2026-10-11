@@ -1,0 +1,143 @@
+{
+  "schema_version": "cscwd_phase_v2_recompute_observability_calibration_abstention_ab_v1",
+  "run_id": "cscwd_phase_v2_recompute_observability_calibration_abstention_ab_20261011_v1",
+  "execution_authorized": true,
+  "authorization_state": "authorized_once_after_postfix_nonzero_consumer_coverage_gate",
+  "authorized_at": "2026-10-11",
+  "authorization_scope": "one_create_only_development_run_no_retry",
+  "scope": "development_only_same_lankershim_recording_three_time_disjoint_windows",
+  "single_variable": {
+    "name": "mechanism_aux_positive_prepare_calibration_abstention_enabled",
+    "control": false,
+    "candidate": true,
+    "base_event_semantics": "causal_public_prepare_advantage_v4",
+    "candidate_semantics": "causal_public_prepare_advantage_calibration_abstention_v2",
+    "sa_only": true,
+    "reward_change": false,
+    "action_permission_change": false,
+    "network_parameter_change": 0
+  },
+  "inputs": {
+    "base_config": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+    "workload_manifest": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+    "phase_contract": "configs/experiment/cscwd_raw_phase_v2_lankershim_three_role_development_20261011.json",
+    "raw_csv_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+    "development_split": "configs/experiment/cscwd_lankershim_three_role_development_split_v1.json",
+    "coverage_summary": "artifacts/analysis/cscwd_lankershim_v668_positive_prepare_coverage_postfix_20261011_v1/summary.json",
+    "coverage_integrity": "artifacts/analysis/cscwd_lankershim_v668_positive_prepare_coverage_postfix_20261011_v1/artifact_integrity.json",
+    "coverage_semantic_states": "artifacts/analysis/cscwd_lankershim_v668_positive_prepare_coverage_postfix_20261011_v1/semantic_states.jsonl",
+    "sha256": {
+      "workload_manifest": "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc",
+      "phase_contract": "eb0c5320756a4791c7da94b532a2b808bf2dc640f03cc2a9b2ba588c805c722f",
+      "raw_csv": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+      "development_split": "94e974383f14554c3c1f5256a8752d40d06b8d48196d04b879322b98e1eb5433",
+      "coverage_summary": "f99e5abb43d3d6187e1141c07c667d186df566b58448f4318da5eff16ecad6c0",
+      "coverage_integrity": "c8467c585afadd27fd3349db367d5699a4d365206aa290da33f97f2cebb23c53",
+      "coverage_semantic_states": "e7a55f974e01b088b31da85f1e8116b2722623890624f1562cf310735d164c42",
+      "phase_v2_environment": "5a5b888f37a3ec8922d74e3b886d325ae96ee266852d338deb37bf0f0b67d683",
+      "calibrated_environment": "704a2219c90cb87b93396e7ed91c567adb781686ffe5b4fb80e07f68e17960a8",
+      "public_estimator": "b8f349b80bbb8bd561d9a08a13cc23abbc2b64843bf00c3383a932932ace9d09",
+      "raw_event_time_environment": "30666d7c874717d8464a64702c811116e96b931a5db6b57287c6c11d2dcc6575",
+      "sa_core": "adaf8c5aebf984f647e2c342b0b8a1765f4c619b97a8ea097535b82728e93a57",
+      "agent_builder": "ab6cc72bba2550531eb28237e499ac7aed0c090243d014122f980666c07c0389",
+      "pilot_runner": "39f1e1153d43abeab137555a5f6dcefab411cc7e86438aa2ecc0a0c8896392e4",
+      "ab_analysis": "b479816fd0a5426d53617ca3cfabc30809c0087c6b941845fdd337cde56f5276",
+      "ab_launcher": "c78540a74f4533ff459cd71ddbee6a21ff0b8f2bd09316933b3099628c2f387d"
+    }
+  },
+  "training": {
+    "learned_cells": [
+      {"arm": "sa_public_v4", "method": "sa_ghmappo", "candidate_enabled": true, "positive_prepare_calibration_abstention_enabled": false},
+      {"arm": "sa_calibration_abstention_v2", "method": "sa_ghmappo", "candidate_enabled": true, "positive_prepare_calibration_abstention_enabled": true},
+      {"arm": "ppo", "method": "ppo", "candidate_enabled": false, "positive_prepare_calibration_abstention_enabled": false},
+      {"arm": "mappo", "method": "mappo", "candidate_enabled": false, "positive_prepare_calibration_abstention_enabled": false}
+    ],
+    "seeds": [7, 17, 29, 43, 61],
+    "environment_steps_per_cell": 1152,
+    "transitions_per_update": 48,
+    "update_opportunities_per_cell": 24,
+    "ppo_epochs_per_update": 4,
+    "minibatch_size": 32,
+    "optimizer_steps_per_update": 8,
+    "optimizer_steps_per_cell": 192,
+    "checkpoint_update_candidates": [6, 12, 18, 24],
+    "episode_max_steps": 24,
+    "total_environment_steps": 23040,
+    "total_optimizer_steps": 3840,
+    "start_from_scratch": true,
+    "automatic_retry": false,
+    "scientific_launches": 1,
+    "wall_clock_cap_seconds": 3600
+  },
+  "data_assignment": {
+    "training_source_segment": "train",
+    "checkpoint_selection_source_segment": "selection",
+    "final_check_source_segment": "check",
+    "workload_design_id": "dev_01",
+    "training_condition": "default",
+    "selection_condition": "default",
+    "selection_order": [
+      "on_time_workflow_completion_rate",
+      "workflow_completion_rate",
+      "negative_service_failure_rate",
+      "negative_unfinished_rate",
+      "negative_total_transfer_mb",
+      "negative_update_index"
+    ]
+  },
+  "evaluation": {
+    "checkpoint_views": ["selected", "fixed_update24"],
+    "time_profiles": ["raw_ngsim_event_time_v2", "raw_ngsim_event_time_v1"],
+    "phase_v2_conditions": ["default", "adverse_link", "ample_cache"],
+    "phase_v1_conditions": ["mechanism_off_default"],
+    "source_segments": ["selection", "check"],
+    "rule_methods": ["causal_public_immediate_rule", "causal_public_two_step_rule"],
+    "privileged_exact_rule": "raw_v1_capability_reference_only",
+    "final_learned_episode_count": 320,
+    "checkpoint_selection_episode_count": 80,
+    "formal_or_holdout_reads": 0
+  },
+  "objective": {
+    "reward_profile": "original_reward_v1",
+    "critic_target_normalization": "raw_disabled",
+    "gamma_and_gae_unchanged": true,
+    "primary_service_metrics": [
+      "workflow_completion_rate",
+      "on_time_workflow_completion_rate",
+      "service_failure_rate"
+    ],
+    "joint_resource_metrics": [
+      "migration_successes",
+      "state_ready_count",
+      "recompute_seconds",
+      "model_transfer_bytes",
+      "state_transfer_bytes",
+      "input_transfer_bytes",
+      "backhaul_transfer_bytes",
+      "partial_transfer_bytes",
+      "phase_elapsed_seconds",
+      "decision_overhead_ms",
+      "parameter_count"
+    ]
+  },
+  "verdict": {
+    "fail_if": "candidate completion or on-time completion decreases, or service failures increase, in either selected or fixed_update24 view; also fail if intervention count is zero",
+    "mixed_if": "service is noninferior but transfer/recompute/failed migration lacks a common Pareto improvement, or improvement is confined to one view or a seed subset",
+    "support_if": "both views have nondecreasing completion and on-time completion, nonincreasing failures, at least one preregistered resource or failed-migration improvement, at least 3 of 5 seed directions favorable, at most 1 unfavorable, and nonzero calibration-abstention intervention",
+    "automatic_next_stage": false,
+    "paper_ready": false
+  },
+  "claim_boundary": {
+    "development_only": true,
+    "independent_test": false,
+    "formal": false,
+    "holdout": false,
+    "same_source_recording": true,
+    "time_disjoint_windows": true,
+    "historical_check_exposure_provenance_complete": false,
+    "statistical_significance_claim": false,
+    "independent_unit_count": 2,
+    "sa_win_required": false,
+    "checkpoint_or_raw_data_upload": false
+  }
+}

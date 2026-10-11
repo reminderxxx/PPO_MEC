@@ -1161,3 +1161,11 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - `OPEN / physical contract`：当前 atomic full-step gate 把模型传输/加载、current compute/recompute、state transfer/restore 等
   全计入 current contact。8/12 prepare 阶段可达但 0/12 full step 可达。若要 phase-split/cross-boundary execution，必须另立
   物理与状态机合同并给应用依据，不能静默放宽现有 gate。
+
+## 2026-10-11 RESOLVED / public recompute observability；OPEN / abstention 性能因果
+
+- `RESOLVED`：v4 public semantic state 已暴露仅由已发生执行历史导出的 last execution RSU/current handoff；estimator 可按
+  公开 DAG predecessor closure 计算 recompute。旧 profile 和缺字段旧 state 保持原样/fail-closed。
+- `RESOLVED`：纠错后 v668 actual-consumer probe 为 base prepare=46、candidate prepare→abstain=46、mismatch=0，训练干预不再为零。
+- `OPEN`：尚无匹配训练结果证明 abstention 改善 completion/on-time/failure 或资源成本。同一 Lankershim recording 的时间互斥
+  窗口不是独立泛化证据；历史 check 暴露不完整。

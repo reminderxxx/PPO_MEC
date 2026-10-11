@@ -7,6 +7,7 @@ from collections import Counter, defaultdict
 from copy import deepcopy
 import csv
 from datetime import datetime, timezone
+import hashlib
 import json
 import random
 from pathlib import Path
@@ -44,6 +45,9 @@ from src.trainers.ppo_buffer import PPORolloutBuffer  # noqa: E402
 
 
 DEFAULT_PROTOCOL = "configs/experiment/cscwd_phase_v2_causal_public_pilot_v1.json"
+LANKERSHIM_POSTFIX_SCHEMA = (
+    "cscwd_phase_v2_recompute_observability_calibration_abstention_ab_v1"
+)
 
 
 def _load(path: Path) -> dict[str, Any]:
@@ -84,20 +88,180 @@ def _git_clean() -> bool:
 def _input_paths(protocol: dict[str, Any]) -> dict[str, Path]:
     values = protocol["inputs"]
     result = {}
-    for key in (
-        "base_config", "workload_manifest", "phase_contract", "raw_csv_path",
-        "source_manifest", "phase_v2_preflight", "public_fixture",
-        "mechanism_matrix_manifest", "mechanism_matrix_ledger", "mechanism_matrix_audit",
-    ):
+    keys = (
+        (
+            "base_config", "workload_manifest", "phase_contract", "raw_csv_path",
+            "development_split", "coverage_summary", "coverage_integrity",
+            "coverage_semantic_states",
+        )
+        if protocol.get("schema_version") == LANKERSHIM_POSTFIX_SCHEMA
+        else (
+            "base_config", "workload_manifest", "phase_contract", "raw_csv_path",
+            "source_manifest", "phase_v2_preflight", "public_fixture",
+            "mechanism_matrix_manifest", "mechanism_matrix_ledger",
+            "mechanism_matrix_audit",
+        )
+    )
+    for key in keys:
         path = Path(values[key])
         result[key] = path.resolve() if path.is_absolute() else (ROOT / path).resolve()
     return result
+
+
+def _validate_lankershim_postfix_protocol(
+    protocol: dict[str, Any], *, require_clean: bool, require_authorized: bool,
+) -> dict[str, Any]:
+    if require_authorized and protocol.get("execution_authorized") is not True:
+        raise RuntimeError("pilot is not authorized")
+    expected_single = {
+        "name": "mechanism_aux_positive_prepare_calibration_abstention_enabled",
+        "control": False,
+        "candidate": True,
+        "base_event_semantics": EVENT_LABEL_SCHEMA_VERSION,
+        "candidate_semantics": CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION,
+        "sa_only": True,
+        "reward_change": False,
+        "action_permission_change": False,
+        "network_parameter_change": 0,
+    }
+    if protocol.get("single_variable") != expected_single:
+        raise RuntimeError("single-variable contract drift")
+    training = protocol["training"]
+    if (
+        training["seeds"] != [7, 17, 29, 43, 61]
+        or int(training["environment_steps_per_cell"]) != 1152
+        or int(training["transitions_per_update"]) != 48
+        or int(training["update_opportunities_per_cell"]) != 24
+        or int(training["optimizer_steps_per_update"]) != 8
+        or int(training["optimizer_steps_per_cell"]) != 192
+        or training["checkpoint_update_candidates"] != [6, 12, 18, 24]
+        or int(training["total_environment_steps"]) != 23040
+        or int(training["total_optimizer_steps"]) != 3840
+        or training["automatic_retry"]
+        or int(training["scientific_launches"]) != 1
+    ):
+        raise RuntimeError("training budget drift")
+    actual_cells = [
+        (
+            row["arm"], row["method"], bool(row["candidate_enabled"]),
+            bool(row.get("positive_prepare_calibration_abstention_enabled", False)),
+        )
+        for row in training["learned_cells"]
+    ]
+    if actual_cells != [
+        ("sa_public_v4", "sa_ghmappo", True, False),
+        ("sa_calibration_abstention_v2", "sa_ghmappo", True, True),
+        ("ppo", "ppo", False, False),
+        ("mappo", "mappo", False, False),
+    ]:
+        raise RuntimeError("learned cell identity drift")
+    if (
+        protocol["objective"]["reward_profile"] != "original_reward_v1"
+        or protocol["objective"]["critic_target_normalization"] != "raw_disabled"
+    ):
+        raise RuntimeError("objective identity drift")
+
+    paths = _input_paths(protocol)
+    hashes = protocol["inputs"]["sha256"]
+    checks = {
+        "workload_manifest": paths["workload_manifest"],
+        "phase_contract": paths["phase_contract"],
+        "raw_csv": paths["raw_csv_path"],
+        "development_split": paths["development_split"],
+        "coverage_summary": paths["coverage_summary"],
+        "coverage_integrity": paths["coverage_integrity"],
+        "coverage_semantic_states": paths["coverage_semantic_states"],
+        "phase_v2_environment": ROOT / "src/envs/core/raw_ngsim_phase_v2_env.py",
+        "calibrated_environment": (
+            ROOT / "src/envs/core/calibrated_continuous_workflow_env.py"
+        ),
+        "public_estimator": ROOT / "src/agents/causal_public_action_estimator.py",
+        "raw_event_time_environment": ROOT / "src/envs/core/raw_ngsim_event_time_env.py",
+        "sa_core": ROOT / "src/agents/sa_ghmappo_core.py",
+        "agent_builder": ROOT / "scripts/run_calibrated_workflow_interface_repair.py",
+        "pilot_runner": Path(__file__).resolve(),
+        "ab_analysis": (
+            ROOT / "scripts/analyze_cscwd_positive_prepare_calibration_abstention_ab.py"
+        ),
+        "ab_launcher": (
+            ROOT / "scripts/launch_cscwd_lankershim_recompute_observability_ab.py"
+        ),
+    }
+    for name, path in checks.items():
+        if not path.is_file() or _sha256(path) != hashes.get(name):
+            raise RuntimeError(f"frozen input identity mismatch: {name}")
+
+    split = _load(paths["development_split"])
+    phase = _load(paths["phase_contract"])
+    coverage = _load(paths["coverage_summary"])
+    integrity = _load(paths["coverage_integrity"])
+    windows = split.get("selected_windows", [])
+    if (
+        split.get("schema_version")
+        != "cscwd_lankershim_three_role_development_split_v1"
+        or [row.get("role") for row in windows] != ["train", "selection", "check"]
+        or any(row.get("source_segment_id") != "lankershim" for row in windows)
+        or phase.get("time_profile") != "raw_ngsim_event_time_v2"
+        or phase.get("source_manifest_sha256") != hashes["development_split"]
+        or coverage.get("status") != "PASS"
+        or coverage.get("coverage_gate_passed") is not True
+        or coverage.get("base_positive_prepare_count") != 46
+        or coverage.get("candidate_prepare_to_abstain_count") != 46
+        or coverage.get("actual_training_consumer_mismatch_count") != 0
+        or coverage.get("selection_and_check_rows_read") is not False
+        or coverage.get("optimizer_steps") != 0
+        or coverage.get("formal_or_holdout_reads") != 0
+    ):
+        raise RuntimeError("post-fix coverage or three-role split gate failed")
+    integrity_rows = {row["path"]: row["sha256"] for row in integrity["files"]}
+    if integrity_rows.get("summary.json") != hashes["coverage_summary"] or (
+        integrity_rows.get("semantic_states.jsonl")
+        != hashes["coverage_semantic_states"]
+    ):
+        raise RuntimeError("coverage artifact internal identity mismatch")
+    intervals = sorted(
+        (int(row["source_time_start"]), int(row["source_time_end"]))
+        for row in windows
+    )
+    if any(left[1] >= right[0] for left, right in zip(intervals, intervals[1:])):
+        raise RuntimeError("three-role windows are not time-disjoint")
+    if require_clean and not _git_clean():
+        raise RuntimeError("scientific checkout must be clean")
+    return {
+        "status": "PASS",
+        "git_commit": _git_commit(),
+        "git_clean": _git_clean(),
+        "input_sha256": hashes,
+        "estimator_schema": ESTIMATOR_SCHEMA_VERSION,
+        "event_schema": EVENT_LABEL_SCHEMA_VERSION,
+        "calibration_abstention_event_schema": (
+            CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION
+        ),
+        "rule_schema": PUBLIC_RULE_SCHEMA_VERSION,
+        "coverage_gate": {
+            "status": "PASS",
+            "steps": 192,
+            "base_positive_prepare_count": 46,
+            "candidate_prepare_to_abstain_count": 46,
+            "consumer_mismatch_count": 0,
+        },
+        "development_identity": (
+            "same_lankershim_recording_three_time_disjoint_windows_"
+            "historical_check_exposure_unknown"
+        ),
+    }
 
 
 def _validate_protocol(
     protocol: dict[str, Any], *, require_clean: bool, require_authorized: bool = True,
 ) -> dict[str, Any]:
     schema_version = protocol.get("schema_version")
+    if schema_version == LANKERSHIM_POSTFIX_SCHEMA:
+        return _validate_lankershim_postfix_protocol(
+            protocol,
+            require_clean=require_clean,
+            require_authorized=require_authorized,
+        )
     if schema_version not in {
         "cscwd_phase_v2_causal_public_pilot_v1",
         "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1",
@@ -301,17 +465,20 @@ def _load_runtime(protocol: dict[str, Any]) -> tuple[dict[str, Any], dict[str, A
         if row["design_id"] == protocol["data_assignment"]["workload_design_id"]
     )
     phase = _load(paths["phase_contract"])
-    source = _load(paths["source_manifest"])
+    new_split = protocol.get("schema_version") == LANKERSHIM_POSTFIX_SCHEMA
+    source = _load(paths["development_split"] if new_split else paths["source_manifest"])
     traces, trace_identity = load_traces(paths["raw_csv_path"], source["selected_windows"])
+    identity_key = "role" if new_split else "source_segment_id"
     by_segment = {
-        row["source_segment_id"]: traces[row["window_id"]]
+        row[identity_key]: traces[row["window_id"]]
         for row in source["selected_windows"]
     }
     source_by_segment = {
-        row["source_segment_id"]: row for row in source["selected_windows"]
+        row[identity_key]: row for row in source["selected_windows"]
     }
-    if set(by_segment) != {"lankershim", "us_101"}:
-        raise RuntimeError("two frozen source segments are incomplete")
+    expected = {"train", "selection", "check"} if new_split else {"lankershim", "us_101"}
+    if set(by_segment) != expected:
+        raise RuntimeError("frozen source windows are incomplete")
     return config, instance, {"traces": by_segment, "sources": source_by_segment}, {
         "phase": phase, "trace_identity": trace_identity,
     }
@@ -333,6 +500,70 @@ def _actual_class_gate(
     source_bundle: dict[str, Any], runtime: dict[str, Any],
 ) -> dict[str, Any]:
     paths = _input_paths(protocol)
+    if protocol.get("schema_version") == LANKERSHIM_POSTFIX_SCHEMA:
+        witness = None
+        with paths["coverage_semantic_states"].open(encoding="utf-8") as handle:
+            for line in handle:
+                row = json.loads(line)
+                base = public_prepare_advantage_label(
+                    row["semantic_state"], row["action_mask"]
+                )
+                if base["decision"] == "prepare":
+                    witness = row
+                    break
+        if witness is None:
+            raise RuntimeError("coverage artifact has no positive prepare witness")
+        label = public_prepare_advantage_label(
+            witness["semantic_state"], witness["action_mask"]
+        )
+        gated_label = public_prepare_advantage_label(
+            witness["semantic_state"], witness["action_mask"],
+            positive_prepare_calibration_abstention_enabled=True,
+        )
+        if label["decision"] != "prepare" or gated_label["decision"] != "abstain":
+            raise RuntimeError("post-fix intervention witness gate failed")
+        sa_cells = [
+            row for row in protocol["training"]["learned_cells"]
+            if row["method"] == "sa_ghmappo"
+        ]
+        torch.manual_seed(7)
+        control = _build_cell_agent(sa_cells[0], 7, config)
+        torch.manual_seed(7)
+        candidate = _build_cell_agent(sa_cells[1], 7, config)
+        control_state = control._network.state_dict()
+        candidate_state = candidate._network.state_dict()
+        tensors_equal = control_state.keys() == candidate_state.keys() and all(
+            torch.equal(control_state[key], candidate_state[key])
+            for key in control_state
+        )
+        if not tensors_equal:
+            raise RuntimeError("SA control/candidate initialized network identity drift")
+        control_parameters = sum(int(item.numel()) for item in control._network.parameters())
+        candidate_parameters = sum(int(item.numel()) for item in candidate._network.parameters())
+        if control_parameters != candidate_parameters:
+            raise RuntimeError("SA candidate changed network parameter count")
+        env = _phase_env(
+            config, instance, source_bundle["traces"]["train"],
+            runtime["phase"], "default",
+        )
+        observation, info = env.reset()
+        action, action_info = candidate.act(observation, deepcopy(info))
+        if not info["action_mask"][int(action)] or not np.isfinite(float(action_info["log_prob"])):
+            raise RuntimeError("candidate action likelihood gate failed")
+        return {
+            "status": "PASS",
+            "witness_semantic_state_sha256": witness["semantic_state_sha256"],
+            "base_event_label": label["decision"],
+            "base_event_label_reason": label["reason"],
+            "candidate_event_label": gated_label["decision"],
+            "candidate_event_label_reason": gated_label["reason"],
+            "candidate_action": int(action),
+            "candidate_action_log_prob_finite": True,
+            "sa_initialized_tensors_equal": True,
+            "sa_control_parameter_count": control_parameters,
+            "sa_candidate_parameter_count": candidate_parameters,
+            "environment_steps": 0,
+        }
     fixture = _load(paths["public_fixture"])
     env = _phase_env(
         config, instance, source_bundle["traces"]["us_101"], runtime["phase"], "default"
@@ -549,7 +780,15 @@ def _evaluate_episode(
             "action_mask": json.dumps(mask),
             "action_probabilities": json.dumps(action_info.get("env_action_probs", [])),
             "event_label": label["decision"],
+            "event_label_reason": label["reason"],
+            "event_label_schema_version": label["schema_version"],
             "event_supervision_weight": label["supervision_weight"],
+            "semantic_state_sha256": hashlib.sha256(
+                json.dumps(
+                    decision_info["semantic_state"], ensure_ascii=False,
+                    sort_keys=True, separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest(),
             "reward": float(reward), "service_completed": bool(event.get("service_completed")),
             "migration_success": bool(event.get("migration_success", False)),
             "failure_reason": event.get("failure_reason") or event.get("admission_rejection_reason"),
@@ -637,6 +876,8 @@ def _training_signal(
             positive_prepare_calibration_abstention_enabled
         ),
     )
+    estimate = label["estimate"]
+    action4 = estimate["actions"]["4"]
     return {
         "arm": arm, "method": method, "seed": seed,
         "update_index": update_index, "global_step": global_step,
@@ -653,7 +894,20 @@ def _training_signal(
         "segment_truncated": bool(row["segment_truncated"]),
         "batch_boundary": bool(row["batch_boundary"]),
         "event_label": label["decision"],
+        "event_label_reason": label["reason"],
+        "event_label_schema_version": label["schema_version"],
         "event_supervision_weight": label["supervision_weight"],
+        "semantic_state_sha256": hashlib.sha256(
+            json.dumps(
+                decision["semantic_state"], ensure_ascii=False,
+                sort_keys=True, separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest(),
+        "action4_legal": bool(action4["legal"]),
+        "action4_current_service": action4["current_service"],
+        "action4_target_prepare": action4["target_prepare"],
+        "action4_deadline_fit": action4["deadline_fit"],
+        "action4_future_readiness_gain": action4["future_readiness_gain"],
         "action_probabilities": json.dumps(action_info.get("env_action_probs", [])),
         "service_completed": bool(event.get("service_completed")),
         "migration_success": bool(event.get("migration_success", False)),
@@ -895,12 +1149,16 @@ def execute(protocol_path: Path, output_root: Path, expected_commit: str) -> Non
         raise RuntimeError("scientific row-count identity drift")
     if len(training_signal_rows) != 23040 or len(optimizer_rows) != 3840:
         raise RuntimeError("scientific training-count identity drift")
-    calibration_abstention_run = protocol.get("schema_version") == (
-        "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1"
-    )
+    calibration_abstention_run = protocol.get("schema_version") in {
+        "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1",
+        LANKERSHIM_POSTFIX_SCHEMA,
+    }
+    postfix_run = protocol.get("schema_version") == LANKERSHIM_POSTFIX_SCHEMA
     _write_json(output_root / "run_manifest.json", {
         "schema_version": (
-            "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_manifest_v1"
+            "cscwd_phase_v2_recompute_observability_calibration_abstention_ab_manifest_v1"
+            if postfix_run
+            else "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_manifest_v1"
             if calibration_abstention_run
             else "cscwd_phase_v2_causal_public_pilot_manifest_v1"
         ),
@@ -912,7 +1170,12 @@ def execute(protocol_path: Path, output_root: Path, expected_commit: str) -> Non
         "calibration_abstention_scope": (
             {
                 "raw_producer_confidence_calibrated": False,
-                "new_arm_effect": "removes_all_positive_prepare_auxiliary_supervision",
+                "new_arm_effect": (
+                    "abstains_positive_prepare_auxiliary_supervision_when_"
+                    "public_prediction_confidence_is_not_calibrated"
+                    if postfix_run
+                    else "removes_all_positive_prepare_auxiliary_supervision"
+                ),
                 "fine_grained_uncertainty_control": False,
                 "three_head_structure_contribution_tested": False,
                 "single_variable": (
@@ -921,6 +1184,11 @@ def execute(protocol_path: Path, output_root: Path, expected_commit: str) -> Non
             }
             if calibration_abstention_run
             else None
+        ),
+        "development_split_scope": (
+            "same_lankershim_recording_time_disjoint_windows_"
+            "historical_check_exposure_unknown"
+            if postfix_run else None
         ),
         "formal_or_holdout_reads": 0, "raw_or_checkpoint_uploaded": False,
         "counts": {"learned_cells": 20, "training_steps": 23040, "optimizer_steps": 3840,
