@@ -1,29 +1,48 @@
 {
   "contract_version": "cscwd_sharing_migration_factorial_v1",
-  "execution_authorized": false,
-  "gate_status": "BLOCKED_SOURCE_AND_CONSUMER_IDENTITY",
+  "execution_authorized": true,
+  "gate_status": "AUTHORIZED_SINGLE_DEVELOPMENT_RUN",
+  "fixed_implementation_commit": "ed33099b0c7a02ead9649100a83e1b7d5772412a",
   "scope": "single_development_contract_acceptance_only",
   "time_profile": "raw_ngsim_event_time_v2",
   "source": {
-    "segment": null,
-    "vehicle_id": null,
-    "raw_global_time_start": null,
-    "raw_global_time_end": null,
+    "selection_rule": "first approved selected window with initial public action_mask[4]=true, in source manifest order",
+    "raw_csv_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+    "source_manifest_path": "artifacts/analysis/cscwd_new_development_source_20261011_v2/source_manifest.json",
+    "source_manifest_sha256": "34eee3a8d16f2dfe89f3a8d8dcd27f20159c0488e2f1a9ebc77be3aac747abde",
+    "window_id": "cscwd_newdev_us_101_v1183_t1118849293800_1118849412600",
+    "segment": "us_101",
+    "vehicle_id": 1183,
+    "raw_global_time_start": 1118849293800,
+    "raw_global_time_end": 1118849412600,
+    "historical_train_dev_overlap_count": 2,
     "source_csv_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
     "required_raw_frame_step": 1,
     "required_raw_time_step_ms": 100,
-    "must_not_overlap_train_dev_formal_hidden_or_consumed_intervals": true,
+    "must_not_overlap_formal_hidden_or_consumed_intervals": true,
+    "historically_exposed_development_only": true,
     "peachtree_unit_identity_verified": false,
     "i80_sealed_access": false
   },
   "workload": {
+    "config_path": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+    "config_sha256": "20e82b0ea4ff5c7caf597d987bcef1f7523dc0c1c7ece21deba32aa7d47af923",
     "manifest_path": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+    "manifest_sha256": "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc",
     "design_id": "dev_01",
     "same_nodes_edges_inputs_adapter_function_in_all_arms": true,
     "requires_two_compatible_adapters": true
   },
   "physical_condition": {
+    "protocol_path": "configs/experiment/cscwd_raw_phase_v2_development_20261011.json",
+    "protocol_sha256": "2a0cee4b4b2ba512f8015296ee1946698dd51066d1ae5744e22b4d428d176343",
     "condition_id": "default",
+    "condition": {
+      "condition_id": "default",
+      "backhaul_actual_mbps": 1000.0,
+      "backhaul_estimated_mbps": 1000.0,
+      "cache_profile": "workload_native"
+    },
     "backhaul_actual_mbps": 1000.0,
     "backhaul_estimated_mbps": 1000.0,
     "cache_profile": "workload_native",
@@ -36,7 +55,7 @@
     "action_order": [4, 3, 2, 0, 1],
     "rule": "choose action 4 when legal, otherwise 3 when legal, otherwise 2 when legal; remaining actions in fixed order",
     "future_trace_or_outcome_access": false,
-    "consumer_identity_sha256": null
+    "consumer_identity_sha256": "13c74a81340e6be761002d81714f7bc916083263a044ec110eef855dc7798b86"
   },
   "arms": [
     {"arm_id": "S0M0", "base_sharing_enabled": false, "state_migration_enabled": false},
@@ -54,7 +73,7 @@
     "formal_or_holdout_access": false
   },
   "output": {
-    "create_only_root": null,
+    "create_only_root": "artifacts/analysis/cscwd_sharing_migration_2x2_development_20261011_v1",
     "require_per_arm_step_ledger_and_completion_receipt": true,
     "require_input_and_code_sha256": true,
     "require_raw_interval_exposure_audit": true,
