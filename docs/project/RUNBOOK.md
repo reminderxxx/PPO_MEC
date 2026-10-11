@@ -7,7 +7,7 @@
 
 ## CSCWD phase-v2 公开 prepare 正负区域有界诊断（2026-10-11）
 
-先读事前方案 `cscwd_phase_v2_public_prepare_region_plan_20261011.md`。获授权只做一次结果盲开发分支；已存 root 不可覆盖，失败即停不补条件/seed。脚本要求 clean commit，先写 24 格选择全集/排除理由，再在两个已授权长来源上运行最多 12 起点/36 分支/288 真实环境步，0 训练/formal/holdout。下列命令作为冻结执行命令，运行后记录实际回执与报告：
+先读事前方案 `cscwd_phase_v2_public_prepare_region_plan_20261011.md` 和一次运行的失败报告 `cscwd_phase_v2_public_prepare_region_failure_20261011.md`。下列为**历史执行命令记录，不得原样重跑**：冻结 commit `82818d9` 的脚本在 Python 3.9.6 因 `zip(strict=True)` 于首个 `env.step` 前失败。原 root 有 24 格选择清单、启动/失败回执，0 分支/0 步；按失败即停规则未补跑。后续源码已修兼容性，但原 run 身份和 `FAIL` 不变。任何新运行须另立授权、方案和 create-only run ID。
 
 ```bash
 /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_cscwd_phase_v2_public_prepare_regions.py tests/test_cscwd_phase_v2_repeated_action4_branch.py

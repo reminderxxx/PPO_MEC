@@ -142,6 +142,13 @@ def public_features(info: dict[str, Any]) -> dict[str, Any]:
     return facts
 
 
+def prefix_history_pairs(prefix: list[int], history: list[dict[str, str]]) -> list[tuple[int, dict[str, str]]]:
+    """Pair frozen actions and rows without relying on Python 3.10 zip(strict=...)."""
+    if len(prefix) != len(history):
+        raise RuntimeError("registered prefix/history length mismatch")
+    return list(zip(prefix, history))
+
+
 def posthoc_migration_use(ledger: list[dict[str, Any]]) -> dict[str, Any]:
     first = ledger[0]
     target = None
@@ -260,7 +267,7 @@ def run(protocol_path: Path, pilot_root: Path, output_root: Path) -> dict:
                                      phase_contract=phase["physical_assumptions"], condition=condition)
             _, info = env.reset()
             prefix_events = []
-            for action, old in zip(prefix, item["history"], strict=True):
+            for action, old in prefix_history_pairs(prefix, item["history"]):
                 step, info, done, truncated = step_once(env, action, info,
                                                         start_id=start_id, condition_id=condition_id,
                                                         branch="common_prefix", budget=budget)

@@ -5,7 +5,7 @@
 
 # PPO_MEC
 
-2026-10-11 已事前冻结 [phase v2 公开 prepare 正负区域有界诊断](docs/project/cscwd_phase_v2_public_prepare_region_plan_20261011.md)：从既有两条 development 来源的公开动作前缀结果盲枚举 24 格，11 个合法起点中 3 个为旧回归、8 个为新增覆盖，最多 27 分支/224 步（硬限 36 分支/288 步）。一次运行后才报告正例、无益与不确定区域；不启动训练或修改在线策略。
+2026-10-11 的 [phase v2 公开 prepare 正负区域有界诊断](docs/project/cscwd_phase_v2_public_prepare_region_failure_20261011.md)按[事前方案](docs/project/cscwd_phase_v2_public_prepare_region_plan_20261011.md)枚举 24 格、选出 11 个 US101 开发起点；一次执行因 Python 3.9 不支持 `zip(strict=True)` 在首个环境步前 `FAIL`，实际 0 分支/0 步。没有正负区域效果结果；原 root 保留且未补跑，在线策略与论文主张不变。
 
 2026-10-11 的 [raw phase v2 第二次 action4 有界分支确认](docs/project/cscwd_phase_v2_repeated_action4_branch_result_20261011.md)按事前[方案](docs/project/cscwd_phase_v2_repeated_action4_branch_plan_20261011.md)一次完成 3 个去重 US101 起点、6 分支/45 真实步。相同公开 continuation 下 action3 在三条件均保持服务并省传输；这仍是单一已暴露来源的局部诊断，尚无安全的公开 abstain 门，不修改生产策略或论文主张。
 

@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-11：公开 prepare 正负区域诊断在首步前失败
+
+- 冻结执行 commit `82818d97a0cbe6c8f6570a770cb81f8ff73f1144`，结果盲 24 格选择清单有 11 个 US101 起点（3 个旧回归、8 个新增覆盖状态）；Lankershim 未入选，11 个状态仍来自同一轨迹。清单 SHA-256 `875163d7022ce209746c1e7dd954891d12da2f92f640cac7e815a0604a2d54cb`。
+- 唯一运行因 Python 3.9.6 不支持 `zip(strict=True)` 在首个 `env.step` 前 `FAIL`；失败回执 SHA-256 `55b826571c4b2474bf1f52ab228892d37855a850425ce20249b942100127e1ad`，实际 0 分支/0 环境步/0 训练/formal/holdout。原件保留、未重试；兼容修复只供未来单独授权，不追认本轮。正/负区域和优秀基线效果均 `Unverifiable`，见 `cscwd_phase_v2_public_prepare_region_failure_20261011.md`。
+
 ## 2026-10-11：第二次 action4 有界配对确认完成，生产策略不变
 
 - 事前冻结 commit `da2c8b7`，一次 create-only 运行 3 个去重 US101 公共起点、6 分支/45 真实环境步；启动/完成回执均留原件，5/5 payload SHA/size 与 45/45 事件时钟/字节/action mask 经独立只读核对通过。summary SHA-256 `be57ec84b234e31e9866d768b095d2b25ce58645c7f1c8bc179ff27aee8e9a1d`，独立 audit SHA-256 `175bc27a84b9e41d823c1a84aadb2f9862a545511f88391fee37b66da3982f0c`；完整结果见 `cscwd_phase_v2_repeated_action4_branch_result_20261011.md`。

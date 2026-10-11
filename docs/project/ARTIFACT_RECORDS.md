@@ -5,6 +5,11 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD phase-v2 public prepare regions failed execution
+
+- 冻结执行 commit `82818d97a0cbe6c8f6570a770cb81f8ff73f1144`；本地 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v1/`，`start_receipt.json` SHA-256 `a90a5428ba0aa8bd77883a9bbb25fbff5ac88cb194fa7845c3664faaa899cedc`、`selection_inventory.json` `875163d7022ce209746c1e7dd954891d12da2f92f640cac7e815a0604a2d54cb`、`failure_receipt.json` `55b826571c4b2474bf1f52ab228892d37855a850425ce20249b942100127e1ad`。
+- 24 候选格、11 入选起点、13 排除格；全部入选在同一 US101 来源。Python 3.9 `zip(strict=True)` 失败，0 分支/0 `env.step`，无区域 outcome、summary 或 completion；原件不入 Git、未补跑。报告 `cscwd_phase_v2_public_prepare_region_failure_20261011.md`；区域效果 `E0_UNAVAILABLE`。
+
 ## 2026-10-11 CSCWD phase-v2 second-action4 matched branches
 
 - 事前方案/脚本 commit `da2c8b7474b0f06d8c9f1fa0a6389c95faf85714`，本地 create-only `artifacts/analysis/cscwd_phase_v2_repeated_action4_branches_20261011_v1/`：completion receipt SHA-256 `d84ef73379d1e10e45be396b924db6d16c63ce3943dd39a0c9fe6a40b73a0566`，summary `be57ec84b234e31e9866d768b095d2b25ce58645c7f1c8bc179ff27aee8e9a1d`，integrity `2e34a14a8e4037aaf040da7ed5597ed1c1d31f20db5904c27f204cbf8548dcd6`；3 公共起点/6 分支/45 真实步，0 训练/formal/holdout。

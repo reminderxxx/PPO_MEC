@@ -7,7 +7,7 @@ import json
 import pytest
 
 from scripts.confirm_cscwd_phase_v2_public_prepare_regions import (
-    CONDITIONS, enumerate_public_starts, posthoc_migration_use, region,
+    CONDITIONS, enumerate_public_starts, posthoc_migration_use, prefix_history_pairs, region,
 )
 
 
@@ -88,3 +88,11 @@ def test_first_step_departure_is_posthoc_only() -> None:
                                   "phase_events": [{"phase": "state_transfer", "location": "rsu_1_to_rsu_2"}]}])
     assert use["actual_target_departed_before_delivery"]
     assert not use["later_target_compute_without_recompute"]
+
+
+def test_prefix_history_pairing_under_python_39() -> None:
+    row = {"step": "0"}
+    assert prefix_history_pairs([], []) == []
+    assert prefix_history_pairs([4], [row]) == [(4, row)]
+    with pytest.raises(RuntimeError, match="length mismatch"):
+        prefix_history_pairs([4], [])

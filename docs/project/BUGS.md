@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：公开 prepare 区域诊断执行兼容失败
+
+- `RESOLVED IN FUTURE SOURCE / INVALID RUN`：唯一运行的 Python 3.9.6 不支持 `zip(strict=True)`，首个环境步前抛错。已在后续源码显式校验长度并补局部测试；原 run `cscwd_phase_v2_public_prepare_regions_20261011_v1` 永远保持 `FAIL`/0 分支/0 步，不用修复源码追认或重试。
+- `OPEN SCIENCE`：24 格选择仅覆盖 11 个同一 US101 开发轨迹状态，Lankershim 无合法 action3/action4 同状态；因无新 outcome，正向交付利用和无益区域都未验证。不得据此固定贡献、改在线门或宣称优秀基线。详见 `cscwd_phase_v2_public_prepare_region_failure_20261011.md`。
+
 ## 2026-10-11：第二次 action4 局部浪费已确认，公开识别门仍未建立
 
 - `OPEN SCIENCE`：三个同一 US101 来源的配对起点中，action4 对新预测目标的模型/状态准备最终交付失败；action3 在固定后续规则下同服务少传字节。当前 `prepared_state_prefix.current.valid=true` 仅说明当前站状态有效，预测目标 `rsu_2` 尚未准备，不能据此推断未来目标会离开。禁止把事后 `target_departed_before_delivery` 当在线门或直接删 action4；缺其它来源及成功第二次迁移反例。报告 `cscwd_phase_v2_repeated_action4_branch_result_20261011.md`。

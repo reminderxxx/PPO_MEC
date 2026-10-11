@@ -3,7 +3,8 @@
 ## 2026-10-11 CSCWD phase-v2 公开 prepare 区域覆盖
 
 - `docs/project/cscwd_phase_v2_public_prepare_region_plan_20261011.md`：运行前冻结两个既有 development 来源、24 个浅前缀候选格、11 个合法去重起点、原策略/非 prepare/prepare 同状态臂、正负判据及 12/36/288 硬预算。
-- `scripts/confirm_cscwd_phase_v2_public_prepare_regions.py`、`tests/test_cscwd_phase_v2_public_prepare_regions.py`：结果盲只读消费 B pilot 行为并记录全集/排除理由；仅一次 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v1/` 真环境有界分支，不训练/不改生产代码。
+- `scripts/confirm_cscwd_phase_v2_public_prepare_regions.py`、`tests/test_cscwd_phase_v2_public_prepare_regions.py`：结果盲只读消费 B pilot 行为并记录全集/排除理由；后续源码已修 Python 3.9 前缀配对兼容，不训练/不改生产代码。一次 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v1/` 在首步前失败，仅保留启动、选择、失败回执，不能重用 root。
+- `docs/project/cscwd_phase_v2_public_prepare_region_failure_20261011.md`：上述 `FAIL`/0 分支/0 步的独立证据边界与不晋级结论。
 
 ## 2026-10-11 CSCWD phase-v2 第二次 action4 有界分支
 
