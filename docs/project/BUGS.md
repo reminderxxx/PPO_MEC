@@ -5,6 +5,17 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：OPEN / calibration-abstention 零处理暴露与训练源资格缺口
+
+- `ZERO TREATMENT EXPOSURE`：已完成 run 的四 arms 各 5,760 行均为 `abstain, weight=0`；SA 两臂 checkpoint 网络张量和
+  评价完全相同。不得把该结果解释为辅助项有效、无效或等效。
+- `LOCATED PROTOCOL DEFECT`：授权前只用 US-101 静态 prepare fixture 证明开关可变化，没有要求实际 Lankershim 训练源出现
+  非零 base-positive label。96-step 结果盲 probe 中 action4 96/96 不合法，predicted target 为空。
+- `RECOVERABILITY LIMIT`：旧训练日志未存 semantic state/label reason，故新 probe 不能倒推 23,040 个历史状态的 exact reason；
+  只能提供同训练域的有界机制见证。
+- `STOP`：不因零暴露修改 reward/label、增加 seed 或延长训练。后续须先冻结 source-disjoint、结果盲 mechanism-coverage
+  资格协议；US-101 已用于选模，不得移作训练。未观察标签只记未观察，不推断域内不存在。
+
 ## 2026-10-11：IMPLEMENTED DEFAULT-OFF / 正 prepare 校准门；OPEN / 效果与生产校准
 
 - `IMPLEMENTED`：commit `f500f5ef…b75f` 将 literal-true calibration provenance 接到 label、SA loss、builder、checkpoint、

@@ -6,6 +6,9 @@
 - `scripts/probe_cscwd_lankershim_event_label_coverage.py`：只在既有 Lankershim/default 训练域记录 public label、reason、weight、
   semantic-state hash 与各公开前置门；保存所有采样 semantic state，不读 checkpoint/formal/holdout，不更新参数。
 - `tests/test_cscwd_lankershim_event_label_coverage_probe.py`：预算/权限和固定 mask-safe 动作选择的纯函数合同。
+- `artifacts/analysis/cscwd_lankershim_event_label_coverage_probe_20261011_v1/`：已完成的 96-step 本机轻量原件；不上传 raw 或权重。
+- `artifacts/analysis/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_20261011_v1_result_review_v1/`：只读结果审查的
+  全 seed/view/profile 表、SA 配对和 checkpoint tensor identity；不覆盖 scientific run。
 
 ## 2026-10-11 scientific completion receipt contract
 

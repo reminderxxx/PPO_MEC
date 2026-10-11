@@ -5,6 +5,20 @@
 
 # Artifact Records
 
+## 2026-10-11 calibration-abstention 完成结果与 Lankershim coverage probe
+
+- scientific run=`cscwd_phase_v2_positive_prepare_calibration_abstention_ab_20261011_v1`，commit=`56d25519…9b`；23,040
+  steps、3,840 optimizer、80 selection、320 learned eval、100 checkpoints、18 rule rows；run integrity 113/113、analysis
+  5/5，无 mismatch。supervisor 缺 producer integrity manifest，11 个文件仅独立 hash，未改旧 root。
+- create-only review root=`artifacts/analysis/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_20261011_v1_result_review_v1/`；
+  integrity/review SHA-256=`943017d2…297`/`fd1a6f99…21b8`。全 seed/view/profile/source/condition、规则和 80 个 SA
+  paired deltas 已保存；裁决=`UNINFORMATIVE_ZERO_TREATMENT_EXPOSURE`。
+- probe entry commit=`77c1a823…e0`；root=`artifacts/analysis/cscwd_lankershim_event_label_coverage_probe_20261011_v1/`；
+  integrity/summary SHA-256=`337e2984…7e86`/`8c2d885b…54db`。96 env steps、0 optimizer/parameter/checkpoint/
+  formal/holdout；96/96 `action4_not_legal`，19 次固定 action4 请求全部 mask fallback，26 个唯一 state hash。
+- 报告=`cscwd_positive_prepare_calibration_abstention_results_20261011.md`；A 线独立说明=
+  `cscwd_positive_prepare_calibration_abstention_result_claim_change_20261011.md`。旧负结果/checkpoint/run root 均保留。
+
 ## 2026-10-11 positive-prepare calibration abstention 实现与静态覆盖（0 训练）
 
 - implementation commit=`f500f5ef1e96f3c39b0a99f2a93adb6655c6b75f`；static audit root=

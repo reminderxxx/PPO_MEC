@@ -9,7 +9,7 @@
 
 协议固定在 `configs/experiment/cscwd_lankershim_event_label_coverage_probe_v1.json`：仅 Lankershim/default、seed 7、固定
 `0,1,2,3,4` 动作周期（mask 时取最低合法动作）、最多 96 steps；不得按结果选状态，不训练、不读写 checkpoint、不读
-formal/holdout、无 retry。先在 clean commit 上做 0-step actual-class preflight，再只运行一次：
+formal/holdout、无 retry。以下命令已在 commit `77c1a823…e0` 执行完毕，仅作 provenance，**不得再次运行**：
 
 ```bash
 /Users/howen/Projects/PPO_MEC/.venv/bin/python \
@@ -18,8 +18,8 @@ formal/holdout、无 retry。先在 clean commit 上做 0-step actual-class pref
   scripts/probe_cscwd_lankershim_event_label_coverage.py
 ```
 
-输出 root 为 `artifacts/analysis/cscwd_lankershim_event_label_coverage_probe_20261011_v1/`，create-only。未在 96 步内观察到
-某标签只能写“未观测”，不得外推为训练域不存在；该结果不能用于方法排名或 checkpoint/reward 选择。
+输出 root 为 `artifacts/analysis/cscwd_lankershim_event_label_coverage_probe_20261011_v1/`，create-only，当前已存在。未在
+96 步内观察到某标签只能写“未观测”，不得外推为训练域不存在；该结果不能用于方法排名或 checkpoint/reward 选择。
 
 ## Positive-prepare calibration abstention（2026-10-11；一次性授权）
 
@@ -27,10 +27,10 @@ formal/holdout、无 retry。先在 clean commit 上做 0-step actual-class pref
 命令及输入清单见 `cscwd_positive_prepare_calibration_abstention_implementation_20261011.md`；输出 root 为
 `artifacts/analysis/cscwd_positive_prepare_calibration_abstention_static_audit_20261011_v1/`，create-only，不得覆盖。
 
-未来匹配协议位于
+已执行的匹配协议位于
 `configs/experiment/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json`。后续已获一次性
-`one_create_only_development_run_no_retry` 授权。必须先使冻结 commit 出现在
-`origin/codex/event-aux-abstention`、工作树 clean、三个 create-only root 不存在，并运行 actual-class preflight；随后只允许：
+`one_create_only_development_run_no_retry` 授权并已完成。下列命令只保留 provenance，三个 create-only root 已存在，
+**不得再次启动或 retry**：
 
 ```bash
 /Users/howen/Projects/PPO_MEC/.venv/bin/python \

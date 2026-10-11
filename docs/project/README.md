@@ -9,6 +9,10 @@
 
 ## Live 文档
 
+- `cscwd_positive_prepare_calibration_abstention_results_20261011.md`：完成 run 的全 seed/view/profile 服务—reward—成本表、
+  零处理暴露裁决、96-step Lankershim coverage probe 与唯一后续资格门。
+- `cscwd_positive_prepare_calibration_abstention_result_claim_change_20261011.md`：给 A 论文线的结果主张变更；不编辑主稿。
+
 - `cscwd_positive_prepare_calibration_abstention_implementation_20261011.md`：唯一 calibration-provenance 正 prepare
   abstention 的 default-off 实现、11-state 静态覆盖、当前 Raw 全撤销边界与未授权 23,040-step A/B。
 - `cscwd_positive_prepare_calibration_abstention_claim_change_20261011.md`：给 A 论文线的实现事实、禁行主张与后续单变量门。

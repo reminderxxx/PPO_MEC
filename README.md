@@ -5,6 +5,10 @@
 
 # PPO_MEC
 
+2026-10-11 的 [calibration-abstention 结果审查](docs/project/cscwd_positive_prepare_calibration_abstention_results_20261011.md)
+确认一次性 run 完整但 A/B 零处理暴露：四 arms 的训练 label 全为 abstain，SA 两臂网络张量和评价完全相同。96-step
+Lankershim 非训练 probe 又在 96/96 状态观察到 action4 不合法；当前应先补训练源机制资格门，不再调 reward 或追加训练。
+
 2026-10-11 新增一次性 Lankershim event-label coverage probe：固定 seed/action cycle、最多 96 个环境步、0 optimizer/
 checkpoint/formal/holdout，仅记录 public semantic state 身份、label/reason/weight 与公开门值。它用于避免在训练域没有
 监督暴露时再次启动完整训练，不参与方法排名或 checkpoint 选择；见 `docs/project/RUNBOOK.md`。

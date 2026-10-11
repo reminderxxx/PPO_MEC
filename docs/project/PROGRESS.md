@@ -5,6 +5,18 @@
 
 ﻿# Progress
 
+## 2026-10-11：calibration-abstention run 完成，但因零处理暴露不可解释
+
+- commit `56d25519…9b` 的一次性 run 完成 23,040 steps、3,840 optimizer steps、80 selection、320 learned eval、100
+  checkpoints；run 113 个和 analysis 5 个 manifest 文件无 mismatch，未读 formal/holdout、无 retry。
+- 四 learned arms 各 5,760 行训练 label 全为 `abstain, weight=0`；两个 SA arm 的 update 均为
+  `23,040 eligible / 0 supervised / 23,040 abstained`。10 对 SA 网络张量、80 对评价指标完全相同；裁决为
+  `UNINFORMATIVE_ZERO_TREATMENT_EXPOSURE`，不是候选有效/无效或等效。
+- 预注册 96-step Lankershim 非训练 probe 在 96/96 状态得到 `action4_not_legal`，19 次固定 action4 请求全部 mask fallback；
+  0 optimizer/parameter/checkpoint/formal/holdout。当前定位为训练源机制机会缺失及预训练资格门缺失，不修算法、不追加训练。
+- 唯一后续门：实际训练源先通过结果盲 nonzero base-prepare coverage；未通过即停止。完整报告见
+  `cscwd_positive_prepare_calibration_abstention_results_20261011.md`，A 线说明独立保存且未编辑主稿。
+
 ## 2026-10-11：正 prepare 校准来源 abstention 已默认关闭实现；训练仍未授权
 
 - commit `f500f5ef…b75f` 完成 opt-in 单门：只有旧 public-causal label 已为 `prepare` 且
