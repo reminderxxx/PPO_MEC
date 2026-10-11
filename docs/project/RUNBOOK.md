@@ -5,6 +5,18 @@
 
 # Runbook
 
+## CSCWD phase-v2 公开 prepare 正负区域有界诊断（2026-10-11）
+
+先读事前方案 `cscwd_phase_v2_public_prepare_region_plan_20261011.md`。获授权只做一次结果盲开发分支；已存 root 不可覆盖，失败即停不补条件/seed。脚本要求 clean commit，先写 24 格选择全集/排除理由，再在两个已授权长来源上运行最多 12 起点/36 分支/288 真实环境步，0 训练/formal/holdout。下列命令作为冻结执行命令，运行后记录实际回执与报告：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_cscwd_phase_v2_public_prepare_regions.py tests/test_cscwd_phase_v2_repeated_action4_branch.py
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/confirm_cscwd_phase_v2_public_prepare_regions.py \
+  --pilot-protocol /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/configs/experiment/cscwd_phase_v2_causal_public_pilot_v1.json \
+  --pilot-run-root /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/artifacts/experiments/cscwd_phase_v2_causal_public_pilot_20261011_v1 \
+  --output-root artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v1
+```
+
 ## CSCWD phase-v2 第二次 action4 有界配对确认（2026-10-11）
 
 事前范围、11 次原始见证/3 个去重起点和停止规则见 `cscwd_phase_v2_repeated_action4_branch_plan_20261011.md`；一次已执行结果与 SHA 见 `cscwd_phase_v2_repeated_action4_branch_result_20261011.md`。下列为**已执行命令记录**，45 个真实环境步后停止；两个 output root 均必须不存在，不覆盖已完成原件。诊断要求 clean commit、验证 B pilot/输入 SHA，并在创建 root 后保存启动/完成或失败回执；失败不自动重试，不按结果补条件或 seed：

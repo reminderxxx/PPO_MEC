@@ -1,5 +1,10 @@
 ﻿# Directory Structure
 
+## 2026-10-11 CSCWD phase-v2 公开 prepare 区域覆盖
+
+- `docs/project/cscwd_phase_v2_public_prepare_region_plan_20261011.md`：运行前冻结两个既有 development 来源、24 个浅前缀候选格、11 个合法去重起点、原策略/非 prepare/prepare 同状态臂、正负判据及 12/36/288 硬预算。
+- `scripts/confirm_cscwd_phase_v2_public_prepare_regions.py`、`tests/test_cscwd_phase_v2_public_prepare_regions.py`：结果盲只读消费 B pilot 行为并记录全集/排除理由；仅一次 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v1/` 真环境有界分支，不训练/不改生产代码。
+
 ## 2026-10-11 CSCWD phase-v2 第二次 action4 有界分支
 
 - `docs/project/cscwd_phase_v2_repeated_action4_branch_plan_20261011.md`：运行前冻结的三个开发公共前缀、配对动作、后续公开规则、主判据和单次硬预算。

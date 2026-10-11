@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `cscwd_phase_v2_public_prepare_region_plan_20261011.md`：运行前冻结的结果盲浅前缀覆盖、旧回归与新增状态分列、匹配原生动作和 12/36/288 硬预算；结果需以一次 create-only 运行原件及后续报告为准。
+
 - `cscwd_phase_v2_repeated_action4_branch_plan_20261011.md`：B pilot 11 次第二次 action4 失败的三个去重公共起点与有界配对确认的运行前方案；结果需以独立 create-only 原件及后续报告为准。
 - `cscwd_phase_v2_repeated_action4_branch_result_20261011.md`：一次 45 步局部配对与独立只读核对；三条件省成本而服务不变，但没有一般化的公开交付识别门，生产策略不改。
 
