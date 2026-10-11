@@ -9,6 +9,8 @@
 
 独立 [v2 兼容修复执行方案](docs/project/cscwd_phase_v2_public_prepare_region_v2_execution_plan_20261011.md)保留原 24 格选择及实验判据；[唯一运行](docs/project/cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md)通过 Python 3.9 位置后，在 77 个环境步骤时因公开状态重复门 `FAIL`。只有启动、选择和失败回执，没有完整分支/区域结果；原 v1/v2 现场均保留，不晋级论文或基线主张。
 
+随后完成 [v3 工程修复设计](docs/project/cscwd_phase_v2_public_prepare_region_v3_engineering_design_20261011.md)与[待授权执行方案](docs/project/cscwd_phase_v2_public_prepare_region_v3_execution_plan_20261011.md)：公开观测碰撞会分组，完整模拟状态才判严格重复；所有起点身份先检查，完整分支逐条原子落盘。v3 尚未读取真实数据执行，未来科学运行仍需单独授权。
+
 2026-10-11 的 [raw phase v2 第二次 action4 有界分支确认](docs/project/cscwd_phase_v2_repeated_action4_branch_result_20261011.md)按事前[方案](docs/project/cscwd_phase_v2_repeated_action4_branch_plan_20261011.md)一次完成 3 个去重 US101 起点、6 分支/45 真实步。相同公开 continuation 下 action3 在三条件均保持服务并省传输；这仍是单一已暴露来源的局部诊断，尚无安全的公开 abstain 门，不修改生产策略或论文主张。
 
 2026-10-11 的 [CSCWD raw phase v2 learned pilot 独立复核](docs/project/cscwd_phase_v2_pilot_independent_evidence_20261011.md)逐项对账 B 冻结开发原件。候选 SA 重算与耗时下降，但传输增加且服务指标无改善；效果仅见重复 US101 开发来源，外层 terminal 仍 `FAIL`。开发判定 `MIXED`，不晋级算法或固定论文主张。

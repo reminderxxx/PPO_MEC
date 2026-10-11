@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：v3 工程修复后的未验证边界
+
+- `ENGINEERING TESTED / SCIENCE OPEN`：双身份分组与原子分支文件仅通过 synthetic/unit 验证；真实 11 格的 full-state 代表数、观测碰撞结构和结果仍未知。未来真实 prefix 回放须计入 288 步，不得把 v3 工程修复写成 v2 失败的追认或科学效果。
+- `OPEN PROVENANCE`：v2 失败路径没有已完成分支账本，旧 77 步不可恢复；v3 的 partial 证据只保护未来运行，不能补旧原件。新科学执行须单独授权/冻结，且同一 US101 开发来源仍不支持独立论文结论。
+
 ## 2026-10-11：公开 prepare 区域选择单位与公开状态唯一性门冲突
 
 - `OPEN PROTOCOL / INVALID V2 RUN`：结果盲选择按 `(source, condition, prefix)` 保留 11 个 US101 开发格，执行器按全局 `semantic_state + action_mask` hash 去重；唯一 v2 运行在 77 个 `env.step` 后发现至少一个入选状态重复并停止。失败路径未保存部分分支账本，不能确认碰撞格、已完成分支数或区域效果；原 root 保留，禁止从步数倒推效果或直接放宽唯一性门。见 `cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md`。

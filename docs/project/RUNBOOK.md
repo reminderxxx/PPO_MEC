@@ -5,6 +5,10 @@
 
 # Runbook
 
+## CSCWD phase-v2 公开 prepare 区域 v3 工程修复（未授权科学执行）
+
+先读 `cscwd_phase_v2_public_prepare_region_v3_engineering_design_20261011.md` 与 `cscwd_phase_v2_public_prepare_region_v3_execution_plan_20261011.md`。只允许运行 `tests/test_cscwd_region_v3_evidence.py` 等局部合成验证；v3 CLI 必须另有已跟踪、干净提交中的显式授权 manifest，精确新 create-only root 才可执行真实来源。合法 prefix 的真实回放是计入 288 硬限的 `env.step`，不能当零步 preflight；完整身份表落盘前没有比较分支。v1/v2 失败 root 均不得复用，当前没有 v3 科学命令记录。
+
 ## CSCWD phase-v2 公开 prepare 区域兼容修复后独立执行（2026-10-11）
 
 先读 `cscwd_phase_v2_public_prepare_region_v2_execution_plan_20261011.md` 与失败报告 `cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md`。这一段是**已执行记录，不可原样重跑**：新授权的 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v2/` 从干净且已 push 的 `d4a3e5b` 单次启动；项目 Python 3.9.6 的零环境步 CSV/前缀配对 preflight 通过，原 v1 root 未变。v2 在 77 个真实环境步后触发原有公开状态唯一性门，只有启动、选择、失败回执，没有完整科学结果；按失败即停停止。后续碰撞定位及新执行须另立任务/身份。

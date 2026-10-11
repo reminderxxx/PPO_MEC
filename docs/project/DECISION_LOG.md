@@ -1,5 +1,9 @@
 ﻿# Decision Log
 
+## 2026-10-11：公开观测相同不能直接等同完整模拟状态
+
+- v2 的全局公开 hash 唯一性门与按 `(source, condition, prefix)` 结果盲选格冲突，且未落盘碰撞对。v3 工程决定同时记录公开观测组和显式完整状态 hash：同公开、不同外生/隐状态保留为部分可观测对照；仅严格 full-state 相同才标 alias 并执行一次代表分支，所有原格和排除理由保留。真实 prefix 回放计入总步数，分支完成即持久化，失败仅给 partial verdict。当前只完成合成工程验收，v3 科学执行需另获授权。详见 `cscwd_phase_v2_public_prepare_region_v3_engineering_design_20261011.md`。
+
 ## 2026-10-11：公开 prepare 区域 v2 失败后仍不固定贡献
 
 - Python 3.9 兼容修复已通过零步 preflight，但新身份唯一科学运行在 77 步后被原有公开状态全局唯一性门拒绝；没有持久完整分支结果。维持原 v1/v2 两失败身份，不重试、不按碰撞改选择，也不把已执行步数作为正/负区域效果。生产动作、reward、优秀基线排名、论文主表与 contribution claim 不变；如需继续，先另立碰撞只读定位和新协议审批。见 `cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md`。

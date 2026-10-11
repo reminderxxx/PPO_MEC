@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-11：公开 prepare 区域 v3 身份/证据工程修复，未执行真实数据
+
+- 依据 v2 77 步后的唯一性失败，新增版本化公开观测/full 模拟状态双身份和严格 alias 规则；全部合法 prefix 身份先登记再执行比较分支，真实 prefix 步计入 288 总预算。每条完成分支原子写入输入身份、事件、指标和可读回 SHA，失败回执保留已完成清单与 `PARTIAL_UNVERIFIABLE`。
+- 本轮只做 synthetic/unit/Python 3.9 入口验证：v3 与相邻 v2/环境局部测试 `26 passed`，语法和 CLI `--help` 通过；未创建 v3 真实运行 root、未读取原始来源执行新分支、未训练或开启 formal/holdout。原 24 格/11 US101 入选格仍是未来计划，full-state 代表数和区域结果未知；见 `cscwd_phase_v2_public_prepare_region_v3_engineering_design_20261011.md` 与待授权执行方案。
+
 ## 2026-10-11：公开 prepare 区域 v2 兼容修复执行在公开状态去重门失败
 
 - 新授权的兼容修复执行 commit `d4a3e5b0a8341d86d080da283c6726f872333ba2` 已在运行前 push；Python 3.9.6 零步 preflight 对 24 格/11 起点/27 计划分支和 11 次实际 prefix 配对通过，SHA-256 `8a4c001261f13bad10fe96003f6d21b704c1085f7bbe98a8d942540e9b54193b`。旧 v1 失败 root 未改。
