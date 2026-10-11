@@ -1,13 +1,13 @@
 {
   "contract_version": "cscwd_sharing_migration_factorial_v1",
   "execution_authorized": false,
-  "gate_status": "PRESTEP_FAILED_NO_RETRY",
+  "gate_status": "READY_ZERO_STEP_ONLY",
   "attempted_execution_commit": "f6d89bee6ba6d65430aba2b61ce301cb69a559c7",
   "failure_receipt_path": "artifacts/analysis/cscwd_sharing_migration_2x2_development_20261011_v1/failure_receipt.json",
   "failure_receipt_sha256": "939bb277c8387c6060849286be01f84eaf9fa65bc6fd427fb723325141c66315",
   "raw_env_steps_used": 0,
   "same_run_retry_authorized": false,
-  "fixed_implementation_commit": "ed33099b0c7a02ead9649100a83e1b7d5772412a",
+  "fixed_implementation_commit": "0da1ed2de5b54368e5d58dfdd506f51350075673",
   "scope": "single_development_contract_acceptance_only",
   "time_profile": "raw_ngsim_event_time_v2",
   "source": {
@@ -60,7 +60,7 @@
     "action_order": [4, 3, 2, 0, 1],
     "rule": "choose action 4 when legal, otherwise 3 when legal, otherwise 2 when legal; remaining actions in fixed order",
     "future_trace_or_outcome_access": false,
-    "consumer_identity_sha256": "13c74a81340e6be761002d81714f7bc916083263a044ec110eef855dc7798b86"
+    "consumer_identity_sha256": "455c96d1944278a89c8752002c80c7e897e54e94f2311a6dcc351eb62ee988f7"
   },
   "arms": [
     {"arm_id": "S0M0", "base_sharing_enabled": false, "state_migration_enabled": false},
@@ -78,7 +78,8 @@
     "formal_or_holdout_access": false
   },
   "output": {
-    "create_only_root": "artifacts/analysis/cscwd_sharing_migration_2x2_development_20261011_v1",
+    "create_only_root": "artifacts/analysis/cscwd_sharing_migration_2x2_development_20261011_v2",
+    "zero_step_preflight_root": "artifacts/analysis/cscwd_sharing_migration_2x2_zero_step_20261011_v1",
     "require_per_arm_step_ledger_and_completion_receipt": true,
     "require_input_and_code_sha256": true,
     "require_raw_interval_exposure_audit": true,
