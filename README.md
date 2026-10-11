@@ -8,7 +8,7 @@
 2026-10-11 已批准并事前冻结 [CSCWD raw phase v2 物理与开发矩阵合同](docs/project/cscwd_raw_phase_v2_frozen_contract_20261011.md)：输入在当前接触内完成后，原 RSU 可继续节点计算，状态只在成功后经有成本的模拟 RSU 链路交付目标。独立 opt-in 环境通过[原始轨迹预检](docs/project/cscwd_raw_phase_v2_environment_acceptance_20261011.md)；[冻结 60 格开发机制矩阵](docs/project/cscwd_raw_phase_v2_mechanism_matrix_20261011.md)有 9 次成功交付及 9 次目标先离开失败（同一来源重复条件/策略），只证明模拟机制可执行，不能形成算法或论文排名。旧 v1 和论文结果不改。
 
 2026-10-11 的 [CSCWD 接触与阶段阻断诊断](docs/project/cscwd_new_development_contact_phase_diagnosis_20261011.md)复用原 40 episode：68 次接触拒绝中 6 次公开预测乐观；12 次 action 4 全部超当前 RSU 整步 contact，8 次准备阶段本可完成但被回滚。下一步须先冻结跨接触相位合同，不能直接放宽当前门槛或启动训练。
-待决策的 [raw 逐相位合同实施方案](docs/project/cscwd_raw_phase_contract_implementation_plan_20261011.md)列出原子服务与远端连续服务两种明确物理语义、事件/字节守恒和合成验收门；它尚未授权环境改动。
+历史 [raw 逐相位合同实施方案](docs/project/cscwd_raw_phase_contract_implementation_plan_20261011.md)列出原子服务与远端连续服务两种物理语义；其中方案 B 后来由上方新合同授权，当前执行和结论以新合同及其矩阵报告为准。
 
 2026-10-11 新增 [CSCWD 长原始 development 来源与有界可达性审查](docs/project/cscwd_new_development_source_reachability_20261011.md)：事前冻结的两个 118.8 秒窗口完成 40 次开发 episode，4 次按期、0 次成功迁移。数据时长已足够，当前整步接触合同仍阻断迁移机制；训练与论文主张不晋级。
 

@@ -15,7 +15,7 @@
 - `RESOLVED IN OPT-IN V2 / engineering`：逐相位合同已有独立环境与两条原始 development 的真实 step 正例，部分传输、目标离开、trace end 等负例由合成测试覆盖；v1 整步接触诊断仍是其历史版本事实。模拟 RSU 几何、backhaul 和零共享队列未做真实系统测量，不能把迁移成功写成部署效果。
 - `OPEN / consumer and evidence gate`：B 公开规则、SA 与 checkpoint profile 须在修正的最终 fixture 上独立验收；60-cell 开发矩阵、匹配训练及独立 formal/holdout 尚无结果。早期 v2 fixture 内嵌 SHA 与保存内容不符，已留失败见证并以 v3 create-only root 修正；禁止引用旧 fixture 作为通过证据。论文贡献与 paper-ready 仍 `Unverifiable`。
 
-## 2026-10-11：raw 相位合同未定义，公开规则未消费已知整步不可行标签
+## 2026-10-11：历史 v1 raw 相位合同未定义，公开规则未消费已知整步不可行标签
 
 - `CONFIRMED / phase contract blocker`：冻结两条长 trace 的 12 次 action 4 中，4 次模型+状态准备自身超过当前 RSU 接触；8 次准备可放入接触，其中 4 次 native 预览在当前节点服务后可迁移，但完整服务超出当前接触，因此 raw 全部原子回滚。直接只放宽 full-step gate 会允许未建模的跨接触服务；需先定义逐相位目标/当前 RSU、跨界执行、部分传输与 commit/rollback 合同，而非把 0 字节视为算法失效。
 - `CONFIRMED / public consumer defect`：公开一阶/两步规则在同一 US101 `dev_01` 起点各选一次 action 4，虽其 estimator 的 `raw_full_step_contact_fit=no`。B 线可按相同公开输入最小修 rule scorer/验收；只避免明显不可行选择，不解除迁移物理门。另 6 次 action 0/3 的公开预测可完成、实际拒绝为恒速 contact 预测误差，不能用隐藏实际未来修规则。证据见 `cscwd_new_development_contact_phase_diagnosis_20261011.md`。
