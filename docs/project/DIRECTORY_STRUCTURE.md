@@ -10,6 +10,8 @@
 - `scripts/cscwd_region_v3_evidence.py`、`scripts/confirm_cscwd_phase_v2_public_prepare_regions_v3.py`、`tests/test_cscwd_region_v3_evidence.py`：v3 显式公开/full 状态身份、全起点前缀预检及逐分支原子证据；真实 `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v3/` 尚不存在、未授权执行。
 - `docs/project/cscwd_phase_v2_public_prepare_region_v3_engineering_design_20261011.md`、`docs/project/cscwd_phase_v2_public_prepare_region_v3_execution_plan_20261011.md`：工程修复合同与未来单次科学执行门，未知 full-state 去重数不预填。
 - `configs/experiment/cscwd_phase_v2_public_prepare_regions_v3_authorization.json`：另获单次授权的运行身份、执行器基础 commit、旧方案/失败原件/选择 SHA 与 12/36/288 硬限；不含实验结果。
+- `scripts/audit_cscwd_phase_v2_public_prepare_regions_v3.py`、`tests/test_cscwd_phase_v2_public_prepare_regions_v3_audit.py`：只读核对 v3 的 43 个 manifest 文件、身份/前缀/分支自校验、逐事件账本与配对结果；输出 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_v3_audit_20261011_v1/`。
+- `docs/project/cscwd_phase_v2_public_prepare_region_v3_result_20261011.md`：v3 完成运行的 11 格全表、独立审计和四项 `UNVERIFIED` 最短缺口。
 
 ## 2026-10-11 CSCWD phase-v2 第二次 action4 有界分支
 

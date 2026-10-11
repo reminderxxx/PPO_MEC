@@ -1,5 +1,9 @@
 ﻿# Decision Log
 
+## 2026-10-11：v3 局部正例不晋级在线规则或论文贡献
+
+- 单次 11 个同 US101 来源配对中，ample_cache/reset 给出 action4 成功交付、后续目标计算使用、少重算/少耗时但多状态字节的一例；六格无益、四格截断，所有格相关且模拟 backhaul。决定只固定“局部可兑现但有成本、并有多格浪费/不确定”的开发机制边界，不将它写成真实跨 RSU 净收益或公开在线 gate。sharing×migration 公平 2×2、三头匹配基线和独立泛化均另立任务，formal/holdout 不因本结果开启。见 `cscwd_phase_v2_public_prepare_region_v3_result_20261011.md`。
+
 ## 2026-10-11：公开观测相同不能直接等同完整模拟状态
 
 - v2 的全局公开 hash 唯一性门与按 `(source, condition, prefix)` 结果盲选格冲突，且未落盘碰撞对。v3 工程决定同时记录公开观测组和显式完整状态 hash：同公开、不同外生/隐状态保留为部分可观测对照；仅严格 full-state 相同才标 alias 并执行一次代表分支，所有原格和排除理由保留。真实 prefix 回放计入总步数，分支完成即持久化，失败仅给 partial verdict。当前只完成合成工程验收，v3 科学执行需另获授权。详见 `cscwd_phase_v2_public_prepare_region_v3_engineering_design_20261011.md`。

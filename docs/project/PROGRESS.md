@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-11：公开 prepare 区域 v3 单次完成，四项论文主张仍未验证
+
+- 已 push 的冻结 commit `0cade5cb19dcf8e8c1b169c6b08deb1c422455e3` 上，唯一 create-only v3 运行 `COMPLETE`：24 格/11 US101 入选、11 distinct full state、9 公开观测组（2 组各含不同 full state）、8 prefix +199 branch =207/288 `env.step`，27/36 完成分支，0 训练/formal/holdout。summary SHA-256 `c5591db1c39f630b7d1d87856daba0a8698aad9b3d3c6867dc9793effa79dff5`，integrity `5928581d59ab89401157b4bb379cde7e21fe578897c924fcbf48466c177f60a4`。
+- 独立只读审计 `43/43` 文件、`11/11` 前缀、`27/27` 分支及逐事件/配对/分类均通过，audit SHA-256 `1eda52da0777b3786916f05e1d3af2b097af0414fa2bf0963ae54abedadae10f`。区域为 1 正向机制/资源取舍（ample_cache reset：同完成/按期/失败，少重算 4.315814 s、少耗时 4.290278 s、多状态 140,480 bytes）、6 无益高成本、4 action3 continuation 截断不确定。旧 3 回归另列；不按 11 格作独立统计。
+- 真实跨 RSU 净收益、sharing×migration 因果交互、三头优于公平基线、独立泛化/paper-ready 仍为 `UNVERIFIED`；没有真实独立 RSU 主机/实测链路、可执行公平 2×2、匹配基线 formal/holdout/support。完整全表和最短缺口见 `cscwd_phase_v2_public_prepare_region_v3_result_20261011.md`。
+
 ## 2026-10-11：公开 prepare 区域 v3 身份/证据工程修复，未执行真实数据
 
 - 依据 v2 77 步后的唯一性失败，新增版本化公开观测/full 模拟状态双身份和严格 alias 规则；全部合法 prefix 身份先登记再执行比较分支，真实 prefix 步计入 288 总预算。每条完成分支原子写入输入身份、事件、指标和可读回 SHA，失败回执保留已完成清单与 `PARTIAL_UNVERIFIABLE`。

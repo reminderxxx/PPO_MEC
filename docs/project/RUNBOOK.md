@@ -5,9 +5,14 @@
 
 # Runbook
 
-## CSCWD phase-v2 公开 prepare 区域 v3 工程修复（未授权科学执行）
+## CSCWD phase-v2 公开 prepare 区域 v3 单次执行已完成
 
-先读 `cscwd_phase_v2_public_prepare_region_v3_engineering_design_20261011.md` 与 `cscwd_phase_v2_public_prepare_region_v3_execution_plan_20261011.md`。已另获一次有界授权，机器 manifest 为 `configs/experiment/cscwd_phase_v2_public_prepare_regions_v3_authorization.json`；v3 CLI 仅接受已跟踪、干净提交中的该身份与精确新 create-only root。合法 prefix 的真实回放是计入 288 硬限的 `env.step`，不能当零步 preflight；完整身份表落盘前没有比较分支。v1/v2 失败 root 均不得复用；实际执行及回执以新 root 为准。
+先读 `cscwd_phase_v2_public_prepare_region_v3_engineering_design_20261011.md` 与结果报告 `cscwd_phase_v2_public_prepare_region_v3_result_20261011.md`。已另获一次有界授权，机器 manifest 为 `configs/experiment/cscwd_phase_v2_public_prepare_regions_v3_authorization.json`。冻结 commit `0cade5c` 从干净工作树对全新 root 仅运行一次，完成 8 prefix+199 branch=207 步、27 分支；完成回执和独立审计 SHA 见结果报告。此为**历史命令记录，不得原样重跑**；v1/v2 失败 root 和 v3 完成 root 均不可复用：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/confirm_cscwd_phase_v2_public_prepare_regions_v3.py --pilot-protocol /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/configs/experiment/cscwd_phase_v2_causal_public_pilot_v1.json --pilot-run-root /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/artifacts/experiments/cscwd_phase_v2_causal_public_pilot_20261011_v1 --output-root artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v3 --authorization-manifest configs/experiment/cscwd_phase_v2_public_prepare_regions_v3_authorization.json
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_cscwd_phase_v2_public_prepare_regions_v3.py --source-root artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v3 --output-root artifacts/analysis/cscwd_phase_v2_public_prepare_regions_v3_audit_20261011_v1
+```
 
 ## CSCWD phase-v2 公开 prepare 区域兼容修复后独立执行（2026-10-11）
 

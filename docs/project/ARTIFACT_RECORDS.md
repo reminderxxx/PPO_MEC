@@ -5,6 +5,11 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD phase-v2 public prepare regions v3 complete and independent audit
+
+- 事前授权/执行 commit `0cade5cb19dcf8e8c1b169c6b08deb1c422455e3`，本地 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v3/`：`completion_receipt.json` SHA-256 `20dd2ab1b046f7710ab9c78a3057f438074fc4710481cfeecaa3dbdf945be98c`、`summary.json` `c5591db1c39f630b7d1d87856daba0a8698aad9b3d3c6867dc9793effa79dff5`、`artifact_integrity.json` `5928581d59ab89401157b4bb379cde7e21fe578897c924fcbf48466c177f60a4`。11 full states、9 公开观测组、8 prefix+199 branch=207 真实步、27 分支；0 train/formal/holdout。
+- 本地只读 `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_v3_audit_20261011_v1/audit.json` SHA-256 `1eda52da0777b3786916f05e1d3af2b097af0414fa2bf0963ae54abedadae10f`：43/43 文件完整性、11/11 前缀、27/27 分支自校验及逐事件/配对指标和区域重算通过。1 正向机制/资源取舍、6 无益高成本、4 截断不确定；同一 US101 development，正式四项主张仍 `UNVERIFIED`。全表和缺口见 `cscwd_phase_v2_public_prepare_region_v3_result_20261011.md`；原件不入 Git。
+
 ## 2026-10-11 CSCWD phase-v2 public prepare regions v2 failed execution
 
 - 执行 commit `d4a3e5b0a8341d86d080da283c6726f872333ba2` 运行前已 push；manifest SHA-256 `c90e3dce8d58bf823a48a1ec625fe9ca978fe12166003019ee36c61dd8067c13`，零步 preflight `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v2_preflight/preflight.json` SHA-256 `8a4c001261f13bad10fe96003f6d21b704c1085f7bbe98a8d942540e9b54193b`。

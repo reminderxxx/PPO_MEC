@@ -5,6 +5,13 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：v3 完成后的四项科学 blocker
+
+- `RESOLVED ENGINEERING / BOUNDED SCIENCE`：v3 的双身份与逐分支持久化在 11 格/27 分支/207 步单次运行及独立审计通过；v2 的公开 hash 碰撞并非 full-state 重复。v1/v2 失败原件仍不得追认。1 格正向机制伴随 140,480 bytes 额外状态传输，6 格局部浪费，4 格截断；全部同一 US101 模拟 RSU 开发来源，不得形成独立统计或在线门。
+- `OPEN / real cross-RSU`：RSU 几何/200–1000 Mbps backhaul 与零共享队列均为模拟，已检查仓库没有可引用的独立 RSU 主机与链路测量原件；单机多进程不算部署。
+- `OPEN / sharing×migration interaction`：生产环境有 opt-in migration，但 `no_base_sharing` 仍仅在 formal protocol 列为部分可用/不可执行；跨 workflow cache 生命周期缺失。当前 `ample_cache` 改容量/resident，不能作 sharing 关闭臂；同策略同资源对称计费 2×2 尚不可运行。
+- `OPEN / three-head and generalization`：本轮未训练/比较三头与公平基线，也没有独立 raw interval、多 workflow/adapter、formal/holdout/support。论文贡献及 paper-ready=`Unverifiable`。详见 `cscwd_phase_v2_public_prepare_region_v3_result_20261011.md`。
+
 ## 2026-10-11：v3 工程修复后的未验证边界
 
 - `ENGINEERING TESTED / SCIENCE OPEN`：双身份分组与原子分支文件仅通过 synthetic/unit 验证；真实 11 格的 full-state 代表数、观测碰撞结构和结果仍未知。未来真实 prefix 回放须计入 288 步，不得把 v3 工程修复写成 v2 失败的追认或科学效果。

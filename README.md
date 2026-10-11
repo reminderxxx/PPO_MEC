@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+2026-10-11 的 [CSCWD phase-v2 公开 prepare 区域 v3 单次诊断](docs/project/cscwd_phase_v2_public_prepare_region_v3_result_20261011.md)完成 11 个同一 US101 开发轨迹起点、27 条分支/207 真实环境步，并经独立只读核对。模拟环境下有 1 格迁移交付后减少重算/耗时但多 140,480 bytes，6 格无益高成本，4 格后续截断不确定；这不验证真实跨 RSU、sharing×migration 交互、三头优于公平基线或独立泛化，论文状态仍 `Unverifiable`。
+
 2026-10-11 的 [phase v2 公开 prepare 正负区域有界诊断](docs/project/cscwd_phase_v2_public_prepare_region_failure_20261011.md)按[事前方案](docs/project/cscwd_phase_v2_public_prepare_region_plan_20261011.md)枚举 24 格、选出 11 个 US101 开发起点；一次执行因 Python 3.9 不支持 `zip(strict=True)` 在首个环境步前 `FAIL`，实际 0 分支/0 步。没有正负区域效果结果；原 root 保留且未补跑，在线策略与论文主张不变。
 
 独立 [v2 兼容修复执行方案](docs/project/cscwd_phase_v2_public_prepare_region_v2_execution_plan_20261011.md)保留原 24 格选择及实验判据；[唯一运行](docs/project/cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md)通过 Python 3.9 位置后，在 77 个环境步骤时因公开状态重复门 `FAIL`。只有启动、选择和失败回执，没有完整分支/区域结果；原 v1/v2 现场均保留，不晋级论文或基线主张。
