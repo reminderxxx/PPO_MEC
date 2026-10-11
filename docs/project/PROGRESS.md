@@ -5,6 +5,18 @@
 
 ﻿# Progress
 
+## 2026-10-11：phase-v2 公共消费者门 PASS；一次性 pilot 已冻结待启动
+
+- A 线方案 B 的 `RawNGSIMPhaseV2Env` 已合入：input upload 受 current contact 限制，source RSU 可继续 compute，model/state
+  经显式 backhaul，target restore/delivery 决定迁移成功；旧 v1 和历史 evidence 不改。
+- public estimator/event/rule 与 checkpoint 语义升为 v3，实际 US101/dev_01/default fixture 得到 label=prepare、两个 public rule
+  action4，真实 step4 完成 service+migration；时钟/phase/bytes 守恒，hidden-future clone fail-closed。
+- 四 learned cell 均通过 48-transition、bootstrap、8 optimizer-step 实际接口回归；相邻套件共 49 项通过。
+- A 已完成冻结 60-cell mechanism matrix 与独立只读 audit：60 episode/522 steps/731 previews，v2 action4 9/18 delivered；
+  该证据关闭 data/mechanism gate，但重复来源不是独立样本，public two-step 仍不是独立强基线，也没有 learned 排名。
+- 唯一 pilot 已冻结为 SA control/candidate、PPO、MAPPO × 5 seeds，每格 1,152 步，总 23,040 步；训练/选模/最终双视角
+  和 `FAIL/MIXED/SUPPORTED_DEVELOPMENT_CANDIDATE` 条件均事前固定。当前仍无性能结果，不是 paper-ready。
+
 ## 2026-10-11：当前候选身份勘误（不改变训练 STOP）
 
 - 当前唯一冻结算法候选是 `causal_public_prepare_advantage_v2`：基于公共因果状态的 `prepare/serve/abstain` 三态 event

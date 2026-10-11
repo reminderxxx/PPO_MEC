@@ -1,5 +1,16 @@
 ﻿# Decision Log
 
+## 2026-10-11：批准方案 B 后只运行一个 public-causal SA A/B
+
+- 接受 raw phase-v2：车辆只需在 input upload 阶段保持 current contact；原 RSU 可完成已接收任务；model/state 经显式模拟
+  backhaul；state 只能在 node 成功后生成并在 target restore/delivery 后记迁移成功。
+- estimator/event/rule/checkpoint schema 升 v3 仅用于消费新增公开阶段合同；唯一算法变量仍是 SA 的
+  `mechanism_aux_causal_public_prepare_advantage_enabled`，PPO/MAPPO、reward、mask、网络与 optimizer 不变。
+- 训练只用 Lankershim/default；US101/default 只选 updates 6/12/18/24；selected 与 update24 在预先固定 8 cases 上同时报告。
+  失败/混合/支持门与无自动续跑已冻结，SA 获胜不是完成条件。
+- phase-v2 public two-step 不具备可识别第二步运动投影，明确退化为 immediate-score fallback；privileged exact rule 不获得
+  phase-v2 权限。两来源开发结果不进入 paper-ready 主张。
+
 ## 2026-10-11：完成 estimator 纠错；数据资格失败前不训练
 
 - 已按唯一变量完成 `v2` fail-closed 阶段核算，保留 raw executor/mask/reward/label 原则和所有训练预算；这是公共接口纠错，

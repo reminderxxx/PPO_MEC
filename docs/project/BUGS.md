@@ -5,6 +5,19 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：phase-v2 pilot 剩余风险
+
+- `RESOLVED INTERFACE GATE`：actual-class public fixture、consumer schemas、phase/clock/byte conservation、四 learned method
+  rollout/optimizer、executed-action likelihood 与候选 checkpoint 语义均已局部验证。
+- `OPEN DEVELOPMENT LIMIT`：只有两个已暴露 118.8 s 来源，独立单位为 2；即使 pilot 支持候选，也只能作为描述性
+  development evidence，不能作显著性、formal/holdout 或 paper-ready 主张。
+- `BASELINE CAPABILITY`：phase-v2 public two-step 因缺公共二维速度/目标进入时间而退化为 immediate score，不能重复计为独立
+  强基线；privileged exact two-step 仅限 phase-v1 capability reference。
+- `EXECUTION RISK`：scientific run 只能 create-only 启动一次、无 retry；checkpoint/raw CSV 保持本地且不上传。terminal artifact
+  未产生前候选效果仍为 `UNTESTED`。
+- `DEPENDENCE RISK`：60-cell fixed-policy matrix 中 18 次 v2 action4 的 9 success/9 target-departure 重复使用同一 US101 来源跨
+  method/condition，不能当 18 个独立样本；该矩阵只作机制可达性和成本守恒门。
+
 ## 2026-10-11：候选身份混淆风险
 
 - `CORRECTED`：当前冻结算法候选为 `causal_public_prepare_advantage_v2` 三态 event supervision，状态为 `UNTESTED`；

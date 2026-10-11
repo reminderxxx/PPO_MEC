@@ -9,6 +9,10 @@
 
 ## Live 文档
 
+- `cscwd_phase_v2_public_consumer_pilot_protocol_20261011.md`：真实 phase-v2 类、public estimator/rules 与四 learned cells 的接口门，
+  以及 20-cell、23,040-step 一次性 development pilot、双视角裁决和停止条件。
+- `cscwd_phase_v2_paper_claim_change_note_20261011.md`：只向 A 论文线提供可用/禁用主张，不编辑主论文稿。
+
 - `cscwd_public_estimator_phase_accounting_fix_20261011.md`：`v2` fail-closed phase accounting、6-case synthetic
   estimator↔native conformance、artifact hash 与训练继续关闭的边界。
 

@@ -5,6 +5,30 @@
 
 # Runbook
 
+## CSCWD raw phase-v2 public-causal pilot（2026-10-11；一次性）
+
+先运行只读 actual-class preflight；它会核验 raw/source/fixture/env/estimator SHA，扫描两个冻结 raw interval，执行一个真实
+US101 action4 守恒见证，不训练：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/run_cscwd_phase_v2_causal_public_pilot.py --preflight
+```
+
+必须返回 consumer schema v3、fixture label=prepare、immediate/two-step action4、actual-class gate `PASS`，并核验 A 的
+60-cell matrix manifest/ledger/audit 固定 hash 和 `all_checks_passed=true`。只有 final commit 已
+push、checkout clean、run/analysis/supervisor 三个 root 均不存在时，才允许一次：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/launch_cscwd_phase_v2_causal_public_pilot.py \
+  --mode launch --expected-commit <FROZEN_PUSHED_COMMIT>
+```
+
+run ID 固定为 `cscwd_phase_v2_causal_public_pilot_20261011_v1`；20 cells、23,040 env steps、3,840 optimizer steps，
+一小时上限、无 retry。launcher ACK 后本轮不得轮询或根据中间/最终结果改 checkpoint、seed、condition、reward 或 auxiliary。
+terminal 完成后由 analyzer 只读生成 `_analysis_v1`；checkpoint/raw CSV 留本机，不加入 Git。
+
 ## Public estimator phase conformance（2026-10-11）
 
 只生成合成接口回执，不读 raw 数据、checkpoint 或评价结果，也不训练：

@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+2026-10-11 已完成 [raw phase-v2 公共消费者验收并冻结一次性匹配 pilot](docs/project/cscwd_phase_v2_public_consumer_pilot_protocol_20261011.md)：
+实际 `RawNGSIMPhaseV2Env` 与 public estimator/event/rule v3、SA/PPO/MAPPO rollout/optimizer/checkpoint 接口通过；唯一 SA A/B
+变量为 public-causal 三态 auxiliary 开关，总预算 23,040 env steps。该门只授权 development run，不代表算法效果；A 论文线边界见
+[独立主张变更说明](docs/project/cscwd_phase_v2_paper_claim_change_note_20261011.md)。
+
 2026-10-11 已完成 [public estimator fail-closed 阶段核算修复](docs/project/cscwd_public_estimator_phase_accounting_fix_20261011.md)：
 必需阶段 unknown 不再产生有限 partial total；action4 current-service 失败不再计未提交的 state transfer/restore；prepare-contact
 与 raw public-predicted full-step contact 分列，隐藏 trace 继续 unknown。实际 raw `time_profile` 接线经独立复核修正后，

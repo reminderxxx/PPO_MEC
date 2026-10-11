@@ -5,6 +5,18 @@
 
 # Artifact Records
 
+## 2026-10-11 raw phase-v2 public consumer gate（scientific run 尚未启动）
+
+- env/estimator SHA-256=`5a5b888f…b683`/`a6b49bd2…1790`；A fixture v3 文件/内嵌 public-info SHA-256=
+  `1e7da4d9…d8c2`/`0edb2a05…20f`。实际 US101/dev_01/default action4 service+migration 成功，耗时
+  `1.961859672 s`；phase/clock/backhaul bytes 守恒。
+- public estimator/event/rule schema=`v3/v3/v3`；fixture label=prepare，immediate/two-step action4；phase-v2 two-step 标记为
+  same-score fallback。四 learned cell 的 48-step+8-optimizer-step 接口通过。
+- A fixed-policy mechanism matrix manifest/ledger/audit SHA-256=`cb581f68…bc2c`/`bfb2d674…4028`/`30d821d4…db8d`；
+  60 episode/522 real steps/731 preview upper bound，0 training，独立 audit 全通过。它不是 learned 性能原件。
+- 预留 scientific root=`artifacts/experiments/cscwd_phase_v2_causal_public_pilot_20261011_v1/`；当前登记
+  training/evaluation/checkpoint selection=`0/0/false`，只有 final pushed clean commit 才允许 durable launcher 一次启动。
+
 ## 2026-10-11 candidate identity correction（无新 artifact / scientific run）
 
 - 当前冻结算法候选是 `causal_public_prepare_advantage_v2` 的 public-causal `prepare/serve/abstain` 三态 event supervision，

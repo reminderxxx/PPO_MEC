@@ -1,5 +1,16 @@
 ﻿# Directory Structure
 
+## 2026-10-11 raw phase-v2 causal public pilot
+
+- `configs/experiment/cscwd_phase_v2_causal_public_pilot_v1.json`：唯一变量、20 cells、23,040-step 预算、两来源分工、
+  selected/update24 双视角、规则能力与停止门。
+- `scripts/run_cscwd_phase_v2_causal_public_pilot.py`：hash/fixture/actual-class fail-closed preflight、phase-v2 raw training、
+  checkpoint selection、固定 v1/v2 evaluation 与完整 step/optimizer ledger。
+- `scripts/analyze_cscwd_phase_v2_causal_public_pilot.py`：只读 terminal artifact，按预注册双视角/seed/资源门输出描述性 verdict。
+- `scripts/launch_cscwd_phase_v2_causal_public_pilot.py`：create-only durable supervisor；一次启动、无 retry、自动只读分析。
+- `tests/test_cscwd_phase_v2_causal_public_pilot.py`：预算、public consumer、四 learned cells rollout/bootstrap/optimizer 合同。
+- `artifacts/experiments/cscwd_phase_v2_causal_public_pilot_20261011_v1*` 与对应 analysis root：本机 create-only；checkpoint 不上传。
+
 ## 2026-10-11 public estimator phase-accounting fix
 
 - `src/agents/causal_public_action_estimator.py`：`v2` fail-closed action phase、public raw full-step contact 表达与 actual-cost
