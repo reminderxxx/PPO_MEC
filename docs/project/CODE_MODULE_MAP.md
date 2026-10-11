@@ -2,6 +2,8 @@
 
 `src/envs/core/raw_ngsim_phase_v2_env.py` 是继承 v1 轨迹/公共前缀几何、但独立 opt-in 的串行相位 producer：只在真实 `step` 使用未来实际位置检验输入接触与目标交付，`_info()` 仅加估计阶段合同；显式禁止 hidden-future exact decision clone。输入、模型、计算、状态、恢复、交付各自计时计字节，完整提交 typed cache/state 与节点完成分开。`scripts/audit_cscwd_raw_phase_v2_preflight.py` 锁定源/配置 hash，只做两条开发轨迹各一次真实 reset/step，输出公开 fixture 与明确 privileged 的事件账本；`tests/test_raw_ngsim_phase_v2_env.py` 覆盖 synthetic 正负边界。B 的估计器/规则/SA 为独立消费者，需再按公开 fixture 验收，不能读取本脚本的 privileged transition。
 
+`scripts/run_cscwd_raw_phase_v2_mechanism_matrix.py` 在独立消费者门通过后才运行冻结的两窗×`dev_01`×三条件×v1/v2×五方法矩阵。它要求显式公共规则文件 SHA，锁定原始来源、预检、合同与两个环境源码，逐 cell 检查时钟/相位/字节和总预算；规则入口仅接收公开 `_info()`，真实结果仅在 step 之后写本地 create-only 账本。v2 的 public two-step 因缺少可公开重建的下一步二维移动输入，按 B 规则降级为同一 immediate score，不当作独立强基线；v1 的 adverse backhaul 条件没有物理 backhaul 效果。
+
 `scripts/freeze_cscwd_new_development_source.py` 只读已提交 split/future-validation 来源元数据和本机 NGSIM CSV，对 v27/v28/v71 formal/hidden 原始时间作带 embargo 排除，对 v8/v17/v20 匿名计划的原始读取前缀整体隔离；输出不含坐标或算法结果的来源 manifest 与候选理由。`tests/test_cscwd_new_development_source.py` 用合成车辆帧锁定禁区切分和同时间车辆选择。
 
 `scripts/audit_cscwd_new_development_reachability.py` 消费来源 manifest、冻结 workload、现有 `RawNGSIMEventTimeEnv` 与 B 分支按 SHA 锁定的 public immediate/two-step 方法；不改算法或训练器。真实未来接触只写入明确 privileged 的本地诊断字段，规则入口仅接收环境公开 `_info()`。`tests/test_cscwd_new_development_reachability.py` 检查精确源车帧重建及动作 mask fallback。

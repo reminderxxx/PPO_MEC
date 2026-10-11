@@ -20,6 +20,8 @@
   --output-root artifacts/analysis/cscwd_raw_phase_v2_preflight_20261011_v3
 ```
 
+消费者实际类/SA/checkpoint 门通过后，`scripts/run_cscwd_raw_phase_v2_mechanism_matrix.py` 接受 B 冻结公共规则文件路径与精确 SHA，另需原始 CSV、来源 manifest、最终 `v3` 预检及公开 fixture；输出必须是新的不存在的 `artifacts/analysis/` root。入口自行核验 60 格、2,880 real step、10,000 preview 上限与逐步守恒。当前仅通过 synthetic 入口检查，未执行真实矩阵；B 门未通过时不能以此入口试跑或改条件。
+
 ## CSCWD 新 development 长轨迹来源资格（2026-10-11；结果盲）
 
 先核对事前冻结的 `cscwd_new_development_source_plan_20261011.md`。仅使用本机原始 NGSIM CSV；输出 root 必须不存在，脚本只写不含坐标/结果的来源清单与候选拒绝 ledger，不启动 agent：
