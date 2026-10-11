@@ -5,6 +5,14 @@
 
 ﻿# Progress
 
+## 2026-10-11：v668 零 prepare 的 first-order 工程原因已定位
+
+- 46 个 decisive-unknown 状态的 action4 服务/目标准备/readiness gain 均成立，唯一 unknown 是 recompute/total/deadline；其中
+  30 行当前节点无前驱。
+- executor 只在 `current_rsu != last_execution_rsu` 时重算，但 public semantic state 未公开这项已发生历史；estimator 将
+  所有 completed-prefix + invalid prepared-prefix 状态混成 unknown。该接口缺失可最小纠错，不涉及 future truth 或 reward。
+- 独立诊断见 `cscwd_recompute_observability_diagnosis_20261011.md`；修复前旧 gate FAIL 和 artifact 保持不变。
+
 ## 2026-10-11：新 v668 train source 可执行 action4，但正 prepare 暴露仍为零
 
 - A metadata candidate SHA=`7aaad8ce…fdec` 已独立核验；v668/v19/v749 三段各 1,189 frames/118.8 s，原始 time/frame

@@ -5,6 +5,14 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：LOCATED / public state 缺 last-execution RSU 导致 recompute 假 unknown
+
+- raw phase-v2 executor 的 recompute 条件依赖 current RSU 与 last execution RSU；后者未进入 public semantic state。
+- estimator 只能见 prepared-prefix invalid，于 46 个本可继续比较的状态统一返回
+  `handoff_and_missing_predecessor_identity_unknown`；该行为会撤销 event supervision，并非策略学习本身造成。
+- 允许的最小修复仅增加已发生 execution-history 字段并对齐 executor recompute 公式；不得加入 actual future、改变 reward/mask
+  或用评价结果调标签。旧零暴露结果不追认改写。
+
 ## 2026-10-11：BLOCKED / 新开发 train source 仍无正 prepare 监督
 
 - v668 的 action4 已实际执行 15 次，排除“完全不可执行”这一狭义解释；但 192 个 actual-consumer label 中 prepare=0，
