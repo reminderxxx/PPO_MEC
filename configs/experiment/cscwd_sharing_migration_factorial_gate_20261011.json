@@ -1,7 +1,10 @@
 {
   "contract_version": "cscwd_sharing_migration_factorial_v1",
-  "execution_authorized": false,
-  "gate_status": "READY_ZERO_STEP_ONLY",
+  "execution_authorized": true,
+  "gate_status": "AUTHORIZED_SINGLE_DEVELOPMENT_RUN",
+  "zero_step_preflight_execution_commit": "5385e550e483833979bf8605a1c35e7de1cb893e",
+  "zero_step_preflight_receipt_sha256": "6e296df7dedb682274180a36f1ff960e54bd02d67466b0cb7a6964a8a8842084",
+  "zero_step_preflight_raw_env_steps": 0,
   "attempted_execution_commit": "f6d89bee6ba6d65430aba2b61ce301cb69a559c7",
   "failure_receipt_path": "artifacts/analysis/cscwd_sharing_migration_2x2_development_20261011_v1/failure_receipt.json",
   "failure_receipt_sha256": "939bb277c8387c6060849286be01f84eaf9fa65bc6fd427fb723325141c66315",
