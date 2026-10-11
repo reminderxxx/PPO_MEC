@@ -1,5 +1,7 @@
 # Code Module Map
 
+`scripts/audit_cscwd_phase_v2_pilot_independent.py` 是独立只读 consumer：按 SHA 锁定 B 原 pilot 的收据、manifest、完整性清单和评估行，从训练/checkpoint 及行为 CSV 重建所有 episode/成本/奖励、同实例配对与观察到的模型/状态后续使用；只写本地 create-only 分析 root，不调用环境、agent、训练器或外部真实数据。`tests/test_cscwd_phase_v2_pilot_independent_audit.py` 覆盖失败分母、成本拒绝和非因果事件标签。
+
 `src/envs/core/raw_ngsim_phase_v2_env.py` 是继承 v1 轨迹/公共前缀几何、但独立 opt-in 的串行相位 producer：只在真实 `step` 使用未来实际位置检验输入接触与目标交付，`_info()` 仅加估计阶段合同；显式禁止 hidden-future exact decision clone。输入、模型、计算、状态、恢复、交付各自计时计字节，完整提交 typed cache/state 与节点完成分开。`scripts/audit_cscwd_raw_phase_v2_preflight.py` 锁定源/配置 hash，只做两条开发轨迹各一次真实 reset/step，输出公开 fixture 与明确 privileged 的事件账本；`tests/test_raw_ngsim_phase_v2_env.py` 覆盖 synthetic 正负边界。B 的估计器/规则/SA 为独立消费者，需再按公开 fixture 验收，不能读取本脚本的 privileged transition。
 
 `scripts/run_cscwd_raw_phase_v2_mechanism_matrix.py` 在独立消费者门通过后才运行冻结的两窗×`dev_01`×三条件×v1/v2×五方法矩阵。它要求显式公共规则文件 SHA，锁定原始来源、预检、合同与两个环境源码，逐 cell 检查时钟/相位/字节和总预算；规则入口仅接收公开 `_info()`，真实结果仅在 step 之后写本地 create-only 账本。v2 的 public two-step 因缺少可公开重建的下一步二维移动输入，按 B 规则降级为同一 immediate score，不当作独立强基线；v1 的 adverse backhaul 条件没有物理 backhaul 效果。

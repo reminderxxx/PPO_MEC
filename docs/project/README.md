@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `cscwd_phase_v2_pilot_independent_evidence_20261011.md`：B raw phase v2 learned pilot 的 A 只读全方法/逐事件复算、MIXED 开发结论、外层 terminal FAIL 与论文不可验证边界。
+
 - `cscwd_raw_phase_v2_frozen_contract_20261011.md`：方案 B 已授权的输入上传、原站跨接触计算、RSU backhaul、状态交付与两窗 60 episode 开发矩阵事前合同。
 - `cscwd_raw_phase_v2_environment_acceptance_20261011.md`：独立 opt-in 环境的合成正负链、两条原始开发轨迹真实 step 与公开 fixture 身份；不构成方法效果或论文证据。
 - `cscwd_raw_phase_v2_mechanism_matrix_20261011.md`：按事前合同一次执行的 60 格开发机制结果、完整负例、规则能力与物理版本边界；不构成 learned baseline 或论文主表。

@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-06
+更新日期：2026-10-11
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -38,6 +38,27 @@
 5. 信息不完整时保守记录：venue、年份、DOI、页码、acceptance status 或结论没核实时，写 `待核验`；不要为了补齐表格编造。
 6. 更新日期：新增或大幅修订本表后，同步更新文件顶部 `更新日期`。
 7. 范围控制：无关论文不加入；边缘相关但可能影响审稿回应的论文可以加入，并在 `论文写作位置` 中标注为 `Discussion / reviewer response`。
+
+## 2026-10-11 原始轨迹迁移与依赖任务检索增量
+
+仅检索公开关键词与 IEEE 出版页面；未上传项目数据或 manuscript。下表是本轮新发现的近邻，不是当前 pilot 的性能证据。IEEE 搜索页未提供完整元数据的条目显式待核验；只根据其摘要说明参考点，不推断本项目相对优势。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| DAG 依赖与跨站迁移 | [Dependency-Aware Service Migration for Backhaul-Free Vehicular Edge Computing Networks](https://doi.org/10.1109/TVT.2023.3310520) | IEEE TVT, 2024；IEEE 页面核验 | 用任务依赖决定车载提取原站结果及沿途迁移，时变 MDP 联合卸载与迁移；无 backhaul。 | 本项目 v2 是显式有成本的模拟 RSU backhaul 与应用状态交付；因此不能把“依赖感知跨站迁移”本身称首创，需分别验证 adapter 准备和状态连续性。 | 最近邻机制对照 / Backhaul 假设差异。 |
+| 真实轨迹服务迁移 | [ApMove: A Service Migration Technique for Connected and Autonomous Vehicles](https://doi.org/10.1109/JIOT.2024.3403415) | IEEE IoT Journal, 2024；IEEE 页面核验 | 用真实工作负载和移动模式评估迁移时间、响应及避免不必要迁移。 | 本项目需把连续 DAG 节点、typed adapter 与状态传输逐项入账；“真实轨迹评估迁移”不是独有卖点，当前 pilot 仍只有两个已暴露来源。 | Baseline rationale / 真实数据证据边界。 |
+| 多时域移动预测迁移 | [AI-Enabled Spatial-Temporal Mobility Awareness Service Migration for Connected Vehicles](https://doi.org/10.1109/TMC.2023.3271655) | IEEE TMC, 2024；IEEE 页面核验 | GRU/图卷积提取道路与多时域移动特征，以多目标优化进行主动服务迁移。 | 本项目的前缀公共预测、真实接触判定与 DAG/adapter/state 联合控制需作为差异；不能主张首次“预测＋主动迁移”。 | A-Core 近邻 / 预测权限边界。 |
+| 动态链路跨区卸载 | [Adaptive Task Offloading and Resource Management for Vehicular Edge Computing](https://doi.org/10.1109/TVT.2025.3597459) | IEEE TVT, 2026；IEEE 页面核验 | 动态链路建模、任务分类与跨区迁移，联合车辆/RSU 通信计算资源。 | 本项目 v2 固定公开估计器和模拟 RSU backhaul，未联合优化传输功率或测真实链路；鲁棒性和开销不能外推。 | B-Supporting / system stress。 |
+| DAG 表达与 DRL 卸载 | [Dependent Task Offloading in Edge Computing Using GNN and Deep Reinforcement Learning](https://doi.org/10.1109/JIOT.2024.3374969) | IEEE IoT Journal, 2024；IEEE 页面核验 | 用 DAG、GAT 编码及多离散动作 DRL 调度依赖任务，覆盖单用户及多用户 edge 场景。 | 本项目不能把 DAG 图编码或 DRL 调度作为新意；需以跨 RSU 连续状态、typed adapter/cache 与机制成本兑现区分。 | DAG learned baseline / novelty 收缩。 |
+| 车联网依赖任务 DRL | [Towards Efficient Task Offloading With Dependency Guarantees in Vehicular Edge Networks Through Distributed Deep Reinforcement Learning](https://doi.org/10.1109/TVT.2024.3387548) | IEEE TVT, 2024；IEEE 页面核验 | DAG 拓扑优先级保证任务依赖，以分布式 DRL 做多车辆卸载。 | 本项目的 controller-level PPO/MAPPO 不能称完整分布式车辆级 MARL；可比较跨 RSU 状态连续性与缓存动作合同。 | B-Supporting / 算法层级界限。 |
+| DAG MEC-Cloud 多应用 | [Efficient Dependent Task Offloading for Multiple Applications in MEC-Cloud System](https://doi.org/10.1109/TMC.2021.3119200) | IEEE TMC, 2023；IEEE 页面核验 | COFE 用任务依赖与排序启发式分配 MEC/Cloud，评估 makespan 和 deadline。 | 本项目在移动 RSU 的跨站连续 DAG 和 adapter/state 机制上另有问题设定；尚未以独立正式结果证明优于该类启发式。 | A-Core DAG/offloading 对照。 |
+| DAG 序列学习卸载 | [Dependent Task Offloading for Edge Computing based on Deep Reinforcement Learning](https://doi.org/10.1109/TC.2021.3131040) | IEEE Transactions on Computers, 2022；IEEE 页面核验 | 用 Seq2Seq 表达 DAG 依赖，结合 off-policy 学习和 clipped surrogate 进行任务卸载。 | 本项目不能以“DAG 表达＋策略梯度”作为独有算法；需证明跨 RSU state/adapter/cache 的机制增量。 | Related Work / 学习基线设计。 |
+| UAV DAG/GAT 卸载 | [Joint UAV Placement and Dependent Task Offloading in Multi-UAV MEC Networks: A Graph Attention Enhanced DRL Approach](https://doi.org/10.1109/TMC.2025.3628608) | IEEE TMC, 2026；IEEE 页面核验 | 联合 UAV 部署/关联与 DAG 任务卸载，GAT 表达供 DRL 决策。 | 平台和动作粒度不同；本项目不涉及 UAV 部署，不能把 DAG+GAT+DRL 组合笼统作为原创。 | Discussion / reviewer response。 |
+| 车辆预测的主动迁移 | [LSTM-based Mobility Prediction for Proactive Service Migration in Vehicular Edge Computing](https://ieeexplore.ieee.org/document/11579216/) | IEEE 会议, 2026；具体会议/DOI 待核验 | 公开摘要说明用多时域 LSTM 预测服务基站并驱动 MEC 主动迁移；具体效果待核验。 | 本项目若谈预测价值，必须同时报告公开前缀权限、预测误差和状态/缓存成本，不能仅靠“主动”命名区分。 | Discussion / predictor baseline 候选待核验。 |
+| 主动状态数据迁移 | [A Mobility-Aware Reinforcement Learning Proactive Solution for State Data Migration in Edge Computing](https://ieeexplore.ieee.org/document/10943072/) | IEEE CAMAD, 2024；DOI 待核验 | 公开摘要说明以移动感知 RL 选迁移目标，并约束 SLA 与边缘资源。 | 应用 state migration + RL 已有先例；本项目需区分 DAG prefix readiness 和 adapter/model 账本，且目前仅 development 观察链。 | Discussion / novelty 风险。 |
+| VEC 移动感知迁移 | [Mobility Aware Task Migration in Vehicular Edge Computing Networks](https://ieeexplore.ieee.org/document/11078613/) | IEEE 会议, 2025；具体会议/DOI 待核验 | 扩展 MEC location service 触发迁移通知；机制和结果细节待核验。 | 本项目不能把移动通知触发视作原创；重点仍是已提交应用状态与连续 DAG 的同合同成本。 | Discussion / handoff 触发背景。 |
+| 停车场迁移场景 | [Edge Computing-Assisted Joint Offloading and Migration in Parking Lots Scenarios](https://ieeexplore.ieee.org/document/10681806/) | IEEE/CIC ICCC, 2024；DOI 待核验 | 公开摘要给出停车场车联网联合卸载和迁移框架，细节与结果待核验。 | 停车场移动模式与本项目原始高速轨迹不同；只用于场景边界，不作直接性能基线。 | Discussion / 场景限制。 |
+| 设备边云 DAG 卸载 | [An Improved Dependent Task Offloading in Device-Edge-Cloud using Favorite Predecessor Task](https://ieeexplore.ieee.org/document/10839740/) | IEEE 会议, 2024；具体会议/结论待核验 | 标题与公开摘要显示围绕前驱任务和设备/边缘/云选择改进依赖任务卸载；效果待核验。 | 本项目不得把“显式前驱依赖”作为独有问题；其移动交付、adapter 与应用状态成本需要单独核验。 | Discussion / 边缘相关。 |
 
 ## 2026-10-06 连续迁移与服务缓存增量近邻
 

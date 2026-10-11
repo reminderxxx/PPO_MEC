@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-11：raw phase v2 learned pilot 独立只读复核，开发判定 MIXED
+
+- B 冻结 run 的子进程完成、113/113 文件完整性通过；外层 terminal 因原收据缺 `scientific_execution_complete` 仍为 `FAIL`，保留双状态，不回填旧原件。A 从 320 learned + 18 rule episode、2,904 行行为账本独立重建完整方法/来源/条件/seed/视图结果，训练 23,040 步、optimizer 3,840 步、80 checkpoint 选择 episode 和 20 selected/update24 身份逐项核验。A 只读摘要 SHA-256 `36540a7b4beb1988bd9b81b38e275cba82d80ef471631d5be8635e7fef0ed9a9`；完整结果见 `cscwd_phase_v2_pilot_independent_evidence_20261011.md`。
+- v2 候选 SA 对 control 完成/按期/失败均不变，平均重算 `6.420439→4.837974 s`、耗时 `90.066228→88.503388 s`，总传输 `12.292352→12.395371 MB`；差异仅由重复 US101 来源驱动，Lankershim 全配对为零。22 次候选 action4 中 11 次状态交付、11 次目标先离开；后者仍发送状态字节。公开 two-step v2 与 immediate 动作完全相同。5 seeds/双视图不增加独立来源；没有 formal/holdout/support 及外层 PASS，SA 贡献、优秀基线排名和 paper-ready=`Unverifiable`。仅提出一个有界局部确认设计，未执行。
+- 公开一手页面增量近邻已追加至 `literature_reference_table.md`（2026-10-11）：依赖感知跨站迁移、多时域预测主动迁移、DAG DRL 卸载都有先例；不把技术关键词组合作为已固定创新，也不基于开发 pilot 评定文献优劣。
+
 ## 2026-10-11：冻结 raw phase v2 机制矩阵完成，算法与论文晋级仍未验证
 
 - 在 B 独立公开消费者实际类门通过后，一次运行事前固定的两窗×`dev_01`×三条件×v1/v2×五方法：60 episode/522 real step/731 preview 上界；唯一 cell、逐步时钟与传输账本只读复核通过。机器 manifest SHA-256 `cb581f6871c0928f13f58f14fb77568290277247dc7de8c03ed355aeeca4bc2c`，ledger SHA-256 `bfb2d6743266a24c2a37bf9b714a53f723f0595e6215ec82a8a0d348c9c64028`，独立审计 SHA-256 `30d821d4fb7c2e8d26c85378e4824fa4a782f62bf6eb1181510f0fe9bf56db8d`，完整表见 `cscwd_raw_phase_v2_mechanism_matrix_20261011.md`。

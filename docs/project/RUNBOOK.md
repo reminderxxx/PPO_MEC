@@ -5,6 +5,18 @@
 
 # Runbook
 
+## CSCWD raw phase v2 learned pilot 独立只读复核（2026-10-11）
+
+先读 `cscwd_phase_v2_pilot_independent_evidence_20261011.md`：B 子进程原件完整而外层 terminal 因原收据字段缺失为 `FAIL`，pilot 仅 development `MIXED`。A 入口只读 B 冻结原件、不调用环境/训练或下载数据；输出 root 必须不存在，不覆盖已完成 `v3`。下列为已执行命令记录，复跑时换新的 create-only root：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_cscwd_phase_v2_pilot_independent_audit.py
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_cscwd_phase_v2_pilot_independent.py \
+  --run-root /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/artifacts/experiments/cscwd_phase_v2_causal_public_pilot_20261011_v1 \
+  --terminal-receipt /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/artifacts/experiments/cscwd_phase_v2_causal_public_pilot_20261011_v1_supervisor/terminal_receipt.json \
+  --output-root artifacts/analysis/cscwd_phase_v2_pilot_independent_audit_20261011_v3
+```
+
 ## CSCWD raw phase v2 授权合同（2026-10-11；执行前冻结）
 
 已批准方案 B 的 opt-in `raw_ngsim_event_time_v2` 物理/成本/公开状态规则见 `cscwd_raw_phase_v2_frozen_contract_20261011.md`，机器配置为 `configs/experiment/cscwd_raw_phase_v2_development_20261011.json`。顺序为环境相位与真实 reset/step 正负链 → B 独立公共消费者验收 → 仅冻结两个长开发来源的最多 60 episode/2,880 step/10,000 preview 矩阵。旧 v1 create-only 命令及原件仍是历史身份；下列旧段落中的“当前不授权训练”只针对当时旧 v1 资格/诊断，不能代替 v2 的新授权或验收门。环境两条真实开发 step 与最终公开 fixture 见 `cscwd_raw_phase_v2_environment_acceptance_20261011.md`；完整消费者门未过前不启动匹配 pilot。

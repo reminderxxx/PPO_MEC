@@ -1,5 +1,9 @@
 ﻿# Directory Structure
 
+## 2026-10-11 CSCWD phase-v2 learned pilot 独立只读审计
+
+- `scripts/audit_cscwd_phase_v2_pilot_independent.py`、`tests/test_cscwd_phase_v2_pilot_independent_audit.py`：消费 B 冻结运行原件、逐步重算方法结果与事件归因，不调用环境或训练器；输出 create-only `artifacts/analysis/cscwd_phase_v2_pilot_independent_audit_20261011_v3/`，本地忽略 Git。报告 `docs/project/cscwd_phase_v2_pilot_independent_evidence_20261011.md`；B 原始 run/checkpoint 不进入此分支。
+
 ## 2026-10-11 CSCWD raw phase v2 opt-in
 
 - `configs/experiment/cscwd_raw_phase_v2_development_20261011.json` 与 `docs/project/cscwd_raw_phase_v2_frozen_contract_20261011.md`：在结果前冻结方案 B 的物理相位、模拟 backhaul、公开字段、验收和两窗开发矩阵预算；历史 v1 原件保留。

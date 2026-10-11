@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：raw phase v2 learned pilot 的重复状态发送与终态记录
+
+- `OPEN SCIENCE`：候选在两个已暴露来源的 v2 开发 pilot 无服务指标改进，重算/耗时收益伴随更多状态字节；效果只出现在 US101 同源重复条件/seed，不能归纳为独立确认或 SA 优势。22 次 action4 有 11 次目标先离开且状态仍发送；成功与失败分支的后续状态不同，单动作因果待另立有界确认。见 `cscwd_phase_v2_pilot_independent_evidence_20261011.md`。
+- `OPEN PROVENANCE`：B 原子进程完成且 113 文件 hash 通过，但外层 terminal=`FAIL`，因为原子进程收据缺外层要求字段。未来版本修复不追认旧 terminal；正式晋级门仍关闭。v2 public two-step 与 immediate 同动作、privileged exact 仅在 v1，不得重复计强基线。
+- `OPEN NOVELTY`：2026-10-11 一手页面增量检索再确认依赖感知跨站迁移、预测主动迁移和 DAG DRL 卸载近邻；当前只能将具体 typed adapter/state 成本合同列为待验证差异，不能把“DAG＋迁移＋预测”并列术语直接写成创新。详见 `literature_reference_table.md`。
+
 ## 2026-10-11：raw phase v2 开发矩阵后的科学边界
 
 - `RESOLVED ENGINEERING / OPEN SCIENCE`：逐相位真实 step 与固定矩阵中成功交付可达，但 18 次 action4 只有 9 次交付，另 9 次目标已先离开；全部来自同一个 US101 开发来源的重复条件/方法，不构成独立统计。v1 整步阻断是历史物理版本事实，v1/v2 差值不能解释为算法改善。`cscwd_raw_phase_v2_mechanism_matrix_20261011.md` 保留所有失败与字节成本。

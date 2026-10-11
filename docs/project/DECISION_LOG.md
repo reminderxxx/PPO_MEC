@@ -1,5 +1,10 @@
 ﻿# Decision Log
 
+## 2026-10-11：raw phase v2 pilot 不晋级，贡献主张继续待证
+
+- B 的一次冻结 learned pilot 在开发来源给出 `MIXED`：候选 SA 相对 control 少重算/短耗时、更多状态字节，完成/按期/失败不变；效果只在 US101 同源重复条件出现。A 独立逐事件复核与之同向，但原外层 terminal 仍 `FAIL`。不固定 SA 优势或强基线排名，不更新论文主表/canonical，formal/holdout 不因该开发结果开启。
+- 后续仅提出一次去重公共状态的 action4 重复发送局部分支确认设计，需独立冻结并执行；当前没有新科学执行。证据、负例和上限见 `cscwd_phase_v2_pilot_independent_evidence_20261011.md`。
+
 ## 2026-10-11：批准独立 opt-in raw phase v2 的远端连续服务合同
 
 - 研究负责人在旧 raw v1 接触/阶段诊断独立完成后选择方案 B：输入必须在当前接触内上传，原 RSU 获得本节点执行权并可跨车辆接触继续计算；节点成功后才生成状态，状态经有成本的模拟 RSU backhaul 到预测目标，restore 与车辆目标覆盖交付完成后才计迁移成功。各相位串行计时、部分传输计费、无未校准共享队列；超时/trace 终点真实失败或 pending，不将隐藏未来给 actor。

@@ -5,6 +5,11 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD phase-v2 learned development pilot independent audit
+
+- B 原件 `cscwd_phase_v2_causal_public_pilot_20261011_v1` 执行 commit `5a79ffd018d4c260bc7a8417229a440c7d591fe4`；completion SHA-256 `88c2ac2c1cd7475b9adb3481d07d70cabe5657b4e0ec3c52fca6eb3fc2b0c8c8`、manifest SHA-256 `8750250575566d68bc4c3030994536da6211db9d8aa65a6ce1a3a2173b84ea28`、integrity SHA-256 `1ecea21b8daddbd79c908edf40a5adfbe38b8e411e9e30ffbc48c8974b95acb2`。原件在 B worktree 本地，113/113 hash 通过；子进程 complete，外层 terminal FAIL（原收据 schema 不匹配）。
+- A 只读 create-only `artifacts/analysis/cscwd_phase_v2_pilot_independent_audit_20261011_v3/audit_summary.json` SHA-256 `36540a7b4beb1988bd9b81b38e275cba82d80ef471631d5be8635e7fef0ed9a9`，含 338 完整方法行、82 分层行、2,904 事件行、80 SA 配对行；四张 CSV hash 在 `cscwd_phase_v2_pilot_independent_evidence_20261011.md`。开发 `MIXED`、无正式/holdout 证据，不上传原件/真实数据/checkpoint；早期审计 `v1/v2` 不作最终引用。
+
 ## 2026-10-11 CSCWD raw phase v2 frozen development matrix
 
 - 本地 create-only `artifacts/analysis/cscwd_raw_phase_v2_mechanism_matrix_20261011_v1/matrix_manifest.json` SHA-256 `cb581f6871c0928f13f58f14fb77568290277247dc7de8c03ed355aeeca4bc2c`、`step_ledger.jsonl` SHA-256 `bfb2d6743266a24c2a37bf9b714a53f723f0595e6215ec82a8a0d348c9c64028`；独立只读审计 `artifacts/analysis/cscwd_raw_phase_v2_matrix_audit_20261011_v1/audit.json` SHA-256 `30d821d4fb7c2e8d26c85378e4824fa4a782f62bf6eb1181510f0fe9bf56db8d`：冻结 60 episode/522 real step/731 preview 上界，来源/环境/公共规则/预检 SHA 锁定，全部 cell/时钟/字节/事件计数守恒通过。v2 18 次 action4 有 9 成功交付、9 目标先离开；来自同一 US101 开发来源的重复条件/方法。完整负结果及禁止算法排名见 `cscwd_raw_phase_v2_mechanism_matrix_20261011.md`；0 训练/formal/hidden。
