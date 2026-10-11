@@ -1362,3 +1362,10 @@ claim map 必须报告 `UNAVAILABLE`。
 - 依据：既有 service-reward 记录显示 critic error 与共享梯度压制显著，但 termination/GAE/reset-observation 和 auxiliary 冲突没有形成一致实现缺陷证据。
 - 约束：training-only statistics；raw-unit bootstrap/GAE；output-preserving affine compensation；旧 reward、actor、auxiliary、预算、instance order 与选模指标不变。
 - 否证：mechanism、current-missing action-4 probability/raw argmax、service completion/failure 三类 gate 任一不通过即停止；不追加 seed、不延长预算、不转做 auxiliary-target 或其他候选。
+
+## 2026-10-11 — sharing × migration 先冻结同功能局部因素合同
+
+- 决定：在 raw phase v2 仅以显式 opt-in `factorial_profile` 提供 S0/M0；S0 使用同一 base 资源逐 adapter 私有副本，逐份计 cache/传输/load，保留 DAG、输入、adapter、模型功能身份与容量；M0 保留 action 4 模型准备/当前节点执行，关闭状态交付并遵守原重算。默认路径不变。
+- 依据：先行只读审查确认旧 `ample_cache` 改容量、旧 `distinct_base` 改人工模型身份，均不能单独代表 sharing 关闭；原 formal `no_base_sharing` 仅部分可用。
+- 边界：合成验收不等于真实模型质量等价或因果交互结果；formal consumer 尚未接入，独立来源和 Peachtree 单位未锁，I-80 seal 不开。唯一下一轮 development 预算与机器门保持 `execution_authorized=false`，另获授权且补齐身份后才可执行。
+- 记录：`cscwd_sharing_migration_factorial_gap_20261011.md`、`cscwd_sharing_migration_factorial_engineering_20261011.md` 与 `configs/experiment/cscwd_sharing_migration_factorial_gate_20261011.json`。

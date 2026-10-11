@@ -5,11 +5,17 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：四臂局部因素开关之后仍开放的科学门
+
+- `RESOLVED LOCAL ENGINEERING / FORMAL OPEN`：raw phase v2 已有默认不变的 opt-in S0/M0，两轴合成合同通过；先前“raw 环境无共享关闭臂”的描述是该实现前状态。正式 `VecWorkflowCoreEnv`/Protocol 2.9 仍无该四臂接入，`no_base_sharing` 仍是 `partially_available`，跨 workflow cache persistence 仍缺。
+- `OPEN SOURCE/CONSUMER GATE`：Peachtree 10 位 `Global_Time` 单位和历史暴露身份未核，未冻结独立原始区间、公开固定策略消费者 hash 与 create-only root。`execution_authorized=false`，不得用同一 US101 开发轨迹再扩条件称独立统计。
+- `OPEN SCIENCE`：同一抽象 base 字节的私有副本未由真实模型推理验证质量等价；真实双 RSU 主机/链路、匹配训练基线、formal/holdout/support 仍缺。四项论文主张 `UNVERIFIED`。
+
 ## 2026-10-11：v3 完成后的四项科学 blocker
 
 - `RESOLVED ENGINEERING / BOUNDED SCIENCE`：v3 的双身份与逐分支持久化在 11 格/27 分支/207 步单次运行及独立审计通过；v2 的公开 hash 碰撞并非 full-state 重复。v1/v2 失败原件仍不得追认。1 格正向机制伴随 140,480 bytes 额外状态传输，6 格局部浪费，4 格截断；全部同一 US101 模拟 RSU 开发来源，不得形成独立统计或在线门。
 - `OPEN / real cross-RSU`：RSU 几何/200–1000 Mbps backhaul 与零共享队列均为模拟，已检查仓库没有可引用的独立 RSU 主机与链路测量原件；单机多进程不算部署。
-- `OPEN / sharing×migration interaction`：生产环境有 opt-in migration，但 `no_base_sharing` 仍仅在 formal protocol 列为部分可用/不可执行；跨 workflow cache 生命周期缺失。当前 `ample_cache` 改容量/resident，不能作 sharing 关闭臂；同策略同资源对称计费 2×2 尚不可运行。
+- `OPEN / sharing×migration interaction`：此处记录的是 v3 审查当时状态；此后 raw phase v2 增加局部合成验收的 S0/M0 开关，但 formal protocol 仍列 `no_base_sharing` 为部分可用，跨 workflow cache 生命周期缺失。`ample_cache` 仍不能作 sharing 关闭臂；真实四臂科学执行尚未运行。
 - `OPEN / three-head and generalization`：本轮未训练/比较三头与公平基线，也没有独立 raw interval、多 workflow/adapter、formal/holdout/support。论文贡献及 paper-ready=`Unverifiable`。详见 `cscwd_phase_v2_public_prepare_region_v3_result_20261011.md`。
 
 ## 2026-10-11：v3 工程修复后的未验证边界

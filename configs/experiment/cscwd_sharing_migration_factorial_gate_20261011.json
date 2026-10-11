@@ -1,0 +1,64 @@
+{
+  "contract_version": "cscwd_sharing_migration_factorial_v1",
+  "execution_authorized": false,
+  "gate_status": "BLOCKED_SOURCE_AND_CONSUMER_IDENTITY",
+  "scope": "single_development_contract_acceptance_only",
+  "time_profile": "raw_ngsim_event_time_v2",
+  "source": {
+    "segment": null,
+    "vehicle_id": null,
+    "raw_global_time_start": null,
+    "raw_global_time_end": null,
+    "source_csv_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+    "required_raw_frame_step": 1,
+    "required_raw_time_step_ms": 100,
+    "must_not_overlap_train_dev_formal_hidden_or_consumed_intervals": true,
+    "peachtree_unit_identity_verified": false,
+    "i80_sealed_access": false
+  },
+  "workload": {
+    "manifest_path": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+    "design_id": "dev_01",
+    "same_nodes_edges_inputs_adapter_function_in_all_arms": true,
+    "requires_two_compatible_adapters": true
+  },
+  "physical_condition": {
+    "condition_id": "default",
+    "backhaul_actual_mbps": 1000.0,
+    "backhaul_estimated_mbps": 1000.0,
+    "cache_profile": "workload_native",
+    "common_cache_capacity_bytes": 2194117040,
+    "initial_logical_residents": "dev_01_manifest_exact_then_private_base_mapping"
+  },
+  "fixed_policy": {
+    "policy_id": "public_prepare_if_legal_else_serve_v1",
+    "inputs": ["semantic_state", "action_mask"],
+    "action_order": [4, 3, 2, 0, 1],
+    "rule": "choose action 4 when legal, otherwise 3 when legal, otherwise 2 when legal; remaining actions in fixed order",
+    "future_trace_or_outcome_access": false,
+    "consumer_identity_sha256": null
+  },
+  "arms": [
+    {"arm_id": "S0M0", "base_sharing_enabled": false, "state_migration_enabled": false},
+    {"arm_id": "S1M0", "base_sharing_enabled": true, "state_migration_enabled": false},
+    {"arm_id": "S0M1", "base_sharing_enabled": false, "state_migration_enabled": true},
+    {"arm_id": "S1M1", "base_sharing_enabled": true, "state_migration_enabled": true}
+  ],
+  "budget": {
+    "independent_source_count_max": 1,
+    "workflow_count_max": 1,
+    "episode_count_max": 4,
+    "real_env_step_count_max": 96,
+    "train_steps": 0,
+    "model_calls": 0,
+    "formal_or_holdout_access": false
+  },
+  "output": {
+    "create_only_root": null,
+    "require_per_arm_step_ledger_and_completion_receipt": true,
+    "require_input_and_code_sha256": true,
+    "require_raw_interval_exposure_audit": true,
+    "require_same_fixed_policy_and_action_permissions": true,
+    "retain_all_zero_negative_rejected_truncated_arms": true
+  }
+}

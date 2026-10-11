@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `cscwd_sharing_migration_factorial_gap_20261011.md`：实现前独立只读差距审查、Peachtree/I-80 元数据门与四臂前置合同。
+- `cscwd_sharing_migration_factorial_engineering_20261011.md`：raw phase v2 最小 opt-in S0/M0 的合成验收和仍关闭的科学执行门。
+
 - `cscwd_phase_v2_public_prepare_region_plan_20261011.md`：运行前冻结的结果盲浅前缀覆盖、旧回归与新增状态分列、匹配原生动作和 12/36/288 硬预算。
 - `cscwd_phase_v2_public_prepare_region_failure_20261011.md`：唯一 create-only 执行选出 11 个 US101 起点后因 Python 3.9 兼容错误于首个环境步前失败；0 分支、无区域效果，不晋级。
 - `cscwd_phase_v2_public_prepare_region_v2_execution_plan_20261011.md`：新授权的兼容修复后独立执行身份与门槛；旧科学规则、选择、预算和失败原件不改。

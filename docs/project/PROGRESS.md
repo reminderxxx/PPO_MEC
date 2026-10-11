@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-11：sharing × migration 四臂环境因素合同合成验收，科学执行未启动
+
+- 先完成只读差距审查，再为 `RawNGSIMPhaseV2Env` 增加显式 opt-in `factorial_profile`：S0 对同一 base 逐 adapter 复制并对称计 resident/transfer/load，M0 保留 action 4 目标模型准备与当前节点服务，关闭状态交付并由后续跨站规则重算。默认路径逐事件行为不变；合成/既有局部测试 `23 passed`。见 `cscwd_sharing_migration_factorial_gap_20261011.md` 和 `cscwd_sharing_migration_factorial_engineering_20261011.md`。
+- 下一轮机器门 `configs/experiment/cscwd_sharing_migration_factorial_gate_20261011.json` 保持 `execution_authorized=false`、source/消费者/root 未锁。0 原始环境步、0 训练、0 模型调用、0 formal/holdout。Peachtree 10 位时间单位与历史暴露未核验，I-80 seal 未开；正式 Protocol 2.9 的 `no_base_sharing` 状态不变。四项论文主张仍 `UNVERIFIED`，paper-ready=`Unverifiable`。
+
 ## 2026-10-11：公开 prepare 区域 v3 单次完成，四项论文主张仍未验证
 
 - 已 push 的冻结 commit `0cade5cb19dcf8e8c1b169c6b08deb1c422455e3` 上，唯一 create-only v3 运行 `COMPLETE`：24 格/11 US101 入选、11 distinct full state、9 公开观测组（2 组各含不同 full state）、8 prefix +199 branch =207/288 `env.step`，27/36 完成分支，0 训练/formal/holdout。summary SHA-256 `c5591db1c39f630b7d1d87856daba0a8698aad9b3d3c6867dc9793effa79dff5`，integrity `5928581d59ab89401157b4bb379cde7e21fe578897c924fcbf48466c177f60a4`。

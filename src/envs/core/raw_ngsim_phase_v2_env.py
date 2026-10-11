@@ -30,6 +30,62 @@ SERIAL_PHASE_ORDER = (
     "input_upload", "model_prepare", "current_node_compute", "state_transfer",
     "target_restore", "target_delivery_wait",
 )
+FACTORIAL_PROFILE_VERSION = "cscwd_sharing_migration_factorial_v1"
+
+
+def _private_base_copies(
+    config: dict[str, Any], instance: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, str]]:
+    """Give each adapter a separately charged copy of the same base weights."""
+    config, instance = deepcopy(config), deepcopy(instance)
+    model_identity = str(config.get("measured_identity", {}).get("base_model") or "")
+    if not model_identity:
+        raise ValueError("sharing-off requires a fixed base model function identity")
+    catalog = config["object_catalog"]
+    bundles = config["adapter_to_bundle"]
+    private_by_adapter: dict[str, str] = {}
+    source_by_private: dict[str, str] = {}
+    for adapter_id, bundle in bundles.items():
+        if len(bundle) != 2:
+            raise ValueError("sharing-off requires exactly one base and one adapter per bundle")
+        base_id, adapter_object_id = map(str, bundle)
+        if (
+            catalog[base_id]["object_type"] != "base_model"
+            or catalog[adapter_object_id]["object_type"] != "adapter"
+            or catalog[adapter_object_id]["adapter_id"] != adapter_id
+            or catalog[adapter_object_id]["dependency_ids"] != [base_id]
+        ):
+            raise ValueError("sharing-off requires an exact compatible base/adapter dependency")
+        private_id = f"{base_id}::private::{adapter_id}"
+        if private_id in catalog:
+            raise ValueError("sharing-off private base identity collides with catalog")
+        private_row = deepcopy(catalog[base_id])
+        private_row["source_base_object_id"] = base_id
+        private_row["model_function_identity"] = model_identity
+        catalog[private_id] = private_row
+        catalog[adapter_object_id]["dependency_ids"] = [private_id]
+        bundles[adapter_id] = [private_id, adapter_object_id]
+        private_by_adapter[adapter_id] = private_id
+        source_by_private[private_id] = base_id
+    for base_id in set(source_by_private.values()):
+        del catalog[base_id]
+    for rsu_id, original in instance["initial_residents"].items():
+        original_set = set(original)
+        mapped: list[str] = []
+        for adapter_id, private_id in private_by_adapter.items():
+            adapter_object_id = bundles[adapter_id][1]
+            if adapter_object_id in original_set:
+                if source_by_private[private_id] not in original_set:
+                    raise ValueError("sharing-off initial adapter has no original base resident")
+                mapped.extend((private_id, adapter_object_id))
+        source_residents = {
+            source_by_private[item] if item in source_by_private else item
+            for item in mapped
+        }
+        if original_set != source_residents:
+            raise ValueError("sharing-off cannot map an unpaired initial resident")
+        instance["initial_residents"][rsu_id] = mapped
+    return config, instance, source_by_private
 
 
 class RawNGSIMPhaseV2Env(RawNGSIMEventTimeEnv):
@@ -45,6 +101,7 @@ class RawNGSIMPhaseV2Env(RawNGSIMEventTimeEnv):
         *,
         phase_contract: dict[str, Any],
         condition: dict[str, Any],
+        factorial_profile: dict[str, Any] | None = None,
     ) -> None:
         if tuple(phase_contract.get("phase_order", ())) != SERIAL_PHASE_ORDER:
             raise ValueError("raw phase v2 phase order differs from frozen contract")
@@ -62,6 +119,19 @@ class RawNGSIMPhaseV2Env(RawNGSIMEventTimeEnv):
                 raise ValueError(f"invalid backhaul rate: {key}")
         self.phase_contract = deepcopy(phase_contract)
         self.phase_condition = deepcopy(condition)
+        self.factorial_profile: dict[str, Any] | None = None
+        self.private_base_sources: dict[str, str] = {}
+        if factorial_profile is not None:
+            if set(factorial_profile) != {"base_sharing_enabled", "state_migration_enabled"}:
+                raise ValueError("factorial profile requires exactly two explicit Boolean factors")
+            if any(type(value) is not bool for value in factorial_profile.values()):
+                raise ValueError("factorial profile factors must be Boolean")
+            self.factorial_profile = {
+                "contract_version": FACTORIAL_PROFILE_VERSION,
+                **factorial_profile,
+            }
+            if not factorial_profile["base_sharing_enabled"]:
+                config, instance, self.private_base_sources = _private_base_copies(config, instance)
         super().__init__(config, instance, trace)
         if condition.get("cache_profile") == "all_required_bundles_at_all_rsus":
             self._install_ample_cache()
@@ -139,6 +209,8 @@ class RawNGSIMPhaseV2Env(RawNGSIMEventTimeEnv):
             },
         }
         state["time_profile"] = PROFILE
+        if self.factorial_profile is not None:
+            context["factorial_profile"] = deepcopy(self.factorial_profile)
         return state
 
     def _actual_radio_mbps(self) -> float:
@@ -302,7 +374,10 @@ class RawNGSIMPhaseV2Env(RawNGSIMEventTimeEnv):
         self.metrics["modeled_completion_seconds"] = self.clock_seconds
         if not service_completed:
             self.metrics["service_failures"] += 1
-        if migration_status not in {"not_requested", "delivered"}:
+        migration_enabled = (
+            self.factorial_profile is None or self.factorial_profile["state_migration_enabled"]
+        )
+        if migration_enabled and migration_status not in {"not_requested", "delivered"}:
             self.metrics["migration_failures"] += 1
         if migration_status == "trace_end_pending_delivery":
             self.metrics["pending_state_count"] += 1
@@ -383,6 +458,8 @@ class RawNGSIMPhaseV2Env(RawNGSIMEventTimeEnv):
             "reward_components": components,
             "reward_components_by_profile": components_by_profile,
         }
+        if self.factorial_profile is not None:
+            event["factorial_profile"] = deepcopy(self.factorial_profile)
         info = self._info()
         info["transition"] = event
         info["episode_metrics"] = deepcopy(self.metrics)
@@ -446,7 +523,9 @@ class RawNGSIMPhaseV2Env(RawNGSIMEventTimeEnv):
         if current is None:
             raise RuntimeError("nonfallback action without current coverage passed mask")
         self.execution_owner_rsu_id = None
-        if action == 4:
+        if action == 4 and (
+            self.factorial_profile is None or self.factorial_profile["state_migration_enabled"]
+        ):
             self.metrics["migration_attempts"] += 1
         ledger: list[dict[str, Any]] = []
         cache_events: list[dict[str, Any]] = []
@@ -584,7 +663,13 @@ class RawNGSIMPhaseV2Env(RawNGSIMEventTimeEnv):
                         self._touch_bundle(current, str(node["required_adapter"]))
                         service_completed = True
 
-        if action == 4 and service_completed:
+        if (
+            action == 4 and service_completed and self.factorial_profile is not None
+            and not self.factorial_profile["state_migration_enabled"]
+        ):
+            if migration_status == "not_started":
+                migration_status = "disabled_by_factor"
+        elif action == 4 and service_completed:
             if target is None:
                 migration_status = "no_public_predicted_target"
             elif not prepared:
@@ -653,4 +738,7 @@ class RawNGSIMPhaseV2Env(RawNGSIMEventTimeEnv):
                       phase_condition_id=self.phase_condition["condition_id"],
                       pending_delivery=deepcopy(self.pending_delivery),
                       execution_owner_rsu_id=self.execution_owner_rsu_id)
+        if self.factorial_profile is not None:
+            result["factorial_profile"] = deepcopy(self.factorial_profile)
+            result["private_base_sources"] = deepcopy(self.private_base_sources)
         return result
