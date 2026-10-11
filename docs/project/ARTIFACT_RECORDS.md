@@ -5,6 +5,12 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD phase-v2 second-action4 matched branches
+
+- 事前方案/脚本 commit `da2c8b7474b0f06d8c9f1fa0a6389c95faf85714`，本地 create-only `artifacts/analysis/cscwd_phase_v2_repeated_action4_branches_20261011_v1/`：completion receipt SHA-256 `d84ef73379d1e10e45be396b924db6d16c63ce3943dd39a0c9fe6a40b73a0566`，summary `be57ec84b234e31e9866d768b095d2b25ce58645c7f1c8bc179ff27aee8e9a1d`，integrity `2e34a14a8e4037aaf040da7ed5597ed1c1d31f20db5904c27f204cbf8548dcd6`；3 公共起点/6 分支/45 真实步，0 训练/formal/holdout。
+- 本地独立只读 `artifacts/analysis/cscwd_phase_v2_repeated_action4_branches_audit_20261011_v1/audit.json` SHA-256 `175bc27a84b9e41d823c1a84aadb2f9862a545511f88391fee37b66da3982f0c`，5/5 payload 与 45/45 逐事件守恒通过；开发局部 action3 同服务少字节，不能外推为算法贡献。完整差值/负结果/禁止实施边界见 `cscwd_phase_v2_repeated_action4_branch_result_20261011.md`；原件不入 Git。
+
+
 ## 2026-10-11 CSCWD phase-v2 learned development pilot independent audit
 
 - B 原件 `cscwd_phase_v2_causal_public_pilot_20261011_v1` 执行 commit `5a79ffd018d4c260bc7a8417229a440c7d591fe4`；completion SHA-256 `88c2ac2c1cd7475b9adb3481d07d70cabe5657b4e0ec3c52fca6eb3fc2b0c8c8`、manifest SHA-256 `8750250575566d68bc4c3030994536da6211db9d8aa65a6ce1a3a2173b84ea28`、integrity SHA-256 `1ecea21b8daddbd79c908edf40a5adfbe38b8e411e9e30ffbc48c8974b95acb2`。原件在 B worktree 本地，113/113 hash 通过；子进程 complete，外层 terminal FAIL（原收据 schema 不匹配）。

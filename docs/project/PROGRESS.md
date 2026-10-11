@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-11：第二次 action4 有界配对确认完成，生产策略不变
+
+- 事前冻结 commit `da2c8b7`，一次 create-only 运行 3 个去重 US101 公共起点、6 分支/45 真实环境步；启动/完成回执均留原件，5/5 payload SHA/size 与 45/45 事件时钟/字节/action mask 经独立只读核对通过。summary SHA-256 `be57ec84b234e31e9866d768b095d2b25ce58645c7f1c8bc179ff27aee8e9a1d`，独立 audit SHA-256 `175bc27a84b9e41d823c1a84aadb2f9862a545511f88391fee37b66da3982f0c`；完整结果见 `cscwd_phase_v2_repeated_action4_branch_result_20261011.md`。
+- 三条件中第二次 action4 均完成当前节点但目标先离开；同状态改选 action3 后，同一公开 serve/fallback continuation 下完成/按期/失败不变，分别少传 9,782,424、9,782,424、140,480 bytes，耗时略降。11 条原 pilot 行仅是三个条件的同一 US101 来源重复；公开状态只能见当前有效 prepared prefix 和新的未准备目标，无法由这些样本安全判定目标实际会离开。0 训练/formal/holdout；不修改生产算法、估计器或论文，B `MIXED`/terminal `FAIL` 和 paper-ready=`Unverifiable` 保持。
+
+
 ## 2026-10-11：raw phase v2 learned pilot 独立只读复核，开发判定 MIXED
 
 - B 冻结 run 的子进程完成、113/113 文件完整性通过；外层 terminal 因原收据缺 `scientific_execution_complete` 仍为 `FAIL`，保留双状态，不回填旧原件。A 从 320 learned + 18 rule episode、2,904 行行为账本独立重建完整方法/来源/条件/seed/视图结果，训练 23,040 步、optimizer 3,840 步、80 checkpoint 选择 episode 和 20 selected/update24 身份逐项核验。A 只读摘要 SHA-256 `36540a7b4beb1988bd9b81b38e275cba82d80ef471631d5be8635e7fef0ed9a9`；完整结果见 `cscwd_phase_v2_pilot_independent_evidence_20261011.md`。

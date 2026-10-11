@@ -1,5 +1,10 @@
 ﻿# Decision Log
 
+## 2026-10-11：第二次 action4 局部成本确认后不修改在线策略
+
+- 已完成事前冻结的一次 3 起点/6 分支诊断，action3 在固定 US101 后续规则下保持服务并减少第二次 action4 的无效模型/状态发送；但三个起点来自同一已暴露来源，且当前公开字段只显示新预测目标尚未准备，不足以知道实际交付将失败。决定保留生产算法/动作 mask/reward/估计器；如需公开 target-delivery 可行性门，必须另立独立来源及成功/失败链共同验收任务，不用本次事后标签反向调参。报告 `cscwd_phase_v2_repeated_action4_branch_result_20261011.md`。
+
+
 ## 2026-10-11：raw phase v2 pilot 不晋级，贡献主张继续待证
 
 - B 的一次冻结 learned pilot 在开发来源给出 `MIXED`：候选 SA 相对 control 少重算/短耗时、更多状态字节，完成/按期/失败不变；效果只在 US101 同源重复条件出现。A 独立逐事件复核与之同向，但原外层 terminal 仍 `FAIL`。不固定 SA 优势或强基线排名，不更新论文主表/canonical，formal/holdout 不因该开发结果开启。

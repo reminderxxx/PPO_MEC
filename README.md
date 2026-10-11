@@ -5,7 +5,7 @@
 
 # PPO_MEC
 
-2026-10-11 已事前冻结 [raw phase v2 第二次 action4 有界分支方案](docs/project/cscwd_phase_v2_repeated_action4_branch_plan_20261011.md)：仅三个去重的 US101 开发前缀，action4/action3 同状态配对，最多 6 分支/57 真实步（硬上限 24 分支/192 步）。该方案只检验局部成本与服务，不替代独立基线实验。
+2026-10-11 的 [raw phase v2 第二次 action4 有界分支确认](docs/project/cscwd_phase_v2_repeated_action4_branch_result_20261011.md)按事前[方案](docs/project/cscwd_phase_v2_repeated_action4_branch_plan_20261011.md)一次完成 3 个去重 US101 起点、6 分支/45 真实步。相同公开 continuation 下 action3 在三条件均保持服务并省传输；这仍是单一已暴露来源的局部诊断，尚无安全的公开 abstain 门，不修改生产策略或论文主张。
 
 2026-10-11 的 [CSCWD raw phase v2 learned pilot 独立复核](docs/project/cscwd_phase_v2_pilot_independent_evidence_20261011.md)逐项对账 B 冻结开发原件。候选 SA 重算与耗时下降，但传输增加且服务指标无改善；效果仅见重复 US101 开发来源，外层 terminal 仍 `FAIL`。开发判定 `MIXED`，不晋级算法或固定论文主张。
 
