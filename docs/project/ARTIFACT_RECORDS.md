@@ -5,6 +5,18 @@
 
 # Artifact Records
 
+## 2026-10-11 phase-v2 public observability audit（0 训练）
+
+- 审查源码/A 结果 commit=`6ce0a583…a81b`/`dabd57dc…7603`；pilot behavior、A starts/paired/summary SHA-256=
+  `b3975c21…0eef`/`10aa0537…a68`/`2dc40ac1…d39a`/`be57ec84…e9a1d`。
+- 输入范围：A 3 public starts、6 branches、45 已执行环境步与既有 pilot ledger；新增 1 个 synthetic unit hidden-suffix
+  witness。新 scientific rollout/training/update/checkpoint/evaluation/formal/holdout=`0/0/0/0/0/0/0`。
+- 结果：第二次 action4 是新目标准备；三处事后局部成本支配，但 public info 缺 delivery confidence bound。同完整 public state
+  可对应相反局部动作偏好；当前 candidate 对未校准 prediction 仍给正 prepare supervision。
+- 报告/机器附录：`cscwd_phase_v2_public_observability_audit_20261011.{md,json}`；A 线边界：
+  `cscwd_phase_v2_public_observability_claim_change_20261011.md`。候选仅冻结，未实现/训练，evidence=
+  `E2_ARTIFACT_AUDITED / bounded development diagnosis`。
+
 ## 2026-10-11 phase-v2 pilot terminal contract audit（0 新训练）
 
 - original terminal SHA-256=`2fbf478e…9a1e`，保持 `FAIL/CHILD_EXECUTION_FAILURE_NO_RETRY`；completion/run/integrity/eval

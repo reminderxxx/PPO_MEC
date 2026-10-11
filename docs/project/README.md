@@ -9,6 +9,10 @@
 
 ## Live 文档
 
+- `cscwd_phase_v2_public_observability_audit_20261011.{md,json}`：A 重复 action4 分支后的公共字段权限、缺失语义、
+  同观测异最优见证，以及唯一未校准 positive-prepare abstention 候选；0 训练、未实现策略。
+- `cscwd_phase_v2_public_observability_claim_change_20261011.md`：给 A 论文线的安全/禁止主张，不编辑主稿。
+
 - `cscwd_phase_v2_pilot_terminal_contract_audit_20261011.{md,json}`：绑定旧 terminal/run/analysis hash 的独立只读附录，
   区分科学原件完整、supervisor 合同 FAIL 与算法 `MIXED`，不补造旧字段或重跑。
 

@@ -5,6 +5,18 @@
 
 ﻿# Progress
 
+## 2026-10-11：phase-v2 公共可观测性审查冻结唯一 epistemic abstention 候选
+
+- A 的 3 个公共起点／6 个分支已只读复核：第二次 action4 面向新预测目标 `rsu_2`，不是同目标重发；固定 continuation
+  中 action3 服务相同并节省 `140,480–9,782,424 B` 与 `0.025536–0.724293 s`，但 target departure 只在执行后可知。
+- current/target bundle、prepared prefix、点 contact、confidence/uncertainty、phase estimate 的 producer/consumer/unknown
+  语义已逐字段对账。raw confidence 固定 `.5/.5` 且 `confidence_calibrated=false`；现有 actor、estimator/rule 都不消费
+  calibration flag，candidate 仍把 finite uncertainty 换成 delivery wait 并给上述状态 `prepare, weight=1`。
+- 新合成单元见证确认：相同完整 public info/estimate/label/rule action 可对应 action4 成功或失败，按声明局部序分别偏好
+  action4/action3。因此当前公开字段不能逐状态识别所有可避免准备。
+- 唯一下一候选冻结为 `calibration_provenance_positive_prepare_abstention_v1`：未校准/缺失/unknown 只撤销正 prepare event
+  supervision，不改 serve、slow/fast、PPO、reward、mask 或推理动作权限。本轮未实现、未训练；论文级仍 `Unverifiable`。
+
 ## 2026-10-11：phase-v2 pilot 科学原件 VERIFIED；原 supervisor FAIL 保留
 
 - child rc=0、未 timeout，20 cells/23,040 environment steps/3,840 optimizer steps/80 selection/320 learned eval/18 rule rows

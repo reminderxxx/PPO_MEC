@@ -5,6 +5,10 @@
 
 # PPO_MEC
 
+2026-10-11 的 [phase-v2 公共可观测性审查](docs/project/cscwd_phase_v2_public_observability_audit_20261011.md)
+确认第二次 action4 面向新目标，不是同目标重发；三处事后成本浪费无法由当前单帧公共字段确定识别。现有 candidate 会在
+`confidence_calibrated=false` 时仍给正 prepare 监督，唯一后续候选冻结为 unknown/未校准→abstain；本轮未实现、未训练。
+
 2026-10-11 的 [phase-v2 pilot 终态合同独立审查](docs/project/cscwd_phase_v2_pilot_terminal_contract_audit_20261011.md)
 确认 scientific child 已完整产生 23,040 steps、3,840 optimizer steps、80 selection、320 learned evaluation 与 100 checkpoints，
 113/113 run 文件 hash 一致；outer `FAIL` 的根因是 completion receipt 缺少 supervisor 强制要求的

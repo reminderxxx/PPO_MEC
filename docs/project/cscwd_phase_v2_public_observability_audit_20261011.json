@@ -1,0 +1,156 @@
+{
+  "schema_version": "cscwd_phase_v2_public_observability_audit_v1",
+  "reviewed_at": "2026-10-11",
+  "literature_cutoff": "2026-10-11",
+  "target_venue": "IEEE TMC",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "artifact_run_id": "cscwd_phase_v2_public_observability_audit_20261011_v1",
+  "audit_source_git_commit": "6ce0a583d2b6853a69cecf4e0e37d060b878a81b",
+  "a_branch_result_git_commit": "dabd57dced3f166bc93d4af8e6ddfcc484ed7603",
+  "evidence_level": "E2_ARTIFACT_AUDITED_BOUNDED_DEVELOPMENT_DIAGNOSIS",
+  "read_only_scientific_scope": true,
+  "training_steps": 0,
+  "checkpoint_selection_runs": 0,
+  "formal_or_holdout_reads": 0,
+  "verdict": "PUBLIC_INFORMATION_INSUFFICIENT_FREEZE_ONE_EPISTEMIC_ABSTENTION_CANDIDATE",
+  "source_hashes": {
+    "pilot_behavior_rows_csv": "b3975c212bf5e0e9d9f444e2f32367f530a27f84b3f0ec494384f45ea94b0eef",
+    "phase_v2_public_fixture_json": "1e7da4d92c5e9387438b2bd33d04d6c1b314cbe4dee4dcd03a72c013a65cd8c2",
+    "a_starts_json": "10aa053745c5d16ef876610e6abffcb6ab4081af98cf7376d1f5cac2c2e1ba68",
+    "a_paired_branches_json": "2dc40ac12d649dbd0086e1acc4551e03654d3e078483eee61b98f9b7bb92d39a",
+    "a_summary_json": "be57ec84b234e31e9866d768b095d2b25ce58645c7f1c8bc179ff27aee8e9a1d",
+    "public_estimator_py": "a6b49bd2cfd649abe8208864aa5f76935a54f391ab26bba77cc1bcd3b3c61790",
+    "raw_event_time_env_py": "30666d7c874717d8464a64702c811116e96b931a5db6b57287c6c11d2dcc6575",
+    "raw_phase_v2_env_py": "5a5b888f37a3ec8922d74e3b886d325ae96ee266852d338deb37bf0f0b67d683",
+    "fusion_encoder_py": "e9fb6b8e3fe1c6b2e23db59efefe84166bc505b7c2bec84912848921ad1c4678",
+    "prepared_state_feature_py": "50fc466114882c1ccaf37b9e37c3046c8482bce478eed236068829fdc11b0461",
+    "unit_witness_py": "a7d9c0825b93c834560c45055561cd230dcaecc811245328d96131427a85ff23"
+  },
+  "field_permissions": [
+    {
+      "concept": "current_rsu",
+      "public_fields": ["vehicles[].associated_rsu_id"],
+      "source": "current observed position plus public RSU geometry",
+      "ppo_mappo_actor": "derived readiness and target-difference features; no categorical id",
+      "sa_actor_critic": "selects current RSU embedding",
+      "candidate_rule": "directly consumed",
+      "missing_semantics": "no coverage restricts mask to fallback"
+    },
+    {
+      "concept": "predicted_target",
+      "public_fields": ["predictions.predicted_first_handoff_rsu_by_vehicle", "predictions.next_rsu_sequence"],
+      "source": "last-two-observed-points constant-velocity extrapolation",
+      "ppo_mappo_actor": "target exists/differs and target readiness",
+      "sa_actor_critic": "target embedding and temporal features",
+      "candidate_rule": "directly consumed",
+      "missing_semantics": "target prepare no; no actual-future fallback"
+    },
+    {
+      "concept": "bundle_readiness",
+      "public_fields": ["calibrated_context.required_bundle_ids", "calibrated_context.object_catalog", "rsus[].typed_resident_object_ids", "rsus[].cache_capacity", "rsus[].cache_used_bytes"],
+      "source": "past committed typed-cache state",
+      "ppo_mappo_actor": "current and target readiness plus occupancy",
+      "sa_actor_critic": "per-RSU and per-node readiness",
+      "candidate_rule": "readiness, bytes, load, conservative admission",
+      "missing_semantics": "missing catalog/RSU or private eviction order becomes unknown"
+    },
+    {
+      "concept": "prepared_state_prefix",
+      "public_fields": ["calibrated_context.prepared_state_prefix.current", "calibrated_context.prepared_state_prefix.predicted_target"],
+      "source": "past successfully committed workflow-state prefix",
+      "ppo_mappo_actor": "seven v4 scalars",
+      "sa_actor_critic": "current/target RSU prefix features",
+      "candidate_rule": "valid/stale/missing/unknown",
+      "missing_semantics": "unknown target encodes zero values plus known mask false"
+    },
+    {
+      "concept": "current_contact_point_estimate",
+      "public_fields": ["calibrated_context.contact_budget_seconds", "predictions.dwell_time"],
+      "source": "last-two-observed-points velocity and current-RSU circle intersection",
+      "ppo_mappo_actor": "normalized contact scalar; dwell_time unused in calibrated flat path",
+      "sa_actor_critic": "normalized contact and derived current-boundary margin",
+      "candidate_rule": "input-upload contact fit only",
+      "missing_semantics": "estimator unknown; actor numeric fallback is zero"
+    },
+    {
+      "concept": "contact_or_delivery_confidence_bounds",
+      "public_fields": [],
+      "source": "unavailable",
+      "ppo_mappo_actor": "unavailable",
+      "sa_actor_critic": "unavailable",
+      "candidate_rule": "unavailable",
+      "missing_semantics": "must remain unknown; scalar confidence is not a bound"
+    },
+    {
+      "concept": "prediction_confidence",
+      "public_fields": ["predictions.prediction_confidence_by_vehicle", "predictions.prediction_uncertainty_by_vehicle", "predictions.causal_provenance.confidence_calibrated"],
+      "source": "raw profile fixed 0.5/0.5 with confidence_calibrated false",
+      "ppo_mappo_actor": "consumes confidence and uncertainty; ignores calibration provenance",
+      "sa_actor_critic": "derives reliability/gates; ignores calibration provenance",
+      "candidate_rule": "uses uncertainty times delivery timeout; ignores calibration provenance",
+      "missing_semantics": "missing uncertainty abstains; finite uncalibrated uncertainty currently permits positive prepare"
+    },
+    {
+      "concept": "phase_estimates",
+      "public_fields": ["calibrated_context.phase_contract.input_upload", "calibrated_context.phase_contract.backhaul", "calibrated_context.phase_contract.queue", "calibrated_context.phase_contract.target_delivery"],
+      "source": "declared simulation assumptions, not measurements",
+      "ppo_mappo_actor": "not directly consumed",
+      "sa_actor_critic": "not directly consumed",
+      "candidate_rule": "directly consumed for conditional time and timeout checks",
+      "missing_semantics": "required unknowns fail closed or schema error"
+    },
+    {
+      "concept": "realized_future",
+      "public_fields": [],
+      "source": "hidden trace, actual rates and post-step outcome",
+      "ppo_mappo_actor": "forbidden online",
+      "sa_actor_critic": "forbidden online",
+      "candidate_rule": "forbidden online",
+      "missing_semantics": "must not be imputed by clone, outcome label or actual route"
+    }
+  ],
+  "a_repeated_action4": {
+    "public_start_count": 3,
+    "branch_count": 6,
+    "environment_steps": 45,
+    "current_rsu_id": "rsu_1",
+    "predicted_target_rsu_id": "rsu_2",
+    "current_prefix_valid": true,
+    "target_prefix_valid": false,
+    "event_label": "prepare",
+    "event_supervision_weight": 1.0,
+    "all_action4_outcomes": "target_departed_before_delivery",
+    "all_action3_service_outcomes_equal": true,
+    "locally_dominated_condition_count": 3,
+    "max_abs_action4_probability_change_from_previous_step": 0.000541
+  },
+  "same_observation_witness": {
+    "fixture_type": "synthetic_unit_hidden_suffix_pair",
+    "public_info_equal": true,
+    "public_estimate_equal": true,
+    "public_label_equal": true,
+    "public_rule_actions_equal": true,
+    "forward_action4_migration_success": true,
+    "reverse_action4_migration_success": false,
+    "declared_local_order_forward_preference": "action4",
+    "declared_local_order_reverse_preference": "action3",
+    "scientific_rollout": false
+  },
+  "single_candidate": {
+    "name": "calibration_provenance_positive_prepare_abstention_v1",
+    "status": "FROZEN_NOT_IMPLEMENTED_NOT_TRAINED",
+    "single_variable": "require predictions.causal_provenance.confidence_calibrated is true before positive prepare supervision",
+    "unknown_semantics": "false_missing_invalid_or_unknown_to_abstain_weight_zero",
+    "unchanged": ["serve labels", "slow auxiliary", "fast auxiliary", "PPO loss", "reward", "observation", "action mask", "optimizer", "rule objective"],
+    "forbidden": ["actual route", "actual link", "exact transition clone", "hardcoded source seed time or failure point", "ban action4 after delivery", "benefit-tuned threshold"]
+  },
+  "claim_boundary": {
+    "implementation_bug": false,
+    "overall_service_degradation_root_cause_proven": false,
+    "algorithm_improvement_proven": false,
+    "development_only": true,
+    "formal": false,
+    "holdout": false,
+    "paper_ready": false
+  }
+}

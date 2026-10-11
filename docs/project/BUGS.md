@@ -5,6 +5,17 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：OPEN / 未校准 target-delivery 被提升为正 prepare 监督
+
+- `OBSERVABILITY LIMIT`：raw phase-v2 没有 target-entry/dwell/contact 的 confidence bound；只公开最近两点常速预测、点 contact
+  与固定 `.5/.5` confidence/uncertainty。同公开状态可对应相反 delivery outcome 和局部动作偏好，不能从事后失败硬编码 guard。
+- `LEARNING-DESIGN GAP`：estimator 用 `uncertainty × delivery_timeout` 形成点等待估计，只要 finite 即将 delivery 标为 `yes`；
+  `causal_provenance.confidence_calibrated=false` 未被 actor、candidate 或 public rule 消费。A 的三个第二次 action4 起点因此仍为
+  `prepare, weight=1`。这是可干预疑点，不是已证总体根因或执行器 bug。
+- `FROZEN / NOT IMPLEMENTED`：唯一候选是 positive-prepare calibration abstention；false/missing/unknown→abstain，serve 与其他
+  loss 不变。没有 calibrated=true producer/source-disjoint calibration record 前不得改成阈值、启动 confirmatory 或宣称收益。
+- `CLAIM RISK`：A 的三处局部成本支配来自已暴露单一 US101 来源；不得当独立样本、在线识别能力、SA 优势或 paper-ready 证据。
+
 ## 2026-10-11：phase-v2 pilot terminal producer/consumer schema mismatch
 
 - `HISTORICAL TERMINAL FAIL / ARTIFACT VERIFIED`：旧 child completion status=complete 且预算/文件完整，但缺 supervisor 必需的
