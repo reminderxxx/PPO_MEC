@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `cscwd_phase_v2_repeated_action4_branch_plan_20261011.md`：B pilot 11 次第二次 action4 失败的三个去重公共起点与有界配对确认的运行前方案；结果需以独立 create-only 原件及后续报告为准。
+
 - `cscwd_phase_v2_pilot_independent_evidence_20261011.md`：B raw phase v2 learned pilot 的 A 只读全方法/逐事件复算、MIXED 开发结论、外层 terminal FAIL 与论文不可验证边界。
 
 - `cscwd_raw_phase_v2_frozen_contract_20261011.md`：方案 B 已授权的输入上传、原站跨接触计算、RSU backhaul、状态交付与两窗 60 episode 开发矩阵事前合同。

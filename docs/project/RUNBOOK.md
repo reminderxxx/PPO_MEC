@@ -5,6 +5,18 @@
 
 # Runbook
 
+## CSCWD phase-v2 第二次 action4 有界配对确认（2026-10-11）
+
+事前范围、11 次原始见证/3 个去重起点和停止规则见 `cscwd_phase_v2_repeated_action4_branch_plan_20261011.md`。下列是获授权的**一次**开发运行命令；根目录必须不存在，脚本要求 clean commit、验证 B pilot/输入 SHA，并在创建 root 后保存启动/完成或失败回执。失败后不自动重试，不按新结果补条件或 seed：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_cscwd_phase_v2_repeated_action4_branch.py
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/confirm_cscwd_phase_v2_repeated_action4.py \
+  --pilot-protocol /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/configs/experiment/cscwd_phase_v2_causal_public_pilot_v1.json \
+  --pilot-run-root /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/artifacts/experiments/cscwd_phase_v2_causal_public_pilot_20261011_v1 \
+  --output-root artifacts/analysis/cscwd_phase_v2_repeated_action4_branches_20261011_v1
+```
+
 ## CSCWD raw phase v2 learned pilot 独立只读复核（2026-10-11）
 
 先读 `cscwd_phase_v2_pilot_independent_evidence_20261011.md`：B 子进程原件完整而外层 terminal 因原收据字段缺失为 `FAIL`，pilot 仅 development `MIXED`。A 入口只读 B 冻结原件、不调用环境/训练或下载数据；输出 root 必须不存在，不覆盖已完成 `v3`。下列为已执行命令记录，复跑时换新的 create-only root：

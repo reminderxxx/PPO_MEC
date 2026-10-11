@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+2026-10-11 已事前冻结 [raw phase v2 第二次 action4 有界分支方案](docs/project/cscwd_phase_v2_repeated_action4_branch_plan_20261011.md)：仅三个去重的 US101 开发前缀，action4/action3 同状态配对，最多 6 分支/57 真实步（硬上限 24 分支/192 步）。该方案只检验局部成本与服务，不替代独立基线实验。
+
 2026-10-11 的 [CSCWD raw phase v2 learned pilot 独立复核](docs/project/cscwd_phase_v2_pilot_independent_evidence_20261011.md)逐项对账 B 冻结开发原件。候选 SA 重算与耗时下降，但传输增加且服务指标无改善；效果仅见重复 US101 开发来源，外层 terminal 仍 `FAIL`。开发判定 `MIXED`，不晋级算法或固定论文主张。
 
 2026-10-11 已批准并事前冻结 [CSCWD raw phase v2 物理与开发矩阵合同](docs/project/cscwd_raw_phase_v2_frozen_contract_20261011.md)：输入在当前接触内完成后，原 RSU 可继续节点计算，状态只在成功后经有成本的模拟 RSU 链路交付目标。独立 opt-in 环境通过[原始轨迹预检](docs/project/cscwd_raw_phase_v2_environment_acceptance_20261011.md)；[冻结 60 格开发机制矩阵](docs/project/cscwd_raw_phase_v2_mechanism_matrix_20261011.md)有 9 次成功交付及 9 次目标先离开失败（同一来源重复条件/策略），只证明模拟机制可执行，不能形成算法或论文排名。旧 v1 和论文结果不改。

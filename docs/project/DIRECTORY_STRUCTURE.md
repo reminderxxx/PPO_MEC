@@ -1,5 +1,10 @@
 ﻿# Directory Structure
 
+## 2026-10-11 CSCWD phase-v2 第二次 action4 有界分支
+
+- `docs/project/cscwd_phase_v2_repeated_action4_branch_plan_20261011.md`：运行前冻结的三个开发公共前缀、配对动作、后续公开规则、主判据和单次硬预算。
+- `scripts/confirm_cscwd_phase_v2_repeated_action4.py`、`tests/test_cscwd_phase_v2_repeated_action4_branch.py`：只读 B 旧行为和原始来源，按同一环境起点离线复制 action4/action3 分支；正式输出 create-only `artifacts/analysis/cscwd_phase_v2_repeated_action4_branches_20261011_v1/`，忽略 Git；不改生产算法或训练器。
+
 ## 2026-10-11 CSCWD phase-v2 learned pilot 独立只读审计
 
 - `scripts/audit_cscwd_phase_v2_pilot_independent.py`、`tests/test_cscwd_phase_v2_pilot_independent_audit.py`：消费 B 冻结运行原件、逐步重算方法结果与事件归因，不调用环境或训练器；输出 create-only `artifacts/analysis/cscwd_phase_v2_pilot_independent_audit_20261011_v3/`，本地忽略 Git。报告 `docs/project/cscwd_phase_v2_pilot_independent_evidence_20261011.md`；B 原始 run/checkpoint 不进入此分支。

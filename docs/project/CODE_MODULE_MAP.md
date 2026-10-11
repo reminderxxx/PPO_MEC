@@ -1,5 +1,7 @@
 # Code Module Map
 
+`scripts/confirm_cscwd_phase_v2_repeated_action4.py` 在已冻结 B pilot 行为上只注册 US101 三个去重第二次 action4 起点，然后调用未修改的 `RawNGSIMPhaseV2Env` 重放一次共同首步并复制同状态分支。首动作 4/3，后续只由公开 action mask 选择 serve 或 fallback；隐藏实际未来仅进入环境物理结算与事后事件，脚本硬限分支/真实步并输出本地 create-only 回执、配对与完整性。它不加载 checkpoint、训练、改变 reward 或为在线决策调用 exact clone。
+
 `scripts/audit_cscwd_phase_v2_pilot_independent.py` 是独立只读 consumer：按 SHA 锁定 B 原 pilot 的收据、manifest、完整性清单和评估行，从训练/checkpoint 及行为 CSV 重建所有 episode/成本/奖励、同实例配对与观察到的模型/状态后续使用；只写本地 create-only 分析 root，不调用环境、agent、训练器或外部真实数据。`tests/test_cscwd_phase_v2_pilot_independent_audit.py` 覆盖失败分母、成本拒绝和非因果事件标签。
 
 `src/envs/core/raw_ngsim_phase_v2_env.py` 是继承 v1 轨迹/公共前缀几何、但独立 opt-in 的串行相位 producer：只在真实 `step` 使用未来实际位置检验输入接触与目标交付，`_info()` 仅加估计阶段合同；显式禁止 hidden-future exact decision clone。输入、模型、计算、状态、恢复、交付各自计时计字节，完整提交 typed cache/state 与节点完成分开。`scripts/audit_cscwd_raw_phase_v2_preflight.py` 锁定源/配置 hash，只做两条开发轨迹各一次真实 reset/step，输出公开 fixture 与明确 privileged 的事件账本；`tests/test_raw_ngsim_phase_v2_env.py` 覆盖 synthetic 正负边界。B 的估计器/规则/SA 为独立消费者，需再按公开 fixture 验收，不能读取本脚本的 privileged transition。
