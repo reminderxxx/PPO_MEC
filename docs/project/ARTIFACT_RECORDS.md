@@ -5,6 +5,10 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD raw phase v2 frozen development matrix
+
+- 本地 create-only `artifacts/analysis/cscwd_raw_phase_v2_mechanism_matrix_20261011_v1/matrix_manifest.json` SHA-256 `cb581f6871c0928f13f58f14fb77568290277247dc7de8c03ed355aeeca4bc2c`、`step_ledger.jsonl` SHA-256 `bfb2d6743266a24c2a37bf9b714a53f723f0595e6215ec82a8a0d348c9c64028`；独立只读审计 `artifacts/analysis/cscwd_raw_phase_v2_matrix_audit_20261011_v1/audit.json` SHA-256 `30d821d4fb7c2e8d26c85378e4824fa4a782f62bf6eb1181510f0fe9bf56db8d`：冻结 60 episode/522 real step/731 preview 上界，来源/环境/公共规则/预检 SHA 锁定，全部 cell/时钟/字节/事件计数守恒通过。v2 18 次 action4 有 9 成功交付、9 目标先离开；来自同一 US101 开发来源的重复条件/方法。完整负结果及禁止算法排名见 `cscwd_raw_phase_v2_mechanism_matrix_20261011.md`；0 训练/formal/hidden。
+
 ## 2026-10-11 CSCWD raw phase v2 local preflight
 
 - 本地 create-only `artifacts/analysis/cscwd_raw_phase_v2_preflight_20261011_v3/preflight.json` SHA-256 `9b26892522a99c5e50189925c8c08affae89ade55fe8512f8f6c0e9cf09245ed`：锁定来源/配置/环境 SHA，两条 118.8 s development 轨迹各执行 1 个真实 step；Lankershim action3 节点完成，US101 action4 节点完成并交付，阶段时间/字节守恒。`public_fixture.json` SHA-256 `1e7da4d92c5e9387438b2bd33d04d6c1b314cbe4dee4dcd03a72c013a65cd8c2`，内嵌三字段 info hash 复算一致；B 已独立消费该公开 fixture。早期 v2 root 因内嵌 hash 范围错误留失败见证，不引用为通过原件。报告 `cscwd_raw_phase_v2_environment_acceptance_20261011.md`；0 训练/formal/hidden。

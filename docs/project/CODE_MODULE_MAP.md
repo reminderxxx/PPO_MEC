@@ -4,6 +4,8 @@
 
 `scripts/run_cscwd_raw_phase_v2_mechanism_matrix.py` 在独立消费者门通过后才运行冻结的两窗×`dev_01`×三条件×v1/v2×五方法矩阵。它要求显式公共规则文件 SHA，锁定原始来源、预检、合同与两个环境源码，逐 cell 检查时钟/相位/字节和总预算；规则入口仅接收公开 `_info()`，真实结果仅在 step 之后写本地 create-only 账本。v2 的 public two-step 因缺少可公开重建的下一步二维移动输入，按 B 规则降级为同一 immediate score，不当作独立强基线；v1 的 adverse backhaul 条件没有物理 backhaul 效果。
 
+`scripts/audit_cscwd_raw_phase_v2_mechanism_matrix.py` 与环境/规则解耦，只读 hash 锁定的矩阵 manifest/step ledger，再核 60 个唯一 cell、预算、逐步时钟、v2 相位/字节、episode 完成/失败计数和全部 30 组聚合；不重算策略或替换原件。
+
 `scripts/freeze_cscwd_new_development_source.py` 只读已提交 split/future-validation 来源元数据和本机 NGSIM CSV，对 v27/v28/v71 formal/hidden 原始时间作带 embargo 排除，对 v8/v17/v20 匿名计划的原始读取前缀整体隔离；输出不含坐标或算法结果的来源 manifest 与候选理由。`tests/test_cscwd_new_development_source.py` 用合成车辆帧锁定禁区切分和同时间车辆选择。
 
 `scripts/audit_cscwd_new_development_reachability.py` 消费来源 manifest、冻结 workload、现有 `RawNGSIMEventTimeEnv` 与 B 分支按 SHA 锁定的 public immediate/two-step 方法；不改算法或训练器。真实未来接触只写入明确 privileged 的本地诊断字段，规则入口仅接收环境公开 `_info()`。`tests/test_cscwd_new_development_reachability.py` 检查精确源车帧重建及动作 mask fallback。

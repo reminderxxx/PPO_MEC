@@ -5,10 +5,15 @@
 
 ﻿# Progress
 
+## 2026-10-11：冻结 raw phase v2 机制矩阵完成，算法与论文晋级仍未验证
+
+- 在 B 独立公开消费者实际类门通过后，一次运行事前固定的两窗×`dev_01`×三条件×v1/v2×五方法：60 episode/522 real step/731 preview 上界；唯一 cell、逐步时钟与传输账本只读复核通过。机器 manifest SHA-256 `cb581f6871c0928f13f58f14fb77568290277247dc7de8c03ed355aeeca4bc2c`，ledger SHA-256 `bfb2d6743266a24c2a37bf9b714a53f723f0595e6215ec82a8a0d348c9c64028`，独立审计 SHA-256 `30d821d4fb7c2e8d26c85378e4824fa4a782f62bf6eb1181510f0fe9bf56db8d`，完整表见 `cscwd_raw_phase_v2_mechanism_matrix_20261011.md`。
+- v2 的 18 次 action4 为同一 US101 来源在条件/方法上的重复：9 成功交付、9 目标先离开；默认两个已暴露窗口的 public immediate 为 2/2 按期、0 service failure，但这不是独立优势证据。v2 two-step 缺少公开的下一步二维移动信息而降级为 immediate；v1 adverse backhaul 条件无作用。P/serve 与 I/T 存在成本、失败、迁移 trade-off，不能宣称单一全面最优。0 learned 训练/formal/hidden；优秀基线、SA 贡献、paper-ready=`Unverifiable`。
+
 ## 2026-10-11：raw phase v2 环境与原始来源预检通过；消费者门仍待独立验收
 
 - 独立 opt-in `RawNGSIMPhaseV2Env` 按冻结串行合同实现输入接触、原站持续计算、模拟 backhaul、状态生成后传输与目标交付；v1 源码 SHA 未变。合成及相关局部测试 `18 passed`，真实两条 118.8 s 开发来源各一次合法 step：Lankershim action3 完成节点，US101 action4 完成节点并迁移，全部相位时间/字节守恒。预检 SHA-256 `9b26892522a99c5e50189925c8c08affae89ade55fe8512f8f6c0e9cf09245ed`，报告 `cscwd_raw_phase_v2_environment_acceptance_20261011.md`。
-- 首版公开 fixture 的内嵌 hash 与所存三字段范围不一致，B 独立门拒绝；保留失败 v2 root，重建 create-only v3 fixture SHA-256 `1e7da4d92c5e9387438b2bd33d04d6c1b314cbe4dee4dcd03a72c013a65cd8c2` 并复算一致。B consumer、SA/checkpoint、60-cell 矩阵及训练结果尚未完成；0 formal/hidden，paper-ready=`Unverifiable`。
+- 首版公开 fixture 的内嵌 hash 与所存三字段范围不一致，B 独立门拒绝；保留失败 v2 root，重建 create-only v3 fixture SHA-256 `1e7da4d92c5e9387438b2bd33d04d6c1b314cbe4dee4dcd03a72c013a65cd8c2` 并复算一致。本节记录预检当时状态；B 消费者及矩阵已随后通过，learned 训练与 formal/hidden 仍无结果。
 - 冻结矩阵执行入口已完成源码和 30-cell 合成链路检查（262 synthetic step、预览上界 367），未读取真实矩阵结果；固定规则只接受公开 `_info()`，真实执行仍以消费者实际类/SA/checkpoint 验收通过为前置门。v2 two-step 降级到 immediate 能力，不能把两行视为独立强方法胜负。
 
 ## 2026-10-11：方案 B raw phase v2 获授权并事前冻结，尚未产生新性能结果

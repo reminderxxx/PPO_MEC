@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：raw phase v2 开发矩阵后的科学边界
+
+- `RESOLVED ENGINEERING / OPEN SCIENCE`：逐相位真实 step 与固定矩阵中成功交付可达，但 18 次 action4 只有 9 次交付，另 9 次目标已先离开；全部来自同一个 US101 开发来源的重复条件/方法，不构成独立统计。v1 整步阻断是历史物理版本事实，v1/v2 差值不能解释为算法改善。`cscwd_raw_phase_v2_mechanism_matrix_20261011.md` 保留所有失败与字节成本。
+- `OPEN / baseline and ablation`：v2 public two-step 因下一步二维 mobility 不可公开重建而降级为 immediate，不能算独立强基线。固定矩阵没有同起点单因素 model prep 开关或 state migration vs legal recompute 分支；ample cache 只是资源条件变化。SA 与其他 learned 方法尚无匹配训练原件，论文贡献/paper-ready 仍 `Unverifiable`。
+
 ## 2026-10-11：raw phase v2 工程验收后的开放边界
 
 - `RESOLVED IN OPT-IN V2 / engineering`：逐相位合同已有独立环境与两条原始 development 的真实 step 正例，部分传输、目标离开、trace end 等负例由合成测试覆盖；v1 整步接触诊断仍是其历史版本事实。模拟 RSU 几何、backhaul 和零共享队列未做真实系统测量，不能把迁移成功写成部署效果。

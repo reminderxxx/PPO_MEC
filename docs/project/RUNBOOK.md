@@ -20,7 +20,27 @@
   --output-root artifacts/analysis/cscwd_raw_phase_v2_preflight_20261011_v3
 ```
 
-消费者实际类/SA/checkpoint 门通过后，`scripts/run_cscwd_raw_phase_v2_mechanism_matrix.py` 接受 B 冻结公共规则文件路径与精确 SHA，另需原始 CSV、来源 manifest、最终 `v3` 预检及公开 fixture；输出必须是新的不存在的 `artifacts/analysis/` root。入口自行核验 60 格、2,880 real step、10,000 preview 上限与逐步守恒。当前仅通过 synthetic 入口检查，未执行真实矩阵；B 门未通过时不能以此入口试跑或改条件。
+公开规则的实际环境类/fixture 门通过后，`scripts/run_cscwd_raw_phase_v2_mechanism_matrix.py` 接受 B 冻结公共规则文件路径与精确 SHA，另需原始 CSV、来源 manifest、最终 `v3` 预检及公开 fixture；输出必须是新的不存在的 `artifacts/analysis/` root。入口自行核验 60 格、2,880 real step、10,000 preview 上限与逐步守恒。SA/checkpoint 的完整门另约束后续 learned pilot，不以本矩阵代替。已执行的 create-only `v1` 矩阵报告见 `cscwd_raw_phase_v2_mechanism_matrix_20261011.md`；如需复算，先在新 root 锁定相同输入 SHA，不覆盖原件。完整命令记录：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_cscwd_raw_phase_v2_mechanism_matrix.py \
+  --raw-csv-path '/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
+  --source-manifest artifacts/analysis/cscwd_new_development_source_20261011_v2/source_manifest.json \
+  --preflight artifacts/analysis/cscwd_raw_phase_v2_preflight_20261011_v3/preflight.json \
+  --public-fixture artifacts/analysis/cscwd_raw_phase_v2_preflight_20261011_v3/public_fixture.json \
+  --public-estimator-path /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/src/agents/causal_public_action_estimator.py \
+  --public-estimator-sha256 a6b49bd2cfd649abe8208864aa5f76935a54f391ab26bba77cc1bcd3b3c61790 \
+  --output-root artifacts/analysis/cscwd_raw_phase_v2_mechanism_matrix_20261011_v1
+```
+
+只读复核命令（同样是已执行记录；复跑须换新的 output root）：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_cscwd_raw_phase_v2_mechanism_matrix.py \
+  --matrix-manifest artifacts/analysis/cscwd_raw_phase_v2_mechanism_matrix_20261011_v1/matrix_manifest.json \
+  --step-ledger artifacts/analysis/cscwd_raw_phase_v2_mechanism_matrix_20261011_v1/step_ledger.jsonl \
+  --output-root artifacts/analysis/cscwd_raw_phase_v2_matrix_audit_20261011_v1
+```
 
 ## CSCWD 新 development 长轨迹来源资格（2026-10-11；结果盲）
 
