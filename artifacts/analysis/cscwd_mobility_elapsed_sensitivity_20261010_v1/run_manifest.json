@@ -1,0 +1,63 @@
+{
+  "actual_environment_steps": 528,
+  "all_step_calls_excluding_local_tests": 2622,
+  "completed_episodes": 80,
+  "decision_model_preview_steps": 2094,
+  "files": [
+    {
+      "path": "episode_rows.json",
+      "rows": 80,
+      "sha256": "6c7b734d2038cd0c0b6d135ee1cda52bfcd6fae92d0ecd92a2da4de7593e3106"
+    },
+    {
+      "path": "transition_rows.json",
+      "rows": 528,
+      "sha256": "a48a965be7fc9f4f5813c50433249b7ee0b288025f003e4c0a8f7c6b5a7138a8"
+    },
+    {
+      "path": "aggregate_summary.json",
+      "sha256": "a418a042509111754461fa8ce7870db2e101e2364f5986da4e5a595f40083ac1"
+    },
+    {
+      "path": "legacy_replay_receipt.json",
+      "sha256": "4eb3289cedc53c9fd553f427807face52caa50be0dfe11e4deff31e522776bba"
+    }
+  ],
+  "instance_ids": [
+    "dev_01",
+    "regression_00",
+    "regression_05",
+    "frozen_check_05",
+    "dev_00",
+    "frozen_check_02",
+    "frozen_check_04",
+    "frozen_check_06"
+  ],
+  "legacy_replay_matched_steps": 144,
+  "methods": [
+    "old_sa",
+    "event_abstention_sa",
+    "ppo",
+    "mappo",
+    "two_step"
+  ],
+  "plan_commit": "428cdc48a9791523d68c57fa8ca7f6372ef256f1",
+  "profiles": [
+    "decision_step_original",
+    "synthetic_elapsed_5s_atomic_v1"
+  ],
+  "protocol_sha256": "61295f49d03ce2f9c4f2b8cf644bc66d6a0436f43b10a61ad9b846776b54b6c4",
+  "run_id": "cscwd_mobility_elapsed_sensitivity_20261010_v1",
+  "schema_version": "cscwd_mobility_elapsed_sensitivity_v1",
+  "seed": 7,
+  "source_code_sha256": {
+    "scripts/run_calibrated_workflow_event_aux_abstention_ab.py": "07ca5a11cf1c1a5c98b3960ffb558b72a8364d59b622079debced8dacd04bc72",
+    "scripts/run_calibrated_workflow_interface_repair.py": "784892709f85d5aca19f889d9d2ed70ba8c983336416136df0d9cce46204df8f",
+    "scripts/run_calibrated_workflow_strong_baselines.py": "f8274cec0da7e0973c518e31fe66844ff9a1bbe900f537703f8f8184b981b468",
+    "src/agents/sa_ghmappo_core.py": "74b1bd1adde037b9e3076057ac32a65c835bc6cca5d3460c5dba2e3429ddf130",
+    "src/envs/core/calibrated_continuous_workflow_env.py": "c6ded6ce84230519160a40f29e276b5823eb204a35e31c35f914d1c6bfee3a59"
+  },
+  "source_commit": "89be4d673bef7ecaf00c94d76e23f5eaa71cc90b",
+  "source_root": "/Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC",
+  "status": "complete"
+}

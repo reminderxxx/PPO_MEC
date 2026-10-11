@@ -1,0 +1,97 @@
+{
+  "action2_logit_positive_sensitivity_count": 1200,
+  "arm_endpoint": {
+    "candidate_selected": {
+      "actor_encoder_norm_mean": 1.2388003468513489,
+      "checkpoint_slots": 5,
+      "eligible": 288,
+      "event_ce_negative_cosine_event_actor": 2,
+      "event_supervised": 215,
+      "executed_action_2": 55,
+      "fast_ce_negative_cosine_fast_actor": 3,
+      "fast_ce_negative_cosine_shared_encoder": 3,
+      "fast_ce_weighted_encoder_norm_mean": 0.21369386790320277,
+      "fast_ce_weighted_loss_mean": 0.028270812018308788,
+      "fast_target_0": 300,
+      "slow_ce_negative_cosine_slow_actor": 4,
+      "steps": 300,
+      "value_weighted_encoder_norm_mean": 18.24157657623291
+    },
+    "candidate_update96": {
+      "actor_encoder_norm_mean": 2.0860045552253723,
+      "checkpoint_slots": 5,
+      "eligible": 287,
+      "event_ce_negative_cosine_event_actor": 2,
+      "event_supervised": 206,
+      "executed_action_2": 57,
+      "fast_ce_negative_cosine_fast_actor": 2,
+      "fast_ce_negative_cosine_shared_encoder": 3,
+      "fast_ce_weighted_encoder_norm_mean": 0.23151905298000203,
+      "fast_ce_weighted_loss_mean": 0.028156805952312423,
+      "fast_target_0": 300,
+      "slow_ce_negative_cosine_slow_actor": 3,
+      "steps": 300,
+      "value_weighted_encoder_norm_mean": 18.368569564819335
+    },
+    "control_selected": {
+      "actor_encoder_norm_mean": 1.469167125225067,
+      "checkpoint_slots": 5,
+      "eligible": 286,
+      "event_ce_negative_cosine_event_actor": 3,
+      "event_supervised": 286,
+      "executed_action_2": 44,
+      "fast_ce_negative_cosine_fast_actor": 5,
+      "fast_ce_negative_cosine_shared_encoder": 5,
+      "fast_ce_weighted_encoder_norm_mean": 0.21907224655151367,
+      "fast_ce_weighted_loss_mean": 0.027331059239804743,
+      "fast_target_0": 300,
+      "slow_ce_negative_cosine_slow_actor": 5,
+      "steps": 300,
+      "value_weighted_encoder_norm_mean": 25.920140266418457
+    },
+    "control_update96": {
+      "actor_encoder_norm_mean": 1.5143810153007506,
+      "checkpoint_slots": 5,
+      "eligible": 287,
+      "event_ce_negative_cosine_event_actor": 3,
+      "event_supervised": 287,
+      "executed_action_2": 44,
+      "fast_ce_negative_cosine_fast_actor": 4,
+      "fast_ce_negative_cosine_shared_encoder": 5,
+      "fast_ce_weighted_encoder_norm_mean": 0.20231710486114024,
+      "fast_ce_weighted_loss_mean": 0.02559193461202085,
+      "fast_target_0": 300,
+      "slow_ce_negative_cosine_slow_actor": 4,
+      "steps": 300,
+      "value_weighted_encoder_norm_mean": 23.779018592834472
+    }
+  },
+  "checkpoint_slots": 20,
+  "max_executed_logprob_abs_error": 5.066394805908203e-07,
+  "schema_version": "cscwd_fast_aux_gradient_probe_summary_v1",
+  "status": "fixed_policy_new_probe_not_historical_training",
+  "strata_counts": {
+    "deadline_bin": {
+      "(10,40]s": 419,
+      "<=10s": 122,
+      ">40s": 465,
+      "unknown": 194
+    },
+    "missing_bytes_bin": {
+      "(0,100MB]": 75,
+      ">100MB": 269,
+      "zero": 856
+    },
+    "predicted_contact_bin": {
+      "(5,15]s": 624,
+      "<=5s": 576
+    },
+    "readiness": {
+      "missing": 344,
+      "ready": 856
+    }
+  },
+  "total_environment_steps": 1200,
+  "unique_checkpoint_file_sha256": 20,
+  "unique_network_parameter_sha256": 13
+}

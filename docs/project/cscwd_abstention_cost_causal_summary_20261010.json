@@ -1,0 +1,61 @@
+{
+  "schema_version": "cscwd_abstention_cost_causal_summary_v1",
+  "reviewed_at": "2026-10-10 Asia/Shanghai",
+  "source_candidate_run_id": "cscwd_event_aux_abstention_ab_20261010_v1",
+  "source_control_run_id": "cscwd_causal_prepared_state_visibility_matched_20261010_v1",
+  "scientific_verdict_unchanged": "MIXED_STOPPED",
+  "predeclared_plan_commit": "5102b4835794308efa6cb4c500e878c259276840",
+  "bounded_audit": {
+    "root": "artifacts/analysis/cscwd_abstention_cost_causal_20261010_v2",
+    "manifest_sha256": "859abe71b5465cceeb20787a429ec932274177311d181a724f47e404cc35c4b7",
+    "selected_sources": 11,
+    "branch_count": 26,
+    "counterfactual_env_steps": 105,
+    "recorded_action_replay_steps": 4203,
+    "training_steps": 0,
+    "formal_holdout_reads": 0
+  },
+  "supplement": {
+    "root": "artifacts/analysis/cscwd_abstention_cost_causal_supplement_20261010_v2",
+    "manifest_sha256": "ee49c70bff27b14e3360e92872dc957669f72722d8944573e21d5e4f79c15bc9",
+    "paired_metric_rows": 330,
+    "selected_target_rows": 11
+  },
+  "selected_mean_per_episode": {
+    "on_time_control": 0.38,
+    "on_time_candidate": 0.45,
+    "model_mb_control": 129.7,
+    "model_mb_candidate": 300.948,
+    "elapsed_seconds_control": 75.499,
+    "elapsed_seconds_candidate": 73.922
+  },
+  "update96_mean_per_episode": {
+    "on_time_control": 0.43,
+    "on_time_candidate": 0.44,
+    "model_mb_control": 176.557,
+    "model_mb_candidate": 289.254,
+    "elapsed_seconds_control": 73.456,
+    "elapsed_seconds_candidate": 75.814
+  },
+  "model_byte_conservation": {
+    "total_object_bytes": 110983569096,
+    "total_transition_bytes": 110983569096,
+    "selected_extra_model_mb_per_episode": 171.248,
+    "selected_extra_base_mb_per_episode": 142.103,
+    "selected_unused_preparation_mb_control": 10.44,
+    "selected_unused_preparation_mb_candidate": 10.247
+  },
+  "confirmed_defect": {
+    "kind": "training_signal_logging_only",
+    "producer": "scripts/run_calibrated_workflow_value_normalization_ab.py::_training_signal_row",
+    "wrong_key": "semantic_state.current_rsu_id",
+    "actual_key": "semantic_state.vehicles[primary].associated_rsu_id",
+    "candidate_false_rows": 28800,
+    "candidate_total_rows": 28800,
+    "control_false_rows": 115200,
+    "control_total_rows": 115200,
+    "training_loss_or_evaluation_effect_confirmed": false
+  },
+  "model_limitation": "decision_step_index_mobility_and_artificial_5_second_contact_scale",
+  "paper_ready": "Unverifiable"
+}

@@ -1,0 +1,261 @@
+{
+  "action2_logit_sensitivity": {
+    "mean": 0.003105171365647645,
+    "negative_count": 0,
+    "positive_count": 60,
+    "zero_count": 0
+  },
+  "action_counts": {
+    "0": 15,
+    "1": 2,
+    "2": 1,
+    "3": 14,
+    "4": 28
+  },
+  "arm": "control",
+  "aux_eligible": 59,
+  "checkpoint": "/Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/artifacts/experiments/cscwd_causal_prepared_state_visibility_matched_20261010_v1/checkpoints/sa_ghmappo_seed29_update96.pt",
+  "checkpoint_sha256": "e5a075de5f6c52bdd30aa0f5689bd26081b17f69ea9e676e94af92266f375e96",
+  "comparisons": {
+    "event_ce": {
+      "critic": {
+        "actor_norm": 0.0,
+        "cosine": "UNDEFINED_ZERO_NORM",
+        "dot": 0.0,
+        "other_norm": 0.0
+      },
+      "encoder": {
+        "actor_norm": 1.4246772527694702,
+        "cosine": 0.2901363726889803,
+        "dot": 0.06392301619052887,
+        "other_norm": 0.15464596450328827
+      },
+      "event_actor": {
+        "actor_norm": 0.21791788935661316,
+        "cosine": 0.6897322893581986,
+        "dot": 0.0025720573030412197,
+        "other_norm": 0.017112253233790398
+      },
+      "fast_actor": {
+        "actor_norm": 0.12323430180549622,
+        "cosine": -0.40574453310548825,
+        "dot": -3.191705218341667e-06,
+        "other_norm": 6.383200525306165e-05
+      },
+      "slow_actor": {
+        "actor_norm": 0.08879580348730087,
+        "cosine": -0.27938711837588553,
+        "dot": -8.535331289749593e-06,
+        "other_norm": 0.00034405000042170286
+      }
+    },
+    "fast_ce": {
+      "critic": {
+        "actor_norm": 0.0,
+        "cosine": "UNDEFINED_ZERO_NORM",
+        "dot": 0.0,
+        "other_norm": 0.0
+      },
+      "encoder": {
+        "actor_norm": 1.4246772527694702,
+        "cosine": -0.0026918615429646527,
+        "dot": -0.0001079979701898992,
+        "other_norm": 0.02816089056432247
+      },
+      "event_actor": {
+        "actor_norm": 0.21791788935661316,
+        "cosine": "UNDEFINED_ZERO_NORM",
+        "dot": 0.0,
+        "other_norm": 0.0
+      },
+      "fast_actor": {
+        "actor_norm": 0.12323430180549622,
+        "cosine": 0.8591015602623503,
+        "dot": 0.0005025630816817284,
+        "other_norm": 0.004746947903186083
+      },
+      "slow_actor": {
+        "actor_norm": 0.08879580348730087,
+        "cosine": -0.8086623904160044,
+        "dot": -2.57563124250737e-06,
+        "other_norm": 3.5869390558218583e-05
+      }
+    },
+    "slow_ce": {
+      "critic": {
+        "actor_norm": 0.0,
+        "cosine": "UNDEFINED_ZERO_NORM",
+        "dot": 0.0,
+        "other_norm": 0.0
+      },
+      "encoder": {
+        "actor_norm": 1.4246772527694702,
+        "cosine": -0.5855517633163286,
+        "dot": -0.2332090139389038,
+        "other_norm": 0.2795526087284088
+      },
+      "event_actor": {
+        "actor_norm": 0.21791788935661316,
+        "cosine": "UNDEFINED_ZERO_NORM",
+        "dot": 0.0,
+        "other_norm": 0.0
+      },
+      "fast_actor": {
+        "actor_norm": 0.12323430180549622,
+        "cosine": "UNDEFINED_ZERO_NORM",
+        "dot": 0.0,
+        "other_norm": 0.0
+      },
+      "slow_actor": {
+        "actor_norm": 0.08879580348730087,
+        "cosine": 0.853455193368231,
+        "dot": 0.0051087988540530205,
+        "other_norm": 0.06741330772638321
+      }
+    },
+    "value": {
+      "critic": {
+        "actor_norm": 0.0,
+        "cosine": "UNDEFINED_ZERO_NORM",
+        "dot": 0.0,
+        "other_norm": 6.262057304382324
+      },
+      "encoder": {
+        "actor_norm": 1.4246772527694702,
+        "cosine": -0.07446806258941799,
+        "dot": -1.994020938873291,
+        "other_norm": 18.79503631591797
+      },
+      "event_actor": {
+        "actor_norm": 0.21791788935661316,
+        "cosine": "UNDEFINED_ZERO_NORM",
+        "dot": 0.0,
+        "other_norm": 0.0
+      },
+      "fast_actor": {
+        "actor_norm": 0.12323430180549622,
+        "cosine": "UNDEFINED_ZERO_NORM",
+        "dot": 0.0,
+        "other_norm": 0.0
+      },
+      "slow_actor": {
+        "actor_norm": 0.08879580348730087,
+        "cosine": "UNDEFINED_ZERO_NORM",
+        "dot": 0.0,
+        "other_norm": 0.0
+      }
+    }
+  },
+  "endpoint": "update96",
+  "episodes_started": 10,
+  "event_supervised": 59,
+  "losses_raw_ce": {
+    "event": 0.17815136909484863,
+    "fast": 0.02211344800889492,
+    "slow": 0.665328323841095
+  },
+  "losses_weighted": {
+    "actor": 5.9604645663569045e-09,
+    "event_ce": 0.017815137282013893,
+    "fast_ce": 0.0011056724470108747,
+    "slow_ce": 0.06653283536434174,
+    "value": 1.3296282291412354
+  },
+  "old_new_logprob_max_abs": 4.991888999938965e-07,
+  "parameter_sha256_after": "93f0ac81d006d248cf9ee68957af8517431b47969c06379ab132a39e10041243",
+  "parameter_sha256_before": "93f0ac81d006d248cf9ee68957af8517431b47969c06379ab132a39e10041243",
+  "raw_ce_grad_norms": {
+    "event": {
+      "critic": 0.0,
+      "encoder": 1.5464646816253662,
+      "event_actor": 0.17112252116203308,
+      "fast_actor": 0.0006383199943229556,
+      "slow_actor": 0.0034405000042170286
+    },
+    "fast": {
+      "critic": 0.0,
+      "encoder": 0.563215434551239,
+      "event_actor": 0.0,
+      "fast_actor": 0.09493895620107651,
+      "slow_actor": 0.0007173878257162869
+    },
+    "slow": {
+      "critic": 0.0,
+      "encoder": 2.7955217361450195,
+      "event_actor": 0.0,
+      "fast_actor": 0.0,
+      "slow_actor": 0.6741330623626709
+    }
+  },
+  "readiness_gradient": {
+    "missing": {
+      "count": 12,
+      "eligible": 11,
+      "fast_actor": {
+        "actor_norm": 0.01074326690286398,
+        "cosine": 0.3603795218970586,
+        "dot": 1.2039472494507208e-05,
+        "other_norm": 0.003109646262601018
+      },
+      "shared_encoder": {
+        "actor_norm": 4.754871845245361,
+        "cosine": -0.04333980884652061,
+        "dot": -0.00554370041936636,
+        "other_norm": 0.02690134197473526
+      }
+    },
+    "ready": {
+      "count": 48,
+      "eligible": 48,
+      "fast_actor": {
+        "actor_norm": 0.15162816643714905,
+        "cosine": 0.9892036110823622,
+        "dot": 0.0003284487465862185,
+        "other_norm": 0.0021897878032177687
+      },
+      "shared_encoder": {
+        "actor_norm": 0.9933236837387085,
+        "cosine": 0.21202853483225303,
+        "dot": 0.0003728778683580458,
+        "other_norm": 0.0017704411875456572
+      }
+    }
+  },
+  "seed": 29,
+  "steps": 60,
+  "strata_counts": {
+    "deadline_bin": {
+      "(10,40]s": 23,
+      "<=10s": 9,
+      ">40s": 18,
+      "unknown": 10
+    },
+    "missing_bytes_bin": {
+      "(0,100MB]": 3,
+      ">100MB": 9,
+      "zero": 48
+    },
+    "predicted_contact_bin": {
+      "(5,15]s": 32,
+      "<=5s": 28
+    },
+    "readiness": {
+      "missing": 12,
+      "ready": 48
+    }
+  },
+  "target_counts": {
+    "event": {
+      "0": 35,
+      "1": 25
+    },
+    "fast": {
+      "0": 60
+    },
+    "slow": {
+      "0": 42,
+      "1": 6,
+      "2": 12
+    }
+  }
+}
