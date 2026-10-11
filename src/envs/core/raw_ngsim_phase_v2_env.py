@@ -499,6 +499,8 @@ class RawNGSIMPhaseV2Env(RawNGSIMEventTimeEnv):
             "backhaul_transfer_bytes": 0, "backhaul_transfer_seconds": 0.0,
             "partial_transfer_bytes": 0, "delivery_wait_seconds": 0.0,
         })
+        if self.factorial_profile is not None:
+            event["factorial_profile"] = deepcopy(self.factorial_profile)
         return obs, reward, terminated, truncated, info
 
     def step(self, action: int) -> tuple[np.ndarray, float, bool, bool, dict[str, Any]]:
