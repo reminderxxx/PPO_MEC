@@ -27,7 +27,12 @@ from scripts.freeze_calibrated_continuous_workflow_pilot import _load_experiment
 from src.envs.core.raw_ngsim_phase_v2_env import RawNGSIMPhaseV2Env  # noqa: E402
 
 
-RUN_ID = "cscwd_phase_v2_public_prepare_regions_20261011_v1"
+RUN_ID = "cscwd_phase_v2_public_prepare_regions_20261011_v2"
+MANIFEST_PATH = ROOT / "configs/experiment/cscwd_phase_v2_public_prepare_regions_v2_manifest.json"
+PRIOR_FAILURE_SHA = "55b826571c4b2474bf1f52ab228892d37855a850425ce20249b942100127e1ad"
+PRIOR_SELECTION_SHA = "875163d7022ce209746c1e7dd954891d12da2f92f640cac7e815a0604a2d54cb"
+ORIGINAL_PLAN_SHA = "472808fc90a3af16f8fe2c4f76acb69a9921a70f50d02184baa1eb40ec9c1def"
+COMPATIBILITY_COMMIT = "54968953b2bd67551b0a934e60019289732d3034"
 RULE_BEHAVIOR_SHA = "229ba1c059f7dd43b2948cc23ae27a952c9fa20bdfdcafdcb671b25089c8704b"
 SOURCES = ("lankershim", "us_101")
 CONDITIONS = ("default", "adverse_link", "ample_cache")
@@ -149,6 +154,52 @@ def prefix_history_pairs(prefix: list[int], history: list[dict[str, str]]) -> li
     return list(zip(prefix, history))
 
 
+def verify_reexecution_manifest() -> tuple[dict, str]:
+    manifest = read_json(MANIFEST_PATH)
+    expected = {
+        "run_id": RUN_ID,
+        "status": "FROZEN_BEFORE_EXECUTION",
+        "authorized_scope": "python_39_compatibility_reexecution_only",
+        "compatibility_fix_commit": COMPATIBILITY_COMMIT,
+        "prior_failed_run_id": "cscwd_phase_v2_public_prepare_regions_20261011_v1",
+        "prior_failure_receipt_sha256": PRIOR_FAILURE_SHA,
+        "prior_selection_inventory_sha256": PRIOR_SELECTION_SHA,
+        "original_plan_sha256": ORIGINAL_PLAN_SHA,
+        "pilot_behavior_sha256": PILOT_BEHAVIOR_SHA,
+        "rule_behavior_sha256": RULE_BEHAVIOR_SHA,
+        "candidate_cell_count": 24,
+        "selected_start_count": 11,
+        "previously_exposed_regression_starts": 3,
+        "new_coverage_starts_same_us101_trace": 8,
+        "max_starts": MAX_STARTS,
+        "max_branches": MAX_BRANCHES,
+        "max_env_steps": MAX_ENV_STEPS,
+        "max_continuation_steps_after_first_action": MAX_CONTINUATION,
+        "automatic_retry": False,
+        "scientific_selection_arms_metrics_and_budgets_changed": False,
+        "training_formal_holdout_model_calls": False,
+    }
+    if any(manifest.get(key) != value for key, value in expected.items()):
+        raise RuntimeError("frozen compatibility reexecution manifest drift")
+    if manifest.get("prior_failure_receipt_path") != (
+            "artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v1/failure_receipt.json"):
+        raise RuntimeError("prior failure receipt path drift")
+    if manifest.get("original_plan_path") != (
+            "docs/project/cscwd_phase_v2_public_prepare_region_plan_20261011.md"):
+        raise RuntimeError("original plan path drift")
+    if sha(ROOT / manifest["prior_failure_receipt_path"]) != PRIOR_FAILURE_SHA:
+        raise RuntimeError("prior failed execution receipt identity mismatch")
+    prior_selection = ROOT / "artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v1/selection_inventory.json"
+    if sha(prior_selection) != PRIOR_SELECTION_SHA:
+        raise RuntimeError("prior public selection inventory identity mismatch")
+    if sha(ROOT / manifest["original_plan_path"]) != ORIGINAL_PLAN_SHA:
+        raise RuntimeError("original scientific plan identity mismatch")
+    if subprocess.run(["git", "merge-base", "--is-ancestor", COMPATIBILITY_COMMIT, "HEAD"],
+                      cwd=ROOT, check=False).returncode != 0:
+        raise RuntimeError("Python 3.9 compatibility fix is not in execution commit")
+    return manifest, sha(MANIFEST_PATH)
+
+
 def posthoc_migration_use(ledger: list[dict[str, Any]]) -> dict[str, Any]:
     first = ledger[0]
     target = None
@@ -224,17 +275,26 @@ def run(protocol_path: Path, pilot_root: Path, output_root: Path) -> dict:
     if subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True,
                       text=True, check=True).stdout:
         raise RuntimeError("public region diagnostic requires a clean frozen commit")
+    manifest, manifest_sha = verify_reexecution_manifest()
     protocol, paths = verify_inputs(protocol_path, pilot_root)
     if sha(pilot_root / "rule_behavior_rows.csv") != RULE_BEHAVIOR_SHA:
         raise RuntimeError("frozen public-rule behavior identity mismatch")
     selected, inventory = enumerate_public_starts(
         read_csv(pilot_root / "behavior_rows.csv"), read_csv(pilot_root / "rule_behavior_rows.csv"))
+    if len(inventory) != manifest["candidate_cell_count"] or len(selected) != manifest["selected_start_count"]:
+        raise RuntimeError("frozen public selection count drift")
+    if inventory != read_json(ROOT / "artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v1/selection_inventory.json"):
+        raise RuntimeError("frozen public selection inventory drift")
+    for item in selected:
+        prefix_history_pairs(item["prefix_actions"], item["history"])
     output_root.mkdir(parents=True)
     receipt = {"run_id": RUN_ID, "status": "STARTED",
                "started_at": datetime.now(timezone.utc).isoformat(),
                "git_commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
                                             capture_output=True, text=True, check=True).stdout.strip(),
-               "plan_sha256": sha(plan), "pilot_behavior_sha256": PILOT_BEHAVIOR_SHA,
+               "plan_sha256": sha(plan), "reexecution_manifest_sha256": manifest_sha,
+               "prior_failure_receipt_sha256": PRIOR_FAILURE_SHA,
+               "pilot_behavior_sha256": PILOT_BEHAVIOR_SHA,
                "rule_behavior_sha256": RULE_BEHAVIOR_SHA,
                "selected_start_count": len(selected), "max_starts": MAX_STARTS,
                "max_branches": MAX_BRANCHES, "max_env_steps": MAX_ENV_STEPS}

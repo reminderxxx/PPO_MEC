@@ -5,6 +5,10 @@
 
 # Runbook
 
+## CSCWD phase-v2 公开 prepare 区域兼容修复后独立执行（2026-10-11）
+
+先读 `cscwd_phase_v2_public_prepare_region_v2_execution_plan_20261011.md` 与机器 manifest。新授权只允许全新 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v2/` 单次运行；旧 `v1` 失败 root 不可复用。先以项目 Python 3.9.6 完成无环境步的实际 CSV 选择/前缀配对 preflight、局部测试和无科学进程/干净 commit 检查，运行命令仍使用下方 v1 历史命令的同一 B pilot 输入路径，只把 output root 改为 v2。启动/完成或失败回执记录实际执行 commit；失败即停不补跑。实验结论以 v2 原件及后续报告为准。
+
 ## CSCWD phase-v2 公开 prepare 正负区域有界诊断（2026-10-11）
 
 先读事前方案 `cscwd_phase_v2_public_prepare_region_plan_20261011.md` 和一次运行的失败报告 `cscwd_phase_v2_public_prepare_region_failure_20261011.md`。下列为**历史执行命令记录，不得原样重跑**：冻结 commit `82818d9` 的脚本在 Python 3.9.6 因 `zip(strict=True)` 于首个 `env.step` 前失败。原 root 有 24 格选择清单、启动/失败回执，0 分支/0 步；按失败即停规则未补跑。后续源码已修兼容性，但原 run 身份和 `FAIL` 不变。任何新运行须另立授权、方案和 create-only run ID。
