@@ -132,7 +132,8 @@ def choose(method: str, info: dict, rules: dict, profile: str) -> tuple[int, int
     if method == "prepare_if_legal_else_serve":
         return (4 if mask[4] else 3), 0
     if method in rules:
-        requested = int(rules[method].select_action_from_info(info))
+        public_info = {key: info[key] for key in ("semantic_state", "action_mask", "run_metadata")}
+        requested = int(rules[method].select_action_from_info(public_info))
         if method == "causal_public_immediate_rule" or profile == V2:
             return requested, 1
         return requested, 1 + sum(mask)
