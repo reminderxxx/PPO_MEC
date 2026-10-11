@@ -52,11 +52,24 @@ def git(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
 
 
-def validate_gate(gate: dict, raw_csv: Path) -> tuple[str, dict, list, dict]:
+def validate_gate(gate: dict, raw_csv: Path, *, preflight_only: bool = False) -> tuple[str, dict, list, dict]:
     if gate["contract_version"] != FACTORIAL_PROFILE_VERSION:
         raise RuntimeError("factorial contract version mismatch")
-    if gate["execution_authorized"] is not True or gate["gate_status"] != "AUTHORIZED_SINGLE_DEVELOPMENT_RUN":
-        raise RuntimeError("factorial execution gate is closed")
+    if preflight_only:
+        if gate["execution_authorized"] is not False or gate["gate_status"] != "READY_ZERO_STEP_ONLY":
+            raise RuntimeError("zero-step preflight requires a closed scientific execution gate")
+        if gate["same_run_retry_authorized"] is not False or gate["raw_env_steps_used"] != 0:
+            raise RuntimeError("prior failed scientific attempt state changed")
+        old_receipt_path = ROOT / gate["failure_receipt_path"]
+        if sha(old_receipt_path) != gate["failure_receipt_sha256"]:
+            raise RuntimeError("old failed root or receipt changed")
+        old_receipt = json.loads(old_receipt_path.read_text(encoding="utf-8"))
+        if old_receipt["status"] != "PRESTEP_FAILED_NO_RETRY" or old_receipt["raw_env_steps"] != 0:
+            raise RuntimeError("old failed attempt was not preserved")
+        if (ROOT / gate["output"]["create_only_root"]).exists():
+            raise RuntimeError("future scientific root must remain untouched during preflight")
+    elif gate["execution_authorized"] is not True or gate["gate_status"] != "AUTHORIZED_SINGLE_DEVELOPMENT_RUN":
+        raise RuntimeError("factorial scientific execution gate is closed")
     if git("status", "--porcelain"):
         raise RuntimeError("execution requires a clean worktree")
     head = git("rev-parse", "HEAD")
@@ -131,7 +144,26 @@ def validate_gate(gate: dict, raw_csv: Path) -> tuple[str, dict, list, dict]:
     conditions = [row for row in protocol["conditions"] if row["condition_id"] == gate["physical_condition"]["condition_id"]]
     if len(conditions) != 1 or conditions[0] != gate["physical_condition"]["condition"]:
         raise RuntimeError("physical condition changed")
-    traces, raw_identities = load_traces(raw_csv, selected)
+    traces, identity_envelope = load_traces(raw_csv, selected)
+    if not isinstance(identity_envelope, dict) or set(identity_envelope) != {"raw_rows_scanned", "window_identities"}:
+        raise RuntimeError("raw trace identity envelope schema changed")
+    window_identities = identity_envelope["window_identities"]
+    if not isinstance(window_identities, dict) or set(window_identities) != {row["window_id"] for row in selected}:
+        raise RuntimeError("raw trace identity keys do not match frozen windows")
+    for row in selected:
+        identity = window_identities[row["window_id"]]
+        expected = {
+            "source_segment_id": row["source_segment_id"],
+            "vehicle_id": row["vehicle_id"],
+            "Global_Time_start": row["source_time_start"],
+            "Global_Time_end": row["source_time_end"],
+            "Frame_ID_start": row["source_frame_start"],
+            "Frame_ID_end": row["source_frame_end"],
+            "raw_source_row_count": row["contiguous_frame_count"],
+            "historical_train_dev_overlap_count": row["historical_train_dev_overlap_count"],
+        }
+        if not isinstance(identity, dict) or any(identity.get(key) != value for key, value in expected.items()):
+            raise RuntimeError("raw trace identity fields do not match frozen source")
     public_candidates = []
     for row in selected:
         environment = RawNGSIMPhaseV2Env(
@@ -156,7 +188,7 @@ def validate_gate(gate: dict, raw_csv: Path) -> tuple[str, dict, list, dict]:
         raise RuntimeError("exposed development source was mislabelled independent")
     return head, {
         "source": source_row,
-        "raw_identity": raw_identities[eligible[0]],
+        "raw_identity": window_identities[eligible[0]],
         "public_candidate_masks": public_candidates,
         "trace": traces[eligible[0]],
     }, [config, instance, protocol["physical_assumptions"], conditions[0]], gate
@@ -165,6 +197,124 @@ def validate_gate(gate: dict, raw_csv: Path) -> tuple[str, dict, list, dict]:
 def fixed_action(info: dict) -> int:
     mask = info["action_mask"]
     return next(action for action in POLICY_ORDER if mask[action])
+
+
+def validate_four_arms_without_step(gate: dict, head: str, source: dict, inputs: list) -> dict:
+    """Bind the four live constructors to the fixed real input with zero steps."""
+    config, instance, phase_contract, condition = inputs
+    selected_mask = next(
+        row["first_action_mask"] for row in source["public_candidate_masks"]
+        if row["window_id"] == source["source"]["window_id"]
+    )
+    expected_logical_residents = {
+        rsu_id: sorted(set(values)) for rsu_id, values in instance["initial_residents"].items()
+    }
+    task_identity = digest({
+        "workflow_id": instance["workflow_id"], "nodes": instance["nodes"],
+        "edges": instance["edges"], "execution_order": instance["execution_order"],
+        "deadline_seconds": instance["deadline_seconds"],
+        "measured_identity": config["measured_identity"], "objective": config["objective"],
+        "phase_contract": phase_contract, "condition": condition,
+    })
+    arms = []
+    for factors in gate["arms"]:
+        environment = RawNGSIMPhaseV2Env(
+            config, deepcopy(instance), source["trace"],
+            phase_contract=phase_contract, condition=condition,
+            factorial_profile={
+                "base_sharing_enabled": factors["base_sharing_enabled"],
+                "state_migration_enabled": factors["state_migration_enabled"],
+            },
+        )
+        info = environment._info()
+        profile = info["semantic_state"]["calibrated_context"].get("factorial_profile")
+        if profile != environment.factorial_profile or not isinstance(profile, dict):
+            raise RuntimeError("factorial factors are not bound to the public consumer")
+        if profile["contract_version"] != FACTORIAL_PROFILE_VERSION or any(
+            profile[key] is not factors[key] for key in ("base_sharing_enabled", "state_migration_enabled")
+        ):
+            raise RuntimeError("four-arm factor values differ from frozen gate")
+        if environment.step_index != 0 or environment.completed or environment.summary()["steps"] != 0:
+            raise RuntimeError("zero-step preflight advanced an environment")
+        if info["action_mask"] != selected_mask or not info["action_mask"][4]:
+            raise RuntimeError("four-arm initial action permissions differ")
+        if environment.instance["nodes"] != instance["nodes"] or environment.instance["edges"] != instance["edges"]:
+            raise RuntimeError("four-arm DAG or task content changed")
+        if environment.instance["execution_order"] != instance["execution_order"] or environment.instance["deadline_seconds"] != instance["deadline_seconds"]:
+            raise RuntimeError("four-arm order or deadline changed")
+        if environment.config["measured_identity"] != config["measured_identity"] or environment.config["objective"] != config["objective"]:
+            raise RuntimeError("four-arm model function or reward changed")
+        if environment.phase_contract != phase_contract or environment.phase_condition != condition:
+            raise RuntimeError("four-arm phase contract or link changed")
+        if environment.trace != source["trace"]:
+            raise RuntimeError("four-arm exogenous trace changed")
+        physical = {rsu_id: list(cache.residents) for rsu_id, cache in environment.caches.items()}
+        logical = {
+            rsu_id: sorted({environment.private_base_sources.get(item, item) for item in residents})
+            for rsu_id, residents in physical.items()
+        }
+        if logical != expected_logical_residents:
+            raise RuntimeError("four-arm initial logical cache resources differ")
+        capacity = {rsu_id: cache.capacity_bytes for rsu_id, cache in environment.caches.items()}
+        if set(capacity.values()) != {instance["cache_capacity_bytes"]}:
+            raise RuntimeError("four-arm cache capacity changed")
+        if not factors["base_sharing_enabled"]:
+            if not environment.private_base_sources:
+                raise RuntimeError("sharing-off private base object mapping is missing")
+            for private_id, source_id in environment.private_base_sources.items():
+                private = environment._object_catalog[private_id]
+                original = config["object_catalog"][source_id]
+                if any(private[key] != original[key] for key in ("resident_bytes", "transfer_bytes", "load_seconds")):
+                    raise RuntimeError("sharing-off private base resource differs from source")
+                if private["model_function_identity"] != config["measured_identity"]["base_model"]:
+                    raise RuntimeError("sharing-off model function identity differs")
+        else:
+            if environment.private_base_sources:
+                raise RuntimeError("sharing-on unexpectedly installed private base copies")
+        environment._validate_all_caches()
+        target_bundle = environment._bundle_ids("alpr")
+        rsu0_residents = set(physical["rsu_0"])
+        missing = [item for item in target_bundle if item not in rsu0_residents]
+        arms.append({
+            "arm_id": factors["arm_id"], "factorial_profile": profile,
+            "initial_action_mask": info["action_mask"],
+            "current_required_adapter": info["semantic_state"]["current_workflow_node"]["required_adapter"],
+            "logical_residents": logical, "physical_residents": physical,
+            "resident_bytes_by_rsu": {
+                rsu_id: environment._resident_bytes(cache) for rsu_id, cache in environment.caches.items()
+            },
+            "capacity_bytes_by_rsu": capacity,
+            "private_base_sources": environment.private_base_sources,
+            "rsu0_next_alpr_missing_object_ids": missing,
+            "rsu0_next_alpr_missing_transfer_bytes": sum(
+                int(environment._object_catalog[item]["transfer_bytes"]) for item in missing
+            ),
+            "raw_env_steps": 0,
+        })
+    by_id = {row["arm_id"]: row for row in arms}
+    source_base_bytes = int(config["object_catalog"]["base:family_a"]["transfer_bytes"])
+    for migration in (0, 1):
+        if (
+            by_id[f"S0M{migration}"]["rsu0_next_alpr_missing_transfer_bytes"]
+            - by_id[f"S1M{migration}"]["rsu0_next_alpr_missing_transfer_bytes"]
+        ) != source_base_bytes:
+            raise RuntimeError("sharing switch did not charge one additional base copy")
+    for sharing in (0, 1):
+        if (
+            by_id[f"S{sharing}M0"]["physical_residents"]
+            != by_id[f"S{sharing}M1"]["physical_residents"]
+        ):
+            raise RuntimeError("migration switch unexpectedly changed initial model resources")
+    return {
+        "status": "PASS_ZERO_ENV_STEP", "checked_at": datetime.now(timezone.utc).isoformat(),
+        "git_commit": head, "gate_sha256": sha(GATE_PATH), "executor_sha256": sha(SCRIPT_PATH),
+        "source": source["source"], "raw_identity": source["raw_identity"],
+        "public_candidate_masks": source["public_candidate_masks"],
+        "task_identity_sha256": task_identity, "source_base_transfer_bytes": source_base_bytes,
+        "arm_count": len(arms), "arms": arms, "total_raw_env_steps": 0,
+        "science_execution_authorized": gate["execution_authorized"],
+        "old_failed_root_preserved": True,
+    }
 
 
 def run(gate: dict, head: str, source: dict, inputs: list, root: Path) -> None:
@@ -378,9 +528,21 @@ def run(gate: dict, head: str, source: dict, inputs: list, root: Path) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--raw-csv", type=Path, required=True)
+    parser.add_argument("--preflight", action="store_true", help="validate fixed real inputs and four arms with zero env.step")
     args = parser.parse_args()
     gate = json.loads(GATE_PATH.read_text(encoding="utf-8"))
-    head, source, inputs, gate = validate_gate(gate, args.raw_csv)
+    head, source, inputs, gate = validate_gate(gate, args.raw_csv, preflight_only=args.preflight)
+    preflight = validate_four_arms_without_step(gate, head, source, inputs)
+    if args.preflight:
+        preflight_root = ROOT / gate["output"]["zero_step_preflight_root"]
+        preflight_root.mkdir(parents=True, exist_ok=False)
+        write_json(preflight_root / "preflight_receipt.json", preflight)
+        print(canonical({
+            "status": preflight["status"], "root": str(preflight_root),
+            "receipt_sha256": sha(preflight_root / "preflight_receipt.json"),
+            "raw_env_steps": 0,
+        }))
+        return 0
     output_root = ROOT / gate["output"]["create_only_root"]
     if output_root.exists():
         raise RuntimeError("create-only result root already exists")
