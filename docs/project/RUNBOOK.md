@@ -5,6 +5,22 @@
 
 # Runbook
 
+## Lankershim event-label coverage probe（2026-10-11；一次性、非训练）
+
+协议固定在 `configs/experiment/cscwd_lankershim_event_label_coverage_probe_v1.json`：仅 Lankershim/default、seed 7、固定
+`0,1,2,3,4` 动作周期（mask 时取最低合法动作）、最多 96 steps；不得按结果选状态，不训练、不读写 checkpoint、不读
+formal/holdout、无 retry。先在 clean commit 上做 0-step actual-class preflight，再只运行一次：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/probe_cscwd_lankershim_event_label_coverage.py --preflight
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/probe_cscwd_lankershim_event_label_coverage.py
+```
+
+输出 root 为 `artifacts/analysis/cscwd_lankershim_event_label_coverage_probe_20261011_v1/`，create-only。未在 96 步内观察到
+某标签只能写“未观测”，不得外推为训练域不存在；该结果不能用于方法排名或 checkpoint/reward 选择。
+
 ## Positive-prepare calibration abstention（2026-10-11；一次性授权）
 
 静态重算只读取已存在 public info/snapshot 和旧 pilot manifest，不调用 `env.step()`、不加载 checkpoint、不训练。canonical

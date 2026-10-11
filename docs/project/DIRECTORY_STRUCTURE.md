@@ -1,5 +1,12 @@
 ﻿# Directory Structure
 
+## 2026-10-11 Lankershim event-label coverage probe
+
+- `configs/experiment/cscwd_lankershim_event_label_coverage_probe_v1.json`：一次性、create-only、96-step、固定动作周期的非训练协议。
+- `scripts/probe_cscwd_lankershim_event_label_coverage.py`：只在既有 Lankershim/default 训练域记录 public label、reason、weight、
+  semantic-state hash 与各公开前置门；保存所有采样 semantic state，不读 checkpoint/formal/holdout，不更新参数。
+- `tests/test_cscwd_lankershim_event_label_coverage_probe.py`：预算/权限和固定 mask-safe 动作选择的纯函数合同。
+
 ## 2026-10-11 scientific completion receipt contract
 
 - `scripts/launch_calibrated_workflow_value_normalization_ab.py`：共享 supervisor 的显式 scientific receipt validator 与纯函数 terminal

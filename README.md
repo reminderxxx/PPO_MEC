@@ -5,6 +5,10 @@
 
 # PPO_MEC
 
+2026-10-11 新增一次性 Lankershim event-label coverage probe：固定 seed/action cycle、最多 96 个环境步、0 optimizer/
+checkpoint/formal/holdout，仅记录 public semantic state 身份、label/reason/weight 与公开门值。它用于避免在训练域没有
+监督暴露时再次启动完整训练，不参与方法排名或 checkpoint 选择；见 `docs/project/RUNBOOK.md`。
+
 2026-10-11 的 [phase-v2 公共可观测性审查](docs/project/cscwd_phase_v2_public_observability_audit_20261011.md)
 确认第二次 action4 面向新目标，不是同目标重发；三处事后成本浪费无法由当前单帧公共字段确定识别。现有 candidate 会在
 `confidence_calibrated=false` 时仍给正 prepare 监督。唯一后续候选已
