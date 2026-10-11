@@ -18,12 +18,12 @@ YES = "yes"
 NO = "no"
 UNKNOWN = "unknown"
 NOT_APPLICABLE = "not_applicable"
-SCHEMA_VERSION = "causal_public_action_estimator_v3"
-EVENT_LABEL_SCHEMA_VERSION = "causal_public_prepare_advantage_v3"
+SCHEMA_VERSION = "causal_public_action_estimator_v4"
+EVENT_LABEL_SCHEMA_VERSION = "causal_public_prepare_advantage_v4"
 CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION = (
-    "causal_public_prepare_advantage_calibration_abstention_v1"
+    "causal_public_prepare_advantage_calibration_abstention_v2"
 )
-PUBLIC_RULE_SCHEMA_VERSION = "causal_public_rule_selection_v3"
+PUBLIC_RULE_SCHEMA_VERSION = "causal_public_rule_selection_v4"
 RAW_PHASE_V1 = "raw_ngsim_event_time_v1"
 RAW_PHASE_V2 = "raw_ngsim_event_time_v2"
 PRIVILEGED_REFERENCE_PROFILES = {
@@ -204,9 +204,58 @@ def _known_recompute_seconds(state: dict[str, Any]) -> tuple[float | None, str]:
     completed = list(workflow.get("completed_node_ids", []) or [])
     if not completed:
         return 0.0, "no_completed_prefix"
+    context = dict(state.get("calibrated_context", {}) or {})
+    history = dict(context.get("execution_history", {}) or {})
+    if history.get("schema_version") == "public_execution_history_v1":
+        current_handoff = history.get("current_handoff")
+        if current_handoff is False:
+            return 0.0, "no_current_handoff"
+        if current_handoff is not True:
+            return None, "current_handoff_history_unknown"
     current = _prefix_status(state, "current")
     if current["valid"] is True:
         return 0.0, "current_prefix_valid"
+    if history.get("schema_version") == "public_execution_history_v1":
+        nodes = {
+            str(row.get("node_id")): dict(row)
+            for row in list(workflow.get("nodes", []) or [])
+            if row.get("node_id") is not None
+        }
+        current_node_id = str(workflow.get("current_node_id", ""))
+        if current_node_id not in nodes:
+            return None, "current_node_identity_unknown"
+        completed_ids = {str(value) for value in completed}
+        required: set[str] = set()
+
+        def visit(node_id: str) -> bool:
+            node = nodes.get(node_id)
+            if node is None:
+                return False
+            for predecessor in list(node.get("predecessors", []) or []):
+                predecessor = str(predecessor)
+                if predecessor in completed_ids and predecessor not in required:
+                    required.add(predecessor)
+                    if not visit(predecessor):
+                        return False
+            return True
+
+        if not visit(current_node_id):
+            return None, "completed_predecessor_identity_unknown"
+        if not required:
+            required.add(str(completed[-1]))
+        try:
+            prefix_work = sum(float(nodes[item]["compute_seconds"]) for item in required)
+            measured = dict(context.get("measured_time_seconds", {}) or {})
+            node_reference = float(measured["node_compute_reference"])
+            prefix_reference = float(measured["prefix_recompute_reference"])
+        except (KeyError, TypeError, ValueError):
+            return None, "public_recompute_cost_unknown"
+        if node_reference <= 0.0 or not math.isfinite(node_reference):
+            return None, "public_recompute_cost_unknown"
+        recompute = prefix_reference * prefix_work / node_reference
+        if not math.isfinite(recompute) or recompute < 0.0:
+            return None, "public_recompute_cost_unknown"
+        return float(recompute), "public_completed_predecessor_recompute"
     return None, "handoff_and_missing_predecessor_identity_unknown"
 
 

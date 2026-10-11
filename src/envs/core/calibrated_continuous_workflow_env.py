@@ -914,6 +914,15 @@ class CalibratedContinuousWorkflowEnv:
         }
         if prepared_state_public is not None:
             semantic_state["calibrated_context"]["prepared_state_prefix"] = prepared_state_public
+            semantic_state["calibrated_context"]["execution_history"] = {
+                "schema_version": "public_execution_history_v1",
+                "last_execution_rsu_id": self.last_execution_rsu,
+                "current_handoff": bool(
+                    self.last_execution_rsu
+                    and current_rsu != self.last_execution_rsu
+                ),
+                "source": "completed_public_execution_history_no_future",
+            }
         return semantic_state
 
     def _info(self) -> dict[str, Any]:

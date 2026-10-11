@@ -1,5 +1,9 @@
 # Code Module Map
 
+`calibrated_continuous_workflow_env.py` 的 v4 public context 现在公开已发生的 last-execution RSU/current-handoff；
+`causal_public_action_estimator.py` 用该字段区分无 handoff 的零 recompute 与 handoff predecessor closure recompute。字段不进入
+encoder，缺字段的旧 state 仍 fail-closed；estimator/event/rule schema 已升级，旧 protocol 不在新代码下复用。
+
 `scripts/probe_cscwd_lankershim_event_label_coverage.py` 是独立于冻结 A/B runner 的 public-label 诊断入口：复用同一
 `RawNGSIMPhaseV2Env` 与 label 纯函数，但只按预注册动作周期执行最多 96 步，记录 semantic-state hash、完整 public state、
 label/reason/weight 与 action4 公开门。它不接 agent、optimizer、checkpoint 或评价排名；因此新增诊断不会改变旧 runner hash。

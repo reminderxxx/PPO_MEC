@@ -109,6 +109,13 @@ def test_existence_validity_staleness_and_unknown_target() -> None:
     config, instance = _fixture()
     env = _env(config, instance, PREPARED_STATE_PREFIX_PROFILE)
     public = env._info()["semantic_state"]["calibrated_context"]["prepared_state_prefix"]
+    history = env._info()["semantic_state"]["calibrated_context"]["execution_history"]
+    assert history == {
+        "schema_version": "public_execution_history_v1",
+        "last_execution_rsu_id": env.last_execution_rsu,
+        "current_handoff": False,
+        "source": "completed_public_execution_history_no_future",
+    }
     assert public["current"] == {
         "known": True, "exists": False, "valid": False,
         "missing_completed_count": 0, "missing_completed_fraction": 0.0,

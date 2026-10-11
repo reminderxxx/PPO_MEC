@@ -5,6 +5,9 @@
 
 # PPO_MEC
 
+2026-10-11 已定位并最小修复 public recompute 假 unknown：v4 semantic state 公开已发生的 last-execution RSU/current-handoff，
+estimator 按 executor 同公式核算，无 future truth、reward/mask/network 改动。旧零暴露原件不改，须由新身份 coverage probe 验收。
+
 2026-10-11 的 [calibration-abstention 结果审查](docs/project/cscwd_positive_prepare_calibration_abstention_results_20261011.md)
 确认一次性 run 完整但 A/B 零处理暴露：四 arms 的训练 label 全为 abstain，SA 两臂网络张量和评价完全相同。96-step
 Lankershim 非训练 probe 又在 96/96 状态观察到 action4 不合法；当前应先补训练源机制资格门，不再调 reward 或追加训练。

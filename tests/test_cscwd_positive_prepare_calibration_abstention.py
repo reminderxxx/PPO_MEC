@@ -203,22 +203,16 @@ def test_training_signal_log_uses_the_cell_semantics() -> None:
     assert gated["positive_prepare_calibration_abstention_enabled"] is True
 
 
-def test_frozen_protocol_is_runnable_and_once_authorized() -> None:
+def test_completed_v1_protocol_is_rejected_after_v4_semantics_fix() -> None:
     path = Path(
         "configs/experiment/"
         "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json"
     )
     protocol = _load(path)
-    gate = _validate_protocol(
-        protocol, require_clean=False, require_authorized=False
-    )
-    assert gate["status"] == "PASS"
-    assert gate["fixture_label"] == "prepare"
-    assert gate["fixture_calibration_abstention_label"] == "abstain"
-    authorized = _validate_protocol(
-        protocol, require_clean=False, require_authorized=True
-    )
-    assert authorized["status"] == "PASS"
+    with pytest.raises(RuntimeError, match="single-variable contract drift"):
+        _validate_protocol(
+            protocol, require_clean=False, require_authorized=False
+        )
     assert protocol["authorization_scope"] == (
         "one_create_only_development_run_no_retry"
     )

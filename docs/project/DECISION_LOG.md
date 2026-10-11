@@ -1,5 +1,12 @@
 ﻿# Decision Log
 
+## 2026-10-11：公开已发生 execution history，对齐 estimator 与 executor recompute
+
+- 接受公开 `last_execution_rsu_id/current_handoff`：它是 agent 自己已发生的执行历史，不是实际未来或 outcome。
+- estimator 只在 handoff 时按公开 DAG predecessor closure 计算 recompute；无 handoff 为 0，缺字段继续 unknown。字段不进入
+  actor encoder，reward/mask/executor/网络不变。
+- schema 升级并以新 identity 重做一次 v668 资格 probe；旧 FAIL root 不覆盖。只有 actual-consumer 非零干预才允许匹配训练。
+
 ## 2026-10-11：只实现校准来源正 prepare abstention；当前 Raw 解释为全撤销而非自适应门
 
 - 接受 `calibration_provenance_positive_prepare_abstention_v1` 作为唯一 default-off 学习设计候选：仅在旧 label 已判

@@ -80,8 +80,8 @@ def test_actual_phase_v2_public_consumer_and_sa_action_likelihood():
     observation, info = env.reset()
     estimate = estimate_public_actions(info["semantic_state"], info["action_mask"])
     label = public_prepare_advantage_label(info["semantic_state"], info["action_mask"])
-    assert estimate["schema_version"] == "causal_public_action_estimator_v3"
-    assert label["schema_version"] == "causal_public_prepare_advantage_v3"
+    assert estimate["schema_version"] == "causal_public_action_estimator_v4"
+    assert label["schema_version"] == "causal_public_prepare_advantage_v4"
     assert label["decision"] in {"prepare", "serve", "abstain"}
     immediate = CausalPublicImmediateRule().select_action_from_info(info)
     two_step = CausalPublicTwoStepRule().select_action_from_info(info)

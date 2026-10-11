@@ -186,7 +186,7 @@ def test_public_estimate_is_pure_and_ignores_private_future_fields() -> None:
     state = _state()
     before = _hash(state)
     estimate = estimate_public_actions(state)
-    assert estimate["schema_version"] == "causal_public_action_estimator_v3"
+    assert estimate["schema_version"] == "causal_public_action_estimator_v4"
     assert estimate["schema_version"] == SCHEMA_VERSION
     assert _hash(state) == before
     assert estimate["actions"]["4"]["current_service"] == YES
@@ -232,6 +232,45 @@ def test_private_eviction_order_is_unknown_not_fabricated_infeasible() -> None:
     assert estimate["actions"]["4"]["estimated_total_seconds"] is None
     assert estimate["actions"]["4"]["deadline_fit"] == UNKNOWN
     assert public_prepare_advantage_label(state)["decision"] == "abstain"
+
+
+def test_phase_v2_recompute_uses_public_execution_history() -> None:
+    state = _phase_v2_state()
+    state["workflow"]["completed_node_ids"] = ["n0"]
+    state["workflow"]["current_node_id"] = "n1"
+    state["workflow"]["nodes"][1]["predecessors"] = ["n0"]
+    state["current_workflow_node"] = deepcopy(state["workflow"]["nodes"][1])
+    state["calibrated_context"].update({
+        "input_bytes": 500_000,
+        "state_bytes": 1_000_000,
+        "compute_seconds": 1.0,
+        "execution_history": {
+            "schema_version": "public_execution_history_v1",
+            "last_execution_rsu_id": "rsu_0",
+            "current_handoff": False,
+            "source": "completed_public_execution_history_no_future",
+        },
+    })
+    state["calibrated_context"]["measured_time_seconds"].update({
+        "node_compute_reference": 2.0,
+        "prefix_recompute_reference": 10.0,
+    })
+    no_handoff = estimate_public_actions(state)
+    assert no_handoff["recompute_seconds"] == 0.0
+    assert no_handoff["recompute_reason"] == "no_current_handoff"
+    assert no_handoff["actions"]["4"]["deadline_fit"] == YES
+
+    handoff = deepcopy(state)
+    handoff["calibrated_context"]["execution_history"].update({
+        "last_execution_rsu_id": "rsu_2",
+        "current_handoff": True,
+    })
+    after_handoff = estimate_public_actions(handoff)
+    assert after_handoff["recompute_seconds"] == 10.0
+    assert after_handoff["recompute_reason"] == (
+        "public_completed_predecessor_recompute"
+    )
+    assert after_handoff["actions"]["4"]["deadline_fit"] == YES
 
 
 def test_raw_full_step_contact_failure_abstains_without_future_truth() -> None:
@@ -410,7 +449,7 @@ def test_rule_capabilities_distinguish_public_baselines_from_privileged_referenc
         assert rule_type.capability_profile == "public_causal_semantic_state_only_v1"
         assert rule_type.public_information_matched is True
         assert rule_type.uses_environment_preview is False
-        assert rule_type.rule_schema_version == "causal_public_rule_selection_v3"
+        assert rule_type.rule_schema_version == "causal_public_rule_selection_v4"
         assert rule_type.objective_profile == (
             "public_phase_feasible_then_lexicographic_service_deadline_known_readiness_cost_v3"
         )

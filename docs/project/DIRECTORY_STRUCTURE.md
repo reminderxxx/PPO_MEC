@@ -1,5 +1,12 @@
 ﻿# Directory Structure
 
+## 2026-10-11 public recompute observability fix
+
+- `src/envs/core/calibrated_continuous_workflow_env.py`：v4 public execution-history producer。
+- `src/agents/causal_public_action_estimator.py`：无 handoff / handoff recompute 的 public consumer 与 v4 schema。
+- `tests/test_{causal_public_action_estimator,calibrated_workflow_prepared_state_prefix}.py`：无未来字段、公式与旧 profile 兼容回归。
+- `docs/project/cscwd_recompute_observability_{diagnosis,fix}_20261011.md`：先诊断、后纠错的独立记录。
+
 ## 2026-10-11 Lankershim event-label coverage probe
 
 - `configs/experiment/cscwd_lankershim_event_label_coverage_probe_v1.json`：一次性、create-only、96-step、固定动作周期的非训练协议。
