@@ -36,6 +36,12 @@ consumer mismatch=0 才能继续冻结匹配 pilot。
 该 v668 probe 已在 commit `ccef09e…6f5` 完成并失败，create-only root 已存在；不得 rerun。base prepare=0、candidate
 intervention=0，因此 4-arm matched pilot 未授权且不得启动。
 
+recompute observability 纠错后的唯一新身份协议为
+`configs/experiment/cscwd_lankershim_v668_positive_prepare_coverage_postfix_v1.json`，输出 root 固定为
+`artifacts/analysis/cscwd_lankershim_v668_positive_prepare_coverage_postfix_20261011_v1/`。它不是旧 root retry；仍只允许同一
+v668 train 段 192 steps、selection/check 不读、无 optimizer/checkpoint/formal/holdout。运行一次后按同一 nonzero 双门停止或
+进入匹配 pilot 冻结。
+
 ## Positive-prepare calibration abstention（2026-10-11；一次性授权）
 
 静态重算只读取已存在 public info/snapshot 和旧 pilot manifest，不调用 `env.step()`、不加载 checkpoint、不训练。canonical

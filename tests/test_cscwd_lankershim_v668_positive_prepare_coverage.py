@@ -11,7 +11,7 @@ from scripts.probe_cscwd_lankershim_v668_positive_prepare_coverage import (
 
 def test_v668_protocol_is_bounded_and_reads_only_train_role() -> None:
     path = Path(
-        "configs/experiment/cscwd_lankershim_v668_positive_prepare_coverage_probe_v1.json"
+        "configs/experiment/cscwd_lankershim_v668_positive_prepare_coverage_postfix_v1.json"
     ).resolve()
     protocol, split, _ = _load_protocol(path)
     assert protocol["environment_step_budget"] == 192

@@ -6,6 +6,8 @@
 - `src/agents/causal_public_action_estimator.py`：无 handoff / handoff recompute 的 public consumer 与 v4 schema。
 - `tests/test_{causal_public_action_estimator,calibrated_workflow_prepared_state_prefix}.py`：无未来字段、公式与旧 profile 兼容回归。
 - `docs/project/cscwd_recompute_observability_{diagnosis,fix}_20261011.md`：先诊断、后纠错的独立记录。
+- `configs/experiment/cscwd_lankershim_v668_positive_prepare_coverage_postfix_v1.json`：绑定纠错 commit/source/code hash 的
+  全新 create-only 资格身份，不覆盖旧 FAIL root。
 
 ## 2026-10-11 Lankershim event-label coverage probe
 

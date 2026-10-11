@@ -73,7 +73,6 @@ def _load_protocol(path: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str
     expected = {
         "schema_version": "cscwd_lankershim_v668_positive_prepare_coverage_probe_v1",
         "execution_authorized": True,
-        "authorization_scope": "one_create_only_nontraining_probe_no_retry",
         "training_window_id": "cscwd_newdev_lankershim_v668_t1118936135400_1118936254200",
         "condition_id": "default",
         "workload_design_id": "dev_01",
@@ -97,6 +96,11 @@ def _load_protocol(path: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str
     for key, value in expected.items():
         if protocol.get(key) != value:
             raise RuntimeError(f"coverage protocol drift: {key}")
+    if protocol.get("authorization_scope") not in {
+        "one_create_only_nontraining_probe_no_retry",
+        "one_create_only_engineering_correction_probe_no_retry",
+    }:
+        raise RuntimeError("coverage protocol drift: authorization_scope")
     split_path = ROOT / protocol["development_split"]
     source_protocol_path = ROOT / protocol["source_protocol"]
     split = json.loads(split_path.read_text(encoding="utf-8"))
@@ -111,10 +115,12 @@ def _load_protocol(path: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str
         "base_config": ROOT / source_protocol["inputs"]["base_config"],
         "workload_manifest": ROOT / source_protocol["inputs"]["workload_manifest"],
         "phase_contract": ROOT / source_protocol["inputs"]["phase_contract"],
+        "base_environment": ROOT / "src/envs/core/calibrated_continuous_workflow_env.py",
         "phase_v2_environment": ROOT / "src/envs/core/raw_ngsim_phase_v2_env.py",
         "public_estimator": ROOT / "src/agents/causal_public_action_estimator.py",
         "sa_core": ROOT / "src/agents/sa_ghmappo_core.py",
         "label_diagnostic_helper": ROOT / "scripts/probe_cscwd_lankershim_event_label_coverage.py",
+        "probe_runner": Path(__file__).resolve(),
     }
     for name, expected_hash in protocol["input_sha256"].items():
         if not paths[name].is_file() or _sha256(paths[name]) != expected_hash:
