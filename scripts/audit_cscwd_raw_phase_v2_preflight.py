@@ -63,6 +63,7 @@ def preflight(raw_path: Path, source_path: Path) -> tuple[dict, dict]:
         mask = list(before_info["action_mask"])
         action = 4 if mask[4] else 3 if mask[3] else 2
         if window["source_segment_id"] == "us_101":
+            public_info = {key: before_info[key] for key in ("semantic_state", "action_mask", "run_metadata")}
             public_fixture = {
                 "schema_version": "cscwd_raw_phase_v2_public_fixture_v1",
                 "source_manifest_sha256": SOURCE_SHA,
@@ -71,8 +72,8 @@ def preflight(raw_path: Path, source_path: Path) -> tuple[dict, dict]:
                 "design_id": "dev_01",
                 "condition_id": "default",
                 "step": 0,
-                "public_info_sha256": _canonical_sha(before_info),
-                "info": {key: before_info[key] for key in ("semantic_state", "action_mask", "run_metadata")},
+                "public_info_sha256": _canonical_sha(public_info),
+                "info": public_info,
             }
         start = env.clock_seconds
         _, _, terminated, truncated, after_info = env.step(action)

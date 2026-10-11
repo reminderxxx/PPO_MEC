@@ -5,6 +5,10 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD raw phase v2 local preflight
+
+- 本地 create-only `artifacts/analysis/cscwd_raw_phase_v2_preflight_20261011_v3/preflight.json` SHA-256 `9b26892522a99c5e50189925c8c08affae89ade55fe8512f8f6c0e9cf09245ed`：锁定来源/配置/环境 SHA，两条 118.8 s development 轨迹各执行 1 个真实 step；Lankershim action3 节点完成，US101 action4 节点完成并交付，阶段时间/字节守恒。`public_fixture.json` SHA-256 `1e7da4d92c5e9387438b2bd33d04d6c1b314cbe4dee4dcd03a72c013a65cd8c2`，内嵌三字段 info hash 复算一致；B 已独立消费该公开 fixture。早期 v2 root 因内嵌 hash 范围错误留失败见证，不引用为通过原件。报告 `cscwd_raw_phase_v2_environment_acceptance_20261011.md`；0 训练/formal/hidden。
+
 ## 2026-10-11 CSCWD long raw contact and action-4 phase diagnosis
 
 - 本地 create-only `artifacts/analysis/cscwd_new_development_contact_ledger_20261011_v1/contact_ledger_audit.json` SHA-256 `f35fe1ded86663488568864790c523a24a62ae66ad517c592d7aa75481d76b93`：父 40 episode/320 step 只读复算，68 contact 拒绝/43 去重，12 action4/10 去重，0 新环境 step。

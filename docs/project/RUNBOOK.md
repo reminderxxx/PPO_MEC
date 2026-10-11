@@ -7,7 +7,18 @@
 
 ## CSCWD raw phase v2 授权合同（2026-10-11；执行前冻结）
 
-已批准方案 B 的 opt-in `raw_ngsim_event_time_v2` 物理/成本/公开状态规则见 `cscwd_raw_phase_v2_frozen_contract_20261011.md`，机器配置为 `configs/experiment/cscwd_raw_phase_v2_development_20261011.json`。顺序为环境相位与真实 reset/step 正负链 → B 独立公共消费者验收 → 仅冻结两个长开发来源的最多 60 episode/2,880 step/10,000 preview 矩阵。旧 v1 create-only 命令及原件仍是历史身份；下列旧段落中的“当前不授权训练”只针对当时旧 v1 资格/诊断，不能代替 v2 的新授权或验收门。无新环境/消费者验收回执时，不启动匹配 pilot。
+已批准方案 B 的 opt-in `raw_ngsim_event_time_v2` 物理/成本/公开状态规则见 `cscwd_raw_phase_v2_frozen_contract_20261011.md`，机器配置为 `configs/experiment/cscwd_raw_phase_v2_development_20261011.json`。顺序为环境相位与真实 reset/step 正负链 → B 独立公共消费者验收 → 仅冻结两个长开发来源的最多 60 episode/2,880 step/10,000 preview 矩阵。旧 v1 create-only 命令及原件仍是历史身份；下列旧段落中的“当前不授权训练”只针对当时旧 v1 资格/诊断，不能代替 v2 的新授权或验收门。环境两条真实开发 step 与最终公开 fixture 见 `cscwd_raw_phase_v2_environment_acceptance_20261011.md`；完整消费者门未过前不启动匹配 pilot。
+
+环境预检仅在新的不存在的 output root 执行；最终通过 root 为 `v3`，早期 `v2` 因公开 fixture 内嵌 hash 范围错误保留失败见证：
+以下是已执行命令的记录；重跑时须改用新的空 root，不能覆盖 `v3`：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_raw_ngsim_phase_v2_env.py tests/test_raw_ngsim_event_time_env.py tests/test_cscwd_new_development_reachability.py
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_cscwd_raw_phase_v2_preflight.py \
+  --raw-csv-path '/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
+  --source-manifest artifacts/analysis/cscwd_new_development_source_20261011_v2/source_manifest.json \
+  --output-root artifacts/analysis/cscwd_raw_phase_v2_preflight_20261011_v3
+```
 
 ## CSCWD 新 development 长轨迹来源资格（2026-10-11；结果盲）
 

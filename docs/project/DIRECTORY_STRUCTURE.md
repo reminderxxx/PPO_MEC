@@ -3,6 +3,9 @@
 ## 2026-10-11 CSCWD raw phase v2 opt-in
 
 - `configs/experiment/cscwd_raw_phase_v2_development_20261011.json` 与 `docs/project/cscwd_raw_phase_v2_frozen_contract_20261011.md`：在结果前冻结方案 B 的物理相位、模拟 backhaul、公开字段、验收和两窗开发矩阵预算；历史 v1 原件保留。
+- `src/envs/core/raw_ngsim_phase_v2_env.py`、`tests/test_raw_ngsim_phase_v2_env.py`：独立 opt-in 原始时间逐相位环境与合成正负测试；旧 `raw_ngsim_event_time_env.py` 源码不变。
+- `scripts/audit_cscwd_raw_phase_v2_preflight.py`：对冻结两条真实开发轨迹各作一次合法 reset/step、守恒验收，并输出本地 create-only `artifacts/analysis/cscwd_raw_phase_v2_preflight_20261011_v3/`；v2 root 保留 fixture hash 失败见证。
+- `docs/project/cscwd_raw_phase_v2_environment_acceptance_20261011.md`：工程验收及开放证据边界，不是方法排名。
 
 ## 2026-10-11 CSCWD 新授权长来源资格
 

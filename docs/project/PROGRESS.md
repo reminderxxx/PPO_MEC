@@ -5,9 +5,14 @@
 
 ﻿# Progress
 
+## 2026-10-11：raw phase v2 环境与原始来源预检通过；消费者门仍待独立验收
+
+- 独立 opt-in `RawNGSIMPhaseV2Env` 按冻结串行合同实现输入接触、原站持续计算、模拟 backhaul、状态生成后传输与目标交付；v1 源码 SHA 未变。合成及相关局部测试 `18 passed`，真实两条 118.8 s 开发来源各一次合法 step：Lankershim action3 完成节点，US101 action4 完成节点并迁移，全部相位时间/字节守恒。预检 SHA-256 `9b26892522a99c5e50189925c8c08affae89ade55fe8512f8f6c0e9cf09245ed`，报告 `cscwd_raw_phase_v2_environment_acceptance_20261011.md`。
+- 首版公开 fixture 的内嵌 hash 与所存三字段范围不一致，B 独立门拒绝；保留失败 v2 root，重建 create-only v3 fixture SHA-256 `1e7da4d92c5e9387438b2bd33d04d6c1b314cbe4dee4dcd03a72c013a65cd8c2` 并复算一致。B consumer、SA/checkpoint、60-cell 矩阵及训练结果尚未完成；0 formal/hidden，paper-ready=`Unverifiable`。
+
 ## 2026-10-11：方案 B raw phase v2 获授权并事前冻结，尚未产生新性能结果
 
-- 依据前轮 12 次 action 4 阶段诊断，负责人选择“当前接触内上传输入、原 RSU 继续节点计算、成功后经有成本的模拟 backhaul 传状态至预测目标”的独立 opt-in v2。已冻结串行相位、部分字节/clock 守恒、target delivery/timeout、public/hidden 边界及两窗×一个已暴露 `dev_01` 任务×三条件×v1/v2×五方法=60 episode、2,880 step/10,000 preview 上限；该任务属机制导向开发选择，非独立确认。配置与规则见 `cscwd_raw_phase_v2_frozen_contract_20261011.md`。目前仅合同，环境/消费者/新矩阵结果尚未验证，旧 v1 和论文保持原身份。
+- 依据前轮 12 次 action 4 阶段诊断，负责人选择“当前接触内上传输入、原 RSU 继续节点计算、成功后经有成本的模拟 backhaul 传状态至预测目标”的独立 opt-in v2。已冻结串行相位、部分字节/clock 守恒、target delivery/timeout、public/hidden 边界及两窗×一个已暴露 `dev_01` 任务×三条件×v1/v2×五方法=60 episode、2,880 step/10,000 preview 上限；该任务属机制导向开发选择，非独立确认。配置与规则见 `cscwd_raw_phase_v2_frozen_contract_20261011.md`。本节记录实施前冻结状态，最新验收见上节；旧 v1 和论文保持原身份。
 
 ## 2026-10-11：长原始来源 action 4 接触/阶段根因定位完成；训练门仍关闭
 

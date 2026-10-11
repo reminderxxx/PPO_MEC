@@ -9,7 +9,8 @@
 
 ## Live 文档
 
-- `cscwd_raw_phase_v2_frozen_contract_20261011.md`：方案 B 已授权的输入上传、原站跨接触计算、RSU backhaul、状态交付与两窗 60 episode 开发矩阵事前合同；当前先验收环境和消费者。
+- `cscwd_raw_phase_v2_frozen_contract_20261011.md`：方案 B 已授权的输入上传、原站跨接触计算、RSU backhaul、状态交付与两窗 60 episode 开发矩阵事前合同。
+- `cscwd_raw_phase_v2_environment_acceptance_20261011.md`：独立 opt-in 环境的合成正负链、两条原始开发轨迹真实 step 与公开 fixture 身份；不构成方法效果或论文证据。
 
 - `cscwd_new_development_contact_diagnosis_plan_20261011.md`、`cscwd_new_development_contact_phase_diagnosis_20261011.md`：原 320 步接触拒绝账本与固定 12 次 action 4 阶段诊断，0/20 额外环境步，区分预测误差、准备预算和整步回滚；不直接修物理合同。
 - `cscwd_raw_phase_contract_implementation_plan_20261011.md`：历史 A/B 物理选项草案；方案 B 后续获授权，执行以新冻结合同为准。
