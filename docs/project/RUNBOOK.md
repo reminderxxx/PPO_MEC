@@ -5,6 +5,10 @@
 
 # Runbook
 
+## CSCWD raw phase v2 授权合同（2026-10-11；执行前冻结）
+
+已批准方案 B 的 opt-in `raw_ngsim_event_time_v2` 物理/成本/公开状态规则见 `cscwd_raw_phase_v2_frozen_contract_20261011.md`，机器配置为 `configs/experiment/cscwd_raw_phase_v2_development_20261011.json`。顺序为环境相位与真实 reset/step 正负链 → B 独立公共消费者验收 → 仅冻结两个长开发来源的最多 60 episode/2,880 step/10,000 preview 矩阵。旧 v1 create-only 命令及原件仍是历史身份；下列旧段落中的“当前不授权训练”只针对当时旧 v1 资格/诊断，不能代替 v2 的新授权或验收门。无新环境/消费者验收回执时，不启动匹配 pilot。
+
 ## CSCWD 新 development 长轨迹来源资格（2026-10-11；结果盲）
 
 先核对事前冻结的 `cscwd_new_development_source_plan_20261011.md`。仅使用本机原始 NGSIM CSV；输出 root 必须不存在，脚本只写不含坐标/结果的来源清单与候选拒绝 ledger，不启动 agent：

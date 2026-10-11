@@ -1,0 +1,82 @@
+{
+  "schema_version": "cscwd_raw_phase_v2_development_contract_v1",
+  "time_profile": "raw_ngsim_event_time_v2",
+  "execution_authorized": true,
+  "source_manifest_sha256": "34eee3a8d16f2dfe89f3a8d8dcd27f20159c0488e2f1a9ebc77be3aac747abde",
+  "raw_source_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+  "workload_manifest_sha256": "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc",
+  "physical_assumptions": {
+    "service_execution": "source_rsu_continues_after_input_upload",
+    "input_upload": "vehicle_to_current_rsu_requires_current_contact",
+    "model_prepare": "rsu_repository_to_target_over_backhaul",
+    "state_generation": "only_after_current_node_completion",
+    "state_transfer": "source_to_target_over_backhaul",
+    "target_delivery": "vehicle_inside_predicted_target_rsu_after_state_restore",
+    "phase_order": [
+      "input_upload",
+      "model_prepare",
+      "current_node_compute",
+      "state_transfer",
+      "target_restore",
+      "target_delivery_wait"
+    ],
+    "overlap_enabled": false,
+    "queue_seconds": 0.0,
+    "queue_source_type": "simulated_no_shared_queue_not_measurement",
+    "radio_source_type": "existing_artificial_link_profile_not_wireless_measurement",
+    "backhaul_source_type": "simulated_assumption_reusing_existing_200_1000_mbps_range",
+    "backhaul_fixed_seconds": 0.02,
+    "backhaul_phase_timeout_seconds": 10.0,
+    "target_delivery_timeout_seconds": 10.0,
+    "partial_transfer_accounting": "elapsed_after_fixed_latency_times_rate_bytes_no_resource_commit",
+    "trace_end": "no_position_extrapolation_truncate_pending_and_account_elapsed",
+    "state_success": "node_output_generated_state_fully_transferred_restored_and_vehicle_delivered",
+    "no_hidden_future_for_decision": true
+  },
+  "conditions": [
+    {
+      "condition_id": "default",
+      "backhaul_actual_mbps": 1000.0,
+      "backhaul_estimated_mbps": 1000.0,
+      "cache_profile": "workload_native"
+    },
+    {
+      "condition_id": "adverse_link",
+      "backhaul_actual_mbps": 200.0,
+      "backhaul_estimated_mbps": 1000.0,
+      "cache_profile": "workload_native"
+    },
+    {
+      "condition_id": "ample_cache",
+      "backhaul_actual_mbps": 1000.0,
+      "backhaul_estimated_mbps": 1000.0,
+      "cache_profile": "all_required_bundles_at_all_rsus",
+      "cache_capacity_bytes": 2194117040
+    }
+  ],
+  "matrix": {
+    "design_ids": ["dev_01"],
+    "methods": [
+      "fallback",
+      "serve",
+      "causal_public_immediate_rule",
+      "causal_public_two_step_rule",
+      "prepare_if_legal_else_serve"
+    ],
+    "time_profiles": ["raw_ngsim_event_time_v1", "raw_ngsim_event_time_v2"],
+    "episode_cap": 60,
+    "real_step_cap": 2880,
+    "preview_cap": 10000,
+    "no_refill_after_freeze": true,
+    "design_selection_exposure": "dev_01_previously_exposed_mechanism_oriented_not_independent_confirmation",
+    "selection_rule": "source_manifest_order_then_design_order_then_condition_order_then_profile_order_then_method_order"
+  },
+  "claim_boundary": {
+    "development_only": true,
+    "formal_or_holdout": false,
+    "real_model_calls": false,
+    "real_rsu_or_wireless_measurement": false,
+    "paper_ready": false,
+    "no_condition_selection_by_performance": true
+  }
+}

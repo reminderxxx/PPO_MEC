@@ -5,6 +5,10 @@
 
 ﻿# Progress
 
+## 2026-10-11：方案 B raw phase v2 获授权并事前冻结，尚未产生新性能结果
+
+- 依据前轮 12 次 action 4 阶段诊断，负责人选择“当前接触内上传输入、原 RSU 继续节点计算、成功后经有成本的模拟 backhaul 传状态至预测目标”的独立 opt-in v2。已冻结串行相位、部分字节/clock 守恒、target delivery/timeout、public/hidden 边界及两窗×一个已暴露 `dev_01` 任务×三条件×v1/v2×五方法=60 episode、2,880 step/10,000 preview 上限；该任务属机制导向开发选择，非独立确认。配置与规则见 `cscwd_raw_phase_v2_frozen_contract_20261011.md`。目前仅合同，环境/消费者/新矩阵结果尚未验证，旧 v1 和论文保持原身份。
+
 ## 2026-10-11：长原始来源 action 4 接触/阶段根因定位完成；训练门仍关闭
 
 - 对冻结 40 episode/320 step 的 68 次 contact 拒绝做 0 步账本复算：43 个去重尝试，68/68 起点有正 contact 且 trace 剩余足够；6 次 action 0/3 公开 contact 预测可行而真实拒绝，action 4 无此类预测误判。12 次 action 4 对应 10 个去重尝试，planned 整步 1.523–6.121 s 全部超过 public/actual 当前 RSU contact；账本 SHA-256 `f35fe1ded86663488568864790c523a24a62ae66ad517c592d7aa75481d76b93`。

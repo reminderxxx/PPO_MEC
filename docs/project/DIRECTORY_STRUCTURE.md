@@ -1,5 +1,9 @@
 ﻿# Directory Structure
 
+## 2026-10-11 CSCWD raw phase v2 opt-in
+
+- `configs/experiment/cscwd_raw_phase_v2_development_20261011.json` 与 `docs/project/cscwd_raw_phase_v2_frozen_contract_20261011.md`：在结果前冻结方案 B 的物理相位、模拟 backhaul、公开字段、验收和两窗开发矩阵预算；历史 v1 原件保留。
+
 ## 2026-10-11 CSCWD 新授权长来源资格
 
 - `scripts/freeze_cscwd_new_development_source.py`、`tests/test_cscwd_new_development_source.py`：冻结后仅按原始来源/时间/车/帧/坐标有效性和历史隔离边界选最多 3 个开发来源窗口；不运行算法。

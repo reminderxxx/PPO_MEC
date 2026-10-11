@@ -2,7 +2,7 @@
 
 ## 状态与证据入口
 
-`status=PROPOSAL_NOT_AUTHORIZED_FOR_IMPLEMENTATION`。本方案只根据冻结两窗 40 episode/320 step、68 次接触拒绝及 12 次 action 4 阶段诊断拟定下一实现门，不改现有 raw 环境或已消费实验。证据和 SHA 见 [阶段报告](cscwd_new_development_contact_phase_diagnosis_20261011.md)。当前公开规则 consumer 的 `raw_full_step_contact_fit` 漏用由 B 独立最小修复；它不能解决 raw 环境内 0 成功迁移。
+`status=HISTORICAL_PROPOSAL_SUPERSEDED_BY_APPROVED_B_CONTRACT`。本方案原先只根据冻结两窗 40 episode/320 step、68 次接触拒绝及 12 次 action 4 阶段诊断拟定下一实现门；随后研究负责人明确选定方案 B，具体已冻结的实施与实验约束以 [raw phase v2 合同](cscwd_raw_phase_v2_frozen_contract_20261011.md)为准。旧 raw 环境和已消费实验仍不改。证据和 SHA 见 [阶段报告](cscwd_new_development_contact_phase_diagnosis_20261011.md)。公开规则 consumer 的 `raw_full_step_contact_fit` 漏用由 B 独立修复，仍不能解决旧 raw 环境内 0 成功迁移。
 
 ## 必须先冻结的物理选择
 
