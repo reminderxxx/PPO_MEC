@@ -5,6 +5,14 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：BLOCKED / 新开发 train source 仍无正 prepare 监督
+
+- v668 的 action4 已实际执行 15 次，排除“完全不可执行”这一狭义解释；但 192 个 actual-consumer label 中 prepare=0，
+  其中 action4 不合法 131、比较不充分 46、action4 损害当前服务 15。
+- `candidate_prepare_to_abstain_count=0`，因此当前算法开关仍无 treatment exposure。不能通过换车、扩预算、改布局/reward 或
+  查看 selection/check 来寻找有利样本；本轮 matching pilot 禁止启动。
+- 三段同一 Lankershim recording，且历史 check 暴露 provenance 不完整；即使未来开发门通过，也不能宣称独立泛化。
+
 ## 2026-10-11：OPEN / calibration-abstention 零处理暴露与训练源资格缺口
 
 - `ZERO TREATMENT EXPOSURE`：已完成 run 的四 arms 各 5,760 行均为 `abstain, weight=0`；SA 两臂 checkpoint 网络张量和

@@ -5,6 +5,14 @@
 
 # Artifact Records
 
+## 2026-10-11 Lankershim v668 actual-consumer coverage（0 训练）
+
+- root=`artifacts/analysis/cscwd_lankershim_v668_positive_prepare_coverage_probe_20261011_v1/`；entry commit=`ccef09e…6f5`；
+  integrity/summary SHA-256=`e3a54452…d00e`/`4215dd97…8986`，3/3 文件复核无 mismatch。
+- 192 env steps、0 optimizer/parameter/checkpoint/formal/holdout；selection/check rows read=false。action4 executed=15，但
+  base prepare=0、candidate intervention=0、consumer mismatch=0；gate=false，未启动 matched pilot。
+- 报告=`cscwd_lankershim_v668_coverage_result_20261011.md`；parent metadata only、同 recording 和历史暴露不完整边界保留。
+
 ## 2026-10-11 calibration-abstention 完成结果与 Lankershim coverage probe
 
 - scientific run=`cscwd_phase_v2_positive_prepare_calibration_abstention_ab_20261011_v1`，commit=`56d25519…9b`；23,040

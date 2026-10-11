@@ -33,6 +33,8 @@ create-only root 已存在；不得 rerun。下一 split/训练计划见 `cscwd_
 `configs/experiment/cscwd_lankershim_v668_positive_prepare_coverage_probe_v1.json`：仅 train 段、固定 action cycle/seed、最多
 192 env steps、一次、无 retry；selection/check 行不得读取。只有 base-positive 与 candidate prepare→abstain 均非零且 actual
 consumer mismatch=0 才能继续冻结匹配 pilot。
+该 v668 probe 已在 commit `ccef09e…6f5` 完成并失败，create-only root 已存在；不得 rerun。base prepare=0、candidate
+intervention=0，因此 4-arm matched pilot 未授权且不得启动。
 
 ## Positive-prepare calibration abstention（2026-10-11；一次性授权）
 

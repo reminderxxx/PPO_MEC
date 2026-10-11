@@ -5,6 +5,15 @@
 
 ﻿# Progress
 
+## 2026-10-11：新 v668 train source 可执行 action4，但正 prepare 暴露仍为零
+
+- A metadata candidate SHA=`7aaad8ce…fdec` 已独立核验；v668/v19/v749 三段各 1,189 frames/118.8 s，原始 time/frame
+  互斥且与已登记保护区间无重叠。历史 check 暴露不完整、同 Lankershim recording，统一记 `development_unknown`。
+- 只对 v668 train 段执行一次 192-step probe；selection/check 未读。action4 实际执行 15 次，但 base label
+  abstain/serve/prepare=`177/15/0`，真实 SA consumer mismatch=0，candidate intervention=0。
+- `coverage_gate_passed=false`，没有启动 4-arm pilot；新增 optimizer/parameter/checkpoint/formal/holdout=`0/0/0/0/0`。
+  按预注册停止，不换车辆、不追加探针或训练。
+
 ## 2026-10-11：calibration-abstention run 完成，但因零处理暴露不可解释
 
 - commit `56d25519…9b` 的一次性 run 完成 23,040 steps、3,840 optimizer steps、80 selection、320 learned eval、100
