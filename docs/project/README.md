@@ -12,6 +12,7 @@
 - `cscwd_phase_v2_public_prepare_region_plan_20261011.md`：运行前冻结的结果盲浅前缀覆盖、旧回归与新增状态分列、匹配原生动作和 12/36/288 硬预算。
 - `cscwd_phase_v2_public_prepare_region_failure_20261011.md`：唯一 create-only 执行选出 11 个 US101 起点后因 Python 3.9 兼容错误于首个环境步前失败；0 分支、无区域效果，不晋级。
 - `cscwd_phase_v2_public_prepare_region_v2_execution_plan_20261011.md`：新授权的兼容修复后独立执行身份与门槛；旧科学规则、选择、预算和失败原件不改。
+- `cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md`：唯一 v2 执行在 77 个环境步后遇公开状态唯一性门，缺完整分支账本，正负区域与基线排名仍不可验证。
 
 - `cscwd_phase_v2_repeated_action4_branch_plan_20261011.md`：B pilot 11 次第二次 action4 失败的三个去重公共起点与有界配对确认的运行前方案；结果需以独立 create-only 原件及后续报告为准。
 - `cscwd_phase_v2_repeated_action4_branch_result_20261011.md`：一次 45 步局部配对与独立只读核对；三条件省成本而服务不变，但没有一般化的公开交付识别门，生产策略不改。

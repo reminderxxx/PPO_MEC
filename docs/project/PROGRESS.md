@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-11：公开 prepare 区域 v2 兼容修复执行在公开状态去重门失败
+
+- 新授权的兼容修复执行 commit `d4a3e5b0a8341d86d080da283c6726f872333ba2` 已在运行前 push；Python 3.9.6 零步 preflight 对 24 格/11 起点/27 计划分支和 11 次实际 prefix 配对通过，SHA-256 `8a4c001261f13bad10fe96003f6d21b704c1085f7bbe98a8d942540e9b54193b`。旧 v1 失败 root 未改。
+- 唯一 v2 create-only 运行在 77 个 `env.step` 后触发原有 `selected public states are not unique` 门，失败回执 SHA-256 `4a19c502d5c5fb298601c211ed0fdb07d8a6b0b01ff829e164fc4bfda605c088`；选择清单与 v1 同 SHA。未写出分支/事件/配对/summary，完成分支数与正/负区域不可核验；未重试或改选择。详见 `cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md`，优秀基线与 paper-ready 仍 `Unverifiable`。
+
 ## 2026-10-11：公开 prepare 正负区域诊断在首步前失败
 
 - 冻结执行 commit `82818d97a0cbe6c8f6570a770cb81f8ff73f1144`，结果盲 24 格选择清单有 11 个 US101 起点（3 个旧回归、8 个新增覆盖状态）；Lankershim 未入选，11 个状态仍来自同一轨迹。清单 SHA-256 `875163d7022ce209746c1e7dd954891d12da2f92f640cac7e815a0604a2d54cb`。

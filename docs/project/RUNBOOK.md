@@ -7,7 +7,7 @@
 
 ## CSCWD phase-v2 公开 prepare 区域兼容修复后独立执行（2026-10-11）
 
-先读 `cscwd_phase_v2_public_prepare_region_v2_execution_plan_20261011.md` 与机器 manifest。新授权只允许全新 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v2/` 单次运行；旧 `v1` 失败 root 不可复用。先以项目 Python 3.9.6 完成无环境步的实际 CSV 选择/前缀配对 preflight、局部测试和无科学进程/干净 commit 检查，运行命令仍使用下方 v1 历史命令的同一 B pilot 输入路径，只把 output root 改为 v2。启动/完成或失败回执记录实际执行 commit；失败即停不补跑。实验结论以 v2 原件及后续报告为准。
+先读 `cscwd_phase_v2_public_prepare_region_v2_execution_plan_20261011.md` 与失败报告 `cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md`。这一段是**已执行记录，不可原样重跑**：新授权的 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v2/` 从干净且已 push 的 `d4a3e5b` 单次启动；项目 Python 3.9.6 的零环境步 CSV/前缀配对 preflight 通过，原 v1 root 未变。v2 在 77 个真实环境步后触发原有公开状态唯一性门，只有启动、选择、失败回执，没有完整科学结果；按失败即停停止。后续碰撞定位及新执行须另立任务/身份。
 
 ## CSCWD phase-v2 公开 prepare 正负区域有界诊断（2026-10-11）
 

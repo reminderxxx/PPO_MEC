@@ -7,7 +7,7 @@
 
 2026-10-11 的 [phase v2 公开 prepare 正负区域有界诊断](docs/project/cscwd_phase_v2_public_prepare_region_failure_20261011.md)按[事前方案](docs/project/cscwd_phase_v2_public_prepare_region_plan_20261011.md)枚举 24 格、选出 11 个 US101 开发起点；一次执行因 Python 3.9 不支持 `zip(strict=True)` 在首个环境步前 `FAIL`，实际 0 分支/0 步。没有正负区域效果结果；原 root 保留且未补跑，在线策略与论文主张不变。
 
-独立 [v2 兼容修复执行方案](docs/project/cscwd_phase_v2_public_prepare_region_v2_execution_plan_20261011.md)已另行冻结新 run ID 与 create-only root，保留原 24 格选择及实验判据；结果以新原件和后续报告为准，原失败现场仍保留。
+独立 [v2 兼容修复执行方案](docs/project/cscwd_phase_v2_public_prepare_region_v2_execution_plan_20261011.md)保留原 24 格选择及实验判据；[唯一运行](docs/project/cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md)通过 Python 3.9 位置后，在 77 个环境步骤时因公开状态重复门 `FAIL`。只有启动、选择和失败回执，没有完整分支/区域结果；原 v1/v2 现场均保留，不晋级论文或基线主张。
 
 2026-10-11 的 [raw phase v2 第二次 action4 有界分支确认](docs/project/cscwd_phase_v2_repeated_action4_branch_result_20261011.md)按事前[方案](docs/project/cscwd_phase_v2_repeated_action4_branch_plan_20261011.md)一次完成 3 个去重 US101 起点、6 分支/45 真实步。相同公开 continuation 下 action3 在三条件均保持服务并省传输；这仍是单一已暴露来源的局部诊断，尚无安全的公开 abstain 门，不修改生产策略或论文主张。
 

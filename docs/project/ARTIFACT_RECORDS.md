@@ -5,6 +5,11 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD phase-v2 public prepare regions v2 failed execution
+
+- 执行 commit `d4a3e5b0a8341d86d080da283c6726f872333ba2` 运行前已 push；manifest SHA-256 `c90e3dce8d58bf823a48a1ec625fe9ca978fe12166003019ee36c61dd8067c13`，零步 preflight `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v2_preflight/preflight.json` SHA-256 `8a4c001261f13bad10fe96003f6d21b704c1085f7bbe98a8d942540e9b54193b`。
+- 唯一 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v2/`：`start_receipt.json` SHA-256 `546927737fad974583ac2757f5103a727be05690846944b9264222fdefbe34f9`，`selection_inventory.json` 与旧 v1 同 SHA-256 `875163d7022ce209746c1e7dd954891d12da2f92f640cac7e815a0604a2d54cb`，`failure_receipt.json` SHA-256 `4a19c502d5c5fb298601c211ed0fdb07d8a6b0b01ff829e164fc4bfda605c088`。真实 77 `env.step` 后公开状态唯一性门 `FAIL`；未写分支/事件/配对/summary，区域效果 `E0_UNAVAILABLE`，未补跑。报告 `cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md`；原件不入 Git。
+
 ## 2026-10-11 CSCWD phase-v2 public prepare regions failed execution
 
 - 冻结执行 commit `82818d97a0cbe6c8f6570a770cb81f8ff73f1144`；本地 create-only `artifacts/analysis/cscwd_phase_v2_public_prepare_regions_20261011_v1/`，`start_receipt.json` SHA-256 `a90a5428ba0aa8bd77883a9bbb25fbff5ac88cb194fa7845c3664faaa899cedc`、`selection_inventory.json` `875163d7022ce209746c1e7dd954891d12da2f92f640cac7e815a0604a2d54cb`、`failure_receipt.json` `55b826571c4b2474bf1f52ab228892d37855a850425ce20249b942100127e1ad`。

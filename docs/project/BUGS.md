@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：公开 prepare 区域选择单位与公开状态唯一性门冲突
+
+- `OPEN PROTOCOL / INVALID V2 RUN`：结果盲选择按 `(source, condition, prefix)` 保留 11 个 US101 开发格，执行器按全局 `semantic_state + action_mask` hash 去重；唯一 v2 运行在 77 个 `env.step` 后发现至少一个入选状态重复并停止。失败路径未保存部分分支账本，不能确认碰撞格、已完成分支数或区域效果；原 root 保留，禁止从步数倒推效果或直接放宽唯一性门。见 `cscwd_phase_v2_public_prepare_region_v2_failure_20261011.md`。
+- `OPEN SCIENCE`：正向 prepare 使用和无益成本的全区域配对仍无完整证据，且 11 个起点均属同一 US101 轨迹。修正选择/去重协议须先另立只读定位与事前冻结任务，不得以 v2 失败结果补选、重跑或改生产在线策略。
+
 ## 2026-10-11：公开 prepare 区域诊断执行兼容失败
 
 - `RESOLVED IN FUTURE SOURCE / INVALID RUN`：唯一运行的 Python 3.9.6 不支持 `zip(strict=True)`，首个环境步前抛错。已在后续源码显式校验长度并补局部测试；原 run `cscwd_phase_v2_public_prepare_regions_20261011_v1` 永远保持 `FAIL`/0 分支/0 步，不用修复源码追认或重试。
