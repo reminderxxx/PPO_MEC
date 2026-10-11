@@ -18,9 +18,11 @@ YES = "yes"
 NO = "no"
 UNKNOWN = "unknown"
 NOT_APPLICABLE = "not_applicable"
-SCHEMA_VERSION = "causal_public_action_estimator_v2"
-EVENT_LABEL_SCHEMA_VERSION = "causal_public_prepare_advantage_v2"
-PUBLIC_RULE_SCHEMA_VERSION = "causal_public_rule_selection_v2"
+SCHEMA_VERSION = "causal_public_action_estimator_v3"
+EVENT_LABEL_SCHEMA_VERSION = "causal_public_prepare_advantage_v3"
+PUBLIC_RULE_SCHEMA_VERSION = "causal_public_rule_selection_v3"
+RAW_PHASE_V1 = "raw_ngsim_event_time_v1"
+RAW_PHASE_V2 = "raw_ngsim_event_time_v2"
 PRIVILEGED_REFERENCE_PROFILES = {
     "immediate_cost_rule": {
         "capability_profile": "privileged_exact_transition_clone_v1",
@@ -60,6 +62,23 @@ def _network_seconds(byte_count: int | None, mbps: float | None, fixed: float | 
     if byte_count <= 0:
         return 0.0
     return float(byte_count) * 8.0 / (mbps * 1_000_000.0) + fixed
+
+
+def _timeout_bytes(
+    byte_count: int | None,
+    mbps: float | None,
+    fixed: float | None,
+    timeout: float | None,
+) -> int | None:
+    if byte_count is None or mbps is None or fixed is None or timeout is None:
+        return None
+    if byte_count <= 0:
+        return 0
+    transferable_seconds = max(0.0, timeout - fixed)
+    return min(
+        int(byte_count),
+        max(0, int(transferable_seconds * mbps * 1_000_000.0 / 8.0)),
+    )
 
 
 def _primary_vehicle(state: dict[str, Any]) -> dict[str, Any]:
@@ -212,6 +231,444 @@ def _service_status(action: int, current_bundle: dict[str, Any]) -> str:
     return UNKNOWN
 
 
+def _raw_time_profile(state: dict[str, Any]) -> str:
+    profiles = {
+        str(state.get("interface_profile", "")),
+        str(state.get("time_profile", "")),
+    }
+    if RAW_PHASE_V2 in profiles:
+        return RAW_PHASE_V2
+    if RAW_PHASE_V1 in profiles:
+        return RAW_PHASE_V1
+    return "nonraw"
+
+
+def _prediction_uncertainty(
+    state: dict[str, Any],
+    vehicle_id: str,
+) -> float | None:
+    predictions = dict(state.get("predictions", {}) or {})
+    value = _finite(
+        dict(predictions.get("prediction_uncertainty_by_vehicle", {}) or {}).get(
+            vehicle_id
+        )
+    )
+    if value is None:
+        return None
+    return max(0.0, min(1.0, value))
+
+
+def _estimate_phase_v2_actions(
+    state: dict[str, Any],
+    mask: list[bool],
+) -> dict[str, Any]:
+    """Estimate the opt-in serial phase-v2 contract from public fields only."""
+
+    context = dict(state.get("calibrated_context", {}) or {})
+    phase = dict(context.get("phase_contract", {}) or {})
+    if phase.get("schema_version") != RAW_PHASE_V2:
+        raise ValueError("raw phase v2 public phase_contract is missing or stale")
+    if phase.get("overlap_enabled") is not False:
+        raise ValueError("raw phase v2 estimator requires serial public phases")
+
+    node = dict(state.get("current_workflow_node", {}) or {})
+    vehicle = _primary_vehicle(state)
+    vehicle_id = str(vehicle.get("vehicle_id", ""))
+    current_rsu_id = vehicle.get("associated_rsu_id")
+    target_rsu_id = _prediction_target(state, vehicle_id)
+    if target_rsu_id is not None and str(target_rsu_id) == str(current_rsu_id):
+        target_rsu_id = None
+    current_bundle = _bundle(
+        state,
+        str(current_rsu_id) if current_rsu_id is not None else None,
+    )
+    target_bundle = _bundle(state, target_rsu_id)
+    current_prefix = _prefix_status(state, "current")
+    target_prefix = _prefix_status(state, "predicted_target")
+    recompute, recompute_reason = _known_recompute_seconds(state)
+
+    time_contract = dict(context.get("time_contract", {}) or {})
+    remaining_deadline = _nonnegative(
+        time_contract.get("remaining_deadline_seconds")
+    )
+    contact = _nonnegative(context.get("contact_budget_seconds"))
+    compute = _nonnegative(
+        context.get("compute_seconds", node.get("compute_seconds"))
+    )
+    fallback = _nonnegative(context.get("vehicle_fallback_seconds"))
+    failure = _nonnegative(context.get("failed_service_seconds"))
+    measured = dict(context.get("measured_time_seconds", {}) or {})
+    restore = _nonnegative(measured.get("state_restore_overhead"))
+    try:
+        state_bytes = max(0, int(context.get("state_bytes", node.get("state_bytes"))))
+        input_bytes = max(0, int(context.get("input_bytes", node.get("input_bytes"))))
+    except (TypeError, ValueError):
+        state_bytes = input_bytes = None
+
+    radio = dict(phase.get("input_upload", {}) or {})
+    backhaul = dict(phase.get("backhaul", {}) or {})
+    delivery = dict(phase.get("target_delivery", {}) or {})
+    queue = dict(phase.get("queue", {}) or {})
+    radio_mbps = _nonnegative(radio.get("estimated_mbps"))
+    radio_fixed = _nonnegative(radio.get("fixed_seconds"))
+    backhaul_mbps = _nonnegative(backhaul.get("estimated_mbps"))
+    backhaul_fixed = _nonnegative(backhaul.get("fixed_seconds"))
+    backhaul_timeout = _nonnegative(backhaul.get("phase_timeout_seconds"))
+    delivery_timeout = _nonnegative(delivery.get("timeout_seconds"))
+    queue_seconds = _nonnegative(queue.get("seconds"))
+    if radio.get("requires_current_contact") is not True:
+        raise ValueError("raw phase v2 input upload must require current contact")
+    if delivery.get("prediction_conditioned") is not True:
+        raise ValueError("raw phase v2 delivery must remain prediction-conditioned")
+    if queue_seconds != 0.0:
+        raise ValueError("raw phase v2 shared queue must remain an explicit zero assumption")
+
+    uncertainty = _prediction_uncertainty(state, vehicle_id)
+    predicted_delivery_wait = (
+        uncertainty * delivery_timeout
+        if target_rsu_id is not None
+        and uncertainty is not None
+        and delivery_timeout is not None
+        else None
+    )
+    input_network = _network_seconds(input_bytes, radio_mbps, radio_fixed)
+    input_contact_fit = _tri_leq(input_network, contact)
+    current_model_network = _network_seconds(
+        current_bundle["transfer_bytes"], backhaul_mbps, backhaul_fixed
+    )
+    target_model_network = _network_seconds(
+        target_bundle["transfer_bytes"], backhaul_mbps, backhaul_fixed
+    )
+    state_network = _network_seconds(state_bytes, backhaul_mbps, backhaul_fixed)
+    current_model_timeout_fit = _tri_leq(
+        current_model_network, backhaul_timeout
+    )
+    target_model_timeout_fit = _tri_leq(target_model_network, backhaul_timeout)
+    state_timeout_fit = _tri_leq(state_network, backhaul_timeout)
+
+    actions: dict[str, dict[str, Any]] = {}
+    for action in range(5):
+        legal = bool(mask[action])
+        service = _service_status(action, current_bundle) if legal else NO
+        target_prepare = NOT_APPLICABLE
+        target_state_commit = NOT_APPLICABLE
+        input_fit = NOT_APPLICABLE
+        model_timeout_fit = NOT_APPLICABLE
+        action_state_timeout_fit = NOT_APPLICABLE
+        delivery_status = NOT_APPLICABLE
+        model_bytes: int | None = 0
+        transferred_state_bytes: int | None = 0
+        transferred_input_bytes: int | None = 0
+        known_parts: list[float | None] = []
+        unknown_reasons: list[str] = []
+        phase_status = {
+            "input_upload": NOT_APPLICABLE,
+            "current_model_prepare": NOT_APPLICABLE,
+            "target_model_prepare": NOT_APPLICABLE,
+            "current_service": NOT_APPLICABLE,
+            "target_state_commit": NOT_APPLICABLE,
+            "target_delivery": NOT_APPLICABLE,
+        }
+        phase_seconds: dict[str, float | None] = {
+            key: None for key in phase_status
+        }
+
+        if not legal:
+            total = None
+            unknown_reasons.append("action_masked")
+        elif action == 2:
+            # The v2 executor intentionally preserves the legacy vehicle
+            # fallback accounting while exempting it from RSU contact.
+            legacy_link = dict(context.get("link", {}) or {})
+            fallback_input = _network_seconds(
+                input_bytes,
+                _nonnegative(legacy_link.get("estimated_mbps")),
+                _nonnegative(legacy_link.get("fixed_seconds")),
+            )
+            known_parts.extend([fallback, compute, fallback_input])
+            transferred_input_bytes = input_bytes
+            phase_status["current_service"] = (
+                "known_estimate"
+                if _sum_known(known_parts) is not None
+                else "unknown"
+            )
+            phase_seconds["current_service"] = _sum_known(known_parts)
+            total = _sum_known(known_parts)
+        else:
+            input_fit = input_contact_fit
+            phase_seconds["input_upload"] = (
+                input_network if input_fit == YES else contact if input_fit == NO else None
+            )
+            if input_fit == YES:
+                known_parts.append(input_network)
+                transferred_input_bytes = input_bytes
+                phase_status["input_upload"] = "known_estimate"
+            elif input_fit == NO:
+                known_parts.append(contact)
+                transferred_input_bytes = _timeout_bytes(
+                    input_bytes, radio_mbps, radio_fixed, contact
+                )
+                service = NO
+                phase_status["input_upload"] = "partial_contact_expired"
+            else:
+                known_parts.append(None)
+                transferred_input_bytes = None
+                service = UNKNOWN
+                phase_status["input_upload"] = "unknown"
+                unknown_reasons.append("missing_public_input_upload_or_contact")
+
+            if input_fit == YES:
+                if action == 0 and current_bundle["readiness"] == NO:
+                    if current_bundle["admission"] != YES:
+                        service = UNKNOWN
+                        model_bytes = None
+                        known_parts.append(None)
+                        phase_status["current_model_prepare"] = "unknown"
+                        unknown_reasons.append(str(current_bundle["reason"]))
+                    else:
+                        model_timeout_fit = current_model_timeout_fit
+                        if model_timeout_fit == YES:
+                            prepare_seconds = _sum_known(
+                                [current_model_network, current_bundle["load_seconds"]]
+                            )
+                            known_parts.append(prepare_seconds)
+                            model_bytes = int(current_bundle["transfer_bytes"] or 0)
+                            phase_seconds["current_model_prepare"] = prepare_seconds
+                            phase_status["current_model_prepare"] = "known_estimate"
+                            service = YES
+                        elif model_timeout_fit == NO:
+                            known_parts.append(backhaul_timeout)
+                            model_bytes = _timeout_bytes(
+                                current_bundle["transfer_bytes"],
+                                backhaul_mbps,
+                                backhaul_fixed,
+                                backhaul_timeout,
+                            )
+                            phase_seconds["current_model_prepare"] = backhaul_timeout
+                            phase_status["current_model_prepare"] = "partial_timeout"
+                            service = NO
+                        else:
+                            known_parts.append(None)
+                            model_bytes = None
+                            phase_status["current_model_prepare"] = "unknown"
+                            service = UNKNOWN
+                            unknown_reasons.append("missing_public_backhaul_timeout")
+
+                target_model_ready = False
+                if action in {1, 4}:
+                    if target_rsu_id is None:
+                        target_prepare = NO
+                        phase_status["target_model_prepare"] = "skipped_no_target"
+                    elif target_bundle["admission"] != YES:
+                        target_prepare = UNKNOWN
+                        model_bytes = None
+                        known_parts.append(None)
+                        phase_status["target_model_prepare"] = "unknown"
+                        unknown_reasons.append(str(target_bundle["reason"]))
+                    else:
+                        model_timeout_fit = target_model_timeout_fit
+                        if model_timeout_fit == YES:
+                            prepare_seconds = _sum_known(
+                                [target_model_network, target_bundle["load_seconds"]]
+                            )
+                            known_parts.append(prepare_seconds)
+                            model_bytes = int(target_bundle["transfer_bytes"] or 0)
+                            phase_seconds["target_model_prepare"] = prepare_seconds
+                            phase_status["target_model_prepare"] = "known_estimate"
+                            target_model_ready = True
+                            target_prepare = YES if action == 1 else UNKNOWN
+                        elif model_timeout_fit == NO:
+                            known_parts.append(backhaul_timeout)
+                            model_bytes = _timeout_bytes(
+                                target_bundle["transfer_bytes"],
+                                backhaul_mbps,
+                                backhaul_fixed,
+                                backhaul_timeout,
+                            )
+                            phase_seconds["target_model_prepare"] = backhaul_timeout
+                            phase_status["target_model_prepare"] = "partial_timeout"
+                            target_prepare = NO
+                        else:
+                            known_parts.append(None)
+                            model_bytes = None
+                            phase_status["target_model_prepare"] = "unknown"
+                            target_prepare = UNKNOWN
+                            unknown_reasons.append("missing_public_backhaul_timeout")
+
+                if service == NO:
+                    known_parts.append(failure)
+                    phase_seconds["current_service"] = failure
+                    phase_status["current_service"] = (
+                        "known_failure_estimate" if failure is not None else "unknown"
+                    )
+                    if failure is None:
+                        unknown_reasons.append(
+                            "missing_public_failed_service_seconds"
+                        )
+                elif service == YES:
+                    service_seconds = _sum_known([compute, recompute])
+                    known_parts.append(service_seconds)
+                    phase_seconds["current_service"] = service_seconds
+                    phase_status["current_service"] = (
+                        "known_estimate" if service_seconds is not None else "unknown"
+                    )
+                    if compute is None:
+                        unknown_reasons.append("missing_public_compute_seconds")
+                    if recompute is None:
+                        unknown_reasons.append(recompute_reason)
+                else:
+                    known_parts.append(None)
+                    phase_status["current_service"] = "unknown"
+                    unknown_reasons.append("current_service_feasibility_unknown")
+
+                if action == 4:
+                    delivery_status = (
+                        YES
+                        if target_rsu_id is not None
+                        and predicted_delivery_wait is not None
+                        else UNKNOWN
+                    )
+                    if service == YES and target_model_ready:
+                        action_state_timeout_fit = state_timeout_fit
+                        if state_timeout_fit == YES and delivery_status == YES:
+                            state_commit_seconds = _sum_known(
+                                [state_network, restore, predicted_delivery_wait]
+                            )
+                            known_parts.append(state_commit_seconds)
+                            transferred_state_bytes = state_bytes
+                            phase_seconds["target_state_commit"] = _sum_known(
+                                [state_network, restore]
+                            )
+                            phase_status["target_state_commit"] = "known_estimate"
+                            phase_seconds["target_delivery"] = predicted_delivery_wait
+                            phase_status["target_delivery"] = (
+                                "prediction_risk_estimate"
+                            )
+                            target_prepare = YES
+                            target_state_commit = YES
+                        elif state_timeout_fit == NO:
+                            known_parts.append(backhaul_timeout)
+                            transferred_state_bytes = _timeout_bytes(
+                                state_bytes,
+                                backhaul_mbps,
+                                backhaul_fixed,
+                                backhaul_timeout,
+                            )
+                            phase_seconds["target_state_commit"] = backhaul_timeout
+                            phase_status["target_state_commit"] = "partial_timeout"
+                            target_prepare = NO
+                            target_state_commit = NO
+                        else:
+                            known_parts.append(None)
+                            transferred_state_bytes = None
+                            phase_status["target_state_commit"] = "unknown"
+                            phase_status["target_delivery"] = "unknown"
+                            target_prepare = UNKNOWN
+                            target_state_commit = UNKNOWN
+                            unknown_reasons.append(
+                                "missing_public_state_timeout_or_delivery_prediction"
+                            )
+                    elif service == NO or target_prepare == NO:
+                        transferred_state_bytes = 0
+                        target_state_commit = NO
+                        phase_status["target_state_commit"] = (
+                            "skipped_current_service_or_model_prepare_failed"
+                        )
+                    else:
+                        transferred_state_bytes = None
+                        target_state_commit = UNKNOWN
+                        phase_status["target_state_commit"] = "conditional_unknown"
+            total = _sum_known(known_parts)
+
+        if legal and action != 2:
+            raw_execution_fit = NO if input_fit == NO else UNKNOWN
+        elif legal:
+            raw_execution_fit = UNKNOWN
+        else:
+            raw_execution_fit = NOT_APPLICABLE
+        cost_status = (
+            "not_executed"
+            if not legal
+            else "known_conditional_estimate" if total is not None else "unknown_required_phase"
+        )
+        readiness_gain = "none"
+        if legal and action == 0 and service == YES and current_bundle["readiness"] == NO:
+            readiness_gain = "current_bundle"
+        elif legal and action == 1 and target_prepare == YES and target_bundle["readiness"] == NO:
+            readiness_gain = "target_bundle"
+        elif legal and action == 4 and target_prepare == YES and service == YES:
+            if target_bundle["readiness"] == NO or target_prefix["valid"] is False:
+                readiness_gain = "target_bundle_and_state"
+
+        actions[str(action)] = {
+            "legal": legal,
+            "current_service": service,
+            "target_prepare": target_prepare,
+            "target_state_commit": target_state_commit,
+            "future_readiness_gain": readiness_gain,
+            "cost_status": cost_status,
+            "cost_basis": "public_prediction_conditioned_phase_estimate_not_realized_cost",
+            "estimated_conditional_seconds": total,
+            "estimated_total_seconds": total,
+            "actual_executed_seconds": None,
+            "actual_execution_cost_status": "unavailable_online",
+            "deadline_fit": _tri_leq(total, remaining_deadline),
+            "input_upload_contact_fit": input_fit,
+            "target_prepare_contact_fit": NOT_APPLICABLE,
+            "raw_full_step_contact_fit": NOT_APPLICABLE,
+            "model_backhaul_timeout_fit": model_timeout_fit,
+            "state_backhaul_timeout_fit": action_state_timeout_fit,
+            "predicted_target_delivery": delivery_status,
+            "raw_trace_fit": UNKNOWN if legal else NOT_APPLICABLE,
+            "raw_execution_fit": raw_execution_fit,
+            "phase_status": phase_status,
+            "estimated_phase_seconds": phase_seconds,
+            "model_transfer_bytes": model_bytes,
+            "state_transfer_bytes": transferred_state_bytes,
+            "input_transfer_bytes": transferred_input_bytes,
+            "unknown_reasons": sorted(set(unknown_reasons)),
+        }
+
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "public_only": True,
+        "time_profile": RAW_PHASE_V2,
+        "current_rsu_id": current_rsu_id,
+        "predicted_target_rsu_id": target_rsu_id,
+        "current_bundle": current_bundle,
+        "target_bundle": target_bundle,
+        "current_prefix": current_prefix,
+        "target_prefix": target_prefix,
+        "time_contract_schema": time_contract.get("schema_version"),
+        "phase_contract_schema": phase.get("schema_version"),
+        "remaining_deadline_seconds": remaining_deadline,
+        "contact_budget_seconds": contact,
+        "prediction_uncertainty": uncertainty,
+        "estimated_prediction_failure_wait_seconds": predicted_delivery_wait,
+        "recompute_seconds": recompute,
+        "recompute_reason": recompute_reason,
+        "actions": actions,
+        "consumed_fields": [
+            "primary_vehicle_id/vehicles.associated_rsu_id",
+            "current_workflow_node/workflow",
+            "predictions causal target/sequence/confidence/uncertainty",
+            "rsus typed residents/capacity/used bytes",
+            "calibrated_context required bundle/object catalog/prepared prefix",
+            "calibrated_context contact/node/fallback/failure costs",
+            "calibrated_context time_contract deadline fields",
+            "calibrated_context phase_contract radio/backhaul/queue/timeouts",
+            "interface_profile/time_profile contract identity",
+        ],
+        "forbidden_fields": [
+            "instance.rsu_sequence",
+            "actual link",
+            "realized future position/contact/target arrival",
+            "environment clone/step",
+            "reward/outcome label",
+        ],
+    }
+
+
 def estimate_public_actions(
     semantic_state: dict[str, Any],
     action_mask: list[bool] | None = None,
@@ -230,6 +687,8 @@ def estimate_public_actions(
     mask = list(action_mask) if action_mask is not None else ActionMaskBuilder().build_mask(state)
     if len(mask) != 5:
         raise ValueError("public action mask must contain five entries")
+    if _raw_time_profile(state) == RAW_PHASE_V2:
+        return _estimate_phase_v2_actions(state, mask)
 
     current_bundle = _bundle(state, str(current_rsu_id) if current_rsu_id is not None else None)
     target_bundle = _bundle(state, target_rsu_id)
@@ -257,10 +716,7 @@ def estimate_public_actions(
     time_contract = dict(context.get("time_contract", {}) or {})
     remaining_deadline = _nonnegative(time_contract.get("remaining_deadline_seconds"))
     recompute, recompute_reason = _known_recompute_seconds(state)
-    raw_full_step_contact_contract = "raw_ngsim_event_time_v1" in {
-        str(state.get("interface_profile", "")),
-        str(state.get("time_profile", "")),
-    }
+    raw_full_step_contact_contract = _raw_time_profile(state) == RAW_PHASE_V1
 
     current_model_network = _network_seconds(current_bundle["transfer_bytes"], mbps, fixed)
     current_model_prepare = _sum_known([current_model_network, current_bundle["load_seconds"]])
@@ -480,6 +936,7 @@ def estimate_public_actions(
     return {
         "schema_version": SCHEMA_VERSION,
         "public_only": True,
+        "time_profile": _raw_time_profile(state),
         "current_rsu_id": current_rsu_id,
         "predicted_target_rsu_id": target_rsu_id,
         "current_bundle": current_bundle,
@@ -584,13 +1041,14 @@ def _score(row: dict[str, Any]) -> tuple[Any, ...]:
 def classify_public_rule_candidates(estimate: dict[str, Any]) -> dict[str, str]:
     """Classify legal rule candidates without promoting unknown raw feasibility.
 
-    The raw executor applies an atomic full-step contact gate.  Vehicle
-    fallback (action 2) is contact-independent; every other raw action must be
-    explicitly known to fit.  Non-raw profiles retain the historical scoring
-    surface because the raw gate is not applicable there.
+    Raw v1 applies an atomic full-step contact gate.  Raw phase v2 instead
+    requires only the public input-upload contact phase to fit, then checks
+    declared backhaul timeouts without exposing realized target arrival.
+    Vehicle fallback remains contact-independent in both profiles.
     """
 
-    raw_contract = any(
+    profile = str(estimate.get("time_profile", "nonraw"))
+    raw_contract = profile == RAW_PHASE_V1 or any(
         row["legal"] and row["raw_trace_fit"] == UNKNOWN
         for row in estimate["actions"].values()
     )
@@ -599,6 +1057,28 @@ def classify_public_rule_candidates(estimate: dict[str, Any]) -> dict[str, str]:
         action = int(key)
         if not row["legal"]:
             result[key] = "masked"
+        elif profile == RAW_PHASE_V2 and action == 2:
+            result[key] = "eligible_contact_independent_fallback"
+        elif profile == RAW_PHASE_V2:
+            upload = row.get("input_upload_contact_fit", UNKNOWN)
+            if upload == NO:
+                result[key] = "excluded_explicit_input_contact_infeasible"
+            elif upload != YES:
+                result[key] = "excluded_unknown_input_contact_feasibility"
+            elif action in {0, 1, 4} and row.get(
+                "model_backhaul_timeout_fit", NOT_APPLICABLE
+            ) == NO:
+                result[key] = "excluded_explicit_model_backhaul_timeout"
+            elif action == 0 and row.get("phase_status", {}).get(
+                "current_model_prepare"
+            ) == "unknown":
+                result[key] = "excluded_unknown_current_model_prepare"
+            elif action in {1, 4} and row["target_prepare"] == NO:
+                result[key] = "excluded_explicit_target_prepare_infeasible"
+            elif action in {1, 4} and row["target_prepare"] != YES:
+                result[key] = "excluded_unknown_target_prepare_feasibility"
+            else:
+                result[key] = "eligible_public_phase_v2_estimate"
         elif not raw_contract:
             result[key] = "eligible_nonraw_contract"
         elif action == 2:
@@ -630,7 +1110,7 @@ class CausalPublicImmediateRule:
     capability_profile = "public_causal_semantic_state_only_v1"
     rule_schema_version = PUBLIC_RULE_SCHEMA_VERSION
     objective_profile = (
-        "raw_feasible_then_lexicographic_service_deadline_known_readiness_cost_v2"
+        "public_phase_feasible_then_lexicographic_service_deadline_known_readiness_cost_v3"
     )
     public_information_matched = True
     uses_environment_preview = False
@@ -657,6 +1137,13 @@ def project_public_state(
 ) -> tuple[dict[str, Any] | None, str]:
     """Project only effects that are identifiable from the public estimate."""
 
+    if estimate.get("time_profile") == RAW_PHASE_V2:
+        # The public state exposes a predicted target but no causal
+        # two-dimensional velocity or target-entry time.  Advancing the
+        # continuous-time RSU association would therefore require the hidden
+        # trace.  Fail closed to the immediate score instead of projecting a
+        # stale association/contact budget.
+        return None, "phase_v2_second_step_mobility_unknown"
     row = estimate["actions"][str(int(action))]
     if row["current_service"] != YES or row["estimated_total_seconds"] is None:
         return None, "first_step_service_or_time_unknown"

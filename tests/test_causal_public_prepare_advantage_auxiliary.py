@@ -131,9 +131,9 @@ def test_checkpoint_semantics_and_mutual_exclusion_are_explicit(
     with pytest.raises(ValueError, match="causal public prepare-advantage"):
         candidate.agent.load(str(legacy_path))
 
-    stale_path = tmp_path / "candidate_v1.pt"
+    stale_path = tmp_path / "candidate_v2.pt"
     payload["config"]["mechanism_aux_event_target_semantics"] = (
-        "causal_public_prepare_advantage_v1"
+        "causal_public_prepare_advantage_v2"
     )
     torch.save(payload, stale_path)
     with pytest.raises(ValueError, match="event-target checkpoint label"):

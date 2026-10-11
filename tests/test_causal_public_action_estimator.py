@@ -138,11 +138,55 @@ def _state(*, current_ready: bool = True, remaining: float = 60.0) -> dict:
     }
 
 
+def _phase_v2_state(*, current_ready: bool = True, remaining: float = 60.0) -> dict:
+    state = _state(current_ready=current_ready, remaining=remaining)
+    state["interface_profile"] = (
+        "calibrated_workflow_interface_v4_prepared_state_prefix"
+    )
+    state["time_profile"] = "raw_ngsim_event_time_v2"
+    state["calibrated_context"]["time_contract"]["schema_version"] = (
+        "raw_ngsim_event_time_v2"
+    )
+    state["calibrated_context"]["phase_contract"] = {
+        "schema_version": "raw_ngsim_event_time_v2",
+        "phase_order": [
+            "input_upload",
+            "model_prepare",
+            "current_node_compute",
+            "state_transfer",
+            "target_restore",
+            "target_delivery_wait",
+        ],
+        "overlap_enabled": False,
+        "service_execution": "source_rsu_continues_after_input_upload",
+        "input_upload": {
+            "estimated_mbps": 100.0,
+            "fixed_seconds": 0.02,
+            "requires_current_contact": True,
+        },
+        "backhaul": {
+            "estimated_mbps": 1000.0,
+            "fixed_seconds": 0.02,
+            "phase_timeout_seconds": 10.0,
+        },
+        "queue": {"seconds": 0.0, "source_type": "simulated_no_queue"},
+        "target_delivery": {
+            "timeout_seconds": 10.0,
+            "prediction_conditioned": True,
+        },
+        "source_types": {
+            "radio": "simulation_assumption",
+            "backhaul": "simulation_assumption",
+        },
+    }
+    return state
+
+
 def test_public_estimate_is_pure_and_ignores_private_future_fields() -> None:
     state = _state()
     before = _hash(state)
     estimate = estimate_public_actions(state)
-    assert estimate["schema_version"] == "causal_public_action_estimator_v2"
+    assert estimate["schema_version"] == "causal_public_action_estimator_v3"
     assert estimate["schema_version"] == SCHEMA_VERSION
     assert _hash(state) == before
     assert estimate["actions"]["4"]["current_service"] == YES
@@ -217,6 +261,65 @@ def test_raw_time_profile_activates_gate_without_overwriting_interface() -> None
     assert action4["target_prepare_contact_fit"] == YES
     assert action4["raw_full_step_contact_fit"] == NO
     assert action4["raw_trace_fit"] == UNKNOWN
+
+
+def test_phase_v2_uses_only_public_phase_estimates_and_prediction_risk() -> None:
+    state = _phase_v2_state()
+    before = _hash(state)
+    estimate = estimate_public_actions(state)
+    action4 = estimate["actions"]["4"]
+    assert _hash(state) == before
+    assert estimate["phase_contract_schema"] == "raw_ngsim_event_time_v2"
+    assert action4["input_upload_contact_fit"] == YES
+    assert action4["model_backhaul_timeout_fit"] == YES
+    assert action4["state_backhaul_timeout_fit"] == YES
+    assert action4["predicted_target_delivery"] == YES
+    assert action4["raw_full_step_contact_fit"] == "not_applicable"
+    assert action4["raw_trace_fit"] == UNKNOWN
+    assert action4["estimated_phase_seconds"]["target_delivery"] == 2.0
+    assert public_prepare_advantage_label(state)["decision"] == "prepare"
+    info = {"semantic_state": state, "action_mask": [True] * 5}
+    assert CausalPublicTwoStepRule().select_action_from_info(info) == (
+        CausalPublicImmediateRule().select_action_from_info(info)
+    )
+
+    altered = deepcopy(state)
+    altered["actual_future_route"] = ["secret"]
+    altered["actual_target_entry_seconds"] = 999.0
+    altered["calibrated_context"]["time_contract"][
+        "trace_remaining_seconds"
+    ] = 0.0
+    assert estimate_public_actions(altered) == estimate
+
+
+def test_phase_v2_known_input_contact_failure_is_fail_closed() -> None:
+    state = _phase_v2_state()
+    state["calibrated_context"]["contact_budget_seconds"] = 0.01
+    estimate = estimate_public_actions(state)
+    action4 = estimate["actions"]["4"]
+    assert action4["input_upload_contact_fit"] == NO
+    assert action4["current_service"] == NO
+    classes = classify_public_rule_candidates(estimate)
+    assert classes["4"] == "excluded_explicit_input_contact_infeasible"
+    assert classes["2"] == "eligible_contact_independent_fallback"
+
+
+def test_phase_v2_backhaul_timeout_and_missing_prediction_abstain() -> None:
+    timeout = _phase_v2_state()
+    timeout["calibrated_context"]["phase_contract"]["backhaul"][
+        "phase_timeout_seconds"
+    ] = 0.01
+    estimate = estimate_public_actions(timeout)
+    assert estimate["actions"]["4"]["target_prepare"] == NO
+    assert classify_public_rule_candidates(estimate)["4"] == (
+        "excluded_explicit_model_backhaul_timeout"
+    )
+
+    unknown = _phase_v2_state()
+    unknown["predictions"]["prediction_uncertainty_by_vehicle"].clear()
+    label = public_prepare_advantage_label(unknown)
+    assert label["decision"] == "abstain"
+    assert label["supervision_weight"] == 0.0
 
 
 def test_nonraw_prepared_state_profile_does_not_invent_raw_gate() -> None:
@@ -307,9 +410,9 @@ def test_rule_capabilities_distinguish_public_baselines_from_privileged_referenc
         assert rule_type.capability_profile == "public_causal_semantic_state_only_v1"
         assert rule_type.public_information_matched is True
         assert rule_type.uses_environment_preview is False
-        assert rule_type.rule_schema_version == "causal_public_rule_selection_v2"
+        assert rule_type.rule_schema_version == "causal_public_rule_selection_v3"
         assert rule_type.objective_profile == (
-            "raw_feasible_then_lexicographic_service_deadline_known_readiness_cost_v2"
+            "public_phase_feasible_then_lexicographic_service_deadline_known_readiness_cost_v3"
         )
 
     for method_name in ("immediate_cost_rule", "two_step_cost_rule"):
