@@ -5,22 +5,28 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：v2 四臂开发探针完成后的未决科学边界
+
+- `RESOLVED EXECUTOR / RUN COMPLETE`：旧 v1 schema 误读已在新提交修复，经真实 CSV 四臂零步门后另获授权，v2 唯一执行 4/4 episode、32/96 步、42/42 文件完整性通过；旧失败回执不变，执行 gate 已关闭。该修复只解决原始 identity wrapper 的消费错误。
+- `OPEN / interaction and deployment`：同一已暴露 US101 轨迹上的四臂给出描述性总系统差异，S1M1 有成功状态消费，同时两臂有目标提前离开的浪费发送；因素还改变后续可用动作机会，不能当直接交互或真实双站净收益。正式 `no_base_sharing` 消费、跨 workflow cache 生命周期、实测 RSU/链路/队列仍缺。
+- `OPEN / baseline and independence`：没有新的 learned 三头结构消融、匹配强基线训练或正式 checkpoint/formal/holdout/support；Peachtree 的 10 位时钟与历史 split 仅检查元数据，单位与独立性未核。四项论文主张和 paper-ready 仍 `UNVERIFIED` / `Unverifiable`。详见 `cscwd_sharing_migration_2x2_v2_result_20261011.md`。
+
 ## 2026-10-11：四臂首次执行器错读来源身份 schema
 
 - `CONFIRMED / PRESTEP FAILED`：`load_traces()` 第二返回项是带 `window_identities` 字段的 wrapper；新四臂执行器在 `validate_gate()` 直接按 window ID 索引，唯一授权运行于第 0 个环境步前 `KeyError`。0/4 arm，无结果；失败 root 和 gate 关闭状态保留，不在同一授权内修后重试。
-- `OPEN / future independent task`：若未来另获执行授权，先做零步生产端/消费端 schema 验收，再冻结新的执行 commit/root。当前合成因素验收本身未被此错误推翻，但不能从中推断四臂真实结果。详见 `cscwd_sharing_migration_2x2_development_failure_20261011.md`。
+- `RESOLVED IN SEPARATE V2 TASK`：后续新身份完成零步生产端/消费端 schema 验收并独立执行 v2；v1 失败原件仍不可追认。详见 `cscwd_sharing_migration_2x2_development_failure_20261011.md` 及 v2 结果报告。
 
 ## 2026-10-11：四臂局部因素开关之后仍开放的科学门
 
 - `RESOLVED LOCAL ENGINEERING / FORMAL OPEN`：raw phase v2 已有默认不变的 opt-in S0/M0，两轴合成合同通过；先前“raw 环境无共享关闭臂”的描述是该实现前状态。正式 `VecWorkflowCoreEnv`/Protocol 2.9 仍无该四臂接入，`no_base_sharing` 仍是 `partially_available`，跨 workflow cache persistence 仍缺。
-- `OPEN SOURCE/CONSUMER GATE`：Peachtree 10 位 `Global_Time` 单位和历史暴露身份未核，未冻结独立原始区间、公开固定策略消费者 hash 与 create-only root。`execution_authorized=false`，不得用同一 US101 开发轨迹再扩条件称独立统计。
+- `PARTLY RESOLVED / INDEPENDENCE OPEN`：v2 的 US101、公开固定策略消费者 hash 与 create-only root 已冻结且执行完成；Peachtree 10 位 `Global_Time` 单位和跨来源身份仍未核，尚无独立原始区间。`execution_authorized=false`，不得用同一 US101 开发轨迹再扩条件称独立统计。
 - `OPEN SCIENCE`：同一抽象 base 字节的私有副本未由真实模型推理验证质量等价；真实双 RSU 主机/链路、匹配训练基线、formal/holdout/support 仍缺。四项论文主张 `UNVERIFIED`。
 
 ## 2026-10-11：v3 完成后的四项科学 blocker
 
 - `RESOLVED ENGINEERING / BOUNDED SCIENCE`：v3 的双身份与逐分支持久化在 11 格/27 分支/207 步单次运行及独立审计通过；v2 的公开 hash 碰撞并非 full-state 重复。v1/v2 失败原件仍不得追认。1 格正向机制伴随 140,480 bytes 额外状态传输，6 格局部浪费，4 格截断；全部同一 US101 模拟 RSU 开发来源，不得形成独立统计或在线门。
 - `OPEN / real cross-RSU`：RSU 几何/200–1000 Mbps backhaul 与零共享队列均为模拟，已检查仓库没有可引用的独立 RSU 主机与链路测量原件；单机多进程不算部署。
-- `OPEN / sharing×migration interaction`：此处记录的是 v3 审查当时状态；此后 raw phase v2 增加局部合成验收的 S0/M0 开关，但 formal protocol 仍列 `no_base_sharing` 为部分可用，跨 workflow cache 生命周期缺失。`ample_cache` 仍不能作 sharing 关闭臂；真实四臂科学执行尚未运行。
+- `OPEN / sharing×migration interaction`：此处记录的是 v3 审查当时状态；此后 raw phase v2 增加局部 S0/M0 开关并完成一次四臂已暴露开发运行。formal protocol 仍列 `no_base_sharing` 为部分可用，跨 workflow cache 生命周期缺失。`ample_cache` 仍不能作 sharing 关闭臂；独立正式四臂科学执行尚未运行。
 - `OPEN / three-head and generalization`：本轮未训练/比较三头与公平基线，也没有独立 raw interval、多 workflow/adapter、formal/holdout/support。论文贡献及 paper-ready=`Unverifiable`。详见 `cscwd_phase_v2_public_prepare_region_v3_result_20261011.md`。
 
 ## 2026-10-11：v3 工程修复后的未验证边界

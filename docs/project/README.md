@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `cscwd_sharing_migration_2x2_v2_result_20261011.md`：新执行身份的四臂已暴露开发探针、完整性核对、Peachtree 元数据和四项论文证据缺口；科学门仍关闭。
+- `cscwd_sharing_migration_2x2_v2_execution_plan_20261011.md`：原失败后的身份修复、真实零步门与一次有界 v2 执行授权；状态以结果报告为准。
 - `cscwd_sharing_migration_2x2_development_plan_20261011.md`：单次四臂开发运行前的来源、公开策略、四臂、预算与 claim 边界。
 - `cscwd_sharing_migration_2x2_development_failure_20261011.md`：唯一启动在第 0 环境步前错读来源身份 schema 的失败回执与关闭门。
 
