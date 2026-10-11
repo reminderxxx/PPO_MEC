@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `cscwd_sharing_migration_2x2_development_plan_20261011.md`：单次四臂开发运行前的来源、公开策略、四臂、预算与 claim 边界。
+- `cscwd_sharing_migration_2x2_development_failure_20261011.md`：唯一启动在第 0 环境步前错读来源身份 schema 的失败回执与关闭门。
+
 - `cscwd_sharing_migration_factorial_gap_20261011.md`：实现前独立只读差距审查、Peachtree/I-80 元数据门与四臂前置合同。
 - `cscwd_sharing_migration_factorial_engineering_20261011.md`：raw phase v2 最小 opt-in S0/M0 的合成验收和仍关闭的科学执行门。
 

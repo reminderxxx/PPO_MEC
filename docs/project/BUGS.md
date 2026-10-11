@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：四臂首次执行器错读来源身份 schema
+
+- `CONFIRMED / PRESTEP FAILED`：`load_traces()` 第二返回项是带 `window_identities` 字段的 wrapper；新四臂执行器在 `validate_gate()` 直接按 window ID 索引，唯一授权运行于第 0 个环境步前 `KeyError`。0/4 arm，无结果；失败 root 和 gate 关闭状态保留，不在同一授权内修后重试。
+- `OPEN / future independent task`：若未来另获执行授权，先做零步生产端/消费端 schema 验收，再冻结新的执行 commit/root。当前合成因素验收本身未被此错误推翻，但不能从中推断四臂真实结果。详见 `cscwd_sharing_migration_2x2_development_failure_20261011.md`。
+
 ## 2026-10-11：四臂局部因素开关之后仍开放的科学门
 
 - `RESOLVED LOCAL ENGINEERING / FORMAL OPEN`：raw phase v2 已有默认不变的 opt-in S0/M0，两轴合成合同通过；先前“raw 环境无共享关闭臂”的描述是该实现前状态。正式 `VecWorkflowCoreEnv`/Protocol 2.9 仍无该四臂接入，`no_base_sharing` 仍是 `partially_available`，跨 workflow cache persistence 仍缺。

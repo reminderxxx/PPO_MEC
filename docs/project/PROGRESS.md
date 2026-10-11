@@ -5,7 +5,12 @@
 
 ﻿# Progress
 
-## 2026-10-11：sharing × migration 四臂环境因素合同合成验收，科学执行未启动
+## 2026-10-11：首次 sharing × migration 四臂开发执行在环境步前失败
+
+- 用户授权一次最多 4 episode/96 步的开发四臂；按已批准来源顺序的首步公开 mask，Lankershim action 4 不合法，选择 US101 车辆 1183（历史 train/dev 暴露 2 次，仅 development）。执行提交 `f6d89bee6ba6d65430aba2b61ce301cb69a559c7` 已 push，输入/代码 hash 冻结。
+- 唯一运行在 `validate_gate()` 中因 `load_traces()` 返回的身份嵌于 `window_identities`、执行器却直接以 window ID 索引而 `KeyError`；0/96 `env.step`、0/4 arm、无四臂结果。create-only 失败 receipt SHA-256 `939bb277c8387c6060849286be01f84eaf9fa65bc6fd427fb723325141c66315`；原 root 保留、gate 已关闭，未修后重试。详见 `cscwd_sharing_migration_2x2_development_failure_20261011.md`。四项论文主张仍 `UNVERIFIED`。
+
+## 2026-10-11：sharing × migration 四臂环境因素合同合成验收（首次运行前状态）
 
 - 先完成只读差距审查，再为 `RawNGSIMPhaseV2Env` 增加显式 opt-in `factorial_profile`：S0 对同一 base 逐 adapter 复制并对称计 resident/transfer/load，M0 保留 action 4 目标模型准备与当前节点服务，关闭状态交付并由后续跨站规则重算。默认路径逐事件行为不变；合成/既有局部测试 `23 passed`。见 `cscwd_sharing_migration_factorial_gap_20261011.md` 和 `cscwd_sharing_migration_factorial_engineering_20261011.md`。
 - 下一轮机器门 `configs/experiment/cscwd_sharing_migration_factorial_gate_20261011.json` 保持 `execution_authorized=false`、source/消费者/root 未锁。0 原始环境步、0 训练、0 模型调用、0 formal/holdout。Peachtree 10 位时间单位与历史暴露未核验，I-80 seal 未开；正式 Protocol 2.9 的 `no_base_sharing` 状态不变。四项论文主张仍 `UNVERIFIED`，paper-ready=`Unverifiable`。
