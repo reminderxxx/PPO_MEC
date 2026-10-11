@@ -2523,3 +2523,11 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - v19 selection 与 v749 check 均未读取；0 optimizer、0 checkpoint、0 formal/holdout。该门只证明候选可干预，不证明收益。
 - 已冻结一次 4 arms × 5 seeds、每 cell 1152 steps/24 updates 的匹配 development A/B；唯一 SA 变量是 calibration abstention，
   两个评价窗口来自同一 Lankershim recording，历史 check 暴露不完整，不能称独立测试。
+
+### 匹配 A/B 终态
+
+- scientific terminal=`PASS`，23,040 steps/3,840 optimizer steps/320 learned eval/18 rule eval 完整，113/113 run 文件与
+  5/5 自动分析文件完整性通过；verdict=`FAIL`，无 retry/formal/holdout。
+- candidate-control selected/fixed24 reward=`+0.735731/+0.059869`，但 failure rate=`+0.100/+0.025`。新增失败全部集中于
+  v1 mechanism-off，v2 所有 view/source 分层 failure 增量为 0；总体 reward 正增来自 deadline gain 覆盖 failure penalty。
+- 当前候选停止。唯一后续设计冻结为 event auxiliary 对 shared encoder 的 head-local gradient isolation；未实现、未训练。

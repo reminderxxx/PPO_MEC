@@ -13,3 +13,9 @@ model-based、lexicographic objective 的单独能力参考；privileged exact t
 `mechanism_aux_positive_prepare_calibration_abstention_enabled`。若训练实际 intervention 为 0，或任一 selected/fixed-update24
 视图 completion/on-time 降低、failure 增加，则候选失败；不得按最终检查结果换 checkpoint、追加 seed 或改奖励。
 
+## 运行后追加（2026-10-11）
+
+该 A/B 已完整结束并判定 `FAIL`。候选在 selected/fixed24 reward 为 `9.780383/9.424639`，control 为
+`9.044652/9.364771`，但 failure rate 同时由 `0.125/0.175` 增至 `0.225/0.200`。新增失败全部位于 v1
+mechanism-off；v2 分层 failure 增量为 0。reward 正增来自 v2 deadline gain 覆盖 v1 failure penalty，不能更新为算法优势。
+详见 `cscwd_recompute_observability_calibration_abstention_results_20261011.md`。主论文稿未修改。

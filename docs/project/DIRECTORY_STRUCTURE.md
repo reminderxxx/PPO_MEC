@@ -35,6 +35,9 @@
 - `scripts/launch_cscwd_lankershim_recompute_observability_ab.py`：create-only detached supervisor；无自动 retry。
 - `docs/project/cscwd_lankershim_v668_postfix_coverage_result_20261011.md`：非零 actual-consumer 覆盖门结果。
 - `docs/project/cscwd_recompute_observability_claim_evidence_change_20261011.md`：给 A 论文线的独立 claim/evidence 变更说明。
+- `scripts/review_cscwd_lankershim_recompute_observability_ab.py`：只读核验完成 run/analysis 完整性，并按 profile、来源、视图输出
+  全方法、SA 配对、公共规则能力和受损 episode 见证。
+- `docs/project/cscwd_recompute_observability_calibration_abstention_results_20261011.md`：`FAIL` 结果审查和自动报告勘误。
 - `artifacts/analysis/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_20261011_v1_result_review_v1/`：只读结果审查的
   全 seed/view/profile 表、SA 配对和 checkpoint tensor identity；不覆盖 scientific run。
 

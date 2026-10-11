@@ -1169,3 +1169,11 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - `RESOLVED`：纠错后 v668 actual-consumer probe 为 base prepare=46、candidate prepare→abstain=46、mismatch=0，训练干预不再为零。
 - `OPEN`：尚无匹配训练结果证明 abstention 改善 completion/on-time/failure 或资源成本。同一 Lankershim recording 的时间互斥
   窗口不是独立泛化证据；历史 check 暴露不完整。
+
+## 2026-10-11 REJECTED / hard calibration abstention；OPEN / cross-head gradient spillover
+
+- 1,325 个真实 candidate abstention 证明处理非零，但事前服务门失败：selected/fixed24 failure rate 分别增加
+  `+0.100/+0.025`。不得用两个视图的 reward 正增覆盖该负结果。
+- 11 个受损评价行全部是 v1 mechanism-off，首次失败均为 `current_rsu_contact_expires_before_commit`；v2 所有分层 failure
+  增量为 0。相同 public state 上可见 control action2/4 转为 candidate action0/1/3，符合 shared encoder 的跨 head 外溢疑点。
+- `OPEN`：尚未用单变量实验确认 shared-encoder event-aux gradient 是充分原因；head-local isolation 仅为冻结候选，不获自动执行授权。

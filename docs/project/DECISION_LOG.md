@@ -1,5 +1,14 @@
 ﻿# Decision Log
 
+## 2026-10-11：拒绝 hard calibration abstention；只冻结 event-aux head-local isolation
+
+- 完成的 matched development A/B 按事前服务非劣门判 `FAIL`；不追加 seed/预算、不重选 checkpoint、不自动实现下一候选。
+- candidate 虽在 selected/fixed24 reward 增加 `+0.735731/+0.059869`，failure rate 也增加 `+0.100/+0.025`；11 个受损
+  评价行全部为 v1 mechanism-off，v2 分层 failure 增量全零。reward 正增是 deadline gain 覆盖 failure penalty 的权衡。
+- 唯一后续设计为 event auxiliary loss 对 shared encoder 的 head-local gradient isolation；PPO、critic、slow/fast auxiliary、
+  reward、数据、预算和 selection 不变。相同 public state 的首分叉由 control action2/4 转为 candidate action0/1/3，支持
+  cross-head spillover 疑点，但未证明它是唯一充分原因。当前只冻结设计，未授权实现或训练。
+
 ## 2026-10-11：公开已发生 execution history，对齐 estimator 与 executor recompute
 
 - 接受公开 `last_execution_rsu_id/current_handoff`：它是 agent 自己已发生的执行历史，不是实际未来或 outcome。

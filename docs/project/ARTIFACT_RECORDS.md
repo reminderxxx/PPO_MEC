@@ -2044,3 +2044,15 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - Identity：summary SHA-256=`f99e5abb43d3d6187e1141c07c667d186df566b58448f4318da5eff16ecad6c0`；integrity SHA-256=
   `c8467c585afadd27fd3349db367d5699a4d365206aa290da33f97f2cebb23c53`。
 - Boundary：E2 bounded development qualification；非性能、独立泛化、formal/holdout 或 paper-ready 证据。
+
+## 2026-10-11 Lankershim post-fix matched A/B 与独立分层审查
+
+- Scientific root：`artifacts/experiments/cscwd_phase_v2_recompute_observability_calibration_abstention_ab_20261011_v1/`；commit=
+  `77bd5d35ced95e144a55a09210ed0da06f659eb8`；terminal=`PASS`，verdict=`FAIL`。
+- Counts：20 cells、23,040 environment steps、3,840 optimizer steps、80 selection、320 learned eval、18 rule eval；无 retry、
+  formal 或 holdout。run integrity 113/113、automatic analysis integrity 5/5 通过。
+- Review root：`artifacts/analysis/cscwd_phase_v2_recompute_observability_calibration_abstention_ab_20261011_v1_result_review_v1/`；
+  summary SHA-256=`3b132e3c56a5edefe5cf03d19ff68a2dfdf804e9068a39fca1b20f8d22bd5d47`；integrity SHA-256=
+  `caecf435a0b0d91a370a6a2c0eff2c412e7efdcb938840eba30a45710c47053b`。
+- Result：candidate-control reward 两视图为正，但 failure rate `+0.100/+0.025`；11 个 harmed rows 全为 v1 mechanism-off，
+  v2 failure delta 全零。Evidence=`E2_ARTIFACT_AUDITED_DEVELOPMENT_ONLY`，不支持 SA 优势或 paper-ready。

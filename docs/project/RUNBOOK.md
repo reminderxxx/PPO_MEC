@@ -49,6 +49,17 @@ prepare→abstain=46、consumer mismatch=0；不得覆盖或 rerun。
 checkpoint selection 只读 v19，最终 selected/fixed-update24 只读 v19/v749；唯一 SA 变量为 calibration abstention。无 retry、
 追加 seed、预算扩展、reward/selection 改动或 formal/holdout 读取。
 
+该 A/B 已在 commit `77bd5d35…9eb8` 完成，scientific terminal=`PASS`、verdict=`FAIL`，run root 与 supervisor root 均为
+create-only 历史原件，**不得再次启动或 retry**。只读分层审查命令为：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/review_cscwd_lankershim_recompute_observability_ab.py
+```
+
+其 create-only review root 已存在，同样不得覆盖；结果见
+`cscwd_recompute_observability_calibration_abstention_results_20261011.md`。
+
 ## Positive-prepare calibration abstention（2026-10-11；一次性授权）
 
 静态重算只读取已存在 public info/snapshot 和旧 pilot manifest，不调用 `env.step()`、不加载 checkpoint、不训练。canonical
