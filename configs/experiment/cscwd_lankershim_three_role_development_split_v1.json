@@ -1,0 +1,56 @@
+{
+  "schema_version": "cscwd_lankershim_three_role_development_split_v1",
+  "status": "development_unknown_not_independent_generalization",
+  "parent_metadata_candidate_path": "/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/configs/experiment/cscwd_local_development_metadata_candidate_20261011.json",
+  "parent_metadata_candidate_sha256": "7aaad8cec66908e5e4044e20f0dd3e1086eafbf925686f84da6947c35829fdec",
+  "raw_csv_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+  "raw_csv_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+  "selection_rule": "fixed parent order; first three nonoverlap slots; roles by ascending raw time; no labels rewards checkpoints or outcomes",
+  "historical_check_exposure_provenance_complete": false,
+  "independent_confirmatory_source": false,
+  "same_source_recording": true,
+  "selected_windows": [
+    {
+      "role": "train",
+      "decision": "selected",
+      "contiguous_frame_count": 1189,
+      "historical_train_dev_overlap_count": 0,
+      "source_csv_first_row": 3847974,
+      "source_frame_start": 4555,
+      "source_frame_end": 5743,
+      "source_segment_id": "lankershim",
+      "source_time_start": 1118936135400,
+      "source_time_end": 1118936254200,
+      "vehicle_id": 668,
+      "window_id": "cscwd_newdev_lankershim_v668_t1118936135400_1118936254200"
+    },
+    {
+      "role": "selection",
+      "decision": "selected",
+      "contiguous_frame_count": 1189,
+      "historical_train_dev_overlap_count": 0,
+      "source_csv_first_row": 3886769,
+      "source_frame_start": 84,
+      "source_frame_end": 1272,
+      "source_segment_id": "lankershim",
+      "source_time_start": 1118936708300,
+      "source_time_end": 1118936827100,
+      "vehicle_id": 19,
+      "window_id": "cscwd_newdev_lankershim_v19_t1118936708300_1118936827100"
+    },
+    {
+      "role": "check",
+      "decision": "selected",
+      "contiguous_frame_count": 1189,
+      "historical_train_dev_overlap_count": 0,
+      "source_csv_first_row": 7283977,
+      "source_frame_start": 3917,
+      "source_frame_end": 5105,
+      "source_segment_id": "lankershim",
+      "source_time_start": 1118937091600,
+      "source_time_end": 1118937210400,
+      "vehicle_id": 749,
+      "window_id": "cscwd_newdev_lankershim_v749_t1118937091600_1118937210400"
+    }
+  ]
+}

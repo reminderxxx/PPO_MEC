@@ -5,6 +5,8 @@
 label/reason/weight 与 action4 公开门。它不接 agent、optimizer、checkpoint 或评价排名；因此新增诊断不会改变旧 runner hash。
 `scripts/qualify_cscwd_training_source_positive_prepare.py` 再把保存状态送入实际 SA `_event_auxiliary_target`，要求 direct label 与
 consumer 一致，并用 nonzero base-positive 与 candidate intervention 双门 fail-closed；它不执行环境或 optimizer。
+`scripts/probe_cscwd_lankershim_v668_positive_prepare_coverage.py` 对新冻结 v668 train trace 使用同一个 phase-v2 env 和实际 SA
+consumer，最多执行 192 个结果盲动作；v19 selection 与 v749 check 仅冻结身份，不加载其 trace 或 label。
 
 `scripts/launch_calibrated_workflow_value_normalization_ab.py` 是 persistent scientific supervisor 的公共 receipt consumer：
 `_validate_scientific_completion_receipt` 要求 `status=complete` 且 `scientific_execution_complete is True`；plan 可进一步指定

@@ -10,6 +10,11 @@
   `scripts/qualify_cscwd_training_source_positive_prepare.py`：复用现有 probe state，以真实 SA event auxiliary consumer 执行
   nonzero base-prepare 与 prepare→abstain 双门；失败即 `training_authorized=false`。
 - `tests/test_cscwd_training_source_positive_prepare_qualification.py`：FAIL/PASS 均不自动授权训练的纯决策合同。
+- `configs/experiment/cscwd_lankershim_three_role_development_split_v1.json`：绑定 A metadata hash 的 v668/v19/v749
+  train/selection/check 三段开发身份；非独立泛化来源。
+- `configs/experiment/cscwd_lankershim_v668_positive_prepare_coverage_probe_v1.json`、
+  `scripts/probe_cscwd_lankershim_v668_positive_prepare_coverage.py`：只读取 v668 train 段的一次 192-step actual-consumer 门；
+  selection/check 不读，0 optimizer/checkpoint/formal/holdout。
 - `artifacts/analysis/cscwd_lankershim_event_label_coverage_probe_20261011_v1/`：已完成的 96-step 本机轻量原件；不上传 raw 或权重。
 - `artifacts/analysis/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_20261011_v1_result_review_v1/`：只读结果审查的
   全 seed/view/profile 表、SA 配对和 checkpoint tensor identity；不覆盖 scientific run。

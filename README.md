@@ -14,6 +14,8 @@ checkpoint/formal/holdout，仅记录 public semantic state 身份、label/reaso
 监督暴露时再次启动完整训练，不参与方法排名或 checkpoint 选择；见 `docs/project/RUNBOOK.md`。
 其后续 training-source qualification 会用真实 SA auxiliary consumer 重算同一批状态；只有 base `prepare, weight>0` 且
 candidate 将其变为 `abstain, weight=0` 才能通过，PASS 也不自动授权训练。
+新的 Lankershim v668 development 候选按 metadata-only 固定顺序产生；train/selection/check 三段 time/frame 互斥，但历史
+check 暴露不完整且同属一个 recording，只能记 `development_unknown`。只有 train 段可用于一次 192-step coverage probe。
 
 2026-10-11 的 [phase-v2 公共可观测性审查](docs/project/cscwd_phase_v2_public_observability_audit_20261011.md)
 确认第二次 action4 面向新目标，不是同目标重发；三处事后成本浪费无法由当前单帧公共字段确定识别。现有 candidate 会在

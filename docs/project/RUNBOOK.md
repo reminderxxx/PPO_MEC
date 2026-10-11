@@ -28,6 +28,12 @@ US-101 在读取 label/reward 前因 checkpoint-selection 角色排除。该资�
 create-only root 已存在；不得 rerun。下一 split/训练计划见 `cscwd_next_positive_prepare_matched_training_plan_20261011.md`，
 当前 `training_authorized=false`。
 
+后续 metadata-only 候选固定为 Lankershim v668 train、v19 selection、v749 check；三段原始 time/frame 互斥，但同 recording
+且历史 check 暴露不完整，因此只作 `development_unknown`。v668 coverage 协议位于
+`configs/experiment/cscwd_lankershim_v668_positive_prepare_coverage_probe_v1.json`：仅 train 段、固定 action cycle/seed、最多
+192 env steps、一次、无 retry；selection/check 行不得读取。只有 base-positive 与 candidate prepare→abstain 均非零且 actual
+consumer mismatch=0 才能继续冻结匹配 pilot。
+
 ## Positive-prepare calibration abstention（2026-10-11；一次性授权）
 
 静态重算只读取已存在 public info/snapshot 和旧 pilot manifest，不调用 `env.step()`、不加载 checkpoint、不训练。canonical
