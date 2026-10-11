@@ -44,6 +44,7 @@ ORIGINAL_PLAN_SHA = "472808fc90a3af16f8fe2c4f76acb69a9921a70f50d02184baa1eb40ec9
 V1_FAILURE_SHA = "55b826571c4b2474bf1f52ab228892d37855a850425ce20249b942100127e1ad"
 V2_FAILURE_SHA = "4a19c502d5c5fb298601c211ed0fdb07d8a6b0b01ff829e164fc4bfda605c088"
 SELECTION_SHA = "875163d7022ce209746c1e7dd954891d12da2f92f640cac7e815a0604a2d54cb"
+EXECUTOR_BASE_COMMIT = "2705fa49a92ff79b83f7a09fc750221fdfe2ebaf"
 
 
 def utc_now() -> str:
@@ -63,18 +64,28 @@ def verify_future_authorization(path: Path) -> tuple[dict[str, Any], str]:
     required = {
         "run_id": RUN_ID,
         "status": "AUTHORIZED_FOR_SINGLE_V3_EXECUTION",
+        "executor_base_commit": EXECUTOR_BASE_COMMIT,
         "original_plan_sha256": ORIGINAL_PLAN_SHA,
         "v1_failure_receipt_sha256": V1_FAILURE_SHA,
         "v2_failure_receipt_sha256": V2_FAILURE_SHA,
         "prior_selection_inventory_sha256": SELECTION_SHA,
+        "candidate_cell_count": 24,
+        "selected_public_cell_count": 11,
+        "previously_exposed_regression_cell_count": 3,
+        "new_coverage_same_us101_trace_cell_count": 8,
         "max_starts": MAX_STARTS,
         "max_branches": MAX_BRANCHES,
         "max_env_steps_including_prefix_replay": MAX_ENV_STEPS,
         "state_identity_version": STATE_IDENTITY_VERSION,
+        "prefix_replay_steps_are_scientific_steps": True,
+        "training_model_calls_formal_holdout_downloads": False,
         "automatic_retry": False,
     }
     if any(manifest.get(key) != value for key, value in required.items()):
         raise RuntimeError("v3 explicit authorization manifest mismatch")
+    if subprocess.run(["git", "merge-base", "--is-ancestor", EXECUTOR_BASE_COMMIT, "HEAD"],
+                      cwd=ROOT, check=False).returncode != 0:
+        raise RuntimeError("v3 executor base commit is not in execution history")
     if sha(ROOT / "docs/project/cscwd_phase_v2_public_prepare_region_plan_20261011.md") != ORIGINAL_PLAN_SHA:
         raise RuntimeError("original scientific plan identity mismatch")
     for path_name, expected in (

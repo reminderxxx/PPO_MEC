@@ -7,7 +7,7 @@
 
 ## CSCWD phase-v2 公开 prepare 区域 v3 工程修复（未授权科学执行）
 
-先读 `cscwd_phase_v2_public_prepare_region_v3_engineering_design_20261011.md` 与 `cscwd_phase_v2_public_prepare_region_v3_execution_plan_20261011.md`。只允许运行 `tests/test_cscwd_region_v3_evidence.py` 等局部合成验证；v3 CLI 必须另有已跟踪、干净提交中的显式授权 manifest，精确新 create-only root 才可执行真实来源。合法 prefix 的真实回放是计入 288 硬限的 `env.step`，不能当零步 preflight；完整身份表落盘前没有比较分支。v1/v2 失败 root 均不得复用，当前没有 v3 科学命令记录。
+先读 `cscwd_phase_v2_public_prepare_region_v3_engineering_design_20261011.md` 与 `cscwd_phase_v2_public_prepare_region_v3_execution_plan_20261011.md`。已另获一次有界授权，机器 manifest 为 `configs/experiment/cscwd_phase_v2_public_prepare_regions_v3_authorization.json`；v3 CLI 仅接受已跟踪、干净提交中的该身份与精确新 create-only root。合法 prefix 的真实回放是计入 288 硬限的 `env.step`，不能当零步 preflight；完整身份表落盘前没有比较分支。v1/v2 失败 root 均不得复用；实际执行及回执以新 root 为准。
 
 ## CSCWD phase-v2 公开 prepare 区域兼容修复后独立执行（2026-10-11）
 

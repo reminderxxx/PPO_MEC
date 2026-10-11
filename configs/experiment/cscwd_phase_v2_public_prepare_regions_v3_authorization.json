@@ -1,0 +1,20 @@
+{
+  "run_id": "cscwd_phase_v2_public_prepare_regions_20261011_v3",
+  "status": "AUTHORIZED_FOR_SINGLE_V3_EXECUTION",
+  "executor_base_commit": "2705fa49a92ff79b83f7a09fc750221fdfe2ebaf",
+  "original_plan_sha256": "472808fc90a3af16f8fe2c4f76acb69a9921a70f50d02184baa1eb40ec9c1def",
+  "v1_failure_receipt_sha256": "55b826571c4b2474bf1f52ab228892d37855a850425ce20249b942100127e1ad",
+  "v2_failure_receipt_sha256": "4a19c502d5c5fb298601c211ed0fdb07d8a6b0b01ff829e164fc4bfda605c088",
+  "prior_selection_inventory_sha256": "875163d7022ce209746c1e7dd954891d12da2f92f640cac7e815a0604a2d54cb",
+  "state_identity_version": "cscwd_public_full_state_v3_1",
+  "candidate_cell_count": 24,
+  "selected_public_cell_count": 11,
+  "previously_exposed_regression_cell_count": 3,
+  "new_coverage_same_us101_trace_cell_count": 8,
+  "max_starts": 12,
+  "max_branches": 36,
+  "max_env_steps_including_prefix_replay": 288,
+  "prefix_replay_steps_are_scientific_steps": true,
+  "training_model_calls_formal_holdout_downloads": false,
+  "automatic_retry": false
+}
