@@ -1,0 +1,147 @@
+{
+  "schema_version": "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1",
+  "run_id": "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_20261011_v1",
+  "execution_authorized": false,
+  "scope": "development_only_two_frozen_raw_ngsim_windows",
+  "single_variable": {
+    "name": "mechanism_aux_positive_prepare_calibration_abstention_enabled",
+    "control": false,
+    "candidate": true,
+    "base_event_semantics": "causal_public_prepare_advantage_v3",
+    "candidate_semantics": "causal_public_prepare_advantage_calibration_abstention_v1",
+    "sa_only": true,
+    "reward_change": false,
+    "action_permission_change": false,
+    "network_parameter_change": 0
+  },
+  "inputs": {
+    "base_config": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+    "workload_manifest": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+    "phase_contract": "configs/experiment/cscwd_raw_phase_v2_development_20261011.json",
+    "raw_csv_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+    "source_manifest": "/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/analysis/cscwd_new_development_source_20261011_v2/source_manifest.json",
+    "phase_v2_preflight": "/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/analysis/cscwd_raw_phase_v2_preflight_20261011_v3/preflight.json",
+    "public_fixture": "/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/analysis/cscwd_raw_phase_v2_preflight_20261011_v3/public_fixture.json",
+    "mechanism_matrix_manifest": "/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/analysis/cscwd_raw_phase_v2_mechanism_matrix_20261011_v1/matrix_manifest.json",
+    "mechanism_matrix_ledger": "/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/analysis/cscwd_raw_phase_v2_mechanism_matrix_20261011_v1/step_ledger.jsonl",
+    "mechanism_matrix_audit": "/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/analysis/cscwd_raw_phase_v2_matrix_audit_20261011_v1/audit.json",
+    "sha256": {
+      "workload_manifest": "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc",
+      "phase_contract": "2a0cee4b4b2ba512f8015296ee1946698dd51066d1ae5744e22b4d428d176343",
+      "raw_csv": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+      "source_manifest": "34eee3a8d16f2dfe89f3a8d8dcd27f20159c0488e2f1a9ebc77be3aac747abde",
+      "phase_v2_preflight": "9b26892522a99c5e50189925c8c08affae89ade55fe8512f8f6c0e9cf09245ed",
+      "public_fixture": "1e7da4d92c5e9387438b2bd33d04d6c1b314cbe4dee4dcd03a72c013a65cd8c2",
+      "mechanism_matrix_manifest": "cb581f6871c0928f13f58f14fb77568290277247dc7de8c03ed355aeeca4bc2c",
+      "mechanism_matrix_ledger": "bfb2d6743266a24c2a37bf9b714a53f723f0595e6215ec82a8a0d348c9c64028",
+      "mechanism_matrix_audit": "30d821d4fb7c2e8d26c85378e4824fa4a782f62bf6eb1181510f0fe9bf56db8d",
+      "phase_v2_environment": "5a5b888f37a3ec8922d74e3b886d325ae96ee266852d338deb37bf0f0b67d683",
+      "public_estimator": "4f8c3405f53de473eaa58c8b30213c3ae4849e096905774d345d4a4f49dc254f",
+      "raw_event_time_environment": "30666d7c874717d8464a64702c811116e96b931a5db6b57287c6c11d2dcc6575",
+      "sa_core": "adaf8c5aebf984f647e2c342b0b8a1765f4c619b97a8ea097535b82728e93a57",
+      "agent_builder": "ab6cc72bba2550531eb28237e499ac7aed0c090243d014122f980666c07c0389",
+      "pilot_runner": "edf5eec6ca0e05d531890cf59ea0c54e36acdd1e71ef81676fe850e1b0f7ecf6"
+    }
+  },
+  "training": {
+    "learned_cells": [
+      {"arm": "sa_public_v3", "method": "sa_ghmappo", "candidate_enabled": true, "positive_prepare_calibration_abstention_enabled": false},
+      {"arm": "sa_calibration_abstention", "method": "sa_ghmappo", "candidate_enabled": true, "positive_prepare_calibration_abstention_enabled": true},
+      {"arm": "ppo", "method": "ppo", "candidate_enabled": false, "positive_prepare_calibration_abstention_enabled": false},
+      {"arm": "mappo", "method": "mappo", "candidate_enabled": false, "positive_prepare_calibration_abstention_enabled": false}
+    ],
+    "seeds": [7, 17, 29, 43, 61],
+    "environment_steps_per_cell": 1152,
+    "transitions_per_update": 48,
+    "update_opportunities_per_cell": 24,
+    "ppo_epochs_per_update": 4,
+    "minibatch_size": 32,
+    "optimizer_steps_per_update": 8,
+    "optimizer_steps_per_cell": 192,
+    "checkpoint_update_candidates": [6, 12, 18, 24],
+    "episode_max_steps": 24,
+    "total_environment_steps": 23040,
+    "total_optimizer_steps": 3840,
+    "start_from_scratch": true,
+    "automatic_retry": false,
+    "scientific_launches": 1,
+    "wall_clock_cap_seconds": 3600
+  },
+  "data_assignment": {
+    "training_source_segment": "lankershim",
+    "checkpoint_selection_source_segment": "us_101",
+    "workload_design_id": "dev_01",
+    "training_condition": "default",
+    "selection_condition": "default",
+    "selection_order": [
+      "on_time_workflow_completion_rate",
+      "workflow_completion_rate",
+      "negative_service_failure_rate",
+      "negative_unfinished_rate",
+      "negative_total_transfer_mb",
+      "negative_update_index"
+    ]
+  },
+  "evaluation": {
+    "checkpoint_views": ["selected", "fixed_update24"],
+    "time_profiles": ["raw_ngsim_event_time_v2", "raw_ngsim_event_time_v1"],
+    "phase_v2_conditions": ["default", "adverse_link", "ample_cache"],
+    "phase_v1_conditions": ["mechanism_off_default"],
+    "source_segments": ["lankershim", "us_101"],
+    "rule_methods": ["causal_public_immediate_rule", "causal_public_two_step_rule"],
+    "privileged_exact_rule": "raw_v1_capability_reference_only",
+    "final_learned_episode_count": 320,
+    "checkpoint_selection_episode_count": 80,
+    "formal_or_holdout_reads": 0
+  },
+  "objective": {
+    "reward_profile": "original_reward_v1",
+    "critic_target_normalization": "raw_disabled",
+    "gamma_and_gae_unchanged": true,
+    "primary_service_metrics": [
+      "workflow_completion_rate",
+      "on_time_workflow_completion_rate",
+      "service_failure_rate"
+    ],
+    "joint_resource_metrics": [
+      "migration_successes",
+      "state_ready_count",
+      "recompute_seconds",
+      "model_transfer_bytes",
+      "state_transfer_bytes",
+      "input_transfer_bytes",
+      "backhaul_transfer_bytes",
+      "partial_transfer_bytes",
+      "phase_elapsed_seconds",
+      "decision_overhead_ms",
+      "parameter_count"
+    ]
+  },
+  "verdict": {
+    "fail_if": "candidate completion or on-time completion decreases, or service failures increase, in either selected or fixed_update24 view; also fail if any raw positive-prepare label remains supervised",
+    "mixed_if": "service is noninferior but transfer/recompute/failed migration lacks a common Pareto improvement, or improvement is confined to one view or a seed subset",
+    "support_if": "both views have nondecreasing completion and on-time completion, nonincreasing failures, at least one preregistered resource or failed-migration improvement, at least 3 of 5 seed directions favorable, at most 1 unfavorable, and zero supervised raw positive-prepare labels",
+    "automatic_next_stage": false,
+    "paper_ready": false
+  },
+  "identity_and_reuse": {
+    "fresh_matched_training_required": true,
+    "historical_pilot_results_role": "descriptive_only_not_matched_control",
+    "original_candidate_arm": "sa_public_v3",
+    "new_candidate_arm": "sa_calibration_abstention",
+    "ppo_and_mappo_reference_arms": "fresh_same_run_identity",
+    "public_rules": "fresh_fixed_rule_evaluation_same_public_capability_and_objective_identity",
+    "selected_and_fixed_update24_both_required": true
+  },
+  "claim_boundary": {
+    "development_only": true,
+    "independent_test": false,
+    "formal": false,
+    "holdout": false,
+    "statistical_significance_claim": false,
+    "independent_unit_count": 2,
+    "sa_win_required": false,
+    "checkpoint_or_raw_data_upload": false,
+    "current_raw_profile_effect": "removes_all_positive_prepare_auxiliary_supervision_not_fine_grained_uncertainty_control"
+  }
+}

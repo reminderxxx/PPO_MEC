@@ -31,6 +31,7 @@ from scripts.launch_calibrated_workflow_value_normalization_ab import (  # noqa:
     SCIENTIFIC_COMPLETION_RECEIPT_SCHEMA_VERSION,
 )
 from src.agents.causal_public_action_estimator import (  # noqa: E402
+    CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION,
     CausalPublicImmediateRule, CausalPublicTwoStepRule,
     SCHEMA_VERSION as ESTIMATOR_SCHEMA_VERSION,
     EVENT_LABEL_SCHEMA_VERSION, PUBLIC_RULE_SCHEMA_VERSION,
@@ -93,22 +94,44 @@ def _input_paths(protocol: dict[str, Any]) -> dict[str, Path]:
     return result
 
 
-def _validate_protocol(protocol: dict[str, Any], *, require_clean: bool) -> dict[str, Any]:
-    if protocol.get("schema_version") != "cscwd_phase_v2_causal_public_pilot_v1":
+def _validate_protocol(
+    protocol: dict[str, Any], *, require_clean: bool, require_authorized: bool = True,
+) -> dict[str, Any]:
+    schema_version = protocol.get("schema_version")
+    if schema_version not in {
+        "cscwd_phase_v2_causal_public_pilot_v1",
+        "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1",
+    }:
         raise RuntimeError("pilot protocol schema drift")
-    if not protocol.get("execution_authorized"):
+    if require_authorized and not protocol.get("execution_authorized"):
         raise RuntimeError("pilot is not authorized")
     single = protocol["single_variable"]
-    if single != {
-        "name": "mechanism_aux_causal_public_prepare_advantage_enabled",
-        "control": False,
-        "candidate": True,
-        "candidate_semantics": "causal_public_prepare_serve_abstain_event_supervision_v3",
-        "sa_only": True,
-        "reward_change": False,
-        "action_permission_change": False,
-        "network_parameter_change": 0,
-    }:
+    legacy = schema_version == "cscwd_phase_v2_causal_public_pilot_v1"
+    expected_single = (
+        {
+            "name": "mechanism_aux_causal_public_prepare_advantage_enabled",
+            "control": False,
+            "candidate": True,
+            "candidate_semantics": "causal_public_prepare_serve_abstain_event_supervision_v3",
+            "sa_only": True,
+            "reward_change": False,
+            "action_permission_change": False,
+            "network_parameter_change": 0,
+        }
+        if legacy
+        else {
+            "name": "mechanism_aux_positive_prepare_calibration_abstention_enabled",
+            "control": False,
+            "candidate": True,
+            "base_event_semantics": EVENT_LABEL_SCHEMA_VERSION,
+            "candidate_semantics": CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION,
+            "sa_only": True,
+            "reward_change": False,
+            "action_permission_change": False,
+            "network_parameter_change": 0,
+        }
+    )
+    if single != expected_single:
         raise RuntimeError("single-variable contract drift")
     training = protocol["training"]
     if (
@@ -125,14 +148,26 @@ def _validate_protocol(protocol: dict[str, Any], *, require_clean: bool) -> dict
         or int(training["scientific_launches"]) != 1
     ):
         raise RuntimeError("training budget drift")
-    expected_cells = [
-        ("sa_control", "sa_ghmappo", False),
-        ("sa_candidate", "sa_ghmappo", True),
-        ("ppo", "ppo", False),
-        ("mappo", "mappo", False),
-    ]
+    expected_cells = (
+        [
+            ("sa_control", "sa_ghmappo", False, False),
+            ("sa_candidate", "sa_ghmappo", True, False),
+            ("ppo", "ppo", False, False),
+            ("mappo", "mappo", False, False),
+        ]
+        if legacy
+        else [
+            ("sa_public_v3", "sa_ghmappo", True, False),
+            ("sa_calibration_abstention", "sa_ghmappo", True, True),
+            ("ppo", "ppo", False, False),
+            ("mappo", "mappo", False, False),
+        ]
+    )
     actual_cells = [
-        (row["arm"], row["method"], bool(row["candidate_enabled"]))
+        (
+            row["arm"], row["method"], bool(row["candidate_enabled"]),
+            bool(row.get("positive_prepare_calibration_abstention_enabled", False)),
+        )
         for row in training["learned_cells"]
     ]
     if actual_cells != expected_cells:
@@ -156,6 +191,17 @@ def _validate_protocol(protocol: dict[str, Any], *, require_clean: bool) -> dict
         "phase_v2_environment": ROOT / "src/envs/core/raw_ngsim_phase_v2_env.py",
         "public_estimator": ROOT / "src/agents/causal_public_action_estimator.py",
     }
+    if not legacy:
+        checks.update({
+            "raw_event_time_environment": (
+                ROOT / "src/envs/core/raw_ngsim_event_time_env.py"
+            ),
+            "sa_core": ROOT / "src/agents/sa_ghmappo_core.py",
+            "agent_builder": (
+                ROOT / "scripts/run_calibrated_workflow_interface_repair.py"
+            ),
+            "pilot_runner": Path(__file__).resolve(),
+        })
     for name, path in checks.items():
         if not path.is_file() or _sha256(path) != expected_hashes[name]:
             raise RuntimeError(f"frozen input identity mismatch: {name}")
@@ -197,6 +243,10 @@ def _validate_protocol(protocol: dict[str, Any], *, require_clean: bool) -> dict
     label = public_prepare_advantage_label(
         public_info["semantic_state"], public_info["action_mask"]
     )
+    gated_label = public_prepare_advantage_label(
+        public_info["semantic_state"], public_info["action_mask"],
+        positive_prepare_calibration_abstention_enabled=True,
+    )
     immediate = CausalPublicImmediateRule().select_action_from_info(public_info)
     two_step = CausalPublicTwoStepRule().select_action_from_info(public_info)
     if (
@@ -204,6 +254,7 @@ def _validate_protocol(protocol: dict[str, Any], *, require_clean: bool) -> dict
         or label["schema_version"] != EVENT_LABEL_SCHEMA_VERSION
         or immediate != 4 or two_step != 4
         or label["decision"] != "prepare"
+        or gated_label["decision"] != "abstain"
     ):
         raise RuntimeError("public consumer fixture gate failed")
     if require_clean and not _git_clean():
@@ -215,8 +266,12 @@ def _validate_protocol(protocol: dict[str, Any], *, require_clean: bool) -> dict
         "input_sha256": expected_hashes,
         "estimator_schema": ESTIMATOR_SCHEMA_VERSION,
         "event_schema": EVENT_LABEL_SCHEMA_VERSION,
+        "calibration_abstention_event_schema": (
+            CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION
+        ),
         "rule_schema": PUBLIC_RULE_SCHEMA_VERSION,
         "fixture_label": label["decision"],
+        "fixture_calibration_abstention_label": gated_label["decision"],
         "fixture_actions": {"immediate": immediate, "two_step": two_step},
         "phase_v2_two_step_capability": "same_public_immediate_fallback_not_independent_baseline",
         "mechanism_matrix_gate": {
@@ -283,16 +338,20 @@ def _actual_class_gate(
         raise RuntimeError("actual phase-v2 reset differs from frozen public fixture")
     estimate = estimate_public_actions(info["semantic_state"], info["action_mask"])
     label = public_prepare_advantage_label(info["semantic_state"], info["action_mask"])
-    torch.manual_seed(7)
-    control = _build_cell_agent(
-        {"arm": "sa_control", "method": "sa_ghmappo", "candidate_enabled": False},
-        7, config,
+    gated_label = public_prepare_advantage_label(
+        info["semantic_state"], info["action_mask"],
+        positive_prepare_calibration_abstention_enabled=True,
     )
+    sa_cells = [
+        row for row in protocol["training"]["learned_cells"]
+        if row["method"] == "sa_ghmappo"
+    ]
+    if len(sa_cells) != 2:
+        raise RuntimeError("expected exactly two SA cells")
     torch.manual_seed(7)
-    candidate = _build_cell_agent(
-        {"arm": "sa_candidate", "method": "sa_ghmappo", "candidate_enabled": True},
-        7, config,
-    )
+    control = _build_cell_agent(sa_cells[0], 7, config)
+    torch.manual_seed(7)
+    candidate = _build_cell_agent(sa_cells[1], 7, config)
     control_state = control._network.state_dict()
     candidate_state = candidate._network.state_dict()
     if control_state.keys() != candidate_state.keys() or any(
@@ -321,6 +380,7 @@ def _actual_class_gate(
     return {
         "status": "PASS", "public_info_sha256": canonical,
         "estimator_schema": estimate["schema_version"], "event_label": label["decision"],
+        "calibration_abstention_event_label": gated_label["decision"],
         "candidate_action": int(action), "candidate_action_log_prob_finite": True,
         "sa_initialized_tensors_equal": True,
         "sa_control_parameter_count": control_parameters,
@@ -549,16 +609,23 @@ def _selection_score(row: dict[str, Any], update_index: int) -> tuple[float, ...
 def _training_signal(
     row: dict[str, Any], *, arm: str, method: str, seed: int,
     update_index: int, global_step: int,
+    positive_prepare_calibration_abstention_enabled: bool = False,
 ) -> dict[str, Any]:
     event = dict(row.get("env_info", {}).get("transition", {}) or {})
     action_info = dict(row.get("action_info", {}) or {})
     decision = dict(row.get("decision_info", {}) or {})
     label = public_prepare_advantage_label(
-        decision["semantic_state"], decision["action_mask"]
+        decision["semantic_state"], decision["action_mask"],
+        positive_prepare_calibration_abstention_enabled=(
+            positive_prepare_calibration_abstention_enabled
+        ),
     )
     return {
         "arm": arm, "method": method, "seed": seed,
         "update_index": update_index, "global_step": global_step,
+        "positive_prepare_calibration_abstention_enabled": bool(
+            positive_prepare_calibration_abstention_enabled
+        ),
         "training_episode_index": row["training_episode_index"],
         "rollout_segment_index": row["rollout_segment_index"],
         "executed_action": int(row["action"]), "reward": float(row["reward"]),
@@ -588,6 +655,9 @@ def _build_cell_agent(cell: dict[str, Any], seed: int, config: dict[str, Any]) -
     cell_config["mechanism_aux_current_service_feasibility_gate_enabled"] = False
     cell_config["mechanism_aux_missing_current_event_abstention_enabled"] = False
     cell_config["mechanism_aux_causal_public_prepare_advantage_enabled"] = bool(cell["candidate_enabled"])
+    cell_config["mechanism_aux_positive_prepare_calibration_abstention_enabled"] = bool(
+        cell.get("positive_prepare_calibration_abstention_enabled", False)
+    )
     return _build_agent(
         cell["method"], seed, cell_config,
         agent_overrides={"value_normalization_enabled": False},
@@ -618,7 +688,9 @@ def execute(protocol_path: Path, output_root: Path, expected_commit: str) -> Non
     if output_root.exists():
         raise FileExistsError(f"create-only output exists: {output_root}")
     protocol = _load(protocol_path)
-    gate = _validate_protocol(protocol, require_clean=True)
+    gate = _validate_protocol(
+        protocol, require_clean=True, require_authorized=True
+    )
     if _git_commit() != expected_commit:
         raise RuntimeError("scientific commit identity mismatch")
     output_root.mkdir(parents=True)
@@ -671,6 +743,12 @@ def execute(protocol_path: Path, output_root: Path, expected_commit: str) -> Non
                     training_signal_rows.append(_training_signal(
                         row, arm=cell["arm"], method=cell["method"], seed=int(seed),
                         update_index=update_index, global_step=global_step,
+                        positive_prepare_calibration_abstention_enabled=bool(
+                            cell.get(
+                                "positive_prepare_calibration_abstention_enabled",
+                                False,
+                            )
+                        ),
                     ))
                 training_episode_rows.extend({
                     "arm": cell["arm"], "method": cell["method"], "seed": seed, **row,
@@ -740,6 +818,11 @@ def execute(protocol_path: Path, output_root: Path, expected_commit: str) -> Non
             summaries.append({
                 "arm": cell["arm"], "method": cell["method"], "seed": seed,
                 "candidate_enabled": bool(cell["candidate_enabled"]),
+                "positive_prepare_calibration_abstention_enabled": bool(
+                    cell.get(
+                        "positive_prepare_calibration_abstention_enabled", False
+                    )
+                ),
                 "parameter_count": parameter_count, "environment_steps": global_step,
                 "updates": 24, "optimizer_steps": 192, "episodes_started": episodes_started,
                 "active_partial_episode_at_budget": state is not None,
@@ -839,7 +922,9 @@ def main() -> None:
     protocol_path = (ROOT / args.protocol).resolve()
     protocol = _load(protocol_path)
     if args.preflight:
-        result = _validate_protocol(protocol, require_clean=False)
+        result = _validate_protocol(
+            protocol, require_clean=False, require_authorized=False
+        )
         config, instance, source_bundle, runtime = _load_runtime(protocol)
         result["actual_class_gate"] = _actual_class_gate(
             protocol, config, instance, source_bundle, runtime

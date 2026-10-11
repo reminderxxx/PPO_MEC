@@ -17,6 +17,7 @@ from torch.distributions import Categorical
 
 from src.agents.base_agent import BaseAgent
 from src.agents.causal_public_action_estimator import (
+    CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION,
     EVENT_LABEL_SCHEMA_VERSION,
     public_prepare_advantage_label,
 )
@@ -728,6 +729,7 @@ class 分层PPO基类(BaseAgent):
         mechanism_aux_current_service_feasibility_gate_enabled: bool = False,
         mechanism_aux_missing_current_event_abstention_enabled: bool = False,
         mechanism_aux_causal_public_prepare_advantage_enabled: bool = False,
+        mechanism_aux_positive_prepare_calibration_abstention_enabled: bool = False,
         prediction_feature_dim: int = 13,
         prepared_state_features_enabled: bool = False,
         prediction_gate_min_leak: float = 0.0,
@@ -1303,6 +1305,9 @@ class 分层PPO基类(BaseAgent):
         self._mechanism_aux_causal_public_prepare_advantage_enabled = bool(
             mechanism_aux_causal_public_prepare_advantage_enabled
         )
+        self._mechanism_aux_positive_prepare_calibration_abstention_enabled = bool(
+            mechanism_aux_positive_prepare_calibration_abstention_enabled
+        )
         if sum(
             int(enabled)
             for enabled in (
@@ -1313,6 +1318,13 @@ class 分层PPO基类(BaseAgent):
         ) > 1:
             raise ValueError(
                 "event auxiliary supervision semantics are mutually exclusive"
+            )
+        if (
+            self._mechanism_aux_positive_prepare_calibration_abstention_enabled
+            and not self._mechanism_aux_causal_public_prepare_advantage_enabled
+        ):
+            raise ValueError(
+                "positive prepare calibration abstention requires causal public prepare advantage"
             )
         self._prediction_feature_dim = int(prediction_feature_dim)
         self._prepared_state_features_enabled = bool(prepared_state_features_enabled)
@@ -4644,6 +4656,9 @@ class 分层PPO基类(BaseAgent):
                 self._mechanism_aux_missing_current_event_abstention_enabled
                 or self._mechanism_aux_causal_public_prepare_advantage_enabled
             ),
+            "event_aux_positive_prepare_calibration_abstention_enabled": (
+                self._mechanism_aux_positive_prepare_calibration_abstention_enabled
+            ),
             "event_aux_supervision_semantics": self._checkpoint_config()[
                 "mechanism_aux_event_target_semantics"
             ],
@@ -5703,6 +5718,12 @@ class 分层PPO基类(BaseAgent):
                 False,
             )
         )
+        saved_positive_prepare_calibration_abstention = bool(
+            saved_config.get(
+                "mechanism_aux_positive_prepare_calibration_abstention_enabled",
+                False,
+            )
+        )
         if sum(
             int(enabled)
             for enabled in (
@@ -5722,6 +5743,18 @@ class 分层PPO基类(BaseAgent):
             != self._mechanism_aux_causal_public_prepare_advantage_enabled
         ):
             raise ValueError("causal public prepare-advantage checkpoint mismatch")
+        if (
+            saved_positive_prepare_calibration_abstention
+            != self._mechanism_aux_positive_prepare_calibration_abstention_enabled
+        ):
+            raise ValueError("positive prepare calibration-abstention checkpoint mismatch")
+        if (
+            saved_positive_prepare_calibration_abstention
+            and not saved_causal_public_prepare_advantage
+        ):
+            raise ValueError(
+                "checkpoint calibration abstention requires causal public prepare advantage"
+            )
         expected_event_target_semantics = (
             "current_complete_bundle_ready_v1"
             if self._mechanism_aux_current_service_feasibility_gate_enabled
@@ -5729,7 +5762,11 @@ class 分层PPO基类(BaseAgent):
                 "missing_current_event_abstention_v1"
                 if self._mechanism_aux_missing_current_event_abstention_enabled
                 else (
-                    EVENT_LABEL_SCHEMA_VERSION
+                    (
+                        CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION
+                        if self._mechanism_aux_positive_prepare_calibration_abstention_enabled
+                        else EVENT_LABEL_SCHEMA_VERSION
+                    )
                     if self._mechanism_aux_causal_public_prepare_advantage_enabled
                     else "legacy_target_timing_v1"
                 )
@@ -5745,7 +5782,11 @@ class 分层PPO基类(BaseAgent):
                         "missing_current_event_abstention_v1"
                         if saved_event_abstention
                         else (
-                            EVENT_LABEL_SCHEMA_VERSION
+                            (
+                                CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION
+                                if saved_positive_prepare_calibration_abstention
+                                else EVENT_LABEL_SCHEMA_VERSION
+                            )
                             if saved_causal_public_prepare_advantage
                             else "legacy_target_timing_v1"
                         )
@@ -15758,6 +15799,9 @@ class 分层PPO基类(BaseAgent):
             "mechanism_aux_causal_public_prepare_advantage_enabled": (
                 self._mechanism_aux_causal_public_prepare_advantage_enabled
             ),
+            "mechanism_aux_positive_prepare_calibration_abstention_enabled": (
+                self._mechanism_aux_positive_prepare_calibration_abstention_enabled
+            ),
             "mechanism_aux_event_target_semantics": (
                 "current_complete_bundle_ready_v1"
                 if self._mechanism_aux_current_service_feasibility_gate_enabled
@@ -15765,7 +15809,11 @@ class 分层PPO基类(BaseAgent):
                     "missing_current_event_abstention_v1"
                     if self._mechanism_aux_missing_current_event_abstention_enabled
                     else (
-                        EVENT_LABEL_SCHEMA_VERSION
+                        (
+                            CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION
+                            if self._mechanism_aux_positive_prepare_calibration_abstention_enabled
+                            else EVENT_LABEL_SCHEMA_VERSION
+                        )
                         if self._mechanism_aux_causal_public_prepare_advantage_enabled
                         else "legacy_target_timing_v1"
                     )
@@ -16628,7 +16676,12 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
                 "decision": "legacy",
                 "reason": "configured_legacy_event_auxiliary_semantics",
             }
-        label = public_prepare_advantage_label(semantic_state)
+        label = public_prepare_advantage_label(
+            semantic_state,
+            positive_prepare_calibration_abstention_enabled=(
+                self._mechanism_aux_positive_prepare_calibration_abstention_enabled
+            ),
+        )
         return {
             "event_target": int(label["event_target"]),
             "event_soft_target": float(label["event_soft_target"]),
@@ -16643,7 +16696,12 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
     ) -> float:
         if self._mechanism_aux_causal_public_prepare_advantage_enabled:
             return float(
-                public_prepare_advantage_label(semantic_state)[
+                public_prepare_advantage_label(
+                    semantic_state,
+                    positive_prepare_calibration_abstention_enabled=(
+                        self._mechanism_aux_positive_prepare_calibration_abstention_enabled
+                    ),
+                )[
                     "supervision_weight"
                 ]
             )

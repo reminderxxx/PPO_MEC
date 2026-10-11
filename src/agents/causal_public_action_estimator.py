@@ -20,6 +20,9 @@ UNKNOWN = "unknown"
 NOT_APPLICABLE = "not_applicable"
 SCHEMA_VERSION = "causal_public_action_estimator_v3"
 EVENT_LABEL_SCHEMA_VERSION = "causal_public_prepare_advantage_v3"
+CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION = (
+    "causal_public_prepare_advantage_calibration_abstention_v1"
+)
 PUBLIC_RULE_SCHEMA_VERSION = "causal_public_rule_selection_v3"
 RAW_PHASE_V1 = "raw_ngsim_event_time_v1"
 RAW_PHASE_V2 = "raw_ngsim_event_time_v2"
@@ -973,6 +976,8 @@ def estimate_public_actions(
 def public_prepare_advantage_label(
     semantic_state: dict[str, Any],
     action_mask: list[bool] | None = None,
+    *,
+    positive_prepare_calibration_abstention_enabled: bool = False,
 ) -> dict[str, Any]:
     """Return the frozen prepare/serve/abstain event-supervision decision."""
 
@@ -1007,8 +1012,27 @@ def public_prepare_advantage_label(
         decision, reason = "prepare", "service_safe_feasible_future_readiness_gain"
     else:
         decision, reason = "abstain", "decisive_public_comparison_unavailable"
+    if (
+        positive_prepare_calibration_abstention_enabled
+        and decision == "prepare"
+        and dict(
+            dict(semantic_state.get("predictions", {}) or {}).get(
+                "causal_provenance", {}
+            )
+            or {}
+        ).get("confidence_calibrated")
+        is not True
+    ):
+        decision, reason = (
+            "abstain",
+            "positive_prepare_prediction_confidence_not_calibrated",
+        )
     return {
-        "schema_version": EVENT_LABEL_SCHEMA_VERSION,
+        "schema_version": (
+            CALIBRATION_ABSTENTION_EVENT_LABEL_SCHEMA_VERSION
+            if positive_prepare_calibration_abstention_enabled
+            else EVENT_LABEL_SCHEMA_VERSION
+        ),
         "decision": decision,
         "event_target": 1 if decision == "prepare" else 0,
         "event_soft_target": 1.0 if decision == "prepare" else 0.0,

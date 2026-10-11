@@ -121,6 +121,12 @@ def _build_agent(
                         False,
                     )
                 ),
+                "mechanism_aux_positive_prepare_calibration_abstention_enabled": bool(
+                    config.get(
+                        "mechanism_aux_positive_prepare_calibration_abstention_enabled",
+                        False,
+                    )
+                ),
             }
         )
     if method in {"sa_ghmappo", "mappo", "dt_handoff_drl"}:
