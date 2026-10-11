@@ -10,7 +10,7 @@
 `confidence_calibrated=false` 时仍给正 prepare 监督。唯一后续候选已
 [默认关闭实现并完成静态覆盖](docs/project/cscwd_positive_prepare_calibration_abstention_implementation_20261011.md)：
 unknown/未校准只撤销正 prepare event supervision；当前 Raw 全 false，故实际是撤销全部正 prepare auxiliary，不是细粒度
-置信控制。匹配训练协议仍 `execution_authorized=false`，本轮未训练。
+置信控制。该匹配训练协议后续已获一次性 create-only、无 retry 授权；结果仍只具有 development 资格。
 
 2026-10-11 的 [phase-v2 pilot 终态合同独立审查](docs/project/cscwd_phase_v2_pilot_terminal_contract_audit_20261011.md)
 确认 scientific child 已完整产生 23,040 steps、3,840 optimizer steps、80 selection、320 learned evaluation 与 100 checkpoints，

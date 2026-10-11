@@ -11,7 +11,7 @@
   training log 和冻结 runner；missing/false/string/int 回归、serve 兼容及 event-only gradient 回归通过。
 - `COARSE INTERVENTION`：当前 Raw producer 永远写 false，故 gate 会撤销该 profile 全部正 prepare 监督；没有
   calibrated=true producer/source-disjoint calibration record，不能称为细粒度不确定性控制。
-- `OPEN / UNTESTED`：服务非劣、failed migration、bytes、recompute 与跨 seed 效果均未知；A/B 未授权、未执行。旧 pilot
+- `OPEN / UNTESTED`：服务非劣、failed migration、bytes、recompute 与跨 seed 效果均未知；A/B 后续已一次性授权但尚未执行。旧 pilot
   不兼容为匹配 control，任何新结论必须来自同一新 run 的原 candidate、新 candidate、PPO、MAPPO 与规则参照。
 - `CLAIM RISK`：实现正确性与静态 `prepare→abstain` 不等于性能因果；不得声称已修复奖励、已定位充分根因或 SA 领先。
 - `INDEPENDENCE BLOCKER`：现有合格 Lankershim/US-101 已用于训练/选模；Peachtree 时间单位待核验、I-80 属另一封存协议，

@@ -28,6 +28,12 @@ zero-byte rollback 原因分类，不重扫 raw data；`scripts/audit_cscwd_publ
 接到 SA control/candidate、PPO、controller-level MAPPO，共用 PPO rollout/bootstrap；只有 SA candidate 打开 v3 三态 auxiliary。
 同名 analyzer 只消费 complete artifact；launcher 复用 persistent supervisor，entry ACK 与 terminal receipt 分离。
 
+同一 runner 的 calibration-abstention 协议只在两个 SA arm 之间切换
+`mechanism_aux_positive_prepare_calibration_abstention_enabled`；PPO/MAPPO 与 public rules 保持原能力。新 analyzer 逐
+seed×view 检查服务非劣，并完整报告 reward 分解、elapsed、bytes、recompute、migration delivery/departure 和训练 label
+覆盖；新 launcher 在 dispatch 前验证 frozen commit 位于 `origin/codex/event-aux-abstention`，再复用公共 durable
+supervisor。该链不检验三头结构、sharing×migration factorial 或独立泛化。
+
 
 `scripts/run_calibrated_workflow_value_normalization_ab.py::_training_signal_row` 通过 primary vehicle 的 `associated_rsu_id` 计算
 current bundle readiness；它只生产训练行为日志，不参与 agent loss。`scripts/audit_calibrated_workflow_training_signal_readiness_correction.py`

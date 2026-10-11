@@ -1,7 +1,10 @@
 {
   "schema_version": "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1",
   "run_id": "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_20261011_v1",
-  "execution_authorized": false,
+  "execution_authorized": true,
+  "authorization_state": "authorized_once_after_static_calibration_abstention_acceptance",
+  "authorized_at": "2026-10-11",
+  "authorization_scope": "one_create_only_development_run_no_retry",
   "scope": "development_only_two_frozen_raw_ngsim_windows",
   "single_variable": {
     "name": "mechanism_aux_positive_prepare_calibration_abstention_enabled",
@@ -40,7 +43,9 @@
       "raw_event_time_environment": "30666d7c874717d8464a64702c811116e96b931a5db6b57287c6c11d2dcc6575",
       "sa_core": "adaf8c5aebf984f647e2c342b0b8a1765f4c619b97a8ea097535b82728e93a57",
       "agent_builder": "ab6cc72bba2550531eb28237e499ac7aed0c090243d014122f980666c07c0389",
-      "pilot_runner": "edf5eec6ca0e05d531890cf59ea0c54e36acdd1e71ef81676fe850e1b0f7ecf6"
+      "pilot_runner": "d0f09789c597b33283b35b4f911df129c80d1c328a3919db4314ef9467a4d9eb",
+      "ab_analysis": "68470b4de78ef8b71d36a1f5ed57e4923738900feb4f7e12520bc50731ab184c",
+      "ab_launcher": "a34143e37903a48e87ced816ebe2c27ab7544ced530a01ef33d94325f6aec7f2"
     }
   },
   "training": {

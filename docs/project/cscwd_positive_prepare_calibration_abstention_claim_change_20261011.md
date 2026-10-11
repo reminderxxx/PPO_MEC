@@ -13,7 +13,7 @@ auxiliary supervision。
 迁移或 SA 相对基线表现。不得写成奖励已修复、退化根因已证实、fine-grained uncertainty control、SA 稳定领先或论文贡献已
 验证。旧 pilot 结果与 checkpoint 只作历史描述，不能充当新候选的匹配 control。
 
-下一步只有一个冻结 A/B，且当前 `execution_authorized=false`：原 public-v3 SA 与新 gate SA 单变量比较，并在同一次新 run 中
+下一步只有一个冻结 A/B；后续已获一次性 `execution_authorized=true` 授权：原 public-v3 SA 与新 gate SA 单变量比较，并在同一次新 run 中
 重训 PPO/MAPPO、重评 public rules；共同 23,040 steps、5 seeds、selected/update24 双视角。任何服务恶化或 Raw 正 prepare
 仍被监督均直接否证；development 支持也不自动晋级 formal/holdout。
 

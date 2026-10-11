@@ -61,8 +61,8 @@ PPO 回报继续学习 action4。本门只撤销未经校准的正 event auxilia
 
 ## 唯一冻结的下一轮 A/B（未执行）
 
-协议：`configs/experiment/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json`，当前
-`execution_authorized=false`。runner 已支持该协议，但本轮没有运行其 preflight 或 scientific execution。
+协议：`configs/experiment/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json`。后续已收到一次性明确授权并切换为
+`execution_authorized=true`、`authorization_scope=one_create_only_development_run_no_retry`；本节其余预算与否证门保持不变。
 
 - 唯一变量：SA 的 `mechanism_aux_positive_prepare_calibration_abstention_enabled=false/true`；两臂都开启原
   `causal_public_prepare_advantage_v3`。
@@ -103,8 +103,8 @@ slow/fast/event 三头结构。三头贡献需要另立结构消融，使 observ
 - 历史 strict split 中存在 sealed holdout 计划，但本轮不得解封或复用；metadata 也没有足够 vehicle ID 集合来证明与当前
   vehicle 215/1183 不重叠。新 seed 只重复同一来源，绝不算独立单位。
 
-所以最快可运行且单一可证伪的仍只有上述 calibration-abstention development A/B。独立泛化是外部数据/新来源资格与明确
-授权 blocker；不能靠追加 seed、旧 sealed holdout 或换一个已暴露窗口消除。
+所以当前唯一获授权、单一可证伪的仍只有上述 calibration-abstention development A/B。独立泛化是外部数据/新来源资格与
+另一明确授权 blocker；不能靠追加 seed、旧 sealed holdout 或换一个已暴露窗口消除。
 
 ## 验证
 

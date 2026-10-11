@@ -14,8 +14,8 @@
   literal false 2、missing 9。environment/training/update/checkpoint/formal/holdout reads=`0/0/0/0/0/0`。
 - 旧 pilot 23,040 steps 的 coverage 来自 Raw producer 固定 false 的源码合同，而非逐 transition semantic-state 重建；因此
   当前候选作用是撤销全部正 prepare supervision，不证明历史 optimizer 更新或性能反事实。
-- 冻结协议=`configs/experiment/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json`，
-  `execution_authorized=false`。报告=`cscwd_positive_prepare_calibration_abstention_implementation_20261011.md`，A 线说明=
+- 冻结协议=`configs/experiment/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json`；原静态阶段未授权，后续已切换为
+  一次性 create-only/no-retry 授权。报告=`cscwd_positive_prepare_calibration_abstention_implementation_20261011.md`，A 线说明=
   `cscwd_positive_prepare_calibration_abstention_claim_change_20261011.md`。
 
 ## 2026-10-11 phase-v2 public observability audit（0 训练）

@@ -201,6 +201,14 @@ def _validate_protocol(
                 ROOT / "scripts/run_calibrated_workflow_interface_repair.py"
             ),
             "pilot_runner": Path(__file__).resolve(),
+            "ab_analysis": (
+                ROOT
+                / "scripts/analyze_cscwd_positive_prepare_calibration_abstention_ab.py"
+            ),
+            "ab_launcher": (
+                ROOT
+                / "scripts/launch_cscwd_positive_prepare_calibration_abstention_ab.py"
+            ),
         })
     for name, path in checks.items():
         if not path.is_file() or _sha256(path) != expected_hashes[name]:
@@ -521,7 +529,16 @@ def _evaluate_episode(
         for phase_event in phases:
             phase_seconds[str(phase_event["phase"])] += float(phase_event["elapsed_seconds"])
         label = public_prepare_advantage_label(
-            decision_info["semantic_state"], decision_info["action_mask"]
+            decision_info["semantic_state"], decision_info["action_mask"],
+            positive_prepare_calibration_abstention_enabled=bool(
+                getattr(
+                    agent,
+                    "_mechanism_aux_positive_prepare_calibration_abstention_enabled",
+                    False,
+                )
+                if agent is not None
+                else False
+            ),
         )
         ledger.append({
             "arm": arm, "view": view, "method": method, "seed": seed,
@@ -878,13 +895,33 @@ def execute(protocol_path: Path, output_root: Path, expected_commit: str) -> Non
         raise RuntimeError("scientific row-count identity drift")
     if len(training_signal_rows) != 23040 or len(optimizer_rows) != 3840:
         raise RuntimeError("scientific training-count identity drift")
+    calibration_abstention_run = protocol.get("schema_version") == (
+        "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1"
+    )
     _write_json(output_root / "run_manifest.json", {
-        "schema_version": "cscwd_phase_v2_causal_public_pilot_manifest_v1",
+        "schema_version": (
+            "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_manifest_v1"
+            if calibration_abstention_run
+            else "cscwd_phase_v2_causal_public_pilot_manifest_v1"
+        ),
         "status": "complete", "git_commit": expected_commit,
         "protocol": str(protocol_path.relative_to(ROOT)), "protocol_sha256": _sha256(protocol_path),
         "gate": gate, "actual_class_gate": actual_class_gate,
         "trace_identity": runtime["trace_identity"],
         "reward_profile": "original_reward_v1", "critic_target_normalization": "raw_disabled",
+        "calibration_abstention_scope": (
+            {
+                "raw_producer_confidence_calibrated": False,
+                "new_arm_effect": "removes_all_positive_prepare_auxiliary_supervision",
+                "fine_grained_uncertainty_control": False,
+                "three_head_structure_contribution_tested": False,
+                "single_variable": (
+                    "mechanism_aux_positive_prepare_calibration_abstention_enabled"
+                ),
+            }
+            if calibration_abstention_run
+            else None
+        ),
         "formal_or_holdout_reads": 0, "raw_or_checkpoint_uploaded": False,
         "counts": {"learned_cells": 20, "training_steps": 23040, "optimizer_steps": 3840,
                    "checkpoint_selection_episodes": 80, "final_learned_evaluation_episodes": 320,

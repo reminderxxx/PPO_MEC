@@ -14,7 +14,7 @@
   `prepare→abstain=1`；0 env step、0 training/update/checkpoint/formal/holdout。
 - Raw producer 对全部状态固定 `confidence_calibrated=false`，所以现有训练 profile 上该候选撤销全部正 prepare auxiliary，
   不是细粒度置信控制。匹配 A/B 已冻结为 4 arms × 5 seeds、总 23,040 steps、selected/update24，但
-  `execution_authorized=false`，本轮未启动。
+  原审查时为 `execution_authorized=false`；后续已获一次性 create-only、无 retry 授权，等待冻结提交、远端同步与真实入口预检。
 
 ## 2026-10-11：phase-v2 公共可观测性审查冻结唯一 epistemic abstention 候选
 

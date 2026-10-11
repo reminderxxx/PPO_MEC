@@ -203,7 +203,7 @@ def test_training_signal_log_uses_the_cell_semantics() -> None:
     assert gated["positive_prepare_calibration_abstention_enabled"] is True
 
 
-def test_frozen_protocol_is_runnable_but_not_execution_authorized() -> None:
+def test_frozen_protocol_is_runnable_and_once_authorized() -> None:
     path = Path(
         "configs/experiment/"
         "cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json"
@@ -215,7 +215,10 @@ def test_frozen_protocol_is_runnable_but_not_execution_authorized() -> None:
     assert gate["status"] == "PASS"
     assert gate["fixture_label"] == "prepare"
     assert gate["fixture_calibration_abstention_label"] == "abstain"
-    with pytest.raises(RuntimeError, match="not authorized"):
-        _validate_protocol(
-            protocol, require_clean=False, require_authorized=True
-        )
+    authorized = _validate_protocol(
+        protocol, require_clean=False, require_authorized=True
+    )
+    assert authorized["status"] == "PASS"
+    assert protocol["authorization_scope"] == (
+        "one_create_only_development_run_no_retry"
+    )

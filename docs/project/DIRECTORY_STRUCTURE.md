@@ -21,6 +21,19 @@
 - `tests/test_cscwd_phase_v2_causal_public_pilot.py`：预算、public consumer、四 learned cells rollout/bootstrap/optimizer 合同。
 - `artifacts/experiments/cscwd_phase_v2_causal_public_pilot_20261011_v1*` 与对应 analysis root：本机 create-only；checkpoint 不上传。
 
+## 2026-10-11 positive-prepare calibration abstention A/B
+
+- `configs/experiment/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json`：原 public-v3 SA、新 abstention SA、
+  PPO、controller-MAPPO × 5 seeds 的单变量 23,040-step 一次性授权与源码 hash。
+- `scripts/run_cscwd_phase_v2_causal_public_pilot.py`：复用 frozen phase-v2 训练/评价路径，并在新 manifest 显式记录 Raw 全
+  false、撤销全部正 prepare auxiliary、非三头结构检验的边界。
+- `scripts/analyze_cscwd_positive_prepare_calibration_abstention_ab.py`：只读 complete run，输出两视角、逐 seed 服务门、
+  reward 六项分解、bytes/recompute/migration 与监督覆盖。
+- `scripts/launch_cscwd_positive_prepare_calibration_abstention_ab.py`：要求 frozen commit 已在指定远端分支，create-only
+  durable supervisor，一次启动、无 retry、完成后自动分析。
+- `tests/test_cscwd_positive_prepare_calibration_abstention{,_analysis}.py`：literal calibration、梯度/checkpoint/log、授权协议
+  与结果 claim-boundary 回归。
+
 ## 2026-10-11 public estimator phase-accounting fix
 
 - `src/agents/causal_public_action_estimator.py`：`v2` fail-closed action phase、public raw full-step contact 表达与 actual-cost

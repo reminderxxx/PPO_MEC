@@ -7,7 +7,8 @@
 - 拒绝把 false 改 true、从 outcome 反推 calibration、加入阈值扫描或自动进入 auxiliary-target 消融。当前 Raw 全 false，故
   科学解释必须是“撤销全部正 prepare auxiliary”的粗粒度干预。
 - 下一轮只允许原 public-v3 SA vs 新 gate SA 的单变量比较；PPO/MAPPO/public rules 在同一新身份下重建参照，旧结果只作
-  描述。总预算上限固定 23,040 steps，selected/update24 同报，服务非劣为先；配置当前未授权，禁止自动执行。
+  描述。总预算上限固定 23,040 steps，selected/update24 同报，服务非劣为先；后续授权仅允许一个 create-only run，
+  无自动 retry，不扩 seed/预算。
 
 ## 2026-10-11：保留历史 terminal FAIL；只修未来 receipt producer/consumer schema
 

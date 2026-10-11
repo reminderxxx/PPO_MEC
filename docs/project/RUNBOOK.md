@@ -5,17 +5,25 @@
 
 # Runbook
 
-## Positive-prepare calibration abstention（2026-10-11；未授权训练）
+## Positive-prepare calibration abstention（2026-10-11；一次性授权）
 
 静态重算只读取已存在 public info/snapshot 和旧 pilot manifest，不调用 `env.step()`、不加载 checkpoint、不训练。canonical
 命令及输入清单见 `cscwd_positive_prepare_calibration_abstention_implementation_20261011.md`；输出 root 为
 `artifacts/analysis/cscwd_positive_prepare_calibration_abstention_static_audit_20261011_v1/`，create-only，不得覆盖。
 
 未来匹配协议位于
-`configs/experiment/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json`。当前
-`execution_authorized=false`；不得执行 runner 的 `--run`，也不得把 `--preflight` 当科学结果。只有另行明确授权、更新并冻结
-config/code hash、push clean commit 后，才可按同一 runner 执行；不改 4 arms × 5 seeds、23,040 steps、update
-6/12/18/24、selected/update24 或服务非劣门。旧 pilot 只作描述性结果，不充当匹配 control。
+`configs/experiment/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_v1.json`。后续已获一次性
+`one_create_only_development_run_no_retry` 授权。必须先使冻结 commit 出现在
+`origin/codex/event-aux-abstention`、工作树 clean、三个 create-only root 不存在，并运行 actual-class preflight；随后只允许：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/launch_cscwd_positive_prepare_calibration_abstention_ab.py \
+  --mode launch --expected-commit <FROZEN_PUSHED_COMMIT>
+```
+
+不得改 4 arms × 5 seeds、23,040 steps、update 6/12/18/24、selected/update24 或服务非劣门；不得 retry。旧 pilot 只作
+描述性结果，不充当匹配 control。launcher ACK 后由 detached supervisor 持续，当前交接不轮询中间训练结果。
 
 ## phase-v2 pilot terminal 只读核验（2026-10-11；禁止重跑）
 
