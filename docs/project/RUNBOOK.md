@@ -21,6 +21,11 @@ formal/holdout、无 retry。以下命令已在 commit `77c1a823…e0` 执行完
 输出 root 为 `artifacts/analysis/cscwd_lankershim_event_label_coverage_probe_20261011_v1/`，create-only，当前已存在。未在
 96 步内观察到某标签只能写“未观测”，不得外推为训练域不存在；该结果不能用于方法排名或 checkpoint/reward 选择。
 
+训练资格门协议为 `configs/experiment/cscwd_training_source_positive_prepare_qualification_v1.json`。它只读上述 96 个已保存
+state，并同时调用 direct label 与真实 SA auxiliary target consumer；不新增 env step。只有 base `prepare, weight>0` 非零、
+candidate 对相同行 `prepare→abstain, weight=0` 非零且 consumer 完全一致才可 PASS；PASS 仍须另行授权训练，FAIL 立即停止。
+US-101 在读取 label/reward 前因 checkpoint-selection 角色排除。
+
 ## Positive-prepare calibration abstention（2026-10-11；一次性授权）
 
 静态重算只读取已存在 public info/snapshot 和旧 pilot manifest，不调用 `env.step()`、不加载 checkpoint、不训练。canonical

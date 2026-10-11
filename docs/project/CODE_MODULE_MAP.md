@@ -3,6 +3,8 @@
 `scripts/probe_cscwd_lankershim_event_label_coverage.py` 是独立于冻结 A/B runner 的 public-label 诊断入口：复用同一
 `RawNGSIMPhaseV2Env` 与 label 纯函数，但只按预注册动作周期执行最多 96 步，记录 semantic-state hash、完整 public state、
 label/reason/weight 与 action4 公开门。它不接 agent、optimizer、checkpoint 或评价排名；因此新增诊断不会改变旧 runner hash。
+`scripts/qualify_cscwd_training_source_positive_prepare.py` 再把保存状态送入实际 SA `_event_auxiliary_target`，要求 direct label 与
+consumer 一致，并用 nonzero base-positive 与 candidate intervention 双门 fail-closed；它不执行环境或 optimizer。
 
 `scripts/launch_calibrated_workflow_value_normalization_ab.py` 是 persistent scientific supervisor 的公共 receipt consumer：
 `_validate_scientific_completion_receipt` 要求 `status=complete` 且 `scientific_execution_complete is True`；plan 可进一步指定
