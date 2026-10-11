@@ -85,6 +85,11 @@ label 暴露，导致用 US-101 静态见证授权了 Lankershim 训练。它是
 elapsed、transfer、recompute 和 label exposure。任一视角 completion/on-time 下降或 failure 增加即否定候选；若 supervised
 prepare 仍为 0，则立即判 `UNINFORMATIVE` 并停止，不再训练或自动 retry。
 
+后续实际 consumer 资格核验已执行且失败：96 个 Lankershim state 的 direct label 与两个 SA
+`_event_auxiliary_target` 全部一致（mismatch=0），但 base-positive prepare=`0`、candidate prepare→abstain=`0`；US-101 在读取
+label/reward 前因 selection 角色排除。故 `gate_passed=false, training_authorized=false`，当前可授权训练来源数为 0，未使用剩余
+96-step 上限。下一轮未授权计划见 `cscwd_next_positive_prepare_matched_training_plan_20261011.md`。
+
 ## Artifact
 
 - result review root：`artifacts/analysis/cscwd_phase_v2_positive_prepare_calibration_abstention_ab_20261011_v1_result_review_v1/`
@@ -93,4 +98,6 @@ prepare 仍为 0，则立即判 `UNINFORMATIVE` 并停止，不再训练或自�
 - probe root：`artifacts/analysis/cscwd_lankershim_event_label_coverage_probe_20261011_v1/`
   - `artifact_integrity.json` SHA-256=`337e29848a4343c86922240b234d4d8d8245ce64d1f3c99df9fa60ace2ce7e86`
   - `summary.json` SHA-256=`8c2d885be45250785d930bef81998eaf65939ee3a5d961e9f982141de3ca54db`
-
+- qualification root：`artifacts/analysis/cscwd_training_source_positive_prepare_qualification_20261011_v1/`
+  - `artifact_integrity.json` SHA-256=`b822fd65441ded573cdd6665c78258171689a5bfe038e577250fdb43caa14244`
+  - `qualification.json` SHA-256=`704fd05a7f564ee7a670ce17d048fcf13d30c42c40831fe8445b5bb986377e5b`

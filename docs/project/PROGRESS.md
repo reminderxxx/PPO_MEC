@@ -16,6 +16,9 @@
   0 optimizer/parameter/checkpoint/formal/holdout。当前定位为训练源机制机会缺失及预训练资格门缺失，不修算法、不追加训练。
 - 唯一后续门：实际训练源先通过结果盲 nonzero base-prepare coverage；未通过即停止。完整报告见
   `cscwd_positive_prepare_calibration_abstention_results_20261011.md`，A 线说明独立保存且未编辑主稿。
+- 实际 SA consumer 资格门随后在 96 个已保存状态上执行：direct/consumer mismatch=0，但 base-positive prepare=0、
+  prepare→abstain=0；US-101 在检查前因 selection 角色排除。最终 `gate_passed=false, training_authorized=false`，新增
+  env/optimizer/parameter/checkpoint/formal/holdout=`0/0/0/0/0/0`，本轮停止。
 
 ## 2026-10-11：正 prepare 校准来源 abstention 已默认关闭实现；训练仍未授权
 

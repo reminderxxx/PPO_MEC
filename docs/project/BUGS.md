@@ -15,6 +15,8 @@
   只能提供同训练域的有界机制见证。
 - `STOP`：不因零暴露修改 reward/label、增加 seed 或延长训练。后续须先冻结 source-disjoint、结果盲 mechanism-coverage
   资格协议；US-101 已用于选模，不得移作训练。未观察标签只记未观察，不推断域内不存在。
+- `QUALIFICATION FAILED`：真实 SA consumer 与 direct label 在 96/96 状态一致，排除 consumer 接线漂移；但 nonzero
+  base-positive 和 candidate intervention 双门均失败。当前授权训练来源数为 0，不得启动下一轮 A/B。
 
 ## 2026-10-11：IMPLEMENTED DEFAULT-OFF / 正 prepare 校准门；OPEN / 效果与生产校准
 

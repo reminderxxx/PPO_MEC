@@ -18,6 +18,10 @@
   formal/holdout；96/96 `action4_not_legal`，19 次固定 action4 请求全部 mask fallback，26 个唯一 state hash。
 - 报告=`cscwd_positive_prepare_calibration_abstention_results_20261011.md`；A 线独立说明=
   `cscwd_positive_prepare_calibration_abstention_result_claim_change_20261011.md`。旧负结果/checkpoint/run root 均保留。
+- actual-consumer qualification root=`artifacts/analysis/cscwd_training_source_positive_prepare_qualification_20261011_v1/`；
+  integrity/result SHA-256=`b822fd65…244`/`704fd05a…7e5b`。96 个旧 probe state、0 新 env step，consumer mismatch=0，
+  base-positive/intervention=`0/0`，`gate_passed=false, training_authorized=false`。最小后续计划=
+  `cscwd_next_positive_prepare_matched_training_plan_20261011.md`，未执行训练。
 
 ## 2026-10-11 positive-prepare calibration abstention 实现与静态覆盖（0 训练）
 

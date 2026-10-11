@@ -24,7 +24,9 @@ formal/holdout、无 retry。以下命令已在 commit `77c1a823…e0` 执行完
 训练资格门协议为 `configs/experiment/cscwd_training_source_positive_prepare_qualification_v1.json`。它只读上述 96 个已保存
 state，并同时调用 direct label 与真实 SA auxiliary target consumer；不新增 env step。只有 base `prepare, weight>0` 非零、
 candidate 对相同行 `prepare→abstain, weight=0` 非零且 consumer 完全一致才可 PASS；PASS 仍须另行授权训练，FAIL 立即停止。
-US-101 在读取 label/reward 前因 checkpoint-selection 角色排除。
+US-101 在读取 label/reward 前因 checkpoint-selection 角色排除。该资格门已在 commit `eeb9b00…763` 执行一次并失败，
+create-only root 已存在；不得 rerun。下一 split/训练计划见 `cscwd_next_positive_prepare_matched_training_plan_20261011.md`，
+当前 `training_authorized=false`。
 
 ## Positive-prepare calibration abstention（2026-10-11；一次性授权）
 
