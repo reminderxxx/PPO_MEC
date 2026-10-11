@@ -10,6 +10,7 @@
 - `RESOLVED EXECUTOR / RUN COMPLETE`：旧 v1 schema 误读已在新提交修复，经真实 CSV 四臂零步门后另获授权，v2 唯一执行 4/4 episode、32/96 步、42/42 文件完整性通过；旧失败回执不变，执行 gate 已关闭。该修复只解决原始 identity wrapper 的消费错误。
 - `OPEN / interaction and deployment`：同一已暴露 US101 轨迹上的四臂给出描述性总系统差异，S1M1 有成功状态消费，同时两臂有目标提前离开的浪费发送；因素还改变后续可用动作机会，不能当直接交互或真实双站净收益。正式 `no_base_sharing` 消费、跨 workflow cache 生命周期、实测 RSU/链路/队列仍缺。
 - `OPEN / baseline and independence`：没有新的 learned 三头结构消融、匹配强基线训练或正式 checkpoint/formal/holdout/support；Peachtree 的 10 位时钟与历史 split 仅检查元数据，单位与独立性未核。四项论文主张和 paper-ready 仍 `UNVERIFIED` / `Unverifiable`。详见 `cscwd_sharing_migration_2x2_v2_result_20261011.md`。
+- `REWARD AUDITED / COVERAGE OPEN`：同一 `original_reward_v1` 的四臂 reward 可由逐步原始量重算，但固定策略回报包含 S0 迟到和超额模型字节，不能用作 SA 结构或优秀基线优势。两条本地长来源均已开发暴露；Lankersheim 四臂首步不具备 action4，整段训练覆盖由 B 的结果盲门另核，A 不更改布局或补选 US101 来制造机会。
 
 ## 2026-10-11：四臂首次执行器错读来源身份 schema
 

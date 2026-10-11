@@ -10,6 +10,7 @@
 - 唯一 create-only v2 运行在事前冻结 commit `dd7bb2afc33bdd7b96a88a1e19b546a2672804e0` 完成 4/4 episode、32/96 真实环境步；每臂 8/8 节点完成、自然终止、0 service failure。42/42 文件 SHA 与逐步/终点对账通过；`summary.json` SHA-256 `de9c1375c2767d0571ba6f1a4a658969da9d816ce1339faf9055f6d472439aa7`，completion receipt SHA-256 `7e07c86ce8c60acac21b639f3bd10293cf3a5ec9e55b41b0403dcda879881d4c`。执行 gate 已关闭，旧 v1 失败 root 不变。
 - 单一已暴露 US101 来源上，S0M0/S1M0/S0M1/S1M1 全部完成，按期依次 0/1/0/1；S1M1 有一次状态交付被后续利用，S0M1 与 S1M1 各有目标提前离开的无益状态发送。局部描述性的完成时刻 difference-in-differences 为 −4.290278 s，总传输为 +140,480 bytes；动作机会随因素而变，不能解释为独立直接机制效应。
 - Peachtree 仅检查本地 raw 时钟与版本化 split 元数据；时间单位、跨来源身份仍待核验。真实双 RSU、三头公平基线和独立 formal/holdout/support 缺失，四项论文主张仍 `UNVERIFIED`、paper-ready=`Unverifiable`。完整四臂表和四项缺口见 `cscwd_sharing_migration_2x2_v2_result_20261011.md`。
+- 后续只读核对按同一 `original_reward_v1` 从 32 条逐步原始成本、字节、完成和 deadline 重算四臂六项 reward，逐步及终点误差均在 `1e-9` 内；S0M0/S1M0/S0M1/S1M1 总分 7.218149/12.622342/7.216040/12.963390。S0 两臂迟到并各扣 4 分，固定策略差异不能称 SA 优势。给 B 的元数据交接仅列既有 Lankersheim（历史 train/dev 交叠 1、曾训练、首步 action4 不合法）与 US101（交叠 2、曾 checkpoint 选择、首步 action4 合法），B 自行冻结结果盲 coverage gate 和 split；0 新环境步、0 新来源选择。
 
 ## 2026-10-11：首次 sharing × migration 四臂开发执行在环境步前失败
 
