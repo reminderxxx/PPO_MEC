@@ -5,6 +5,20 @@
 
 # Runbook
 
+## 四 RSU、八车竞争工程 replay（2026-10-12）
+
+从仓库根目录运行：
+
+```bash
+python scripts/run_vec_competition.py --max-rows 500000 --frames 120 \
+  --output-dir artifacts/analysis/vec_competition_v1
+```
+
+入口只读本地 NGSIM、Alibaba 数据；若当前是 Git LFS 隔离 worktree，会读取同一仓库主工作区的实材文件。
+自定义真实文件可使用 `--ngsim-csv`、`--alibaba-csv`。输出包括 `scenario_manifest.json`、`summary.json`、
+`event_ledger.jsonl`；已有输出目录会被拒绝，请为每次记录使用独立目录。受控带宽、计算和字节换算通过命令行显式配置。
+合同及不可作论文结论的边界见 `vec_competition_engineering_contract.md`。
+
 ## 最小机制证据闭环（2026-10-05）
 
 冻结方案与结果分别见 `mechanism_evidence_closure_plan_20261005.md` 和

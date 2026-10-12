@@ -1,5 +1,12 @@
 # Code Module Map
 
+## 四站八车并发工程 replay（2026-10-12）
+
+- `src/evaluators/vec_competition_scenario.py`：从本地 NGSIM/Alibaba/typed catalog 构建同一连续时间窗的八车四站场景，并记录单位转换、推定站位和输入 hash。
+- `src/envs/core/vec_competition_env.py`：统一帧时钟、并发 DAG、缓存加载、双端回传/无线争用、计算槽、跨站结果收据与交付账本。独立于旧 `VecWorkflowCoreEnv` 和 agent registry。
+- `scripts/run_vec_competition.py`：工程 replay 和 manifest/summary/ledger 生产端；当前只有工程诊断消费端，没有正式训练/benchmark 消费端。
+- `tests/test_vec_competition_env.py`：因果、共享资源、迁移和确定性合同验收。
+
 ## 2026-10-05 bounded mechanism evidence
 
 - `scripts/run_mechanism_evidence_closure.py`：只读复用 native request ledgers，构建 A 的公平成本表；通过正常

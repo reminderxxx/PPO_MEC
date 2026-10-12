@@ -5,6 +5,10 @@
 
 # PPO_MEC
 
+四 RSU、八车同时竞争的 NGSIM+Alibaba 工程 replay 入口为 `scripts/run_vec_competition.py`，合同和论文真实性边界见
+[四站八车环境工程合同](docs/project/vec_competition_engineering_contract.md)。该入口使用受控布站和资源参数，
+输出 `artifacts/analysis/vec_competition_v1/`；不属于冻结的正式 Protocol 2.9 实验。
+
 最小机制证据闭环（共享缓存四配置、连续/重跑/后缀恢复、12 个有界决策场景）见
 [results](docs/project/mechanism_evidence_closure_results_20261005.md)；结论是 bounded diagnostic，非 formal、holdout、
 算法优势或 paper-ready 证据。

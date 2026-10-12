@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-12：四站八车并发环境工程 replay
+
+- 新增 `vec_competition_v1`，使用同一 NGSIM 连续时间窗内八辆观测车、八个 Alibaba DAG job、四个推定 RSU；显式竞争缓存、radio/backhaul 与计算槽，并记录迁移和交付账本。
+- 当前为工程诊断；真实底图/站位、无线及模型测量、正式 agent 训练消费端、独立统计与论文结果均未闭环。范围与验收见 `vec_competition_engineering_contract.md`。
+
 ## 2026-10-09：CSCWD 强基线与贡献证据只读审查
 
 - 已从 v70 mixed/full 原始 rows、episode receipt、checkpoint manifest 和统计包复核旧奖励均值；这些仍是开发协议描述性结果。

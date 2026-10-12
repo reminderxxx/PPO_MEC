@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-12：四站八车工程 replay 的剩余论文阻断项（OPEN）
+
+- NGSIM 八车真实轨迹已可用于同窗并发 replay；四站位置、覆盖、回传/无线和计算容量仍是推定或受控值。没有与 NGSIM 对齐的可核验道路底图/真实 RSU 部署。
+- Alibaba 是真实调度 DAG 而非同源车载 AI 任务；模型权重、任务输出和跨站状态在 `vec_competition_v1` 中仍是受控元数据，未实测端到端语义正确性。
+- 新 replay 不接旧五动作 agent/正式训练与 benchmark，不能修补 v70 错段/重叠、baseline 预算和 formal/holdout 缺口；详见 `vec_competition_engineering_contract.md`。
+
 ## 2026-10-09：v70 窗口身份与强基线可比性（OPEN）
 
 - v70 mixed/full 的 `selected_window_plan` 是 Peachtree，原始 rows/episode receipt 是 Lankershim，ID 交集为 0；普通 frozen-plan 路径传入的 `expected_window_id` 未被普通 mobility loader 校验。需要独立实现任务修复身份链和 rollout 前错段负例。

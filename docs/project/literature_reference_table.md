@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-11
+更新日期：2026-10-12
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -12,6 +12,14 @@
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
 ## 维护规范
+
+### 2026-10-12：模型载入与并发服务系统补充
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 模型载入 I/O | [Accelerating Model Loading in LLM Inference by Programmable Page Cache](https://www.usenix.org/conference/fast26/presentation/liu-yubo) | USENIX FAST, 2026 | PPC/MAIO 将模型加载、预取与驱逐的真实 I/O 延迟作为系统问题，并报告加载时延与弹性部署吞吐测量。 | PPO_MEC 的 RSU adapter 准备也必须计入非零加载时间与并发带宽；该文是服务器存储层，不能提供 VEC 无线/回传或 adapter 迁移的参数。当前仓库的受控 MB/s 仍待实测校准。 | System Model 的加载时延依据；Discussion 的校准限制。 |
+| 并发推理资源争用 | [Torpor: GPU-Enabled Serverless Computing for Low-Latency, Resource-Efficient Inference](https://www.usenix.org/conference/atc25/presentation/yu) | USENIX ATC, 2025 | 模型在主存驻留、按到达动态搬入 GPU，并用干扰感知调度和真实部署评估多函数并发推理。 | PPO_MEC 的对象是移动车辆、跨 RSU DAG 与 handoff；不能从 Torpor 的云端 GPU 结果推断本项目队列参数或优势。其并发服务事实支持对 8 车共享算力和缓存作显式建模。 | System Model / 并发负载基线讨论。 |
+| KV 分层缓存 | [Strata: Hierarchical Context Caching for Long Context Language Model Serving](https://www.usenix.org/conference/osdi26/presentation/xie-zhiqiang) | USENIX OSDI, 2026 | 展示长上下文 KV 分层载入时 I/O 碎片、延迟命中与调度耦合，并在生产系统评估。 | KV 上下文与 PPO_MEC 的 base/adapter 权重和 workflow state 是不同对象；只能用于说明等待中的请求会受到加载过程影响，不作为 adapter 命中率或迁移收益证据。 | Discussion / reviewer response，明确缓存抽象边界。 |
 
 ### 2026-10-11：汇报近邻补充
 

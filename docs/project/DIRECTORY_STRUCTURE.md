@@ -1,5 +1,10 @@
 ﻿# Directory Structure
 
+## 2026-10-12 四站八车工程 replay
+
+- `src/envs/core/vec_competition_env.py`、`src/evaluators/vec_competition_scenario.py`、`scripts/run_vec_competition.py`：独立并发场景、执行内核和入口。
+- `artifacts/analysis/vec_competition_v1/`：工程 manifest、summary、event ledger；不是正式 benchmark 的 live 路径。
+
 ## 2026-10-05 最小机制证据闭环
 
 - `configs/experiment/mechanism_evidence_closure_v1.json`：A/C 冻结矩阵、成本模型、预算和命令。
