@@ -132,7 +132,7 @@ def _assert_acceptance(main: dict[str, Any], replay: dict[str, Any], baseline: d
     def first_primary_model_completion(run: dict[str, Any]) -> float:
         started = {row["operation_id"] for row in run["events"]
                    if row.get("event_type") == "transfer_started" and row.get("transfer_kind") == "model_load"
-                   and row.get("request_id") == "acceptance_wf:vehicle-1"}
+                   and str(row.get("request_id", "")).startswith("acceptance_wf:vehicle-1:prepare:")}
         times = [row["time_s"] for row in run["events"]
                  if row.get("event_type") == "transfer_completed" and row.get("operation_id") in started]
         assert times, "primary vehicle model transfer did not finish"

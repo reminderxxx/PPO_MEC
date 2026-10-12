@@ -9,6 +9,9 @@
 `physical_env_config.py` 校验输入身份，`physical_cost_profile.py` 校验单节点回放身份。训练脚本显式
 `--physical_env_config` 才选择新核心；`benchmark_physical_env.py` 是新环境非正式多窗口消费者。
 旧 `vec_workflow_core_env.py` 与 `benchmark_main_results.py` 继续承载旧正式合同。
+`ReplayProvider` 对物理环境显式提供秒或毫秒时间单位；NGSIM loader 传入毫秒，执行器在每个控制步内消费
+真实时间戳对应的全部帧。原车离开或窗口耗尽时，执行器取消在途操作并给请求记录明确失败终态；缓存准备
+使用独立请求身份，允许工作流交付后仍在途，避免准备任务改变交付完成时间。
 
 ## 2026-10-05 bounded mechanism evidence
 

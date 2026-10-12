@@ -9,6 +9,9 @@
 [物理环境实施记录](docs/project/physical_env_v1_implementation_20261012.md)。新入口为
 `scripts/run_physical_env_acceptance.py`（合成固定场景）和
 `scripts/benchmark_physical_env.py`（NGSIM＋Alibaba 非正式比较）；旧正式主表入口和历史结果保持原身份。
+真实文件的完整工程验收使用 `configs/environment/physical_env_v1_engineering_acceptance.json` 和
+`configs/experiment/physical_env_v1_ngsim_alibaba_acceptance_window.json`；参数仍为 synthetic，运行方法见
+[`docs/project/RUNBOOK.md`](docs/project/RUNBOOK.md)。
 
 最小机制证据闭环（共享缓存四配置、连续/重跑/后缀恢复、12 个有界决策场景）见
 [results](docs/project/mechanism_evidence_closure_results_20261005.md)；结论是 bounded diagnostic，非 formal、holdout、

@@ -106,6 +106,21 @@ def test_compute_slots_fifo_and_completion_starts_next_at_same_time() -> None:
     assert [event["completed_work_units"] for event in events] == [4.0, 2.0, 2.0]
 
 
+def test_cancel_running_compute_preserves_work_and_releases_slot() -> None:
+    clock = runtime()
+    first = clock.submit_compute("rsu-a", 10.0)
+    second = clock.submit_compute("rsu-a", 2.0)
+    clock.advance_to(1.0)
+    cancelled = clock.cancel_compute(first)
+    assert cancelled["event_type"] == "compute_cancelled"
+    assert cancelled["completed_work_units"] == pytest.approx(2.0)
+    assert clock.snapshot()["computes"][0]["job_id"] == second
+    assert clock.snapshot()["computes"][0]["state"] == "running"
+    assert clock.advance_to(2.0)[0]["job_id"] == second
+    with pytest.raises(KeyError):
+        clock.cancel_compute(first)
+
+
 def test_simultaneous_events_have_global_submission_order() -> None:
     clock = runtime()
     a = clock.submit_transfer("backhaul", 10.0, "model")

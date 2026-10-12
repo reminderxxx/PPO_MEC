@@ -14,6 +14,26 @@
 结果不得混用。配置示例为 `configs/environment/physical_env_v1_synthetic.json`，仅 synthetic。
 完整接口、限制与工作包映射见 `physical_env_v1_implementation_20261012.md`。
 
+真实文件完整工程验收（非正式，synthetic 参数）：准备完整 NGSIM 与 Alibaba CSV 后，用下列命令运行。
+窗口固定为 Peachtree offset 660、600 帧；`--max_mobility_rows 50000` 不得缩小，否则窗口身份无法核验。
+
+```bash
+python scripts/benchmark_physical_env.py \
+  --physical_env_config configs/environment/physical_env_v1_engineering_acceptance.json \
+  --window_plan_path configs/experiment/physical_env_v1_ngsim_alibaba_acceptance_window.json \
+  --mobility_csv_path <complete_local_ngsim.csv> \
+  --workflow_csv_path <complete_local_alibaba_batch_task.csv> \
+  --agents reactive_greedy --seeds 7 \
+  --max_mobility_rows 50000 --max_workflows 1 \
+  --min_tasks 5 --max_tasks 5 --max_steps 60 \
+  --output_root artifacts/physical_env/nonformal_benchmark
+```
+
+核对 `rows.json` 的 `episode_completed=true`、`episode_truncated=false`、`physical_metrics_availability=available`，
+并在 `events.json` 核对 5 个不同节点的 `compute_completed`、一次 `request_completed`、交付事件和顺序时间。
+`physical_metrics.json` 应能独立重算；模型准备有独立 request ID，主请求的 transfer bytes 不包含全部准备成本，
+完整资源用量须同时读取所有 request rows。若原车离开或窗口耗尽，请看 `summary.json` 的最后一步 `failure_reason`。
+
 ## 最小机制证据闭环（2026-10-05）
 
 冻结方案与结果分别见 `mechanism_evidence_closure_plan_20261005.md` 和

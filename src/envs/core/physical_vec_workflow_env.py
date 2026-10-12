@@ -203,6 +203,11 @@ class PhysicalVecWorkflowCoreEnv:
         self._predictor.reset()
         self._mapper.update_rsus(self.rsu_states)
         self.vehicles = self._mobility_provider.reset()
+        if not hasattr(self._mobility_provider, "get_time_seconds") or not hasattr(
+            self._mobility_provider, "peek_next_time_seconds"
+        ):
+            raise ValueError("physical mobility provider must expose timestamps in seconds")
+        self._mobility_origin_s = self._mobility_provider.get_time_seconds()
         self._associations = self._mapper.associate(self.vehicles)
         self._apply_associations()
         self._primary_vehicle_id = self._choose_primary_vehicle()
@@ -257,6 +262,8 @@ class PhysicalVecWorkflowCoreEnv:
         self._handoff_events: list[dict[str, Any]] = []
         self._finished = False
         self._failed = False
+        self._failure_reason: str | None = None
+        self._pending_failure_reason: str | None = None
         self._last_state = self._state()
         return deepcopy(self._last_state), self._info(0)
 
@@ -591,7 +598,9 @@ class PhysicalVecWorkflowCoreEnv:
         else:
             target = current_rsu
         if action_id in {0, 1, 4}:
-            result = self._submit_cache(target, node.required_adapter, detached=action_id in {1, 4})
+            # Cache preparation can outlive delivery; keep its transfer on a
+            # separate ledger request so it cannot hold the workflow terminal open.
+            result = self._submit_cache(target, node.required_adapter, detached=True)
             if action_id == 4:
                 predecessors = node.predecessors
                 for predecessor in predecessors:
@@ -782,9 +791,7 @@ class PhysicalVecWorkflowCoreEnv:
                 self._forward_jobs.discard(context["object_id"])
                 self._delivery_job = None
                 if not delivered:
-                    self._emit("request_failed", time_s)
-                    self._failed = True
-                    self._finished = True
+                    self._pending_failure_reason = "access_changed_during_wireless_delivery"
                     return
                 self._delivered_sink_ids.add(context["node_id"])
                 sink_ids = {
@@ -917,12 +924,88 @@ class PhysicalVecWorkflowCoreEnv:
             self._flush_progress()
             for event in completions:
                 self._handle_completion(event)
+            if self._pending_failure_reason is not None:
+                self._fail_request(self._pending_failure_reason)
+                break
             self._submit_background_jobs(boundary)
             self._process_compute_starts()
             if boundary == target_s and not completions:
                 break
         if not self._finished:
             self._drive()
+
+    def _fail_request(self, reason: str) -> None:
+        if self._finished:
+            return
+        self._flush_progress()
+        snapshot = self._runtime.snapshot()
+        cancelled_transfers: list[dict[str, Any]] = []
+        for job in snapshot["transfers"]:
+            job_id = job["job_id"]
+            context = self._job_context.get(job_id)
+            if context is not None and context["kind"] == "model_load":
+                try:
+                    result = self._cache.cancel(job_id, self._runtime.cancel_transfer)
+                except KeyError:
+                    continue  # A dependency cancellation already removed this job.
+                cancelled_transfers.extend(result["cancelled_events"])
+            else:
+                cancelled_transfers.append(self._runtime.cancel_transfer(job_id))
+        for event in cancelled_transfers:
+            job_id = event["job_id"]
+            context = self._job_context.pop(job_id, None)
+            if context is None:
+                continue
+            self._emit(
+                "transfer_cancelled", self._runtime.now_s,
+                request_id_override=context["ledger_request_id"],
+                node_id=context.get("node_id"), operation_id=job_id,
+                object_id=context["object_id"], resource_id=event["resource_id"],
+                transfer_kind=context["kind"], total_bytes=context["total"], bytes_delta=0,
+            )
+            delivery_id = context.get("delivery_operation_id") or context.get("prepare_delivery_operation_id")
+            if delivery_id is not None:
+                self._emit(
+                    "delivery_failed", self._runtime.now_s,
+                    request_id_override=context["ledger_request_id"],
+                    node_id=context.get("node_id"), operation_id=delivery_id,
+                    object_id=context["object_id"], resource_id=event["resource_id"],
+                )
+            if context["ledger_request_id"] != self._request_id:
+                self._emit("request_failed", self._runtime.now_s,
+                           request_id_override=context["ledger_request_id"])
+        for job in snapshot["computes"]:
+            job_id = job["job_id"]
+            context = self._job_context.pop(job_id, None)
+            self._runtime.cancel_compute(job_id)
+            if context is None:
+                continue
+            if context.get("started"):
+                self._emit(
+                    "compute_cancelled", self._runtime.now_s,
+                    request_id_override=context["ledger_request_id"],
+                    node_id=context["node_id"], operation_id=job_id,
+                    resource_id=job["resource_id"],
+                    total_work_units=context["total"], work_units_delta=0.0,
+                )
+            if context.get("kind") == "compute" and context.get("started") and not job["resource_id"].startswith("vehicle:"):
+                self._cache.unpin(job["resource_id"], self._dag.nodes[context["node_id"]].required_adapter)
+            delivery_id = context.get("prepare_delivery_operation_id")
+            if delivery_id is not None:
+                self._emit("delivery_failed", self._runtime.now_s,
+                           request_id_override=context["ledger_request_id"],
+                           operation_id=delivery_id, node_id=context["node_id"],
+                           resource_id=job["resource_id"])
+                self._emit("request_failed", self._runtime.now_s,
+                           request_id_override=context["ledger_request_id"])
+        for node_id, (wait_reason, operation_id) in list(self._waits.items()):
+            self._emit("wait_cancelled", self._runtime.now_s, node_id=node_id,
+                       operation_id=operation_id, wait_reason=wait_reason)
+        self._waits.clear()
+        self._emit("request_failed", self._runtime.now_s)
+        self._failure_reason = reason
+        self._failed = True
+        self._finished = True
 
     def step(self, control: ControlAction) -> tuple[dict[str, Any], RewardBreakdown, bool, bool, dict[str, Any]]:
         if self._finished or self._episode_steps >= self._max_steps:
@@ -931,32 +1014,53 @@ class PhysicalVecWorkflowCoreEnv:
         self._episode_steps += 1
         action_result = self._apply_action(control)
         target_s = self._episode_steps * self._control_step_s
-        self._advance_until(target_s)
         self._handoff_events = []
-        if not self._finished:
+        step_start_s = self._runtime.now_s
+        while not self._finished:
+            next_frame_s = self._mobility_provider.peek_next_time_seconds()
+            if next_frame_s is None:
+                self._fail_request("mobility_trace_exhausted")
+                break
+            frame_s = next_frame_s - self._mobility_origin_s
+            if frame_s <= self._runtime.now_s + 1e-9:
+                raise ValueError("mobility frame timestamps must increase strictly")
+            if frame_s > target_s + 1e-9:
+                break
+            self._advance_until(frame_s)
+            if self._finished:
+                break
             previous = dict(self._associations)
             self.vehicles = self._mobility_provider.step()
             self._associations = self._mapper.associate(self.vehicles)
             self._apply_associations()
-            self._handoff_events = [item.to_dict() for item in self._handoff_builder.build_events(
+            frame_handoffs = [item.to_dict() for item in self._handoff_builder.build_events(
                 previous, self._associations, self._mobility_provider.get_time(),
             )]
+            self._handoff_events.extend(frame_handoffs)
             primary = self._primary_vehicle()
-            if primary is not None:
-                self._dag.on_access_handoff(primary.associated_rsu_id)
-            for event in self._handoff_events:
+            if primary is None:
+                self._fail_request("primary_vehicle_departed")
+                break
+            self._dag.on_access_handoff(primary.associated_rsu_id)
+            for event in frame_handoffs:
                 if event["vehicle_id"] == self._primary_vehicle_id:
                     operation_id = f"handoff:{self._event_number + 1}"
-                    self._emit("wait_started", target_s, operation_id=operation_id,
+                    self._emit("wait_started", frame_s, operation_id=operation_id,
                                wait_reason="handoff", node_id=self._current_node_id())
-                    self._emit("wait_ended", target_s, operation_id=operation_id,
+                    self._emit("wait_ended", frame_s, operation_id=operation_id,
                                wait_reason="handoff", node_id=self._current_node_id())
+            if self._mobility_provider.peek_next_time_seconds() is None:
+                self._fail_request("mobility_trace_exhausted")
+                break
+        if not self._finished:
+            self._advance_until(target_s)
         self._last_state = self._state()
+        elapsed_s = self._runtime.now_s - step_start_s
         reward = RewardBreakdown(
-            total=self._reward_positive_offset + (1.0 if self._finished and not self._failed else 0.0) - self._control_step_s,
+            total=self._reward_positive_offset + (1.0 if self._finished and not self._failed else 0.0) - elapsed_s,
             positive_offset=self._reward_positive_offset,
             service_reward=1.0 if self._finished and not self._failed else 0.0,
-            delay_penalty=self._control_step_s,
+            delay_penalty=elapsed_s,
             cache_miss_penalty=0.0, migration_cost=0.0,
             continuity_bonus=0.0, mechanism_exploration_bonus=0.0, constraint_penalty=0.0,
         )
@@ -974,7 +1078,9 @@ class PhysicalVecWorkflowCoreEnv:
             info["metrics_protocol"][key] = info[key]
         info["workflow_completion_time_s"] = self._runtime.now_s if self._finished and not self._failed else None
         info["service_success"] = self._finished and not self._failed
-        info["failure_reason"] = "access_changed_during_wireless_delivery" if self._failed else None
+        info["failure_reason"] = self._failure_reason if self._failed else (
+            "max_steps_reached" if truncated else None
+        )
         info["metrics_protocol"]["service_success"] = info["service_success"]
         info["metrics_protocol"]["failure_reason"] = info["failure_reason"]
         info["handoff_events"] = deepcopy(self._handoff_events)

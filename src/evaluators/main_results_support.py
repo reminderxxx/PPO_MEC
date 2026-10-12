@@ -1514,7 +1514,10 @@ def run_real_episode(
         runtime_predictor_kwargs.setdefault("oracle_future_frames", trajectory_frames)
         runtime_predictor_kwargs.setdefault("oracle_rsu_states", rsu_states)
     core_kwargs = dict(
-        mobility_provider=ReplayProvider(trajectory_frames=trajectory_frames),
+        mobility_provider=ReplayProvider(
+            trajectory_frames=trajectory_frames,
+            time_unit="ms" if physical_env_config is not None and mobility_source == "ngsim" else "s",
+        ),
         workflow_state=workflow_state_runtime,
         adapter_catalog=adapter_catalog,
         rsu_states=rsu_states,

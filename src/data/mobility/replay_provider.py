@@ -12,8 +12,11 @@ from src.envs.specs import VehicleState
 class ReplayProvider(MobilityProvider):
     """基于离散时间帧的最小回放器。"""
 
-    def __init__(self, trajectory_frames: list[dict[str, Any]] | None = None) -> None:
+    def __init__(self, trajectory_frames: list[dict[str, Any]] | None = None, *, time_unit: str = "s") -> None:
+        if time_unit not in {"s", "ms"}:
+            raise ValueError("time_unit must be 's' or 'ms'")
         self._trajectory_frames = trajectory_frames or self._build_toy_trajectory()
+        self._seconds_per_time_index = 0.001 if time_unit == "ms" else 1.0
         self._frame_index = 0
         self._active_vehicles: list[VehicleState] = []
         self._reached_end = False
@@ -39,6 +42,14 @@ class ReplayProvider(MobilityProvider):
 
     def get_time(self) -> int:
         return int(self._trajectory_frames[self._frame_index]["time_index"])
+
+    def get_time_seconds(self) -> float:
+        return float(self.get_time()) * self._seconds_per_time_index
+
+    def peek_next_time_seconds(self) -> float | None:
+        if self._frame_index >= len(self._trajectory_frames) - 1:
+            return None
+        return float(self._trajectory_frames[self._frame_index + 1]["time_index"]) * self._seconds_per_time_index
 
     def reached_end(self) -> bool:
         """返回是否已到轨迹尾部。"""

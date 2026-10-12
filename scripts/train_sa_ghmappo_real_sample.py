@@ -7422,7 +7422,10 @@ def run_real_episode_with_policy_diagnostics(
         "smoke_warning": False,
     }
     core_kwargs = dict(
-        mobility_provider=ReplayProvider(trajectory_frames=trajectory_frames),
+        mobility_provider=ReplayProvider(
+            trajectory_frames=trajectory_frames,
+            time_unit="ms" if physical_env_config is not None and mobility_source == "ngsim" else "s",
+        ),
         workflow_state=workflow_state_runtime,
         adapter_catalog=adapter_catalog,
         rsu_states=rsu_states,

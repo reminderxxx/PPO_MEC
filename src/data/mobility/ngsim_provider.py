@@ -73,6 +73,15 @@ class NGSIMProvider(MobilityProvider):
         self._ensure_frames_loaded()
         return int(self._trajectory_frames[self._frame_index]["time_index"])
 
+    def get_time_seconds(self) -> float:
+        return self.get_time() / 1000.0
+
+    def peek_next_time_seconds(self) -> float | None:
+        self._ensure_frames_loaded()
+        if self._frame_index >= len(self._trajectory_frames) - 1:
+            return None
+        return int(self._trajectory_frames[self._frame_index + 1]["time_index"]) / 1000.0
+
     def get_loaded_frames(self) -> list[dict[str, Any]]:
         self._ensure_frames_loaded()
         return [self._copy_frame(frame) for frame in self._trajectory_frames]

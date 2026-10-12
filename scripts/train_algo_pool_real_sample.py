@@ -840,7 +840,10 @@ def main() -> None:
             )
         recorder = EpisodeRecorder(prefetch_validation_window=6)
         core_kwargs = dict(
-            mobility_provider=ReplayProvider(trajectory_frames=clone_frames(mobility_bundle.frames)),
+            mobility_provider=ReplayProvider(
+                trajectory_frames=clone_frames(mobility_bundle.frames),
+                time_unit="ms" if physical_env_kwargs is not None and args.mobility_source == "ngsim" else "s",
+            ),
             workflow_state=clone_workflow_state(workflow_state),
             adapter_catalog=adapter_catalog,
             rsu_states=[clone_rsu_state(rsu_state) for rsu_state in mobility_bundle.rsu_states],

@@ -392,6 +392,7 @@ class GymVecEnv(gym.Env):
             for vehicle in vehicles:
                 if str(vehicle.get("vehicle_id")) == str(primary_vehicle_id):
                     return dict(vehicle)
+            return {}
         return dict(vehicles[0]) if vehicles else {}
 
     def _build_compatible_semantic_state(self, state: dict[str, Any]) -> dict[str, Any]:

@@ -142,7 +142,10 @@ def load_real_mobility_bundle(
         "selected_frame_count": len(selected_frames),
     }
     return RealMobilityBundle(
-        provider=ReplayProvider(trajectory_frames=selected_frames),
+        provider=ReplayProvider(
+            trajectory_frames=selected_frames,
+            time_unit="ms" if mobility_source == "ngsim" else "s",
+        ),
         frames=selected_frames,
         rsu_states=rsu_states,
         rsu_metadata=merged_metadata,

@@ -314,6 +314,7 @@ def _primary_vehicle_from_state(state: dict[str, Any]) -> dict[str, Any]:
         for vehicle in vehicles:
             if str(vehicle.get("vehicle_id")) == str(primary_vehicle_id):
                 return dict(vehicle)
+        return {}
     return dict(vehicles[0]) if vehicles else {}
 
 

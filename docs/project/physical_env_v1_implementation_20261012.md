@@ -10,13 +10,13 @@
 | M02 事件内核 | `src/envs/core/physical_runtime.py` | 跨 `step()` 的传输与计算、共享链路和计算槽、取消及确定性事件顺序。 |
 | M03 原生缓存 | `src/envs/core/physical_cache_service.py`、`physical_vec_workflow_env.py` | typed 对象、依赖、预留、在途加载、驻留与运行锁定接入新核心；当前驱逐限 LRU。 |
 | M04 成本与回放 | `src/runtime/physical_cost_profile.py` | 成本来源和 model/input/generation 身份合同；单节点输出在模拟完成后解锁。真实 cold load、adapter switch、state restore 的测量样本仍缺。 |
-| M05 轨迹拓扑 | `physical_vec_workflow_env.py`、既有 NGSIM provider/RSU mapper | 回放帧驱动接入和切换；固定两站场景验证。真实数据入口需提供有效本地 NGSIM 文件。 |
+| M05 轨迹拓扑 | `physical_vec_workflow_env.py`、既有 NGSIM provider/RSU mapper | NGSIM 毫秒时间戳转秒，一个控制步消费全部到期帧；原车离开和轨迹耗尽有明确失败终态。真实数据入口需提供有效本地 NGSIM 文件。 |
 | M06 共享资源 | `physical_runtime.py`、`physical_vec_workflow_env.py` | 模型、输入、状态和结果传输记入有限链路；计算槽排队。固定第二车背景负载改变主请求完成时间。 |
 | M07 DAG | `src/envs/core/dag_execution.py` | 前驱输出身份、目标位置、模型就绪、计算排队分开管理；后继等待真实前驱完成。 |
 | M08 切换交付 | `dag_execution.py`、`physical_vec_workflow_env.py` | 接入变化与运行位置分离；旧站续算、结果转发和无线交付有事件与 receipt。当前状态转移是任务边界显式输出对象，不等同任意 GPU/KV 进程状态。 |
 | M09 预测 | 既有 `src/envs/core/predictor_manager.py` 与新核心预测映射 | 输出下一站候选、handoff ETA、置信度与未校准的候选分布；准备动作使用目标预测。概率校准、误差和决策影响尚需真实多窗口报告。 |
 | M10 策略适配 | `src/envs/wrappers/gym_vec_env.py`、`src/envs/specs/action_schema.py`、训练入口 | 五动作共用 wrapper；物理观察编码为版本化 33 维，含最多四站资源摘要；加载中对象不能重复准备。现有 checkpoint 不兼容新编码，必须重训。 |
-| M11 账本指标 | `src/metrics/physical_event_metrics.py` | 请求、操作、对象、资源、节点与交付 ID 独立重算；未完成请求 latency 为 unavailable；事件字节守恒校验。 |
+| M11 账本指标 | `src/metrics/physical_event_metrics.py` | 请求、操作、对象、资源、节点与交付 ID 独立重算；失败请求取消在途操作并保留已传字节，未完成请求 latency 为 unavailable；事件字节守恒校验。 |
 | M12 场景回归 | `scripts/run_physical_env_acceptance.py`、`scripts/benchmark_physical_env.py` | 固定场景检查确定性、争用、跨步等待、DAG 与切换；独立多窗口多 seed 非正式入口保存原始事件、指标和身份。 |
 
 ## 运行入口
@@ -43,6 +43,8 @@ python scripts/benchmark_physical_env.py \
 训练入口 `scripts/train_algo_pool_real_sample.py`、`scripts/train_sa_ghmappo_real_sample.py` 可通过 `--physical_env_config` 显式选择新核心；旧正式训练合同及 checkpoint 不作为新环境的身份依据。新 checkpoint 记录物理配置哈希。旧 `scripts/benchmark_main_results.py` 保持原正式主表语义，不用于评估新环境。
 
 ## 当前不能据此宣称的内容
+
+- 完整真实轨迹回放的工程验收配置仍为 synthetic；成功时间不是实测 RSU 端到端时延。Alibaba DAG 节点的输入输出字节映射仍是受控代理。
 
 - 参数文件为合成示例，尚无真实模型 load/hot call/switch、状态恢复、无线与回传链路校准。使用它得到的时间与收益不能作真实部署或论文算法优势结论。
 - 单节点回放合同只证明输出在匹配身份且模拟计算完成后可见；多节点真实推理输出、任务语义正确性和动态 KV/tensor 状态未覆盖。

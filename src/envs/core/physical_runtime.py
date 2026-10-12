@@ -165,6 +165,19 @@ class PhysicalRuntime:
             raise KeyError(f"unknown or completed transfer job_id: {job_id}") from exc
         return self._event(job, resource_type="transfer", status="cancelled")
 
+    def cancel_compute(self, job_id: str) -> dict[str, Any]:
+        """Cancel queued or running compute without losing completed work."""
+        try:
+            job = self._computes.pop(job_id)
+        except KeyError as exc:
+            raise KeyError(f"unknown or completed compute job_id: {job_id}") from exc
+        if job_id in self._compute_running[job.resource_id]:
+            self._compute_running[job.resource_id].remove(job_id)
+            self._start_waiting()
+        else:
+            self._compute_waiting[job.resource_id].remove(job_id)
+        return self._event(job, resource_type="compute", status="cancelled")
+
     def _running_jobs(self) -> list[tuple[_Job, float]]:
         result: list[tuple[_Job, float]] = []
         per_link: dict[str, list[_Job]] = {key: [] for key in self.link_capacity_bytes_per_s}

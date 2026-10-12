@@ -1,0 +1,12 @@
+{
+  "mobility_source": "ngsim",
+  "selected_window_plan": [
+    {
+      "window_id": "window_peachtree_off660_len600_t1163098900_1163158800",
+      "frame_offset": 660,
+      "window_length": 600,
+      "window_class": "engineering_acceptance",
+      "recommended_rsu_layout": "auto_dominant_wide"
+    }
+  ]
+}

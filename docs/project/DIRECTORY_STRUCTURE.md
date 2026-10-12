@@ -2,7 +2,8 @@
 
 ## 2026-10-12 物理环境 v1
 
-- `configs/environment/physical_env_v1_synthetic.json`：显式合成参数。
+- `configs/environment/physical_env_v1_synthetic.json`：显式合成参数；`physical_env_v1_engineering_acceptance.json`：真实数据完整链路的合成验收参数。
+- `configs/experiment/physical_env_v1_ngsim_alibaba_acceptance_window.json`：600 帧非正式工程验收窗口。
 - `src/envs/core/physical_runtime.py`、`physical_cache_service.py`、`dag_execution.py`、`physical_vec_workflow_env.py`：资源事件、typed 缓存、DAG/切换与环境主链。
 - `src/runtime/physical_env_config.py`、`physical_cost_profile.py`、`src/metrics/physical_event_metrics.py`：配置身份、成本回放与独立事件账本。
 - `scripts/run_physical_env_acceptance.py`、`benchmark_physical_env.py`：固定验收和非正式多窗口入口。

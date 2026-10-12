@@ -630,7 +630,7 @@ def load_window_bundle_from_contract(
         "observed_source_row_interval": row_ranges[str(window_id)],
     }
     return RealMobilityBundle(
-        provider=ReplayProvider(trajectory_frames=frames),
+        provider=ReplayProvider(trajectory_frames=frames, time_unit="ms"),
         frames=frames,
         rsu_states=rsu_states,
         rsu_metadata=metadata,

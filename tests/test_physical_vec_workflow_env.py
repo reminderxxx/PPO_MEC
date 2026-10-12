@@ -213,3 +213,64 @@ def test_prefetch_remaining_in_flight_does_not_invalidate_workflow_terminal() ->
     assert info["physical_event_summary"]["availability"] == "unavailable"
     assert any(item["request_id"].startswith("physical_test:v1:prepare:")
                for item in info["physical_event_summary"]["requests"])
+
+
+def test_millisecond_frames_advance_within_one_control_step_and_stop_at_trace_end() -> None:
+    frames = [
+        {"time_index": 1000 + offset, "vehicles": [{
+            "vehicle_id": "v1", "position_x": 0.0, "position_y": 0.0,
+            "speed": 10.0, "base_model_id": "veh_base_v1",
+            "active_workflow_id": "physical_test",
+        }]}
+        for offset in (0, 100, 200, 300)
+    ]
+    env = PhysicalVecWorkflowCoreEnv(
+        mobility_provider=ReplayProvider(frames, time_unit="ms"),
+        workflow_state=_graph(size=1000),
+        rsu_states=[RSUState("rsu_a", 0.0, 0.0, 30.0)],
+        control_step_s=0.25, max_steps=20,
+        compute_rate_work_units_per_s=1.0,
+    )
+    env.reset()
+    state, _, terminated, truncated, _ = env.step(_control(3))
+    assert not terminated and not truncated
+    assert state["time_index"] == 1200
+    assert state["physical_state"]["time_s"] == pytest.approx(0.25)
+    state, _, terminated, truncated, info = env.step(_control(3))
+    assert not terminated and truncated
+    assert state["time_index"] == 1300
+    assert state["physical_state"]["time_s"] == pytest.approx(0.3)
+    assert info["failure_reason"] == "mobility_trace_exhausted"
+    assert len([event for event in env.export_physical_events()
+                if event["event_type"] == "request_failed"]) == 1
+
+
+def test_primary_departure_fails_without_reassigning_workflow_to_another_vehicle() -> None:
+    frames = [
+        {"time_index": time, "vehicles": [
+            *([{
+                "vehicle_id": "v1", "position_x": 0.0, "position_y": 0.0,
+                "speed": 10.0, "base_model_id": "veh_base_v1",
+                "active_workflow_id": "physical_test",
+            }] if time < 1200 else []),
+            {"vehicle_id": "v2", "position_x": 1.0, "position_y": 0.0,
+             "speed": 10.0, "base_model_id": "veh_base_v1",
+             "active_workflow_id": "physical_test"},
+        ]}
+        for time in (1000, 1100, 1200, 1300)
+    ]
+    env = PhysicalVecWorkflowCoreEnv(
+        mobility_provider=ReplayProvider(frames, time_unit="ms"),
+        workflow_state=_graph(size=1000),
+        rsu_states=[RSUState("rsu_a", 0.0, 0.0, 30.0)],
+        max_steps=20, compute_rate_work_units_per_s=1.0,
+    )
+    env.reset()
+    state, _, terminated, truncated, info = env.step(_control(3))
+    assert not terminated and truncated
+    assert state["primary_vehicle_id"] == "v1"
+    assert state["time_index"] == 1200
+    assert state["physical_state"]["time_s"] == pytest.approx(0.2)
+    assert info["failure_reason"] == "primary_vehicle_departed"
+    assert not info["service_success"]
+    assert info["workflow_physical_metrics"]["availability"] == "unavailable"
