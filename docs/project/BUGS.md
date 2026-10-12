@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-12：八车冻结运行暴露主方法确定性策略退化（OPEN BLOCKER）
+
+- `20261012T080927Z_formal_sim` 的 SA-GHMAPPO 三个 seed 在 dev/formal 全部 0/8 完成，formal 34,518/34,560 次选 steady offload action 3，绝大多数为 `adapter_not_ready`；随机采样的训练 episode 则普遍 8/8。根因尚未定位，不能将训练完成率替代确定性评估。
+- 各算法虽同为 24 train episode/seed，实际训练决策数约 17,324–21,208，不满足严格等交互预算。当前 formal 已查看，不得调参后当新的盲测使用。
+- 完整 paper package 缺 holdout/support、窗口外层统计和外部近邻论文忠实对照，仍为 `Unverifiable`；封存 holdout 未开启。详情见 `eight_vehicle_joint_sim_review_20261012.md`。
+
 ## 2026-10-12：八车联合控制协议的论文外推边界（OPEN）
 
 - 新五动作仿真修复了旧选站合同不能控制 cache/offload/handoff 的问题，但四站资源、链路与车端执行均为配置成本，没有物理 RSU 测量；Alibaba DAG 与 NGSIM 八车配对及 adapter 身份也属受控合成。

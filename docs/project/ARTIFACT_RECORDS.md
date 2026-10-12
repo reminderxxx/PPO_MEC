@@ -5,6 +5,12 @@
 
 # Artifact Records
 
+## 2026-10-12 eight-vehicle joint-control internal simulation
+
+- Run root：`artifacts/eight_vehicle_joint_sim/20261012T080927Z_formal_sim/`；执行 commit `b97477d5111d199909904a6513b852c42d278635`。
+- `manifest.json`、`audit.json`、`checkpoints.jsonl`、21 个 `checkpoints/*.pt`、`train.jsonl`、`updates.jsonl`、`dev.jsonl`、`formal.jsonl`、`formal_events.jsonl` 均在本地；`audit.json` 核验 21 checkpoint SHA-256 和 119,014 条 formal 事件与 252 个窗口汇总一致。holdout 输出不存在。
+- 原始结果负向：SA-GHMAPPO formal 36/36 执行均 0/8；本 run 不是论文算法优势证据，也不进入主表。独立审查和所有 claim 边界见 `eight_vehicle_joint_sim_review_20261012.md`。
+
 ## 2026-10-12 eight-vehicle algorithm pool diagnostic
 
 **2026-10-12 纠正状态：`INVALID_FOR_SA_GHMAPPO_ALGORITHM_COMPARISON`。** 该 run 的奖励和完成数

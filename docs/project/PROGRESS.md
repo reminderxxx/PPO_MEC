@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-12：八车联合控制内部仿真已完成并审查
+
+- 固定 commit `b97477d` 的 run `20261012T080927Z_formal_sim` 已完成七个原 registry 算法 × 3 seed；21 checkpoint、504 train、168 dev、252 formal 窗口和 119,014 条逐请求事件通过完整性核对，holdout 未开启。审查见 `eight_vehicle_joint_sim_review_20261012.md`。
+- SA-GHMAPPO 在 36 个 formal 执行中均 0/8 完成，34,518/34,560 次选 action 3，adapter 长期未就绪；dev 同样失败。MAPPO、cache_offload_drl、dt_handoff_drl 的 formal 窗口全部 8/8，但相当部分依赖车端兜底，不能据此证明缓存/迁移机制优势。
+- 本轮完成的是配置成本、跨源配对的内部仿真原始记录；正式论文 claim 为 `Unverifiable`，不更新主表或 canonical。既有单主车正式 Protocol 状态不受本 run 改变。
+
 ## 2026-10-12：八车联合控制仿真启动准备
 
 - 新增逐车原生五动作环境与独立执行入口，复用 registry 的 SA-GHMAPPO、PPO、controller-level MAPPO、DQN 及三个仓库方向型 agent；不再以 `trace_*` 选站策略冒充算法对照。
