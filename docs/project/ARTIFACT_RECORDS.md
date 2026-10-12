@@ -5,6 +5,15 @@
 
 # Artifact Records
 
+## 2026-10-12 physical VEC real-data engineering acceptance
+
+- run：`physical_nonformal_20261012T050509Z_a3eeea29c966`；路径：`artifacts/physical_env/nonformal_benchmark/physical_nonformal_20261012T050509Z_a3eeea29c966/`。
+- execution commit：`0b5ead78c52c0eb58592ca7cd638d2bdcb14c9f0`；manifest 对完整 NGSIM、Alibaba、窗口、配置和 typed catalog 保存 SHA-256。输入使用本机主工作区完整 CSV，只读；隔离 worktree 的 LFS pointer 未被当作数据。
+- scope：Peachtree offset 660、600 帧，seed 7，`j_15` 五节点 DAG，`reactive_greedy`，单请求单窗口；`physical_env_v1_engineering_acceptance.json` 的链路和计算参数仍为 synthetic。
+- result：11 个控制步完成，主请求延迟 10.36719388961792 s；5/5 节点计算完成，四条 DAG 边满足前驱完成后后继启动；7 次接入切换，结果交付完成。请求车辆一直为 `peachtree:112`。
+- ledger：主请求及 3 个独立缓存准备请求均为 `available`；全部请求已观测传输 301,991,506 B。`events.json` 经 `reduce_physical_events` 独立重算，与 `physical_metrics.json` 一致。
+- boundary：`non_formal_diagnostic`，不是实测 RSU 成本、训练后策略优势、formal/holdout 或论文结论。
+
 ## 2026-10-05 minimal mechanism evidence closure
 
 - `artifacts/analysis/mechanism_evidence_closure_20261005_v1/`：固定 commit `f323fa2...`，A/C wall 34.193 s，

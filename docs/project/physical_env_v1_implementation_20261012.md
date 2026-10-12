@@ -58,6 +58,13 @@ python scripts/benchmark_physical_env.py \
 
 ## 2026-10-12 本地验证记录
 
+### 真实数据完整链路与轨迹终态修复
+
+- `python -m pytest -q` 的物理运行时、缓存、DAG、账本、benchmark、NGSIM segment 与旧环境合同目标集：83 passed；固定两站两车验收六项通过。
+- 旧 24 帧 Peachtree 窗口在原车离开时于模拟 1.5 s 以 `primary_vehicle_departed` 明确终止，取消事件可独立重算，不再持续到 64/512 个控制步。
+- 提交 `0b5ead78c52c0eb58592ca7cd638d2bdcb14c9f0` 后，使用仓库内 600 帧窗口与工程验收配置运行完整 NGSIM＋Alibaba 回放：`artifacts/physical_env/nonformal_benchmark/physical_nonformal_20261012T050509Z_a3eeea29c966/`。`j_15` 五节点与四条依赖边全部执行，11 步完成；主请求 10.36719388961792 s，7 次接入切换；主请求及三个缓存准备请求指标均为 available，事件账本独立重算一致。工作流绑定车辆始终为 `peachtree:112`。
+- 该配置保留 `parameter_evidence=synthetic`，1 window × 1 workflow × 1 seed × 1 rule agent 是完整执行验收，不是校准成本或算法公平比较。
+
 - 物理模块、benchmark 合同、DAG 与旧环境接口回归：`python -m pytest -q tests/test_physical_runtime.py tests/test_physical_cache_service.py tests/test_physical_vec_workflow_env.py tests/test_physical_event_metrics.py tests/test_physical_env_acceptance.py tests/test_physical_env_config.py tests/test_benchmark_physical_env.py tests/test_dag_execution.py tests/test_env_contract.py`，77 passed；`python scripts/smoke_test.py` 通过。
 - 固定两站两车验收六项检查通过。新 benchmark 从主工作区完整 NGSIM/Alibaba CSV 只读取样；规则 agent 的 1 seed、1 window、1 workflow 合成快速配置 episode 完成，事件和独立指标可重算。
 - PPO 和 SA-GHMAPPO 各完成 1 episode 的物理环境 smoke 训练并生成版本化 checkpoint；两者的 checkpoint 均经新 benchmark 身份核验并实际加载运行。SA 固定样本完成；PPO 在 12 step 预算内截断，主请求 latency 明确为 unavailable。这些都是工程联调，不是训练充分性或算法比较。
