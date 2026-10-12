@@ -5,6 +5,13 @@
 
 # PPO_MEC
 
+八车五动作联合控制的新入口为 `scripts/launch_eight_vehicle_joint_experiment.py`：复用原 registry 的
+`sa_ghmappo`、PPO、controller-level MAPPO、DQN 及三个仓库内方向型算法，在四个模拟 RSU 上执行八个
+NGSIM 车辆与八个 Alibaba DAG 的受控配对。默认将窗口分为 20 train、8 dev、12 formal 和 12 封存 holdout；
+使用训练窗口固定站位，保存逐请求事件、原始结果、checkpoint 和 provenance。它是**内部轨迹驱动仿真实验**，
+资源成本来自配置，adapter 标签由 DAG 结构合成，方向型算法并非外部论文复现，不能直接进入论文主表。
+运行方法见 [`docs/project/RUNBOOK.md`](docs/project/RUNBOOK.md)。
+
 八车四 RSU 的跨源轨迹驱动诊断入口为 `scripts/run_eight_vehicle_simulation.py`；八个 NGSIM 连续车辆分别配对八个
 Alibaba DAG，共享四个模拟 RSU 的计算、链路与 adapter cache，输出逐请求事件。该入口使用未实测的帧级成本，
 不接现有单主车训练器、正式 Protocol 或论文主表；使用方法及来源边界见

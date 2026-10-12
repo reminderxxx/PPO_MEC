@@ -5,6 +5,13 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-12：八车联合控制协议的论文外推边界（OPEN）
+
+- 新五动作仿真修复了旧选站合同不能控制 cache/offload/handoff 的问题，但四站资源、链路与车端执行均为配置成本，没有物理 RSU 测量；Alibaba DAG 与 NGSIM 八车配对及 adapter 身份也属受控合成。
+- 当前八个短 DAG 在 120 帧开发 smoke 中全部完成，handoff 机会可能不足；若正式窗口也如此，不能用微小 reward 差异证明迁移机制收益。输出逐请求事件供后续独立审查，不以结果回头调成本或筛窗。
+- 仓库方向型 agent 不是 COHCTO、LDMCO 等外部论文原算法复现；当前新协议不能据此声称已完成最近邻论文对比。
+- 先前候选 holdout offset 5400–6720 已被开发阶段查看轨迹机会，故排除；新候选从 offset 7080 起，尚未开启策略评估。
+
 ## 2026-10-12：八车算法池的动作空间不覆盖主方法（OPEN BLOCKER）
 
 - 目前八车回放只有逐车目标 RSU 动作；adapter fetch/LRU eviction/handoff transfer 被环境自动执行。

@@ -5,6 +5,13 @@
 
 ﻿# Progress
 
+## 2026-10-12：八车联合控制仿真启动准备
+
+- 新增逐车原生五动作环境与独立执行入口，复用 registry 的 SA-GHMAPPO、PPO、controller-level MAPPO、DQN 及三个仓库方向型 agent；不再以 `trace_*` 选站策略冒充算法对照。
+- 四站布局仅由训练窗口确定，20/8/12/12 原始时间窗口互斥，15 个合格窗口隔离新封存区间；先前查看过机制机会的旧候选 holdout 已排除。
+- 八个 Alibaba DAG 使用 `semantic_ai_service` 的受控合成 adapter 标签；四站计算/链路与车端执行时长为帧级配置假设。7 agent、单 seed、完整 120 帧 smoke 已完成；正式多 seed 运行状态以 `artifacts/eight_vehicle_joint_sim/` 的运行 manifest 为准。
+- 此协议可审计内部仿真，但不是物理 RSU 实测或已有单主车正式 Protocol，论文算法胜负仍需机制机会、统计和外部论文方案对照审查。
+
 ## 2026-10-12：八车算法池用途纠正
 
 - 独立审查确认，`20261012T073902076174Z` 只比较每车目标 RSU 选择；adapter 拉取/LRU 与 handoff

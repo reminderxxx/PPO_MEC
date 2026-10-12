@@ -5,6 +5,32 @@
 
 # Runbook
 
+## 八车联合控制仿真实验启动（2026-10-12）
+
+从仓库根目录执行；若当前 checkout 中 `data/` 为 LFS pointer，显式传入已有真实 CSV 的绝对路径：
+
+```bash
+.venv/bin/python scripts/launch_eight_vehicle_joint_experiment.py \
+  --mobility_csv_path '/absolute/path/to/NGSIM.csv' \
+  --workflow_csv_path '/absolute/path/to/alibaba/batch_task.csv' \
+  --preflight_only
+.venv/bin/python scripts/launch_eight_vehicle_joint_experiment.py \
+  --mobility_csv_path '/absolute/path/to/NGSIM.csv' \
+  --workflow_csv_path '/absolute/path/to/alibaba/batch_task.csv'
+```
+
+默认对原 registry 的 `sa_ghmappo`、`ppo`、controller-level `mappo`、`dqn`、`dag_offload_drl`、
+`cache_offload_drl`、`dt_handoff_drl` 各运行 seed 7/17/27、24 个训练 episode 和 12 个 formal 窗口。
+同一五动作信息合同按每活动车辆决策，八车共享四个逻辑 RSU 的计算、链路及 adapter cache。
+20 train / 8 dev / 12 formal / 12 sealed holdout 窗口按原始时间互斥；四站位置只从 train 帧生成。
+曾用于开发检查的旧候选 holdout offset 5400–6720 已排除，正式入口默认再跳过 15 个合格窗口后取新的封存区间。
+`artifacts/eight_vehicle_joint_sim/<UTC-run-id>/` 保存 manifest、训练/更新 JSONL、checkpoint+SHA-256、
+dev/formal 窗口结果和 formal 逐请求事件；holdout 只登记区间，不执行。`--smoke` 仅检查接线。
+
+成本是帧级配置假设，NGSIM 车辆与 Alibaba DAG 的配对及 adapter 标签均为受控合成；七个算法是仓库原类，
+其中方向型算法不是 COHCTO/LDMCO 等外部论文复现。此入口可形成内部仿真实验的可审原始记录，
+但不等于已有单主车正式 Protocol、实测四台 RSU 或论文主表；需独立检查机制机会、统计和外部论文对照。
+
 ## 八车四 RSU 轨迹驱动诊断（2026-10-12）
 
 算法池诊断（默认 seed 7/13/29，每种学习策略各 320 episodes；24 个训练窗口、跳过 1 个合格窗口、8 个评估窗口）：

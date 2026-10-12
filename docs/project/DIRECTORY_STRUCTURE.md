@@ -1,5 +1,12 @@
 ﻿# Directory Structure
 
+## 2026-10-12 八车联合控制仿真实验
+
+- `src/envs/core/multi_request_joint_control_env.py`：逐请求五动作、四站共享计算/链路/cache、显式 adapter 拉取和状态准备；成本仍为仿真配置。
+- `scripts/launch_eight_vehicle_joint_experiment.py`：原 registry 算法的训练、开发和正式窗口执行入口；封存 holdout 不读取结果。
+- `tests/test_multi_request_joint_control_env.py`：缓存动作、容量、车端计算时长及预测/准备的合同测试。
+- `artifacts/eight_vehicle_joint_sim/`：运行 manifest、checkpoint、训练更新、窗口结果及逐请求事件；不进入 Git。
+
 ## 2026-10-12 八车四 RSU 轨迹驱动诊断
 
 - `scripts/benchmark_eight_vehicle_algorithms.py`：统一八车合同上的六种学习策略和四种规则策略，保存排除清单、最终 checkpoint、逐窗口结果和逐请求事件。

@@ -1,5 +1,12 @@
 ﻿# Decision Log
 
+## 2026-10-12：八车联合控制采用独立仿真协议
+
+八车选站诊断缺少 cache/offload/handoff 决策，不能修饰名称后继续做算法对比。因此新增每请求五动作接口，
+复用原 registry agent，显式共享 RSU 资源；车端 fallback 至少消耗四帧。NGSIM/Alibaba 跨源配对与
+`semantic_ai_service` adapter 标签仍属合成，成本也未经实测。预留封存 holdout，先运行内部仿真协议；
+本协议不沿用单主车 Protocol/checkpoint，也不将仓库方向型 agent 称为外部论文复现。
+
 ## 2026-10-12：八车四站先做跨源轨迹驱动仿真
 
 纠正决定（同日）：八车 `trace_*` 算法池只保留为选站环境与训练接口联调；它没有让策略控制

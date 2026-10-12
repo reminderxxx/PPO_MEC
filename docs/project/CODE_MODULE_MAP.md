@@ -1,5 +1,12 @@
 # Code Module Map
 
+## 八车联合控制仿真入口（2026-10-12）
+
+`MultiRequestJointControlEnv` 继承八请求回放环境，复用 `ActionMaskBuilder` 和 `ActionAdapter` 将原生五动作应用到每个活动请求。
+它的预测只使用当前/上一帧，cache、link 和 RSU compute 在八请求间共享。`launch_eight_vehicle_joint_experiment.py`
+读取 NGSIM/Alibaba，按训练窗口构建固定四站布局，再经 `registry.build_agent` 调用原算法的 `act/learn/save`；
+该入口不消费旧单主车 checkpoint，也不改 `benchmark_main_results.py` 的产物 schema。
+
 ## 八车四 RSU 轨迹驱动诊断（2026-10-12）
 
 - `scripts/benchmark_eight_vehicle_algorithms.py` 复用 `train_eight_vehicle_ppo.py` 的窗口选择、环境和 PPO 更新，
