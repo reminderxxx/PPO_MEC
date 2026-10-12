@@ -25,6 +25,8 @@ class TracePoint:
     x_m: float
     y_m: float
     speed_mps: float
+    road_key: str = ""
+    direction: str = ""
 
 
 @dataclass(frozen=True)

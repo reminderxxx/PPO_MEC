@@ -5,19 +5,19 @@
 
 # Runbook
 
-## 四 RSU、八车竞争工程 replay（2026-10-12）
+## 四 RSU、八车冻结工程 replay v2（2026-10-12）
 
 从仓库根目录运行：
 
 ```bash
-python scripts/run_vec_competition.py --max-rows 500000 --frames 120 \
-  --output-dir artifacts/analysis/vec_competition_v1
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_vec_competition.py \
+  --output-dir artifacts/analysis/<new_run_id> --controller no_prefetch_v1
 ```
 
-入口只读本地 NGSIM、Alibaba 数据；若当前是 Git LFS 隔离 worktree，会读取同一仓库主工作区的实材文件。
-自定义真实文件可使用 `--ngsim-csv`、`--alibaba-csv`。输出包括 `scenario_manifest.json`、`summary.json`、
-`event_ledger.jsonl`；已有输出目录会被拒绝，请为每次记录使用独立目录。受控带宽、计算和字节换算通过命令行显式配置。
-合同及不可作论文结论的边界见 `vec_competition_engineering_contract.md`。
+入口只读冻结 profile 指定且 SHA-256 匹配的本地 NGSIM、Alibaba 和 catalog；Git LFS 隔离 worktree 可读取主工作区实材。
+另可用 `--controller constant_velocity_prefetch_v1`。输出 `scenario_manifest.json`、`summary.json`、
+`ledger_audit.json`、`event_ledger.jsonl`、`association_timeline.json`、`replay.html` 和命令记录；已有目录拒绝覆盖。
+运行前须是 Git clean，确保 manifest 的 commit 对应实际代码。四站配置、身份勘误与不可作论文结论的边界见 `vec_competition_v2_engineering_record.md`。
 
 ## 最小机制证据闭环（2026-10-05）
 

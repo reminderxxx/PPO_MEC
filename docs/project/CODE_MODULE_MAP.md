@@ -1,6 +1,13 @@
 # Code Module Map
 
-## 四站八车并发工程 replay（2026-10-12）
+## 四站八车冻结工程 replay v2（2026-10-12）
+
+- `vec_frozen_scenario.py` 读取冻结 profile 和三份来源 hash；`vec_competition_contract.py` 验证八条唯一连续轨迹、观测道路转移、DAG 和四站物理单位。
+- `vec_competition_runtime.py` 消费合同并调用可替换 access/placement/state codec/controller；共享资源、缓存、DAG、迁移、交付均产生事件。
+- `vec_competition_audit.py` 从事件独立复算守恒和因果；`vec_competition_replay.py` 消费同一 ledger 与接入时间线；入口 `run_vec_competition.py` 拒绝错误审计后才发布输出。
+- `tests/test_vec_competition_v2.py` 覆盖真实身份、共享无线/计算、负例、预测、独立审计。旧 agent 和 benchmark 消费端尚未接 v2。
+
+## 历史 v1（身份错误，验收作废）
 
 - `src/evaluators/vec_competition_scenario.py`：从本地 NGSIM/Alibaba/typed catalog 构建同一连续时间窗的八车四站场景，并记录单位转换、推定站位和输入 hash。
 - `src/envs/core/vec_competition_env.py`：统一帧时钟、并发 DAG、缓存加载、双端回传/无线争用、计算槽、跨站结果收据与交付账本。独立于旧 `VecWorkflowCoreEnv` 和 agent registry。

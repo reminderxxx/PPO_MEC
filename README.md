@@ -5,9 +5,9 @@
 
 # PPO_MEC
 
-四 RSU、八车同时竞争的 NGSIM+Alibaba 工程 replay 入口为 `scripts/run_vec_competition.py`，合同和论文真实性边界见
-[四站八车环境工程合同](docs/project/vec_competition_engineering_contract.md)。该入口使用受控布站和资源参数，
-输出 `artifacts/analysis/vec_competition_v1/`；不属于冻结的正式 Protocol 2.9 实验。
+四 RSU、八车同时竞争的冻结 NGSIM+Alibaba 工程 replay 入口为 `scripts/run_vec_competition.py`，
+配置、数据身份校验、受控资源和论文真实性边界见[四站八车 v2 工程记录](docs/project/vec_competition_v2_engineering_record.md)。
+v1 选车存在重复原始身份覆盖错误，历史单窗 8/8 验收作废；v2 仍不属于正式 Protocol 2.9 实验。
 当前工程与论文剩余问题清单见[四站八车缺陷审查](docs/project/vec_final_engineering_gap_review_20261012.md)。
 
 最小机制证据闭环（共享缓存四配置、连续/重跑/后缀恢复、12 个有界决策场景）见

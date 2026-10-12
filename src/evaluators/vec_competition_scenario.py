@@ -80,6 +80,7 @@ def load_ngsim_window(csv_path: Path, *, max_rows: int = 500_000, frame_count: i
     if is_lfs_pointer(csv_path):
         raise ValueError(f"NGSIM is an LFS pointer, supply the materialized CSV: {csv_path}")
     frames: dict[tuple[str, int], dict[str, TracePoint]] = defaultdict(dict)
+    duplicate_keys: set[tuple[str, int, str]] = set()
     counts: dict[str, int] = defaultdict(int)
     with csv_path.open("r", encoding="utf-8-sig", newline="") as file:
         reader = csv.DictReader(file)
@@ -94,11 +95,20 @@ def load_ngsim_window(csv_path: Path, *, max_rows: int = 500_000, frame_count: i
                 continue
             time_ms = int(float(row["Global_Time"].replace(",", "")))
             vehicle_id = f"{place}:{row['Vehicle_ID']}"
+            identity = (place, time_ms, vehicle_id)
+            if identity in duplicate_keys:
+                continue
+            if vehicle_id in frames[(place, time_ms)]:
+                frames[(place, time_ms)].pop(vehicle_id)
+                duplicate_keys.add(identity)
+                continue
             frames[(place, time_ms)][vehicle_id] = TracePoint(
                 time_ms,
                 float(row["Local_X"].replace(",", "")) * FEET_TO_METRES,
                 float(row["Local_Y"].replace(",", "")) * FEET_TO_METRES,
                 abs(float(row["v_Vel"].replace(",", ""))) * FEET_TO_METRES,
+                f"section:{row.get('Section_ID', '')}|lane:{row.get('Lane_ID', '')}|direction:{row.get('Direction', '')}",
+                str(row.get("Direction", "")),
             )
             counts[place] += 1
     if not frames:
@@ -122,9 +132,22 @@ def load_ngsim_window(csv_path: Path, *, max_rows: int = 500_000, frame_count: i
                     break
             if len(common) < 8:
                 continue
+            plausible: list[str] = []
+            for vid in common:
+                points = [frames[(place, time_ms)][vid] for time_ms in window]
+                if len({point.direction for point in points}) != 1:
+                    continue
+                if all(
+                    math.hypot(b.x_m - a.x_m, b.y_m - a.y_m)
+                    <= max(2.0, 2.5 * max(a.speed_mps, b.speed_mps) * 0.1, 8.0)
+                    for a, b in zip(points, points[1:])
+                ):
+                    plausible.append(vid)
+            if len(plausible) < 8:
+                continue
             first = frames[(place, window[0])]
             last = frames[(place, window[-1])]
-            scored = sorted(common, key=lambda vid: (-math.hypot(last[vid].x_m - first[vid].x_m, last[vid].y_m - first[vid].y_m), vid))
+            scored = sorted(plausible, key=lambda vid: (-math.hypot(last[vid].x_m - first[vid].x_m, last[vid].y_m - first[vid].y_m), vid))
             selected = tuple(sorted(scored[:8]))
             displacement = sum(math.hypot(last[v].x_m - first[v].x_m, last[v].y_m - first[v].y_m) for v in selected)
             spread = max(first[v].y_m for v in selected) - min(first[v].y_m for v in selected)
@@ -144,9 +167,11 @@ def load_ngsim_window(csv_path: Path, *, max_rows: int = 500_000, frame_count: i
         "first_time_ms": first_ms,
         "last_time_ms": first_ms + (frame_count - 1) * 100,
         "vehicle_ids": list(selected),
+        "duplicate_location_vehicle_time_keys_excluded": len(duplicate_keys),
+        "identity_rule": "unique Location+Vehicle_ID+Global_Time in every selected frame; one direction and bounded per-frame displacement",
         "coordinate_system": "NGSIM Local_X/Local_Y, feet converted to metres; no GIS road graph",
         "speed_unit": "NGSIM v_Vel feet/s converted to m/s",
-        "selection_rule": "highest eight-vehicle total displacement among scanned 120-frame shared windows, stride 10",
+        "selection_rule": f"highest eight-vehicle total displacement among scanned {frame_count}-frame shared windows, stride 10; duplicate raw identities excluded",
         "observed_lane_graph": _observed_lane_graph(csv_path, max_rows=max_rows, place=place, selected=selected, first_ms=first_ms, frame_count=frame_count),
     }
     return place, traces, metadata

@@ -5,7 +5,13 @@
 
 ﻿# Progress
 
-## 2026-10-12：四站八车并发环境工程 replay
+## 2026-10-12：四站八车冻结工程 replay v2
+
+- 发现旧 v1 选车把 NGSIM 同一位置、ID、时间的重复行覆盖，导致部分轨迹瞬移；v1 的八车连续性和 8/8 交付验收结论作废，见 `vec_competition_v2_engineering_record.md`。
+- v2 冻结真实 Peachtree 单窗 120 帧八条唯一且连续轨迹、四站受控布设、八个 DAG 同时到达；内核使用统一秒/米/字节，有限无线/回传/计算、缓存预留、DAG 收据、切换和最终交付，并输出独立事件审计及离线回放。
+- 仍缺匹配 GIS/真实站址、真实 AI 推理与状态、旧学习控制器消费端及正式互斥多窗统计；不得晋级论文结论。
+
+## 2026-10-12：历史 v1（验收作废）
 
 - 新增 `vec_competition_v1`，使用同一 NGSIM 连续时间窗内八辆观测车、八个 Alibaba DAG job、四个推定 RSU；显式竞争缓存、radio/backhaul 与计算槽，并记录迁移和交付账本。
 - 当前为工程诊断；真实底图/站位、无线及模型测量、正式 agent 训练消费端、独立统计与论文结果均未闭环。范围与验收见 `vec_competition_engineering_contract.md`。

@@ -1,5 +1,7 @@
 # 四 RSU、八车竞争环境工程合同（2026-10-12）
 
+> **历史 v1，验收作废**：NGSIM 重复 `Location+Vehicle_ID+Global_Time` 行被选车器覆盖，导致部分轨迹瞬移。本页原 v1 实现范围仅作历史记录；当前冻结场景和校验以 `vec_competition_v2_engineering_record.md` 为准。
+
 状态：**engineering replay / 非正式论文证据**。版本 `vec_competition_v1`；不替换冻结的 Protocol 2.9、旧 `VecWorkflowCoreEnv`、checkpoint 或任何 formal/holdout。
 
 ## 实现范围

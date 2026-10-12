@@ -5,6 +5,11 @@
 
 # Artifact Records
 
+## 2026-10-12 vec competition v1 勘误
+
+- `artifacts/analysis/vec_competition_v1_20261012_4fd8549/` 保留为历史错误复核材料：源 CSV 相同 `Location + Vehicle_ID + Global_Time` 重复行被覆盖，部分所选“车辆”瞬移。原八条连续轨迹、handoff 和 8/8 交付验收结论作废；不得作为合格工程或论文结果。
+- v2 读取固定 Peachtree 八车窗口并对原始身份重复 fail closed，合同见 `vec_competition_v2_engineering_record.md`。新输出使用 create-only `artifacts/analysis/<new_run_id>/`，不能覆盖 v1。
+
 ## 2026-10-05 minimal mechanism evidence closure
 
 - `artifacts/analysis/mechanism_evidence_closure_20261005_v1/`：固定 commit `f323fa2...`，A/C wall 34.193 s，

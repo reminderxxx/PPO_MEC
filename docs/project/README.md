@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `vec_competition_v2_engineering_record.md`：冻结四站八车场景、v1 身份勘误、单位、事件内核、验证与未关闭论文阻断项。
+
 - `mechanism_evidence_closure_results_20261005.md`：共享缓存公平成本、两节点重跑/恢复和 12 场景决策空间结果；
   明确 Pareto 边界、ALPR 负结果和不启动 RL 的结论
 - `mechanism_evidence_closure_plan_20261005.md`：本轮命令、调用、墙钟、12 格与状态成本的事前冻结方案

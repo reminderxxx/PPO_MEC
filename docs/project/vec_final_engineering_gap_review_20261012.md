@@ -1,5 +1,7 @@
 # 四 RSU、八车竞争：环境工程与论文完整性审查
 
+> **2026-10-12 勘误**：本页 v1 工程段落的“八辆连续观测车”“70/70、8/8”等验收结论已作废。v1 选车器覆盖同一源段、车辆 ID、毫秒时间的重复行，部分车辆出现瞬移。修复后的独立 v2 工程证据和剩余阻断项见 `vec_competition_v2_engineering_record.md`。本页下方保留历史审查文本，仅供追溯错误；原 `Unverifiable` 论文判断不变。
+
 - `reviewed_at`: 2026-10-12
 - `literature_cutoff`: 2026-10-12
 - `target_venue`: IEEE Transactions on Mobile Computing (TMC)

@@ -1,4 +1,4 @@
-"""Run a trace-driven engineering replay with four RSUs and eight vehicles."""
+"""Execute the frozen four-RSU/eight-request VEC engineering scenario."""
 
 from __future__ import annotations
 
@@ -13,68 +13,50 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.envs.core.vec_competition_env import VECCompetitionEnv  # noqa: E402
-from src.evaluators.vec_competition_scenario import build_scenario, is_lfs_pointer  # noqa: E402
-
-
-def _materialized_path(relative: Path) -> Path:
-    candidate = ROOT / relative
-    if candidate.is_file() and not is_lfs_pointer(candidate):
-        return candidate
-    common = subprocess.check_output(["git", "rev-parse", "--git-common-dir"], cwd=ROOT, text=True).strip()
-    primary = Path(common).resolve().parent / relative
-    return primary if primary.is_file() and not is_lfs_pointer(primary) else candidate
+from src.envs.core.vec_competition_runtime import VECCompetitionRuntime  # noqa: E402
+from src.envs.core.vec_competition_policies import ConstantVelocityPrefetchController, NoPrefetchController  # noqa: E402
+from src.evaluators.vec_frozen_scenario import load_frozen_scenario  # noqa: E402
+from src.evaluators.vec_competition_audit import audit_competition_run  # noqa: E402
+from src.evaluators.vec_competition_replay import render_replay_html  # noqa: E402
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--ngsim-csv", type=Path, default=None)
-    parser.add_argument("--alibaba-csv", type=Path, default=None)
-    parser.add_argument("--catalog-json", type=Path, default=ROOT / "src/data/model_catalog/typed_model_cache_controlled.json")
-    parser.add_argument("--max-rows", type=int, default=500_000)
-    parser.add_argument("--frames", type=int, default=120)
-    parser.add_argument("--segment", default="")
-    parser.add_argument("--cache-capacity-mb", type=float, default=512.0)
-    parser.add_argument("--compute-slots", type=int, default=1)
-    parser.add_argument("--compute-mb-per-s", type=float, default=40.0)
-    parser.add_argument("--radio-mb-per-s", type=float, default=20.0)
-    parser.add_argument("--backhaul-mb-per-s", type=float, default=40.0)
-    parser.add_argument("--alibaba-size-unit-mb", type=float, default=0.001)
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "artifacts/analysis/vec_competition_v1")
+    parser.add_argument("--profile", type=Path, default=ROOT / "configs/experiment/vec_competition_peachtree_4rsu_8vehicle_v2.json")
+    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--controller", choices=("no_prefetch_v1", "constant_velocity_prefetch_v1"), default="no_prefetch_v1")
     args = parser.parse_args()
     if args.output_dir.exists():
-        raise FileExistsError(f"output directory already exists: {args.output_dir}; choose a new run directory")
-    ngsim = args.ngsim_csv or next(iter(sorted((ROOT / "data/raw/mobility/ngsim").glob("*.csv"))), None)
-    if ngsim is None:
-        raise FileNotFoundError("No NGSIM CSV found; supply --ngsim-csv")
-    if args.ngsim_csv is None:
-        ngsim = _materialized_path(ngsim.relative_to(ROOT))
-    alibaba = args.alibaba_csv or _materialized_path(Path("data/raw/workflow/alibaba2018/batch_task.csv"))
-    scenario, metadata = build_scenario(
-        ngsim, alibaba, args.catalog_json,
-        max_rows=args.max_rows, frame_count=args.frames, segment=args.segment,
-        cache_capacity_mb=args.cache_capacity_mb, compute_slots=args.compute_slots,
-        compute_mb_per_s=args.compute_mb_per_s, radio_mb_per_s=args.radio_mb_per_s,
-        backhaul_mb_per_s=args.backhaul_mb_per_s,
-        alibaba_size_unit_mb=args.alibaba_size_unit_mb,
-    )
-    env = VECCompetitionEnv(scenario)
-    result = env.run()
-    result["ledger_sha256"] = env.ledger_digest()
+        raise FileExistsError(f"output directory exists: {args.output_dir}")
+    dirty = subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True)
+    if dirty.strip():
+        raise RuntimeError("frozen engineering run requires a clean Git worktree; commit the implementation first")
+    scenario, metadata = load_frozen_scenario(args.profile, ROOT)
+    env = VECCompetitionRuntime(scenario)
+    controller = NoPrefetchController() if args.controller == "no_prefetch_v1" else ConstantVelocityPrefetchController(scenario.rsus)
+    summary = env.run(controller)
+    summary["controller_version"] = controller.version
+    summary["ledger_sha256"] = env.ledger_digest()
+    audit = audit_competition_run(scenario, env.ledger, summary)
+    if not audit["passed"]:
+        raise AssertionError(f"ledger audit failed: {audit['failures']}")
     metadata.update({
-        "reviewed_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
         "git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
-        "argv": sys.argv,
-        "contract_version": result["contract_version"],
-        "claim_level": "engineering_replay_only; no formal/holdout or model-inference claim",
+        "command_argv": sys.argv,
+        "controller": {**summary["plugin_versions"], "decision": controller.version},
+        "measurement_boundary": "observed mobility and DAG topology; inferred RSUs; controlled radio/backhaul/compute/model bytes; metadata state codec",
     })
     args.output_dir.mkdir(parents=True, exist_ok=False)
-    (args.output_dir / "scenario_manifest.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    (args.output_dir / "summary.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    for name, value in (("scenario_manifest.json", metadata), ("summary.json", summary), ("ledger_audit.json", audit)):
+        (args.output_dir / name).write_text(json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     with (args.output_dir / "event_ledger.jsonl").open("w", encoding="utf-8") as file:
         for event in env.ledger:
             file.write(json.dumps(event, ensure_ascii=False, sort_keys=True) + "\n")
-    print(json.dumps({"output_dir": str(args.output_dir), **result}, ensure_ascii=False, indent=2))
+    (args.output_dir / "association_timeline.json").write_text(json.dumps(env.association_timeline, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (args.output_dir / "replay.html").write_text(render_replay_html(scenario, env.association_timeline, env.ledger, summary), encoding="utf-8")
+    (args.output_dir / "command_log.txt").write_text(" ".join(sys.argv) + "\n", encoding="utf-8")
+    print(json.dumps({"output_dir": str(args.output_dir), "summary": summary, "audit": audit}, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

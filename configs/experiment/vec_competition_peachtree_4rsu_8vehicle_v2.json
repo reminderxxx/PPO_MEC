@@ -1,0 +1,80 @@
+{
+  "contract_version": "vec_competition_v2",
+  "scenario_id": "peachtree_observed_4rsu_8vehicle_v2",
+  "mobility": {
+    "provider": "ngsim",
+    "relative_path": "data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+    "sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+    "source_segment_id": "peachtree",
+    "rows_to_scan": 500000,
+    "first_time_ms": 1163570000,
+    "frame_count": 120,
+    "frame_period_ms": 100,
+    "vehicle_ids": ["peachtree:740", "peachtree:829", "peachtree:832", "peachtree:835", "peachtree:837", "peachtree:839", "peachtree:847", "peachtree:897"],
+    "coordinate_contract": "Local_X/Y feet to metre; v_Vel feet/s to metre/s; Global_Time millisecond offsets to relative seconds",
+    "identity_contract": "exactly one row per location+vehicle+time; constant direction; <=8m per 100ms; no trajectory cloning",
+    "road_graph_type": "observed_lane_section_transitions_not_full_gis",
+    "allowed_road_edges": [
+      ["section:0|lane:0|direction:2", "section:2|lane:2|direction:2"],
+      ["section:0|lane:0|direction:2", "section:3|lane:0|direction:2"],
+      ["section:0|lane:0|direction:2", "section:3|lane:1|direction:2"],
+      ["section:0|lane:0|direction:4", "section:1|lane:1|direction:4"],
+      ["section:0|lane:0|direction:4", "section:2|lane:11|direction:4"],
+      ["section:0|lane:0|direction:4", "section:2|lane:1|direction:4"],
+      ["section:1|lane:2|direction:2", "section:0|lane:0|direction:2"],
+      ["section:2|lane:1|direction:2", "section:0|lane:0|direction:2"],
+      ["section:2|lane:1|direction:4", "section:0|lane:0|direction:4"],
+      ["section:2|lane:2|direction:2", "section:0|lane:0|direction:2"],
+      ["section:3|lane:0|direction:2", "section:3|lane:1|direction:2"],
+      ["section:3|lane:0|direction:4", "section:3|lane:11|direction:4"],
+      ["section:3|lane:11|direction:4", "section:0|lane:0|direction:4"],
+      ["section:3|lane:1|direction:2", "section:3|lane:2|direction:2"],
+      ["section:3|lane:1|direction:4", "section:3|lane:0|direction:4"]
+    ]
+  },
+  "workflow": {
+    "provider": "alibaba2018",
+    "relative_path": "data/raw/workflow/alibaba2018/batch_task.csv",
+    "sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+    "scan_limit_jobs": 64,
+    "min_tasks": 5,
+    "max_tasks": 32,
+    "alibaba_unit_bytes": 1000,
+    "assignments": {
+      "peachtree:740": "j_3",
+      "peachtree:829": "j_8",
+      "peachtree:832": "j_15",
+      "peachtree:835": "j_34",
+      "peachtree:837": "j_49",
+      "peachtree:839": "j_73",
+      "peachtree:847": "j_79",
+      "peachtree:897": "j_90"
+    }
+  },
+  "model_catalog": {
+    "relative_path": "src/data/model_catalog/typed_model_cache_controlled.json",
+    "sha256": "0be81a904f09ca0e8976926caf064f095f6d9fb4173cfa1f0a8eed7042f62b2c",
+    "status": "controlled_validation_only"
+  },
+  "rsus": [
+    {"rsu_id": "rsu_a", "x_m": 1.3072872, "y_m": 69.61551990000001, "radius_m": 68.20245567, "cache_capacity_bytes": 512000000, "compute_slots": 1, "compute_work_bytes_per_s": 40000000, "radio_bytes_per_s": 20000000, "backhaul_port_bytes_per_s": 40000000},
+    {"rsu_id": "rsu_b", "x_m": 1.3072872, "y_m": 141.9088221, "radius_m": 68.20245567, "cache_capacity_bytes": 512000000, "compute_slots": 1, "compute_work_bytes_per_s": 40000000, "radio_bytes_per_s": 20000000, "backhaul_port_bytes_per_s": 40000000},
+    {"rsu_id": "rsu_c", "x_m": 1.3072872, "y_m": 214.20212430000004, "radius_m": 68.20245567, "cache_capacity_bytes": 512000000, "compute_slots": 1, "compute_work_bytes_per_s": 40000000, "radio_bytes_per_s": 20000000, "backhaul_port_bytes_per_s": 40000000},
+    {"rsu_id": "rsu_d", "x_m": 1.3072872, "y_m": 286.49542650000006, "radius_m": 68.20245567, "cache_capacity_bytes": 512000000, "compute_slots": 1, "compute_work_bytes_per_s": 40000000, "radio_bytes_per_s": 20000000, "backhaul_port_bytes_per_s": 40000000}
+  ],
+  "backhaul": {
+    "cloud_port_bytes_per_s": 80000000,
+    "links": [
+      {"from": "rsu_a", "to": "rsu_b", "bytes_per_s": 40000000, "latency_s": 0.005},
+      {"from": "rsu_b", "to": "rsu_c", "bytes_per_s": 40000000, "latency_s": 0.005},
+      {"from": "rsu_c", "to": "rsu_d", "bytes_per_s": 40000000, "latency_s": 0.005}
+    ]
+  },
+  "requests": {
+    "arrival_offset_s": 0.0,
+    "deadline_offset_s": 11.9,
+    "count": 8
+  },
+  "controller": {"association": "nearest_covered_v1", "placement": "attached_fifo_v1", "predictor": "none"},
+  "claim_scope": "engineering_replay; observed_vehicle_trajectories_and_DAG_topology; inferred_RSU_locations_and_controlled_resource_rates"
+}

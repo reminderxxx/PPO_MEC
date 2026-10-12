@@ -1,6 +1,14 @@
 ﻿# Directory Structure
 
-## 2026-10-12 四站八车工程 replay
+## 2026-10-12 四站八车冻结工程 replay v2
+
+- `configs/experiment/vec_competition_peachtree_4rsu_8vehicle_v2.json`：单路段、八车、四站、请求、受控资源与来源哈希。
+- `src/envs/core/vec_competition_contract.py`、`vec_competition_runtime.py`、`vec_competition_policies.py`：单位/插件合同、事件执行、规则策略。
+- `src/evaluators/vec_frozen_scenario.py`、`vec_competition_audit.py`、`vec_competition_replay.py`：冻结输入、独立账本审计、离线画面。
+- `scripts/run_vec_competition.py`：v2 create-only 生产入口；`artifacts/analysis/<new_run_id>/` 是工程输出，非正式 benchmark。
+- `tests/test_vec_competition_v2.py`：数据身份、竞争、因果、失败与独立审计验收。
+
+## 2026-10-12 历史 v1（身份校验错误，验收作废）
 
 - `src/envs/core/vec_competition_env.py`、`src/evaluators/vec_competition_scenario.py`、`scripts/run_vec_competition.py`：独立并发场景、执行内核和入口。
 - `artifacts/analysis/vec_competition_v1/`：工程 manifest、summary、event ledger；不是正式 benchmark 的 live 路径。
