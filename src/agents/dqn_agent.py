@@ -51,13 +51,17 @@ class _QNetwork(nn.Module):
         self,
         *,
         hidden_dim: int = 64,
+        joint_observation_enabled: bool = False,
         hidden_dims: tuple[int, int] = (64, 64),
         action_dim: int = 5,
         dueling: bool = False,
     ) -> None:
         super().__init__()
         self.dueling = bool(dueling)
-        self.encoder = FlatSemanticEncoder(hidden_dim=hidden_dim)
+        self.encoder = FlatSemanticEncoder(
+            hidden_dim=hidden_dim,
+            **({"joint_observation_enabled": True} if joint_observation_enabled else {}),
+        )
         if self.dueling:
             self.feature_head = nn.Sequential(
                 nn.Linear(hidden_dim, hidden_dims[0]),
@@ -113,6 +117,7 @@ class DQNAgent(BaseAgent):
         epsilon_final: float = 0.02,
         epsilon_decay_updates: int = 32,
         hidden_dim: int = 64,
+        joint_observation_enabled: bool = False,
         hidden_dims: tuple[int, int] = (64, 64),
         max_grad_norm: float = 1.0,
         deterministic_action: bool = False,
@@ -135,6 +140,7 @@ class DQNAgent(BaseAgent):
         self._epsilon_final = max(0.0, min(float(epsilon_final), 1.0))
         self._epsilon_decay_updates = max(int(epsilon_decay_updates), 1)
         self._hidden_dim = int(hidden_dim)
+        self._joint_observation_enabled = bool(joint_observation_enabled)
         self._hidden_dims = tuple(hidden_dims)
         self._max_grad_norm = float(max_grad_norm)
         self._deterministic_action = bool(deterministic_action)
@@ -147,12 +153,14 @@ class DQNAgent(BaseAgent):
 
         self._network = _QNetwork(
             hidden_dim=self._hidden_dim,
+            joint_observation_enabled=self._joint_observation_enabled,
             hidden_dims=self._hidden_dims,
             action_dim=5,
             dueling=self.dueling,
         ).to(self._device)
         self._target_network = _QNetwork(
             hidden_dim=self._hidden_dim,
+            joint_observation_enabled=self._joint_observation_enabled,
             hidden_dims=self._hidden_dims,
             action_dim=5,
             dueling=self.dueling,
@@ -218,7 +226,11 @@ class DQNAgent(BaseAgent):
     def learn(self, rollout: list[dict[str, Any]]) -> dict[str, Any]:
         for row in rollout:
             current_state = self._extract_semantic_state(row.get("decision_info"))
-            next_state = row.get("env_info", {}).get("semantic_state")
+            next_info = row.get("env_info", {})
+            next_state = next_info.get("semantic_state")
+            if self._joint_observation_enabled:
+                if next_state is not None or not bool(row.get("terminated", False)):
+                    next_state = self._extract_semantic_state(next_info)
             self._replay.append(
                 {
                     "state": current_state,
@@ -324,6 +336,9 @@ class DQNAgent(BaseAgent):
 
     def load(self, path: str) -> None:
         checkpoint = torch.load(Path(path), map_location=self._device)
+        saved_joint_observation = bool(checkpoint.get("config", {}).get("joint_observation_enabled", False))
+        if saved_joint_observation != self._joint_observation_enabled:
+            raise ValueError("checkpoint joint_observation_enabled mismatch; construct from checkpoint config")
         self._network.load_state_dict(checkpoint["network_state_dict"])
         target_state = checkpoint.get("target_network_state_dict") or checkpoint.get("network_state_dict")
         self._target_network.load_state_dict(target_state)
@@ -348,6 +363,7 @@ class DQNAgent(BaseAgent):
             "epsilon_final": self._epsilon_final,
             "epsilon_decay_updates": self._epsilon_decay_updates,
             "hidden_dim": self._hidden_dim,
+            "joint_observation_enabled": self._joint_observation_enabled,
             "hidden_dims": self._hidden_dims,
             "max_grad_norm": self._max_grad_norm,
             "observation_contract": self.observation_contract,
@@ -362,6 +378,9 @@ class DQNAgent(BaseAgent):
         semantic_state = (info or {}).get("semantic_state")
         if semantic_state is None:
             raise ValueError(f"{self.agent_name} requires info['semantic_state'] for flat semantic encoding.")
+        if (self._joint_observation_enabled
+                and semantic_state.get("observation_contract") != "joint_request_observation_v2"):
+            raise ValueError("joint_observation_enabled requires joint_request_observation_v2")
         return semantic_state
 
     def _extract_action_mask(self, info: dict[str, Any] | None) -> list[bool] | None:

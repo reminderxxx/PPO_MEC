@@ -1,5 +1,21 @@
 # Code Module Map
 
+## 八车 v2 合同修复与任务交付（2026-10-12）
+
+| 修改线 | 实现位置 | 已落实内容 |
+| --- | --- | --- |
+| PPO 与 checkpoint | `src/agents/sa_ghmappo_core.py`、三个方向型 agent、`dqn_agent.py`、`real_eval_support.py` | 精确 masked env-action PPO 主目标；配置保存/恢复；新观察进入全部七算法 |
+| Model cache | `src/envs/core/joint_model_cache.py` | base/adapter 字节容量、共享 base、在途预留、依赖安全自动 LRU、逐对象传输账本 |
+| 执行与迁移 | `src/envs/core/multi_request_joint_control_env.py` | opt-in v2、工作量服务、父依赖、状态版本/增量、完成帧计费、显式车端 adapter 清单 |
+| 预测与共享信息 | `src/envs/core/joint_causal_observation.py` | 过去位置外推、未来位置车辆计数、已到期预测准确率、有时间戳/延迟的 RSU 广播 |
+| 策略输入 | `src/encoders/joint_observation_features.py`、`fusion_encoder.py` | 37 维 actor 就绪/进度/版本/信息年龄特征；20 维独立 joint critic 汇总；无即时 wire-size 侧漏 |
+| 集成入口 | `scripts/launch_eight_vehicle_joint_experiment.py` | raw-policy rollout 原样保存、全团队终局回报、提前完成请求的 terminal tail、greedy/sample dev、逐帧费用收据与配置清单 |
+
+新 predictor 和 cache 仅接八车 v2，不替换生产 `VecWorkflowCoreEnv` 或正式 Protocol。
+算法构造参数 `actor_objective="masked_env_action_v1"`、`joint_observation_enabled=True` 显式启用新合同；
+DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 centralized critic 使用。
+实现不等于模型缓存效果已超过 MAPPO；所有算法拥有相同物理能力和可用信息，差异留待冻结对照验证。
+
 ## 八车联合控制仿真入口（2026-10-12）
 
 `MultiRequestJointControlEnv` 继承八请求回放环境，复用 `ActionMaskBuilder` 和 `ActionAdapter` 将原生五动作应用到每个活动请求。

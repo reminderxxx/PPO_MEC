@@ -235,6 +235,7 @@ class 分层策略网络(nn.Module):
         use_uncertainty_signal: bool = True,
         use_dependency_aware: bool = True,
         prediction_feature_dim: int = 13,
+        joint_observation_enabled: bool = False,
         prediction_gate_min_leak: float = 0.0,
         graph_continuity_critic_enabled: bool = False,
         uncertainty_aware_critic_enabled: bool = False,
@@ -300,7 +301,10 @@ class 分层策略网络(nn.Module):
         )
 
         if self.encoder_kind == "flat":
-            self.encoder = FlatSemanticEncoder(hidden_dim=self.hidden_dim)
+            self.encoder = FlatSemanticEncoder(
+                hidden_dim=self.hidden_dim,
+                **({"joint_observation_enabled": True} if joint_observation_enabled else {}),
+            )
         else:
             self.encoder = SurrogateFusionEncoder(
                 hidden_dim=self.hidden_dim,
@@ -308,6 +312,7 @@ class 分层策略网络(nn.Module):
                 use_uncertainty_signal=use_uncertainty_signal,
                 use_dependency_aware=use_dependency_aware,
                 prediction_feature_dim=prediction_feature_dim,
+                **({"joint_observation_enabled": True} if joint_observation_enabled else {}),
                 prediction_gate_min_leak=prediction_gate_min_leak,
                 graph_continuity_critic_enabled=graph_continuity_critic_enabled,
                 uncertainty_aware_critic_enabled=uncertainty_aware_critic_enabled,
@@ -708,6 +713,7 @@ class 分层PPO基类(BaseAgent):
         mechanism_logit_bias_strength: float = 0.0,
         mechanism_confidence_floor: float = 0.0,
         prediction_feature_dim: int = 13,
+        joint_observation_enabled: bool = False,
         prediction_gate_min_leak: float = 0.0,
         slow_entropy_coef_scale: float = 1.0,
         fast_entropy_coef_scale: float = 1.0,
@@ -831,6 +837,7 @@ class 分层PPO基类(BaseAgent):
         digital_twin_policy_prior_wait_timing_ceiling: float = 0.38,
         digital_twin_policy_prior_wait_cache_ready_scale: float = 1.15,
         digital_twin_policy_prior_prepare_not_ready_scale: float = 1.0,
+        actor_objective: str = "legacy_head",
         env_action_ppo_enabled: bool = False,
         env_action_ppo_coef: float = 0.0,
         env_action_ppo_advantage_blend: float = 0.65,
@@ -1262,6 +1269,7 @@ class 分层PPO基类(BaseAgent):
         self._mechanism_logit_bias_strength = float(mechanism_logit_bias_strength)
         self._mechanism_confidence_floor = float(mechanism_confidence_floor)
         self._prediction_feature_dim = int(prediction_feature_dim)
+        self._joint_observation_enabled = bool(joint_observation_enabled)
         self._prediction_gate_min_leak = max(0.0, min(float(prediction_gate_min_leak), 1.0))
         self._slow_entropy_coef_scale = max(float(slow_entropy_coef_scale), 0.0)
         self._fast_entropy_coef_scale = max(float(fast_entropy_coef_scale), 0.0)
@@ -1546,6 +1554,14 @@ class 分层PPO基类(BaseAgent):
             float(digital_twin_policy_prior_prepare_not_ready_scale),
             0.0,
         )
+        self._actor_objective = str(actor_objective)
+        if self._actor_objective not in {"legacy_head", "masked_env_action_v1"}:
+            raise ValueError("unsupported actor_objective")
+        if self._actor_objective == "masked_env_action_v1":
+            if env_action_ppo_enabled or float(env_action_ppo_coef) != 0.0:
+                raise ValueError("masked_env_action_v1 replaces, rather than supplements, head PPO")
+            if self._use_hierarchy and not (self._event_head_enabled and self._adapter_prefetch_enabled):
+                raise ValueError("masked_env_action_v1 requires all hierarchical action heads")
         self._env_action_ppo_enabled = bool(env_action_ppo_enabled)
         self._env_action_ppo_coef = max(float(env_action_ppo_coef), 0.0)
         self._env_action_ppo_advantage_blend = max(
@@ -2712,6 +2728,7 @@ class 分层PPO基类(BaseAgent):
             use_uncertainty_signal=self._use_uncertainty_signal,
             use_dependency_aware=self._use_dependency_aware,
             prediction_feature_dim=self._prediction_feature_dim,
+            joint_observation_enabled=self._joint_observation_enabled,
             prediction_gate_min_leak=self._prediction_gate_min_leak,
             graph_continuity_critic_enabled=self._graph_continuity_critic_enabled,
             uncertainty_aware_critic_enabled=self._uncertainty_aware_critic_enabled,
@@ -2824,6 +2841,10 @@ class 分层PPO基类(BaseAgent):
             policy_evaluation_mode = "safety_projected"
         run_metadata["policy_evaluation_mode"] = policy_evaluation_mode
         raw_policy_evaluation = policy_evaluation_mode == "raw_policy"
+        if self._actor_objective == "masked_env_action_v1":
+            if not raw_policy_evaluation:
+                raise ValueError("masked_env_action_v1 requires explicit raw_policy run_metadata")
+            self._validate_exact_action_mask((info or {}).get("action_mask"))
         deterministic = bool(self._deterministic_action or (info or {}).get("deterministic_policy", False))
         with torch.no_grad():
             policy_output = self._forward_policy(semantic_state, run_metadata=run_metadata)
@@ -2831,7 +2852,7 @@ class 分层PPO基类(BaseAgent):
                 "enabled": False,
                 "applied": False,
             }
-            if deterministic:
+            if deterministic and self._actor_objective != "masked_env_action_v1":
                 (
                     policy_output,
                     env_action_model_critic_info,
@@ -3035,6 +3056,8 @@ class 分层PPO基类(BaseAgent):
             )
             if option_entropy_tensor is not None:
                 entropy = 0.5 * (entropy + option_entropy_tensor)
+            if self._actor_objective == "masked_env_action_v1":
+                log_prob, entropy = env_action_log_prob, env_action_entropy
             value = float(policy_output["value"].item())
             prediction_gate = float(policy_output["encoded"].get("prediction_gate", torch.tensor([1.0], device=self._device)).flatten()[0].item())
             temporal_urgency = float(policy_output["encoded"].get("temporal_urgency", torch.tensor([0.0], device=self._device)).flatten()[0].item())
@@ -3077,8 +3100,12 @@ class 分层PPO基类(BaseAgent):
             "guard_action_delta": guard_action_delta,
             "projected_aggregation_reason": projected_aggregation_reason,
             "aggregation_reason": aggregation_reason,
-            "log_prob": round(float(log_prob.item()), 6),
-            "env_action_log_prob": round(float(env_action_log_prob.item()), 6),
+            "actor_objective": self._actor_objective,
+            "log_prob": (float(log_prob.item()) if self._actor_objective == "masked_env_action_v1"
+                         else round(float(log_prob.item()), 6)),
+            "env_action_log_prob": (float(env_action_log_prob.item())
+                                    if self._actor_objective == "masked_env_action_v1"
+                                    else round(float(env_action_log_prob.item()), 6)),
             "env_action_entropy": round(float(env_action_entropy.item()), 6),
             "env_action_probs": env_action_probs,
             "env_action_model_critic": env_action_model_critic_info,
@@ -3461,6 +3488,8 @@ class 分层PPO基类(BaseAgent):
                 "update_count": self._update_count,
             }
 
+        if self._actor_objective == "masked_env_action_v1":
+            self._validate_exact_rollout(rollout)
         model_training_rollout = list(rollout)
         counterfactual_sample_count = 0
         for row in rollout:
@@ -3508,6 +3537,8 @@ class 分层PPO基类(BaseAgent):
                 old_env_action_log_prob_values.append(float(row.get("log_prob", 0.0) or 0.0))
                 old_env_action_log_prob_missing_count += 1
         old_env_action_log_probs = np.asarray(old_env_action_log_prob_values, dtype=np.float32)
+        if self._actor_objective == "masked_env_action_v1":
+            old_log_probs = old_env_action_log_probs.copy()
         retention_active = self._mechanism_retention_active_for_update()
         effective_mechanism_aux_coef = self._effective_mechanism_aux_coef()
         effective_mechanism_entropy_coef = self._effective_mechanism_entropy_coef()
@@ -4101,6 +4132,18 @@ class 分层PPO基类(BaseAgent):
                     )
                     env_action_model_teacher_distillation_batch_support = 0
 
+                if self._actor_objective == "masked_env_action_v1":
+                    exact_statistics = self._exact_env_action_ppo_statistics(
+                        batch_outputs, batch_action_masks, action_tensor[batch_indices],
+                        old_env_action_log_prob_tensor[batch_indices],
+                        advantage_tensor[batch_indices],
+                        torch.as_tensor([row["action_info"]["env_action_probs"] for row in batch_rows],
+                                        dtype=torch.float32, device=self._device),
+                    )
+                    actor_loss = exact_statistics["actor_loss"]
+                    new_log_prob = exact_statistics["log_prob"]
+                    entropy = exact_statistics["entropy"]
+                    env_action_ppo_loss = torch.zeros((), device=self._device)
                 value_prediction = torch.stack([output["value"] for output in batch_outputs], dim=0)
                 ratio = torch.exp(new_log_prob - old_log_prob_tensor[batch_indices])
                 value_loss = torch.mean((return_tensor[batch_indices] - value_prediction) ** 2)
@@ -4187,7 +4230,9 @@ class 分层PPO基类(BaseAgent):
                 self._optimizer.step()
 
                 with torch.no_grad():
-                    approx_kl = torch.mean(old_log_prob_tensor[batch_indices] - new_log_prob)
+                    approx_kl = (exact_statistics["kl"].detach()
+                                 if self._actor_objective == "masked_env_action_v1"
+                                 else torch.mean(old_log_prob_tensor[batch_indices] - new_log_prob))
                     clip_fraction = torch.mean((torch.abs(ratio - 1.0) > self._clip_ratio).float())
 
                 actor_loss_total += float(actor_loss.item())
@@ -4876,6 +4921,7 @@ class 分层PPO基类(BaseAgent):
             "advantage_std_raw": round(advantage_std, 6),
             "event_advantage_mean_raw": round(event_advantage_mean, 6),
             "event_advantage_std_raw": round(event_advantage_std, 6),
+            "actor_objective": self._actor_objective,
             "env_action_ppo_enabled": self._env_action_ppo_enabled,
             "env_action_ppo_coef": round(self._env_action_ppo_coef, 6),
             "env_action_ppo_advantage_blend": round(self._env_action_ppo_advantage_blend, 6),
@@ -5325,6 +5371,18 @@ class 分层PPO基类(BaseAgent):
 
     def load(self, path: str) -> None:
         checkpoint = torch.load(Path(path), map_location=self._device)
+        saved_joint_observation = bool(checkpoint.get("config", {}).get("joint_observation_enabled", False))
+        if saved_joint_observation != self._joint_observation_enabled:
+            raise ValueError("checkpoint joint_observation_enabled mismatch; construct from checkpoint config")
+        saved_objective = checkpoint.get("config", {}).get("actor_objective", "legacy_head")
+        if saved_objective not in {"legacy_head", "masked_env_action_v1"}:
+            raise ValueError("unsupported checkpoint actor_objective")
+        if saved_objective == "masked_env_action_v1" and (
+            self._env_action_ppo_enabled or self._env_action_ppo_coef != 0.0
+            or (self._use_hierarchy and not (self._event_head_enabled and self._adapter_prefetch_enabled))
+        ):
+            raise ValueError("checkpoint actor_objective conflicts with current policy configuration")
+        self._actor_objective = saved_objective
         network_state = checkpoint["network_state_dict"]
         current_state = self._network.state_dict()
         missing_keys = set(current_state) - set(network_state)
@@ -5363,6 +5421,21 @@ class 分层PPO基类(BaseAgent):
         semantic_state = (info or {}).get("semantic_state")
         if semantic_state is None:
             raise ValueError(f"{self.agent_name} 需要 info['semantic_state'] 才能做图结构编码。")
+        if self._joint_observation_enabled:
+            if semantic_state.get("observation_contract") != "joint_request_observation_v2":
+                raise ValueError("joint_observation_enabled requires joint_request_observation_v2")
+            central = (info or {}).get("centralized_critic_state")
+            if self._centralized_critic and (
+                not isinstance(central, dict)
+                or not isinstance(central.get("joint_workflows"), dict)
+                or not isinstance(central.get("rsus"), list)
+                or not isinstance(central.get("associations"), dict)
+            ):
+                raise ValueError("joint centralized critic requires joint_workflows, rsus and associations context")
+            # Only the encoder's centralized critic branch may consume this
+            # training context; actor features use the shared observation.
+            semantic_state = dict(semantic_state)
+            semantic_state["centralized_critic_state"] = dict(central or {})
         algorithm_memory = (info or {}).get("algorithm_memory")
         if not isinstance(algorithm_memory, dict):
             return semantic_state
@@ -6415,6 +6488,64 @@ class 分层PPO基类(BaseAgent):
             (run_metadata or {}).get("policy_evaluation_mode", "safety_projected")
         ).strip().lower() == "raw_policy"
 
+    @staticmethod
+    def _validate_exact_action_mask(action_mask: list[bool] | None) -> None:
+        if action_mask is not None and (len(action_mask) != 5 or not any(action_mask)):
+            raise ValueError("masked_env_action_v1 requires a nonempty five-action mask")
+
+    def _validate_exact_rollout(self, rollout: list[dict[str, Any]]) -> None:
+        for row in rollout:
+            decision_info = row.get("decision_info", {})
+            details = row.get("action_info", {})
+            if decision_info.get("run_metadata", {}).get("policy_evaluation_mode") != "raw_policy":
+                raise ValueError("exact PPO rollout is missing raw_policy run_metadata")
+            if (details.get("actor_objective") != "masked_env_action_v1"
+                    or details.get("policy_mode") != "sample"
+                    or details.get("guard_action_delta", False)):
+                raise ValueError("exact PPO requires unmodified sampled behavior from the same objective")
+            self._validate_exact_action_mask(decision_info.get("action_mask"))
+            mask = self._extract_action_mask(decision_info)
+            if details.get("action_mask") != mask or details.get("final_env_action") != int(row["action"]):
+                raise ValueError("exact PPO rollout changed its behavior action or mask")
+            self._validate_exact_action_mask(mask)
+            action = int(row["action"])
+            probs = np.asarray(details.get("env_action_probs", []), dtype=np.float64)
+            if (probs.shape != (5,) or not np.isfinite(probs).all()
+                    or (probs < 0).any() or abs(float(probs.sum()) - 1.0) > 1e-5
+                    or action not in range(5) or probs[action] <= 0
+                    or (mask is not None and (not mask[action] or any(
+                        probs[i] != 0.0 for i in range(5) if not mask[i])))):
+                raise ValueError("exact PPO behavior probabilities disagree with action/mask")
+            old_log_prob = details.get("env_action_log_prob")
+            if (old_log_prob is None or not np.isfinite(old_log_prob)
+                    or abs(float(old_log_prob) - float(np.log(probs[action]))) > 1e-5):
+                raise ValueError("exact PPO requires matching saved behavior log probability")
+
+    def _exact_env_action_ppo_statistics(
+        self, batch_outputs: list[dict[str, Any]],
+        action_masks: list[list[bool] | None], actions: torch.Tensor,
+        old_log_probs: torch.Tensor, advantages: torch.Tensor,
+        old_probs: torch.Tensor,
+    ) -> dict[str, torch.Tensor]:
+        # Optimize the sampled marginal distribution; canonical latent heads are
+        # labels for execution and are not separately sampled PPO actions.
+        logits = []
+        for output, mask in zip(batch_outputs, action_masks):
+            self._validate_exact_action_mask(mask)
+            scores = (self._hierarchical_env_action_scores(output) if self._use_hierarchy
+                      else output["flat_logits"])
+            logits.append(self._masked_flat_logits(scores, mask))
+        distribution = Categorical(logits=torch.stack(logits))
+        new_log_probs = distribution.log_prob(actions)
+        ratio = torch.exp(new_log_probs - old_log_probs)
+        clipped = ratio.clamp(1.0 - self._clip_ratio, 1.0 + self._clip_ratio)
+        # Zero mass outside the common support contributes exactly zero to KL.
+        old_log = old_probs.clamp_min(torch.finfo(old_probs.dtype).tiny).log()
+        kl = (old_probs * (old_log - distribution.logits)).sum(-1).mean()
+        return {"actor_loss": -torch.minimum(ratio * advantages, clipped * advantages).mean(),
+                "log_prob": new_log_probs, "entropy": distribution.entropy().mean(),
+                "ratio": ratio, "kl": kl.clamp_min(0.0)}
+
     def _env_action_distribution_statistics(
         self,
         *,
@@ -6434,7 +6565,8 @@ class 分层PPO基类(BaseAgent):
         return (
             distribution.log_prob(action_tensor),
             distribution.entropy(),
-            [round(float(item), 6) for item in torch.softmax(logits, dim=-1).tolist()],
+            [(float(item) if self._actor_objective == "masked_env_action_v1" else round(float(item), 6))
+             for item in distribution.probs.tolist()],
         )
 
     def _selected_action_statistics(
@@ -7118,6 +7250,9 @@ class 分层PPO基类(BaseAgent):
         deterministic: bool,
         action_mask: list[bool] | None = None,
     ) -> tuple[dict[str, int], dict[str, torch.Tensor], dict[str, torch.Tensor], dict[str, list[float]], dict[str, Any]]:
+        if self._actor_objective == "masked_env_action_v1":
+            self._validate_exact_action_mask(action_mask)
+            action_mask = action_mask if action_mask is not None else [True] * 5
         if not self._use_hierarchy:
             flat_logits = self._masked_flat_logits(policy_output["flat_logits"], action_mask)
             distribution = Categorical(logits=flat_logits)
@@ -15243,6 +15378,7 @@ class 分层PPO基类(BaseAgent):
             "mechanism_logit_bias_strength": self._mechanism_logit_bias_strength,
             "mechanism_confidence_floor": self._mechanism_confidence_floor,
             "prediction_feature_dim": self._prediction_feature_dim,
+            "joint_observation_enabled": self._joint_observation_enabled,
             "prediction_gate_min_leak": self._prediction_gate_min_leak,
             "slow_policy_credit_floor": self._slow_policy_credit_floor,
             "fast_policy_credit_floor": self._fast_policy_credit_floor,
@@ -15401,6 +15537,7 @@ class 分层PPO基类(BaseAgent):
             "digital_twin_policy_prior_prepare_not_ready_scale": (
                 self._digital_twin_policy_prior_prepare_not_ready_scale
             ),
+            "actor_objective": self._actor_objective,
             "env_action_ppo_enabled": self._env_action_ppo_enabled,
             "env_action_ppo_coef": self._env_action_ppo_coef,
             "env_action_ppo_advantage_blend": self._env_action_ppo_advantage_blend,

@@ -33,7 +33,8 @@ from src.evaluators.real_sample_support import build_sample_rsus, discover_ngsim
 
 AGENTS = ("sa_ghmappo", "ppo", "mappo", "dqn", "dag_offload_drl", "cache_offload_drl", "dt_handoff_drl")
 CONTRACT = "semantic_discrete_5_per_request_v1"
-PROTOCOL = "eight_vehicle_joint_sim_v1"
+PROTOCOL = "eight_vehicle_joint_sim_v1_1"
+PPO_AGENTS = {"sa_ghmappo", "ppo", "mappo", "dag_offload_drl", "cache_offload_drl", "dt_handoff_drl"}
 
 
 def arguments() -> argparse.Namespace:
@@ -55,6 +56,23 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--output_root", type=Path, default=ROOT / "artifacts/eight_vehicle_joint_sim")
     parser.add_argument("--preflight_only", action="store_true")
     parser.add_argument("--smoke", action="store_true", help="Short plumbing check; output is not formal evidence")
+    parser.add_argument("--environment_revision", choices=("v1", "v2"), default="v1")
+    parser.add_argument("--development_only", action="store_true", help="Train/dev only; do not evaluate formal or holdout")
+    parser.add_argument("--model_cache_config", type=Path, help="v2 controlled byte-cache JSON configuration")
+    parser.add_argument("--vehicle_adapter_config", type=Path,
+                        help="v2 JSON list of statically preloaded adapters for all vehicles, or per-vehicle map")
+    parser.add_argument("--prediction_horizon_frames", type=int, default=3)
+    parser.add_argument("--disable_prediction", action="store_true")
+    parser.add_argument("--disable_shared_state", action="store_true")
+    parser.add_argument("--shared_state_delay_frames", type=int, default=1)
+    parser.add_argument("--shared_state_interval_frames", type=int, default=1)
+    parser.add_argument("--sa_auxiliary_coef", type=float, default=0.0,
+                        help="v2 explicit auxiliary ablation; default is the corrected PPO objective alone")
+    parser.add_argument("--rsu_work_units_per_frame", type=float, default=1.0)
+    parser.add_argument("--vehicle_work_units_per_frame", type=float, default=0.25)
+    parser.add_argument("--workload_bytes_per_unit", type=float, default=1024.0)
+    parser.add_argument("--workflow_profile_unit_bytes", type=int, default=1)
+    parser.add_argument("--state_bytes_per_link_frame", type=int, default=1024)
     return parser.parse_args()
 
 
@@ -84,7 +102,9 @@ def _load_protocol(args: argparse.Namespace) -> tuple[dict[str, list[dict]], lis
         raise ValueError("update_every cannot exceed episodes")
     if args.gap_windows < 0 or args.holdout_gap_windows < 0:
         raise ValueError("split gaps must be nonnegative")
-    if not args.smoke and (args.formal_windows < 12 or args.holdout_windows < 12 or len(args.seeds) < 3):
+    if not args.smoke and not getattr(args, "development_only", False) and (
+        args.formal_windows < 12 or args.holdout_windows < 12 or len(args.seeds) < 3
+    ):
         raise ValueError("formal protocol requires >=12 formal/holdout windows and >=3 seeds")
     if len(set(args.seeds)) != len(args.seeds):
         raise ValueError("seeds must be distinct")
@@ -145,82 +165,156 @@ def _load_protocol(args: argparse.Namespace) -> tuple[dict[str, list[dict]], lis
     return splits, workflows, rsus
 
 
-def _environment(window: dict, workflows: list[Any], rsus: list[Any]) -> MultiRequestJointControlEnv:
+def _environment(window: dict, workflows: list[Any], rsus: list[Any],
+                 environment_options: dict | None = None) -> MultiRequestJointControlEnv:
     return MultiRequestJointControlEnv(
         frames=window["frames"], vehicle_workflows=dict(zip(window["vehicle_ids"], workflows)),
         rsu_states=rsus, costs=ReplayCosts(compute_slots_per_rsu=1, adapter_slots_per_rsu=2,
                                           link_slots_per_rsu=1, adapter_fetch_frames=1, handoff_state_frames=1),
+        **(environment_options or {}),
     )
 
 
 def _episode(agent: Any, window: dict, workflows: list[Any], rsus: list[Any],
-             *, deterministic: bool, collect: bool) -> tuple[dict, list[dict], list[dict]]:
-    env = _environment(window, workflows, rsus)
+             *, deterministic: bool, collect: bool,
+             environment_options: dict | None = None) -> tuple[dict, list[dict], list[dict]]:
+    env = _environment(window, workflows, rsus, environment_options)
     trajectories: dict[str, list[dict]] = defaultdict(list)
+    team_rewards: list[float] = []
     total_reward = 0.0
     while True:
         states = env.decision_states()
         actions: dict[str, int] = {}
         action_info: dict[str, dict] = {}
+        decision_info: dict[str, dict] = {}
         for vehicle_id, info in sorted(states.items()):
             policy_info = {**info, "deterministic_policy": deterministic,
                            "run_metadata": {"policy_evaluation_mode": "raw_policy"}}
             action, details = agent.act([], policy_info)
             actions[vehicle_id] = int(action)
             action_info[vehicle_id] = dict(details)
+            decision_info[vehicle_id] = policy_info
         _, reward, done, _ = env.step_actions(actions)
         total_reward += reward
+        team_rewards.append(float(reward))
         following = env.decision_states() if not done else {}
         if collect:
             for vehicle_id, info in states.items():
                 details = action_info[vehicle_id]
                 trajectories[vehicle_id].append({
                     "observation": [], "action": actions[vehicle_id], "reward": reward,
+                    "environment_reward": reward, "team_frame_index": len(team_rewards) - 1,
                     "terminated": done or vehicle_id not in following, "truncated": False,
                     "log_prob": float(details.get("log_prob", 0.0)),
                     "value": float(details.get("value", 0.0)), "next_value": 0.0,
                     "next_observation": [], "action_info": details,
-                    "decision_info": info,
+                    "decision_info": decision_info[vehicle_id],
                     "env_info": following.get(vehicle_id, {}),
                 })
         if done:
             break
     rows = []
+    team_returns = [0.0] * len(team_rewards)
+    future = 0.0
+    for index in range(len(team_rewards) - 1, -1, -1):
+        future = team_rewards[index] + 0.99 * future
+        team_returns[index] = future
     for vehicle_rows in trajectories.values():
-        future = 0.0
-        for row in reversed(vehicle_rows):
-            future = row["reward"] + 0.99 * future
-            row["return"] = future
-            row["advantage"] = future - row["value"]
+        # A finished request has no more actions, but its cache/state choices
+        # still affect the team's later rewards. Preserve that tail for PPO's
+        # return and for the terminal DQN transition (whose next state is absent).
+        last = vehicle_rows[-1]
+        next_index = last["team_frame_index"] + 1
+        tail = 0.99 * team_returns[next_index] if next_index < len(team_returns) else 0.0
+        last["team_terminal_continuation_reward"] = tail
+        last["reward"] += tail
+        for row in vehicle_rows:
+            row["return"] = team_returns[row["team_frame_index"]]
+            row["advantage"] = row["return"] - row["value"]
         rows.extend(vehicle_rows)
     summary = env.summary()
     summary["reward"] = round(total_reward, 6)
     summary["frame_offset"] = window["frame_offset"]
     summary["time_start"] = window["time_start"]
     summary["time_end"] = window["time_end"]
+    summary["policy_evaluation_mode"] = "raw_policy"
+    summary["action_selection"] = "greedy" if deterministic else "sample"
+    summary["collected_decisions"] = len(rows)
     return summary, rows, env.events
+
+
+def _environment_options(args: argparse.Namespace) -> dict:
+    if args.environment_revision == "v1":
+        return {"environment_revision": "v1"}
+    options = {
+        "environment_revision": "v2",
+        "prediction_enabled": not args.disable_prediction,
+        "prediction_horizon_frames": args.prediction_horizon_frames,
+        "shared_state_enabled": not args.disable_shared_state,
+        "shared_state_delay_frames": args.shared_state_delay_frames,
+        "shared_state_interval_frames": args.shared_state_interval_frames,
+        "rsu_work_units_per_frame": args.rsu_work_units_per_frame,
+        "vehicle_work_units_per_frame": args.vehicle_work_units_per_frame,
+        "workload_bytes_per_unit": args.workload_bytes_per_unit,
+        "workflow_profile_unit_bytes": args.workflow_profile_unit_bytes,
+        "state_bytes_per_link_frame": args.state_bytes_per_link_frame,
+    }
+    if args.model_cache_config is not None:
+        options["model_cache_config"] = json.loads(args.model_cache_config.read_text(encoding="utf-8"))
+    if args.vehicle_adapter_config is not None:
+        options["vehicle_adapter_ids"] = json.loads(args.vehicle_adapter_config.read_text(encoding="utf-8"))
+    return options
+
+
+def _agent_options(name: str, args: argparse.Namespace) -> dict:
+    if args.environment_revision != "v2":
+        return {}
+    options = {"joint_observation_enabled": True}
+    if name in PPO_AGENTS:
+        options["actor_objective"] = "masked_env_action_v1"
+    if name == "sa_ghmappo":
+        options.update(auxiliary_coef=args.sa_auxiliary_coef, event_logit_temperature=1.0,
+                       event_logit_temperature_final=1.0, event_temperature_decay_updates=0,
+                       event_logit_sharpening_final_scale=1.0)
+    return options
 
 
 def main() -> None:
     args = arguments()
+    if args.environment_revision == "v2" and not (args.development_only or args.smoke or args.preflight_only):
+        raise ValueError("v2 is development-only until a new independent evaluation protocol is frozen; use --development_only")
+    if not np.isfinite(args.sa_auxiliary_coef) or args.sa_auxiliary_coef < 0:
+        raise ValueError("sa_auxiliary_coef must be finite and nonnegative")
     if len(set(args.agents)) != len(args.agents):
         raise ValueError("agents must be distinct")
     for name in args.agents:
         if name not in ALGO_REGISTRY or ALGO_REGISTRY[name]["support_level"] != "trainable":
             raise ValueError(f"not a registered trainable algorithm: {name}")
     splits, workflows, rsus = _load_protocol(args)
+    environment_options = _environment_options(args)
+    # Instantiate before writing any run manifest to reject invalid configuration.
+    probe_env = _environment(splits["train"][0], workflows, rsus, environment_options)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    run_id = f"{stamp}_{'smoke' if args.smoke else 'formal_sim'}"
+    run_id = f"{stamp}_{'smoke' if args.smoke else 'development' if args.development_only else 'formal_sim'}"
     output = args.output_root / run_id
+    output.mkdir(parents=True, exist_ok=False)
     public_splits = {name: [{key: value for key, value in window.items() if key != "frames"}
                             for window in windows] for name, windows in splits.items()}
     git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     manifest = {
-        "run_id": run_id, "protocol": PROTOCOL, "action_contract": CONTRACT,
+        "run_id": run_id, "protocol": PROTOCOL if args.environment_revision == "v1" else "eight_vehicle_joint_sim_v2_development",
+        "action_contract": CONTRACT, "environment_revision": args.environment_revision,
+        "environment_options": environment_options,
+        "observation_contract": getattr(probe_env, "observation_contract", "legacy_semantic_v1"),
+        "agent_options": {name: _agent_options(name, args) for name in args.agents},
+        "training_contract": "raw_policy_rollout_metadata_preserved_v2",
+        "return_contract": "discounted_team_return_to_episode_end_with_terminal_request_tail",
+        "development_only": args.development_only or args.smoke,
         "evidence_scope": "internal_trace_driven_simulation; not physical RSUs or measured links",
         "paper_claim_ready": False, "holdout_status": "sealed_not_evaluated",
         "holdout_exclusion_note": "Earlier proposed offsets 5400..6720 were inspected for mobility handoff opportunities before freeze; this run uses later uninspected intervals.",
         "git_commit": git_commit, "command": sys.argv, "agents": args.agents, "seeds": args.seeds,
+        "git_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip()),
         "episodes_per_agent_seed": args.episodes, "update_every": args.update_every,
         "window_length": args.window_length, "max_mobility_rows": args.max_mobility_rows,
         "mobility_csv_path": str(args.mobility_csv_path.resolve()),
@@ -239,11 +333,31 @@ def main() -> None:
         "splits": public_splits,
         "limitations": ["cross-source NGSIM/Alibaba pairing is synthetic",
                         "first-party direction agents are not reproductions of outside papers",
-                        "same NGSIM segment can correlate nonoverlapping windows"],
+                        "same NGSIM segment can correlate nonoverlapping windows",
+                        "equal episodes do not imply equal decision counts",
+                        "v2 byte sizes, work units and shared JSON wire cost are controlled proxies",
+                        "shared controller actors are not full vehicle/RSU-level MARL"],
     }
+    if args.environment_revision == "v2":
+        manifest["costs"] = probe_env.configuration()
+        manifest["reward"] = "completed_nodes minus unfinished/vehicle/model-transfer/state-transfer/shared-information costs; see environment configuration"
+        work = [probe_env._work_required(node) for workflow in workflows for node in workflow.nodes]
+        working_set = sum(obj.resident_size_bytes for obj in probe_env.model_cache.objects.values())
+        manifest["mechanism_qualification"] = {
+            "scope": "static_input_check_not_realized_performance",
+            "node_work_units_min": min(work), "node_work_units_max": max(work),
+            "node_work_units_unique": sorted(set(work)),
+            "multi_frame_rsu_node_fraction": sum(value > probe_env.rsu_work_units_per_frame for value in work) / len(work),
+            "model_working_set_bytes": working_set,
+            "model_cache_capacity_by_rsu": probe_env.model_cache.capacity_bytes,
+            "cache_pressure_possible_by_rsu": {rsu: working_set > capacity
+                                               for rsu, capacity in probe_env.model_cache.capacity_bytes.items()},
+        }
     _write_json(output / "manifest.json", manifest)
     print(f"PREFLIGHT_OK run_id={run_id} output={output} splits="
           f"{','.join(f'{key}:{len(value)}' for key, value in splits.items())}", flush=True)
+    if "mechanism_qualification" in manifest:
+        print("MECHANISM_INPUT_CHECK " + json.dumps(manifest["mechanism_qualification"], sort_keys=True), flush=True)
     if args.preflight_only:
         return
     for seed in args.seeds:
@@ -251,12 +365,13 @@ def main() -> None:
             random.seed(seed)
             np.random.seed(seed)
             torch.manual_seed(seed)
-            agent = build_agent(name, random_seed=seed, train_epochs=2, batch_size=64)
+            agent = build_agent(name, random_seed=seed, train_epochs=2, batch_size=64,
+                                **_agent_options(name, args))
             pending: list[dict] = []
             for episode_index in range(args.episodes):
                 window = splits["train"][episode_index % len(splits["train"])]
                 summary, rows, _ = _episode(agent, window, workflows, rsus,
-                                            deterministic=False, collect=True)
+                                            deterministic=False, collect=True, environment_options=environment_options)
                 pending.extend(rows)
                 _append_jsonl(output / "train.jsonl", {"agent": name, "seed": seed,
                               "episode": episode_index, **summary})
@@ -272,14 +387,28 @@ def main() -> None:
             checkpoint = output / "checkpoints" / f"{name}_seed{seed}.pt"
             agent.save(str(checkpoint))
             _append_jsonl(output / "checkpoints.jsonl", {"agent": name, "seed": seed,
-                          "path": str(checkpoint), "sha256": _hash_file(checkpoint)})
+                          "path": str(checkpoint), "sha256": _hash_file(checkpoint),
+                          "environment_revision": args.environment_revision,
+                          "observation_contract": manifest["observation_contract"],
+                          "agent_options": _agent_options(name, args)})
             for split_name in ("dev", "formal"):
-                if args.smoke and split_name == "formal":
+                if (args.smoke or args.development_only) and split_name == "formal":
                     continue
                 for window in splits[split_name]:
                     summary, _, events = _episode(agent, window, workflows, rsus,
-                                                  deterministic=True, collect=False)
+                                                  deterministic=True, collect=False, environment_options=environment_options)
                     _append_jsonl(output / f"{split_name}.jsonl", {"agent": name, "seed": seed, **summary})
+                    if split_name == "dev" and args.environment_revision == "v2":
+                        for event in events:
+                            _append_jsonl(output / "dev_events.jsonl", {"agent": name, "seed": seed,
+                                          "action_selection": "greedy", "window_frame_offset": window["frame_offset"], **event})
+                        sampled, _, sampled_events = _episode(agent, window, workflows, rsus,
+                                                deterministic=False, collect=False,
+                                                environment_options=environment_options)
+                        _append_jsonl(output / "dev_sampled.jsonl", {"agent": name, "seed": seed, **sampled})
+                        for event in sampled_events:
+                            _append_jsonl(output / "dev_events.jsonl", {"agent": name, "seed": seed,
+                                          "action_selection": "sample", "window_frame_offset": window["frame_offset"], **event})
                     if split_name == "formal":
                         for event in events:
                             _append_jsonl(output / "formal_events.jsonl",

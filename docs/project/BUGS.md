@@ -5,6 +5,22 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-12：八车实现合同已修复，性能与系统真实性仍开放
+
+- **FIXED / opt-in v2**：masked 动作 PPO 主目标及未舍入旧概率；raw-policy 元数据保存；完整团队回报；
+  状态版本、过期刷新、传输完成帧费用；typed byte cache/base 依赖；actor 共享快照的即时字节长度侧漏。
+- **FIXED / v2 fallback**：默认没有车端 adapter，必须显式声明预载才能执行 action 2；所有 baseline 共同约束。
+  静态预载本身未计费，动态车辆缓存尚未覆盖。
+- **OPEN / performance**：旧运行 SA 的 0/8 greedy 失败没有被新训练证明解除；398 个合成回归不提供性能排序。
+  原 formal 已消费，不能用修复后重跑同窗口宣称独立优势。成本和 reward 改变后旧/新均值也不可直接比较。
+- **OPEN / surrogate and timing**：常速度外推不是 learned surrogate；其 confidence 是到期 horizon 准确率，
+  不是校准概率；future_load 是投影车辆占用计数，非精确 CPU 队列预测。三个 heads 仍逐帧决策。
+- **OPEN / activation**：默认 input profile→work 的阈值可能使节点仍全部一帧；缓存工作集可能完整驻留。
+  新 preflight 记录这些输入条件，不自动调参数追求正结果。关闭 prediction 同时关闭 action 1/4，非纯预测消融。
+- **OPEN / realism**：Alibaba 尺寸是 synthetic profile，base/adapter 与 prefix 字节、链路吞吐未测量；
+  state 存储无容量上限，控制面共享费用尚不竞争数据链路；固定同时到达/串行 DAG，未执行真实模型或实际前驱数据恢复。
+  当前车辆位置作为公共观测，不计单独采集/上报开销；共享延迟仅作用于 RSU 运行状态。
+
 ## 2026-10-12：八车冻结运行暴露主方法确定性策略退化（OPEN BLOCKER）
 
 - `20261012T080927Z_formal_sim` 的 SA-GHMAPPO 三个 seed 在 dev/formal 全部 0/8 完成，formal 34,518/34,560 次选 steady offload action 3，绝大多数为 `adapter_not_ready`；随机采样的训练 episode 则普遍 8/8。根因尚未定位，不能将训练完成率替代确定性评估。

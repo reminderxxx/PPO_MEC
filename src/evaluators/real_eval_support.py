@@ -87,6 +87,8 @@ def _infer_prediction_feature_dim_from_payload(payload: Any) -> int | None:
 
 def _filter_checkpoint_config(agent_name: str, checkpoint_config: dict[str, Any]) -> dict[str, Any]:
     common_fields = {
+        "actor_objective",
+        "joint_observation_enabled",
         "learning_rate",
         "clip_ratio",
         "entropy_coef",

@@ -121,10 +121,14 @@ class _CacheOffloadPolicyNetwork(nn.Module):
         self,
         *,
         hidden_dim: int = 64,
+        joint_observation_enabled: bool = False,
         hidden_dims: tuple[int, int] = (64, 64),
     ) -> None:
         super().__init__()
-        self.encoder = FlatSemanticEncoder(hidden_dim=hidden_dim)
+        self.encoder = FlatSemanticEncoder(
+            hidden_dim=hidden_dim,
+            **({"joint_observation_enabled": True} if joint_observation_enabled else {}),
+        )
         self.cache_projection = nn.Sequential(
             nn.Linear(14, hidden_dim),
             nn.Tanh(),
@@ -235,6 +239,7 @@ class CacheOffloadDRLAgent(PPOBaseAgent):
         )
         self._network = _CacheOffloadPolicyNetwork(
             hidden_dim=self._hidden_dim,
+            joint_observation_enabled=self._joint_observation_enabled,
             hidden_dims=self._hidden_dims,
         ).to(self._device)
         self._optimizer = torch.optim.Adam(self._network.parameters(), lr=self._learning_rate)

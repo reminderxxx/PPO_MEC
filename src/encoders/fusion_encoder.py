@@ -10,6 +10,10 @@ from torch import nn
 
 from src.encoders.dag_graph_encoder import DAGGraphEncoder
 from src.encoders.rsu_state_encoder import RSUStateEncoder
+from src.encoders.joint_observation_features import (
+    JOINT_ACTOR_FEATURE_DIM, JOINT_CRITIC_FEATURE_DIM,
+    joint_actor_features, joint_critic_features,
+)
 
 
 def _clamp01(value: float) -> float:
@@ -263,7 +267,8 @@ def build_graph_continuity_critic_features(
 class FlatSemanticEncoder(nn.Module):
     """flat baseline encoder。"""
 
-    def __init__(self, input_dim: int = 18, hidden_dim: int = 64) -> None:
+    def __init__(self, input_dim: int = 18, hidden_dim: int = 64,
+                 joint_observation_enabled: bool = False) -> None:
         super().__init__()
         self._input_dim = int(input_dim)
         self._hidden_dim = int(hidden_dim)
@@ -274,11 +279,24 @@ class FlatSemanticEncoder(nn.Module):
             nn.Tanh(),
         )
 
+        self._joint_observation_enabled = bool(joint_observation_enabled)
+        if self._joint_observation_enabled:
+            self._joint_actor_projection = nn.Sequential(
+                nn.Linear(JOINT_ACTOR_FEATURE_DIM, self._hidden_dim), nn.Tanh())
+            self._joint_critic_projection = nn.Sequential(
+                nn.Linear(JOINT_CRITIC_FEATURE_DIM, self._hidden_dim), nn.Tanh())
+
     def forward(self, semantic_state: dict[str, Any]) -> dict[str, torch.Tensor]:
         feature_tensor = self._build_feature_tensor(semantic_state)
         centralized_feature_tensor = self._build_centralized_feature_tensor(semantic_state)
         embedding = self._projection(feature_tensor.unsqueeze(0)).squeeze(0)
         centralized_embedding = self._projection(centralized_feature_tensor.unsqueeze(0)).squeeze(0)
+        if self._joint_observation_enabled:
+            actor_features = embedding.new_tensor(joint_actor_features(semantic_state))
+            critic_features = embedding.new_tensor(joint_critic_features(semantic_state))
+            embedding = torch.tanh(embedding + self._joint_actor_projection(actor_features))
+            centralized_embedding = torch.tanh(
+                centralized_embedding + self._joint_critic_projection(critic_features))
         return {
             "shared_embedding": embedding,
             "slow_context": embedding,
@@ -415,6 +433,7 @@ class SurrogateFusionEncoder(nn.Module):
         prediction_gate_min_leak: float = 0.0,
         graph_continuity_critic_enabled: bool = False,
         uncertainty_aware_critic_enabled: bool = False,
+        joint_observation_enabled: bool = False,
     ) -> None:
         super().__init__()
         self._hidden_dim = int(hidden_dim)
@@ -467,6 +486,12 @@ class SurrogateFusionEncoder(nn.Module):
                     nn.Sigmoid(),
                 )
         self._critic_context = nn.Linear(critic_context_input_dim, self._hidden_dim)
+        self._joint_observation_enabled = bool(joint_observation_enabled)
+        if self._joint_observation_enabled:
+            self._joint_actor_projection = nn.Sequential(
+                nn.Linear(JOINT_ACTOR_FEATURE_DIM, self._hidden_dim), nn.Tanh())
+            self._joint_critic_projection = nn.Sequential(
+                nn.Linear(JOINT_CRITIC_FEATURE_DIM, self._hidden_dim), nn.Tanh())
 
     def forward(self, semantic_state: dict[str, Any]) -> dict[str, torch.Tensor]:
         dag_output = self._dag_encoder(semantic_state)
@@ -487,6 +512,10 @@ class SurrogateFusionEncoder(nn.Module):
                 dim=-1,
             ).unsqueeze(0)
         ).squeeze(0)
+
+        if self._joint_observation_enabled:
+            actor_features = fused.new_tensor(joint_actor_features(semantic_state))
+            fused = torch.tanh(fused + self._joint_actor_projection(actor_features))
 
         slow_context = torch.tanh(
             self._slow_head_context(torch.cat([fused, rsu_output["target_rsu_embedding"] + prediction_embedding], dim=-1))
@@ -567,7 +596,13 @@ class SurrogateFusionEncoder(nn.Module):
             critic_context = torch.tanh(critic_pre * reliability_gate + reliability_bias)
         else:
             critic_context = torch.tanh(critic_pre)
+        joint_critic_output = {}
+        if self._joint_observation_enabled:
+            critic_features = fused.new_tensor(joint_critic_features(semantic_state))
+            joint_critic_output["centralized_critic_context"] = torch.tanh(
+                critic_context + self._joint_critic_projection(critic_features))
         return {
+            **joint_critic_output,
             "shared_embedding": fused,
             "slow_context": slow_context,
             "fast_context": fast_context,

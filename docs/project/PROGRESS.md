@@ -5,6 +5,15 @@
 
 ﻿# Progress
 
+## 2026-10-12：八车 v2 环境与算法合同修复完成局部验收
+
+- 中心任务分派并集成 PPO/恢复合同、typed cache、执行迁移、预测共享观察与特征消费；修改入口、模块和配置边界见 `CODE_MODULE_MAP.md` / `RUNBOOK.md`。
+- 修复采样分布与训练主目标错位、raw metadata 丢失、提前完成请求丢团队回报、prepared 永久有效、迁移完成帧漏费、共享即时消息长度侧漏；新增工作量/父依赖与静态车端 adapter 清单约束。
+- 七算法在相同 v2 观察与物理动作约束上完成合成 rollout→learn→save/load→greedy 检查；31 种非空 mask、actor/critic 信息隔离、legacy checkpoint 与旧环境兼容均覆盖；新版 checkpoint 接旧观察或集中信息缺失时明确拒绝，DQN 下一步观察同样验证。
+- 验证命令见 `RUNBOOK.md`：联合回归 **398 passed**；`python scripts/smoke_test.py` 通过，toy workflow 完成 6 节点。
+- 本轮未运行真实数据重训、formal/holdout、成本标定或论文主表；不存在可据此替换原排名的新 run。预测仍为因果外推，LRU 为公共规则；模型缓存/预测/状态共享相对 MAPPO 的优势均待独立实验。
+- 静态输入 qualification 写入新 manifest，避免将“支持多帧工作量/缓存竞争”误写为“当前默认数据已充分激活机制”。旧 SA 确定性退化的性能 blocker 仍开放。
+
 ## 2026-10-12：八车联合控制内部仿真已完成并审查
 
 - 固定 commit `b97477d` 的 run `20261012T080927Z_formal_sim` 已完成七个原 registry 算法 × 3 seed；21 checkpoint、504 train、168 dev、252 formal 窗口和 119,014 条逐请求事件通过完整性核对，holdout 未开启。审查见 `eight_vehicle_joint_sim_review_20261012.md`。

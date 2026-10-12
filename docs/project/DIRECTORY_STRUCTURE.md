@@ -1,5 +1,17 @@
 ﻿# Directory Structure
 
+## 2026-10-12 八车 v2 修复
+
+- `src/envs/core/joint_model_cache.py`：八车开发合同的独立 typed base/adapter 字节缓存。
+- `src/envs/core/joint_causal_observation.py`：按帧因果预测和带延迟的 RSU 状态广播。
+- `src/encoders/joint_observation_features.py`：actor 与集中 critic 的独立特征边界。
+- `tests/test_masked_env_action_ppo.py`、`test_joint_model_cache.py`、`test_multi_request_joint_v2_execution.py`、
+  `test_joint_causal_observation.py`、`test_joint_observation_encoder.py`、`test_joint_experiment_launcher.py`：
+  概率合同、物理费用、信息隔离及七算法 producer/consumer 联合验证。
+- 原 `artifacts/eight_vehicle_joint_sim/` 根目录沿用；v2 run manifest 标记 `eight_vehicle_joint_sim_v2_development`，
+  新增 `dev_sampled.jsonl` 和含 greedy/sample 标签及逐帧费用收据的 `dev_events.jsonl`。
+  旧目录不移动、不覆盖；同一 run ID 冲突立即拒绝。
+
 ## 2026-10-12 八车联合控制仿真实验
 
 - `src/envs/core/multi_request_joint_control_env.py`：逐请求五动作、四站共享计算/链路/cache、显式 adapter 拉取和状态准备；成本仍为仿真配置。

@@ -5,6 +5,14 @@
 
 # PPO_MEC
 
+八车环境与算法合同修复已作为 `--environment_revision v2 --development_only` 接入同一入口。
+v2 提供 typed base/adapter 字节缓存、版本化状态增量迁移、工作量与父依赖检查、因果车辆预测、
+有延迟的 RSU 状态共享，以及精确 masked 五动作 PPO。所有七种算法共同读取新缓存/执行观测；
+车端 fallback 默认要求显式 adapter 预载清单。v2 当前仅用于开发验证，性能优势仍未验证。
+修改与剩余边界见 [`DECISION_LOG`](docs/project/DECISION_LOG.md)，使用方式见
+[`RUNBOOK`](docs/project/RUNBOOK.md)。默认环境 v1 保留；入口修复了 rollout 元数据及团队回报，
+因此新 v1 运行标为 `eight_vehicle_joint_sim_v1_1`，旧训练应使用历史 commit 复现。
+
 八车五动作联合控制的新入口为 `scripts/launch_eight_vehicle_joint_experiment.py`：复用原 registry 的
 `sa_ghmappo`、PPO、controller-level MAPPO、DQN 及三个仓库内方向型算法，在四个模拟 RSU 上执行八个
 NGSIM 车辆与八个 Alibaba DAG 的受控配对。默认将窗口分为 20 train、8 dev、12 formal 和 12 封存 holdout；

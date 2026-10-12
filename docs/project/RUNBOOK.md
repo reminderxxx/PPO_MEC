@@ -5,6 +5,49 @@
 
 # Runbook
 
+## 八车 v2 开发验证（2026-10-12）
+
+在已有真实 CSV 的工作区使用同一 launcher，显式选择 v2。这里只提供复现命令；本次实现验收只执行
+合成回归与 toy smoke，没有运行新的真实数据训练、formal 或 holdout。
+
+```bash
+.venv/bin/python scripts/launch_eight_vehicle_joint_experiment.py \
+  --environment_revision v2 --development_only --preflight_only \
+  --mobility_csv_path '/absolute/path/to/NGSIM.csv' \
+  --workflow_csv_path '/absolute/path/to/alibaba/batch_task.csv'
+```
+
+去掉 `--preflight_only` 才会训练并执行 dev。v2 未冻结新独立评估协议，入口拒绝直接执行 formal；
+`--development_only` 或 `--smoke` 跳过 formal，holdout 始终不执行。原已消费 formal 不能重标盲测。
+
+- v2 默认开启 `actor_objective=masked_env_action_v1`（六种 PPO）与 `joint_observation_enabled=True`
+  （全部七算法）。SA 默认 `--sa_auxiliary_coef 0`、event temperature=1，先检查正确 PPO 与结构；
+  辅助项必须显式配置并在独立对照中验证。这不是声称已找到最优超参数。
+- 所有 rollout 保存实际 `raw_policy` 元数据、未舍入行为概率和动作 mask；缺失时新 PPO 拒绝训练。
+  同帧请求使用同一全团队终局折扣回报；提前结束请求的末 transition 包含后续 team tail，
+  `environment_reward` 保留未聚合的原帧奖励；折扣为 0.99。
+- `--model_cache_config` 接 JSON 对象，可配置 `capacity_bytes`（整数或按 RSU 字典）、`base_size_bytes`、
+  `adapter_size_bytes`、`transfer_bytes_per_frame`。未知字段拒绝；单位是受控合成 bytes，非实测模型尺寸。
+- 车端默认没有 adapter，action 2 只有本车 base 与显式预载 adapter 均满足时才合法。
+  `--vehicle_adapter_config` 接 JSON adapter ID 列表（所有车辆相同预载）或逐车字典；静态预载本身不计下载费用，
+  完整声明写入 manifest。车端动态缓存/下载尚未实现，不能据此宣称已覆盖它。
+- `--workflow_profile_unit_bytes`、`--workload_bytes_per_unit`、`--rsu_work_units_per_frame`、
+  `--vehicle_work_units_per_frame`、`--state_bytes_per_link_frame` 明确控制模拟成本。
+  Alibaba input/output 字段是 CPU/memory 派生代理，不能直接称测量 bytes 或 FLOPs。
+- preflight 保存 `mechanism_qualification`：节点工作量分布、多帧节点比例、模型总工作集/容量关系。
+  若节点全部一帧或整个工作集可驻留，只说明机制未充分激活，不能声称缓存/多步服务优势已被检验。
+- `--prediction_horizon_frames` 控制外推长度；`--shared_state_delay_frames` / `--shared_state_interval_frames`
+  控制 RSU 状态广播延迟/周期，`--disable_shared_state` 关闭远端 RSU 信息。
+  `--disable_prediction` 同时关闭预测并移除依赖预测目标的 action 1/4，是能力联合消融，不能当纯信息消融。
+- `dev.jsonl` 为 greedy，`dev_sampled.jsonl` 为 sample；`dev_events.jsonl` 保存二者逐请求事件。
+  每执行帧恰好一个 `frame_cost_receipt` 可复算 reward、model/state 链路费用和 shared 信息费用。
+- manifest 保存实际生效成本、环境/观察合同、算法选项、Git commit/dirty 状态；checkpoint 保存并恢复新增配置。
+  v1 环境默认物理行为保留；当前 launcher 的元数据与团队回报已修复，protocol 为 `v1_1`，
+  历史 `20261012T080927Z_formal_sim` 需按其记录的历史 commit 复现，不能混用新版训练语义。
+
+验证：使用当前 checkout 可用 Python，执行 `python scripts/smoke_test.py`，以及
+`python -m pytest tests/test_joint_experiment_launcher.py tests/test_joint_causal_observation.py tests/test_joint_model_cache.py tests/test_joint_observation_encoder.py tests/test_masked_env_action_ppo.py tests/test_multi_request_joint_v2_execution.py tests/test_multi_request_joint_control_env.py tests/test_algo_pool_contract.py tests/test_checkpoint_compat.py tests/test_env_contract.py -q`。
+
 ## 八车联合控制仿真实验启动（2026-10-12）
 
 从仓库根目录执行；若当前 checkout 中 `data/` 为 LFS pointer，显式传入已有真实 CSV 的绝对路径：
