@@ -5,6 +5,21 @@
 
 # Artifact Records
 
+## 2026-10-12 eight-vehicle shared-actor PPO diagnostic
+
+- run ID：`20261012T071927073309Z`；路径：`artifacts/training/eight_vehicle_ppo_diagnostic/20261012T071927073309Z/`；
+  execution commit：`5a85d5d`；最终 checkpoint SHA-256：
+  `c7b47c375cd6c1b3f3c6097fa8f9fbf8c148b27a6720612c4b709649cb83cd3b`。
+- NGSIM 同段连续八车与 Alibaba 八 DAG 跨源配对；24 个不重叠训练窗口、跳过 1 个合格窗口、8 个不重叠评估窗口，
+  每窗口 120 帧；seed 7、320 episodes、40 次 PPO 更新。manifest 保存原始时间区间、车辆 ID、轨迹指纹、
+  工作流指纹、布局和仿真假设。
+- `results.json`：训练前 32 / 后 32 episode 平均原始奖励为 `68.583125 / 68.543125`；最终 PPO 在八个
+  eval 窗口均值 `60.66375`，同窗口最近站 `60.865`，配对均值差 `-0.20125`；完成请求均为 `58/64`。
+  八个窗口中仅两个 PPO 奖励高于最近站。`eval_request_events.jsonl` 有 3,893 条两策略逐请求事件。
+- 完整性：checkpoint 文件 SHA-256、40 个 update、训练/评估 raw time interval 互斥、八个窗口两臂事件计数与
+  节点完成数均已独立核对；actor 参数较同 seed 初始化改变。结论仅是一个单 seed、假设成本、
+  探索性跨源仿真负结果，不能证明算法总体优劣或实体 VEC 效果。
+
 ## 2026-10-05 minimal mechanism evidence closure
 
 - `artifacts/analysis/mechanism_evidence_closure_20261005_v1/`：固定 commit `f323fa2...`，A/C wall 34.193 s，
