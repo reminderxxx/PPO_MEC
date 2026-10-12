@@ -154,6 +154,14 @@ def test_coverage_outage_is_visible_and_blocks_delivery(frozen_scenario) -> None
     assert sum(event["event"] == "request_unfinished" for event in env.ledger) == 8
 
 
+def test_access_selects_nearest_covered_not_nearest_uncovered(frozen_scenario) -> None:
+    point = frozen_scenario.traces["peachtree:740"][0]
+    nearest = replace(frozen_scenario.rsus[0], x_m=point.x_m, y_m=point.y_m, radius_m=0.01)
+    covered = replace(frozen_scenario.rsus[1], x_m=point.x_m + 1.0, y_m=point.y_m, radius_m=2.0)
+    moved_point = replace(point, x_m=point.x_m + 0.1)
+    assert NearestCoveredAccess().associate(moved_point, None, (nearest, covered)) == covered.rsu_id
+
+
 def test_cancelled_base_load_releases_dependent_reservation(frozen_scenario) -> None:
     env = VECCompetitionRuntime(frozen_scenario)
     base_flow = next(flow_id for flow_id, flow in env.flows.items() if flow.kind == "model_load" and flow.object_id == "base:veh_base_v1" and flow.target_rsu_id == "rsu_d")

@@ -175,9 +175,8 @@ class NearestCoveredAccess:
     version = "nearest_covered_v1"
 
     def associate(self, point: TraceSample, current_rsu_id: str | None, rsus: tuple[RSUConfig, ...]) -> str | None:
-        candidates = [(math.hypot(point.x_m - rsu.x_m, point.y_m - rsu.y_m), rsu.rsu_id) for rsu in rsus]
-        distance, rsu_id = min(candidates)
-        return rsu_id if distance <= next(r.radius_m for r in rsus if r.rsu_id == rsu_id) else None
+        covered = [(distance, rsu.rsu_id) for rsu in rsus if (distance := math.hypot(point.x_m - rsu.x_m, point.y_m - rsu.y_m)) <= rsu.radius_m]
+        return min(covered)[1] if covered else None
 
 
 class AttachedFifoPlacement:
