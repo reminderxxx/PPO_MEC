@@ -2,6 +2,10 @@
 
 ## 2026-10-12 八车四 RSU 轨迹驱动诊断
 
+- `scripts/benchmark_eight_vehicle_algorithms.py`：统一八车合同上的六种学习策略和四种规则策略，保存排除清单、最终 checkpoint、逐窗口结果和逐请求事件。
+- `src/agents/dqn_agent.py` / `mappo_agent.py`：新增独立 `TraceDrivenMultiRequest*` 类，不替换正式 registry 算法。
+- `tests/test_eight_vehicle_algorithm_pool.py`：合法动作 mask、Q 更新和集中 critic 输入边界。
+- `artifacts/training/eight_vehicle_algorithm_diagnostic/`：算法池诊断产物，不进入 Git 或正式主表。
 - `src/agents/ppo_agent.py` 中的 `TraceDrivenMultiRequestPPO`：独立实验性共享策略 PPO，不注册为正式 baseline。
 - `scripts/train_eight_vehicle_ppo.py`：多个不重叠 NGSIM 窗口的训练、间隔与评估，保存诊断 checkpoint 和逐窗口奖励。
 - `tests/test_trace_driven_ppo.py`：非法 RSU 动作 mask 回归。

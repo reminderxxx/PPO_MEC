@@ -15,6 +15,35 @@ from src.agents.base_agent import BaseAgent
 from src.encoders import FlatSemanticEncoder
 
 
+class TraceDrivenMultiRequestQNetwork(nn.Module):
+    """Q values for the four-RSU replay action contract, separate from DQNAgent."""
+
+    def __init__(self, *, dueling: bool = False) -> None:
+        super().__init__()
+        self.dueling = dueling
+        self.body = nn.Sequential(nn.Flatten(), nn.Linear(40, 64), nn.ReLU(),
+                                  nn.Linear(64, 64), nn.ReLU())
+        if dueling:
+            self.value = nn.Linear(64, 1)
+            self.advantage = nn.Linear(64, 4)
+        else:
+            self.head = nn.Linear(64, 4)
+
+    def forward(self, features: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+        if features.ndim != 3 or features.shape[1:] != (4, 10) or mask.shape != features.shape[:2]:
+            raise ValueError("expected [batch, 4 RSUs, 10 features] and matching mask")
+        if not bool(mask.any(dim=1).all()):
+            raise ValueError("each decision needs a covered RSU")
+        hidden = self.body(features)
+        if self.dueling:
+            advantage = self.advantage(hidden)
+            legal_mean = (advantage * mask.float()).sum(1, keepdim=True) / mask.sum(1, keepdim=True)
+            q_values = self.value(hidden) + advantage - legal_mean
+        else:
+            q_values = self.head(hidden)
+        return q_values.masked_fill(~mask, -1.0e9)
+
+
 class _QNetwork(nn.Module):
     """Flat semantic encoder followed by plain or dueling action-value heads."""
 

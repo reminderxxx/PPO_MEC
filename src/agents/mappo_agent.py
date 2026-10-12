@@ -4,7 +4,40 @@ from __future__ import annotations
 
 from typing import Any
 
+import torch
+from torch import nn
+from torch.distributions import Categorical
+
+from src.agents.ppo_agent import TraceDrivenMultiRequestPPO
 from src.agents.sa_ghmappo_core import 分层PPO基类 as PPOBaseAgent
+
+
+class TraceDrivenMultiRequestMAPPO(TraceDrivenMultiRequestPPO):
+    """Shared per-request actor and joint-observation critic for replay diagnostics.
+
+    This is a different action contract from the registered controller MAPPOAgent.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.critic = nn.Sequential(nn.Linear(40, 64), nn.Tanh(),
+                                    nn.Linear(64, 64), nn.Tanh(), nn.Linear(64, 1))
+
+    def distribution_and_value(self, features: torch.Tensor, mask: torch.Tensor,
+                               joint_context: torch.Tensor) -> tuple[Categorical, torch.Tensor]:
+        if features.ndim != 3 or features.shape[1:] != (4, 10) or mask.shape != features.shape[:2]:
+            raise ValueError("expected [batch, 4 RSUs, 10 features] and matching mask")
+        if joint_context.shape != (len(features), 40) or not bool(mask.any(dim=1).all()):
+            raise ValueError("joint context must be one 40-feature frame per request")
+        logits = self.actor(features).squeeze(-1).masked_fill(~mask, -1.0e9)
+        return Categorical(logits=logits), self.critic(joint_context).squeeze(-1)
+
+    @torch.no_grad()
+    def act(self, features: torch.Tensor, mask: torch.Tensor, joint_context: torch.Tensor,
+            *, deterministic: bool) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        distribution, values = self.distribution_and_value(features, mask, joint_context)
+        actions = distribution.logits.argmax(-1) if deterministic else distribution.sample()
+        return actions, distribution.log_prob(actions), values
 
 
 class MAPPOAgent(PPOBaseAgent):

@@ -2,6 +2,12 @@
 
 ## 2026-10-12：八车四站先做跨源轨迹驱动仿真
 
+算法池补充决定：固定六种学习策略和四种规则策略，使用同一 24/1/8 窗口划分、三个 seed、每个学习策略每 seed
+320 episode；最终 checkpoint 直接评估，不根据评估窗口挑模型。PPO/MAPPO 和 DQN 家族的更新机制不同，
+相同 episode 数不代表优化步数完全公平。旧 `sa_ghmappo`、`mappo`、`qmix`、`controller_mat` 等算法使用不同
+observation/action 合同，新实现以 `trace_*` 标识，排除原因写入 manifest，不冒称原算法已在八车环境运行。
+三个 seed 共用相同评估窗口，统计单位仍是窗口，不把 seed-window 组合视为独立道路场景。
+
 - 用户本轮授权启动训练；在独立诊断入口运行共享策略、逐车动作的 PPO，不将它注册成当前
   `semantic_discrete_5` 合同下的 `ppo` 或 `sa_ghmappo`。训练奖励固定为每帧完成节点数减去
   `0.01 × 未完成请求数`，报告原始总奖励，梯度内部只做固定比例缩放。

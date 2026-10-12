@@ -7,6 +7,23 @@
 
 ## 八车四 RSU 轨迹驱动诊断（2026-10-12）
 
+算法池诊断（默认 seed 7/13/29，每种学习策略各 320 episodes；24 个训练窗口、跳过 1 个合格窗口、8 个评估窗口）：
+
+```bash
+.venv/bin/python scripts/benchmark_eight_vehicle_algorithms.py \
+  --mobility_csv_path 'data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
+  --workflow_csv_path data/raw/workflow/alibaba2018/batch_task.csv
+```
+
+六个 `trace_*` 学习策略为 PPO、共享 actor/集中 critic 的 MAPPO、DQN、DDQN、dueling DQN 和 dueling DDQN；
+规则臂为 `nearest`、`uniform_random`、`least_associated`、`cache_affinity`。它们都在每辆未完成车每帧选择一个
+覆盖内 RSU；这些新实现不复用旧 registry 算法和 checkpoint。`manifest.json` 保存排除原算法的原因、
+窗口/车辆/工作流身份、仿真假设及命令。`results.json` 保存全部训练 episode 和逐窗口逐请求结果，
+`eval_request_events.jsonl` 保存逐帧事件，`*.pt` 是每个学习策略每个 seed 的最终 checkpoint。
+输出位于 `artifacts/training/eight_vehicle_algorithm_diagnostic/<UTC-run-id>/`，不进入 Git。隔离 worktree 中若数据
+是 Git LFS pointer，应通过参数显式指向已有的真实数据文件，不能把 pointer 当 CSV。
+这套对照不具备真实 RSU、成本校准、联合车载请求日志、模型推理或正式 holdout，不用其排名更新论文主表。
+
 共享策略 PPO 诊断训练（单 seed、320 episodes；默认 24 个训练窗口，跳过 1 个合格窗口，再评估 8 个窗口）：
 
 ```bash

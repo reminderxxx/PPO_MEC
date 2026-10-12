@@ -2,6 +2,11 @@
 
 ## 八车四 RSU 轨迹驱动诊断（2026-10-12）
 
+- `scripts/benchmark_eight_vehicle_algorithms.py` 复用 `train_eight_vehicle_ppo.py` 的窗口选择、环境和 PPO 更新，
+  对诊断 MAPPO/DQN 家族与规则臂使用同一批八车四站窗口；单独输出算法池 manifest、checkpoint、训练行和事件。
+- `src/agents/mappo_agent.py` 的 `TraceDrivenMultiRequestMAPPO` 将各车 actor 的当前帧观测汇总到集中 critic；
+  `src/agents/dqn_agent.py` 的 `TraceDrivenMultiRequestQNetwork` 对每车四站候选计算 masked Q 值，支持 dueling。
+  这些类不进入 `registry.py`，既有 controller-level MAPPO 与五动作 DQN 消费端保持原合同。
 - `src/agents/ppo_agent.py` 中 `TraceDrivenMultiRequestPPO` 只消费多请求回放当前帧观测，对每辆未完成车辆
   在覆盖内四站产生动作；训练脚本做 PPO 更新，保持现有 `PPOAgent`/registry 与正式 checkpoint 消费端不变。
 - `scripts/train_eight_vehicle_ppo.py` 与回放环境复用 NGSIM/Alibaba loader，但训练及评估独立输出到诊断根目录。

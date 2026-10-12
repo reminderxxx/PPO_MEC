@@ -11,6 +11,8 @@ Alibaba DAG，共享四个模拟 RSU 的计算、链路与 adapter cache，输�
 [`docs/project/RUNBOOK.md`](docs/project/RUNBOOK.md)。
 另有独立的 `scripts/train_eight_vehicle_ppo.py` 共享策略 PPO 诊断训练入口；它采用新的每车选站动作合同，
 不复用现有 `ppo` / `sa_ghmappo` checkpoint 或正式算法 registry。
+`scripts/benchmark_eight_vehicle_algorithms.py` 在同一八车动作合同和相同窗口上训练六种探索性学习策略、
+评估四种规则策略，并输出逐请求事件与原仓库算法的合同排除清单；其结果仍是非正式仿真诊断。
 
 最小机制证据闭环（共享缓存四配置、连续/重跑/后缀恢复、12 个有界决策场景）见
 [results](docs/project/mechanism_evidence_closure_results_20261005.md)；结论是 bounded diagnostic，非 formal、holdout、
