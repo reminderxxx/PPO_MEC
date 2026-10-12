@@ -341,15 +341,24 @@ def main() -> None:
     }, checkpoint_path)
     checkpoint_hash = hashlib.sha256(checkpoint_path.read_bytes()).hexdigest()
     eval_rows = []
+    eval_event_rows = []
     for index, window in enumerate(eval_windows):
+        learned_env = _environment(window, workflows)
         learned, _ = _episode(
-            _environment(window, workflows), policy,
+            learned_env, policy,
             deterministic=True, gamma=args.gamma, reward_scale=args.reward_scale, collect=False,
         )
+        nearest_env = _environment(window, workflows)
         nearest, _ = _episode(
-            _environment(window, workflows), None,
+            nearest_env, None,
             deterministic=True, gamma=args.gamma, reward_scale=args.reward_scale, collect=False,
         )
+        for label, evaluated_env in (("ppo_final", learned_env), ("nearest", nearest_env)):
+            eval_event_rows.extend({
+                "eval_window_index": index,
+                "policy": label,
+                **event,
+            } for event in evaluated_env.events)
         eval_rows.append({
             "eval_window_index": index,
             "frame_offset": window["frame_offset"],
@@ -363,6 +372,8 @@ def main() -> None:
             "nearest_completed_nodes": nearest["completed_nodes"],
             "ppo_steps": learned["steps"],
             "nearest_steps": nearest["steps"],
+            "ppo_per_request": learned["per_request"],
+            "nearest_per_request": nearest["per_request"],
         })
     report = {
         "run_id": run_id,
@@ -378,6 +389,9 @@ def main() -> None:
         "eval_rows": eval_rows,
     }
     (output / "results.json").write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    with (output / "eval_request_events.jsonl").open("w", encoding="utf-8") as handle:
+        for event in eval_event_rows:
+            handle.write(json.dumps(event, ensure_ascii=False) + "\n")
     print(json.dumps({key: value for key, value in report.items() if key not in {"train_rows", "eval_rows"}}, indent=2))
     print(f"output_dir={output}")
 

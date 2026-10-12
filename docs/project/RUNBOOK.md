@@ -18,7 +18,8 @@
 ```
 
 输出写入 `artifacts/training/eight_vehicle_ppo_diagnostic/<UTC-run-id>/` 的 `manifest.json`、
-`final_checkpoint.pt` 与 `results.json`；逐 episode 训练奖励和八个逐窗口评估奖励均保留。
+`final_checkpoint.pt`、`results.json` 与 `eval_request_events.jsonl`；逐 episode 训练奖励、八个逐窗口评估奖励和
+两种策略的逐请求事件均保留。
 这是单 seed、假设成本、跨源配对的诊断训练；不同窗口不能自动称独立车辆/请求分布，
 PPO 策略也不是现有正式 SA-GHMAPPO 或 PPO checkpoint。训练过程中不读取评估奖励；最终 checkpoint
 直接评估，不在八窗口中挑选最佳 checkpoint。
