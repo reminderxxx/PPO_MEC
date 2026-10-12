@@ -41,6 +41,8 @@ from src.evaluators.main_results_support import (
 from src.evaluators.real_eval_support import build_inference_agent
 from src.envs.core.predictor_manager import PredictorManager
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
+from src.envs.core.physical_vec_workflow_env import PhysicalVecWorkflowCoreEnv
+from src.runtime.physical_env_config import load_physical_env_config, physical_env_config_identity
 from src.envs.wrappers.gym_vec_env import GymVecEnv
 from src.metrics.recorder import EpisodeRecorder
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
@@ -2285,6 +2287,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_workflows", type=int, default=2)
     parser.add_argument("--max_steps", type=int, default=None)
     parser.add_argument("--reward_positive_offset", type=float, default=None)
+    parser.add_argument("--physical_env_config", type=str, default="")
     parser.add_argument("--workflow_selector", type=str, default="ordered")
     parser.add_argument("--rsu_layout", type=str, default="auto_dominant_tight")
     parser.add_argument("--frame_offset", type=int, default=0)
@@ -7396,13 +7399,15 @@ def run_real_episode_with_policy_diagnostics(
     reward_positive_offset: float,
     predictor_runtime_kwargs: dict[str, Any],
     run_metadata: dict[str, Any],
+    physical_env_config: dict[str, Any] | None = None,
     policy_evaluation_mode: str = "safety_projected",
 ) -> dict[str, Any]:
     policy_evaluation_mode = str(policy_evaluation_mode).strip().lower()
     if policy_evaluation_mode not in {"raw_policy", "safety_projected"}:
         raise ValueError(f"unsupported policy_evaluation_mode: {policy_evaluation_mode}")
     recorder = EpisodeRecorder(prefetch_validation_window=6)
-    adapter_catalog = AdapterCatalog.from_json(ROOT_DIR / "src" / "data" / "model_catalog" / "sample_model_catalog.json")
+    catalog_name = "typed_model_cache_controlled.json" if physical_env_config else "sample_model_catalog.json"
+    adapter_catalog = AdapterCatalog.from_json(ROOT_DIR / "src" / "data" / "model_catalog" / catalog_name)
     rsu_states = [clone_rsu_state(rsu_state) for rsu_state in mobility_bundle.rsu_states]
     workflow_state_runtime = clone_workflow_state(workflow_state)
     trajectory_frames = clone_frames(mobility_bundle.frames)
@@ -7416,7 +7421,7 @@ def run_real_episode_with_policy_diagnostics(
         "is_smoke_checkpoint": False,
         "smoke_warning": False,
     }
-    core_env = VecWorkflowCoreEnv(
+    core_kwargs = dict(
         mobility_provider=ReplayProvider(trajectory_frames=trajectory_frames),
         workflow_state=workflow_state_runtime,
         adapter_catalog=adapter_catalog,
@@ -7426,6 +7431,12 @@ def run_real_episode_with_policy_diagnostics(
         mobility_source=mobility_source,
         primary_vehicle_selection=primary_vehicle_selection,
         reward_positive_offset=reward_positive_offset,
+    )
+    core_env = (
+        PhysicalVecWorkflowCoreEnv(
+            **{**core_kwargs, "max_steps": max_steps}, **physical_env_config
+        )
+        if physical_env_config is not None else VecWorkflowCoreEnv(**core_kwargs)
     )
     env = GymVecEnv(core_env=core_env, recorder=recorder)
     agent = build_inference_agent(
@@ -7580,6 +7591,7 @@ def evaluate_checkpoint_protocol(
                         "policy_evaluation_mode": policy_evaluation_mode,
                         "experiment_run_type": build_run_scale_info(args.profile, args.episodes, max(1, len(selected_windows))).get("experiment_run_type"),
                     },
+                    physical_env_config=getattr(args, "_physical_env_kwargs", None),
                     policy_evaluation_mode=policy_evaluation_mode,
                 )
                 metrics = summary["system_metrics"]
@@ -7678,7 +7690,7 @@ def run_update_eval(
         workflow_states=workflow_states,
         eval_windows=eval_windows,
         args=args,
-        include_reference_agents=True,
+        include_reference_agents=not bool(args.physical_env_config),
         max_workflows=args.update_eval_max_workflows,
         max_windows=args.update_eval_max_windows,
         protocol_name="update_eval",
@@ -9722,6 +9734,12 @@ def maybe_update_best_checkpoint(
 
 def main() -> None:
     args = parse_args()
+    args._physical_env_kwargs, args._physical_env_manifest = (
+        load_physical_env_config(args.physical_env_config)
+        if args.physical_env_config else (None, None)
+    )
+    if args._physical_env_kwargs is not None and args.warm_start_checkpoint_path:
+        raise ValueError("physical environment cannot warm-start from a legacy checkpoint")
     mainline_label = "LuST(SUMO) + Alibaba" if args.mobility_source == "lust" else "NGSIM + Alibaba"
     rng = random.Random(args.random_seed)
     workflow_states = build_selected_workflow_states(
@@ -9793,7 +9811,8 @@ def main() -> None:
     checkpoint_root.mkdir(parents=True, exist_ok=True)
 
     agent = build_agent(args.agent_name, **build_agent_kwargs(args))
-    adapter_catalog = AdapterCatalog.from_json(ROOT_DIR / "src" / "data" / "model_catalog" / "sample_model_catalog.json")
+    catalog_name = "typed_model_cache_controlled.json" if args._physical_env_kwargs else "sample_model_catalog.json"
+    adapter_catalog = AdapterCatalog.from_json(ROOT_DIR / "src" / "data" / "model_catalog" / catalog_name)
 
     pending_rollout: list[dict[str, Any]] = []
     episode_metrics: list[dict[str, Any]] = []
@@ -9898,7 +9917,7 @@ def main() -> None:
         )
         mobility_bundle.rsu_metadata["window_class"] = selected_window.get("window_class", "unknown")
         recorder = EpisodeRecorder(prefetch_validation_window=6)
-        core_env = VecWorkflowCoreEnv(
+        core_kwargs = dict(
             mobility_provider=mobility_bundle.provider,
             workflow_state=workflow_state,
             adapter_catalog=adapter_catalog,
@@ -9914,11 +9933,18 @@ def main() -> None:
             primary_vehicle_selection=args.primary_vehicle_selection,
             reward_positive_offset=args.reward_positive_offset,
         )
+        core_env = (
+            PhysicalVecWorkflowCoreEnv(
+                **{**core_kwargs, "max_steps": args.max_steps}, **args._physical_env_kwargs
+            )
+            if args._physical_env_kwargs is not None else VecWorkflowCoreEnv(**core_kwargs)
+        )
         env = GymVecEnv(core_env=core_env, recorder=recorder)
         trainer = MARLOnPolicyTrainer(env=env, agent=agent, recorder=recorder, max_steps=args.max_steps, gamma=args.gamma, gae_lambda=args.gae_lambda)
         summary, rollout = trainer.collect_episode(
             run_metadata={
                 "script": "scripts/train_sa_ghmappo_real_sample.py",
+                "physical_environment_config_path": args.physical_env_config or None,
                 "mainline": mainline_label,
                 "agent_name": args.agent_name,
                 "episode_index": episode_index,
@@ -9955,6 +9981,11 @@ def main() -> None:
             agent.save(str(latest_checkpoint_path))
             checkpoint_metadata = {
                 "run_id": run_id,
+                "environment_version": "physical_vec_env_v1" if args._physical_env_manifest else "legacy_vec_env",
+                "physical_environment_config_sha256": (
+                    physical_env_config_identity(args._physical_env_manifest)
+                    if args._physical_env_manifest else None
+                ),
                 "agent_name": args.agent_name,
                 "config_profile": args.profile,
                 "train_window_mode": args.train_window_mode,

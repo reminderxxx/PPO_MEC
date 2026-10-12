@@ -1,5 +1,12 @@
 ﻿# Decision Log
 
+## 2026-10-12：新物理事件环境使用独立身份
+
+- 决定：`physical_vec_env_v1` 以显式 JSON 配置和 SHA-256 身份运行；旧正式环境、Protocol 2.9、checkpoint 与指标不迁移。
+- 决定：先以合成、可重放事件证明资源、DAG、切换和账本机制；没有实测成本和真实输出时，只能称工程诊断。
+- 决定：多窗口比较走独立非正式入口，并在运行前核验窗口、typed catalog 与新 checkpoint 身份；新核心暂只支持 LRU 和最多四站观察编码。
+- 依据与后续门槛见 `physical_env_v1_implementation_20261012.md`。
+
 ## 2026-10-05：机制证据优先，不晋级 RL
 
 - 决定：保留原生 typed-cache candidate 作为 opt-in bounded mechanism，正式协议不静默切换。

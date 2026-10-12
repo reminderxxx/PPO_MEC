@@ -1,5 +1,13 @@
 ﻿# Directory Structure
 
+## 2026-10-12 物理环境 v1
+
+- `configs/environment/physical_env_v1_synthetic.json`：显式合成参数。
+- `src/envs/core/physical_runtime.py`、`physical_cache_service.py`、`dag_execution.py`、`physical_vec_workflow_env.py`：资源事件、typed 缓存、DAG/切换与环境主链。
+- `src/runtime/physical_env_config.py`、`physical_cost_profile.py`、`src/metrics/physical_event_metrics.py`：配置身份、成本回放与独立事件账本。
+- `scripts/run_physical_env_acceptance.py`、`benchmark_physical_env.py`：固定验收和非正式多窗口入口。
+- `docs/project/physical_env_v1_implementation_20261012.md`：M01–M12 映射及限制。
+
 ## 2026-10-05 最小机制证据闭环
 
 - `configs/experiment/mechanism_evidence_closure_v1.json`：A/C 冻结矩阵、成本模型、预算和命令。

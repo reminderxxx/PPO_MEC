@@ -20,6 +20,7 @@ from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.data.workflow.workflow_dataset_builder import WorkflowDatasetBuilder
 from src.envs.core.predictor_manager import PredictorManager
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
+from src.envs.core.physical_vec_workflow_env import PhysicalVecWorkflowCoreEnv
 from src.envs.specs import RSUState, VehicleState, WorkflowGraphState, WorkflowNode
 from src.envs.wrappers.gym_vec_env import GymVecEnv
 from src.evaluators.real_eval_support import build_inference_agent, ensure_agent_checkpoint_path
@@ -29,6 +30,8 @@ from src.metrics.cache_efficiency_metrics import (
     reduce_cache_efficiency_summary,
 )
 from src.metrics.recorder import EpisodeRecorder
+from src.metrics.physical_event_metrics import reduce_physical_events
+from src.runtime.physical_env_config import physical_env_config_identity
 from src.metrics.formal_nullable_metrics import nullable_finite_value
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 from src.runtime.formal_exogenous_request_execution import (
@@ -1378,6 +1381,10 @@ def load_checkpoint_metadata(checkpoint_path: str) -> dict[str, Any]:
                     "checkpoint_source_update_index": checkpoint_source_update_index,
                     "is_smoke_checkpoint": is_smoke,
                     "smoke_warning": is_smoke,
+                    "environment_version": training_metadata.get("environment_version"),
+                    "physical_environment_config_sha256": training_metadata.get(
+                        "physical_environment_config_sha256"
+                    ),
                 }
             )
             typed_runtime_provenance = training_metadata.get("typed_runtime_provenance")
@@ -1469,12 +1476,18 @@ def run_real_episode(
     cache_capacity_profile: dict[str, Any] | None = None,
     model_cache_runtime_contract: dict[str, Any] | None = None,
     formal_request_exposure_trace: dict[str, Any] | None = None,
+    physical_env_config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    if physical_env_config is not None and formal_request_exposure_trace is not None:
+        raise ValueError("physical environment cannot consume legacy formal request exposure")
     cache_capacity_profile = validate_agent_eviction_binding(
         agent_name, cache_capacity_profile, run_seed=seed
     )
     recorder = EpisodeRecorder(prefetch_validation_window=6)
-    adapter_catalog = adapter_catalog_override or AdapterCatalog.from_json(root_dir / "src" / "data" / "model_catalog" / "sample_model_catalog.json")
+    adapter_catalog = adapter_catalog_override or AdapterCatalog.from_json(
+        root_dir / "src" / "data" / "model_catalog" /
+        ("typed_model_cache_controlled.json" if physical_env_config else "sample_model_catalog.json")
+    )
     rsu_states = [clone_rsu_state(rsu_state) for rsu_state in (rsu_states_override or mobility_bundle.rsu_states)]
     workflow_state_runtime = clone_workflow_state(workflow_state_override or workflow_state)
     trajectory_frames = clone_frames(mobility_frames_override or mobility_bundle.frames)
@@ -1488,11 +1501,19 @@ def run_real_episode(
         "is_smoke_checkpoint": False,
         "smoke_warning": False,
     }
+    if physical_env_config is not None and checkpoint_path:
+        if checkpoint_metadata.get("environment_version") != "physical_vec_env_v1":
+            raise ValueError("checkpoint was not trained with physical_vec_env_v1")
+        physical_manifest = run_metadata.get("physical_environment_config")
+        if physical_manifest is not None and checkpoint_metadata.get(
+            "physical_environment_config_sha256"
+        ) != physical_env_config_identity(physical_manifest):
+            raise ValueError("checkpoint physical environment config identity mismatch")
     runtime_predictor_kwargs = dict(predictor_kwargs or {})
     if runtime_predictor_kwargs.get("oracle_prediction_enabled"):
         runtime_predictor_kwargs.setdefault("oracle_future_frames", trajectory_frames)
         runtime_predictor_kwargs.setdefault("oracle_rsu_states", rsu_states)
-    core_env = VecWorkflowCoreEnv(
+    core_kwargs = dict(
         mobility_provider=ReplayProvider(trajectory_frames=trajectory_frames),
         workflow_state=workflow_state_runtime,
         adapter_catalog=adapter_catalog,
@@ -1503,8 +1524,18 @@ def run_real_episode(
         primary_vehicle_selection=primary_vehicle_selection,
         reward_positive_offset=reward_positive_offset,
         cache_capacity_profile=cache_capacity_profile,
-        formal_request_exposure_trace=formal_request_exposure_trace,
     )
+    if physical_env_config is None:
+        core_env = VecWorkflowCoreEnv(
+            **core_kwargs,
+            formal_request_exposure_trace=formal_request_exposure_trace,
+        )
+    else:
+        core_kwargs["max_steps"] = max_steps
+        core_env = PhysicalVecWorkflowCoreEnv(
+            **core_kwargs,
+            **physical_env_config,
+        )
     env = GymVecEnv(core_env=core_env, recorder=recorder)
     runtime_agent_config_overrides = build_window_context_agent_overrides(
         agent_name=agent_name,
@@ -1599,9 +1630,20 @@ def run_real_episode(
     summary["episode_success"] = bool(summary.get("episode_status", {}).get("completed", False))
     summary["run_info"]["rsu_metadata"] = mobility_bundle.rsu_metadata
     summary["run_info"]["checkpoint_metadata"] = checkpoint_metadata
+    if physical_env_config is not None:
+        event_trace = core_env.export_physical_events()
+        summary["physical_event_trace"] = event_trace
+        summary["physical_event_summary"] = reduce_physical_events(event_trace).to_dict()
+        summary["workflow_physical_metrics"] = core_env.export_workflow_physical_metrics()
     if model_cache_runtime_contract is not None:
         summary["resolved_model_cache_runtime"] = dict(model_cache_runtime_contract)
-    summary["cache_efficiency_metrics"] = reduce_cache_efficiency_summary(summary).to_dict()
+    if physical_env_config is not None:
+        summary["cache_efficiency_metrics"] = {
+            "availability": "unavailable",
+            "reason": "legacy_cache_event_reducer_does_not_apply_to_physical_events_v1",
+        }
+    else:
+        summary["cache_efficiency_metrics"] = reduce_cache_efficiency_summary(summary).to_dict()
     if formal_request_exposure_trace is not None:
         endpoint_metrics = compute_formal_endpoint_metrics(
             summary["cache_event_trace"],
@@ -1958,7 +2000,11 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         or handoff_summary.get("migration_during_handoff_count", 0) > 0
     )
     actionmix_diagnostics = _build_actionmix_diagnostics(summary)
-    cache_efficiency_fields = cache_efficiency_row_fields(summary)
+    cache_efficiency_fields = (
+        {"cache_efficiency_availability": "unavailable"}
+        if "physical_event_trace" in summary
+        else cache_efficiency_row_fields(summary)
+    )
     formal_request_audit = dict(summary.get("formal_request_execution_audit") or {})
     if formal_request_audit:
         cache_efficiency_fields.update(

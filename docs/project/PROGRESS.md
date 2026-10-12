@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-12：物理环境 v1 工程闭环
+
+- 已建立共享链路/计算事件、typed 缓存预留、DAG 输出与切换交付的显式主链，增加独立账本重算和固定两站两车验收。
+- 增加版本化 33 维观察、配置/新 checkpoint 身份、非正式 NGSIM＋Alibaba 多窗口入口；旧正式主表没有切换环境。
+- 固定验收参数为 synthetic；真实成本、全策略新 checkpoint、独立外测及论文结论保持 `UNVERIFIED`。验证命令与接口边界见 `physical_env_v1_implementation_20261012.md`。
+
 ## 2026-10-09：CSCWD 强基线与贡献证据只读审查
 
 - 已从 v70 mixed/full 原始 rows、episode receipt、checkpoint manifest 和统计包复核旧奖励均值；这些仍是开发协议描述性结果。

@@ -1,5 +1,15 @@
 # Code Module Map
 
+## 2026-10-12 physical_vec_env_v1
+
+`physical_vec_workflow_env.py` 是新主执行链的唯一编排者：从 mobility provider 消费帧，由
+`dag_execution.py` 保持前驱、输入位置与交付状态；`physical_cache_service.py` 管理 typed 对象的
+预留/驻留/运行锁定；`physical_runtime.py` 推进共享链路和计算槽。它输出物理事件，
+`physical_event_metrics.py` 独立重算。`gym_vec_env.py` 与 `action_schema.py` 提供版本化观察和五动作适配。
+`physical_env_config.py` 校验输入身份，`physical_cost_profile.py` 校验单节点回放身份。训练脚本显式
+`--physical_env_config` 才选择新核心；`benchmark_physical_env.py` 是新环境非正式多窗口消费者。
+旧 `vec_workflow_core_env.py` 与 `benchmark_main_results.py` 继续承载旧正式合同。
+
 ## 2026-10-05 bounded mechanism evidence
 
 - `scripts/run_mechanism_evidence_closure.py`：只读复用 native request ledgers，构建 A 的公平成本表；通过正常

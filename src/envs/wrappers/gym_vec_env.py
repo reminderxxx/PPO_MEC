@@ -56,6 +56,16 @@ FLAT_OBSERVATION_FEATURE_NAMES = (
     "current_rsu_cache_size",
     "mean_future_load",
 )
+PHYSICAL_MAX_RSUS = 4
+PHYSICAL_RSU_FEATURES = (
+    "present", "cache_used_ratio", "cache_reserved_ratio",
+    "compute_running_ratio", "compute_queued", "model_loading",
+)
+PHYSICAL_OBSERVATION_FEATURE_NAMES = FLAT_OBSERVATION_FEATURE_NAMES + tuple(
+    f"rsu_{index}_{feature}"
+    for index in range(PHYSICAL_MAX_RSUS)
+    for feature in PHYSICAL_RSU_FEATURES
+)
 动作语义表 = {
     action_id: 默认动作规范.action_name(action_id)
     for action_id in range(默认动作规范.discrete_action_count)
@@ -74,6 +84,7 @@ class GymVecEnv(gym.Env):
     ) -> None:
         super().__init__()
         self._core_env = core_env or VecWorkflowCoreEnv()
+        self._physical_mode = bool(getattr(self._core_env, "physical_mode", False))
         self._recorder = recorder
         self._normalizer = ObservationNormalizer()
         self._action_schema = 默认动作规范
@@ -88,7 +99,7 @@ class GymVecEnv(gym.Env):
         self.observation_space = spaces.Box(
             low=-1.0,
             high=2.0,
-            shape=(9,),
+            shape=(len(PHYSICAL_OBSERVATION_FEATURE_NAMES) if self._physical_mode else 9,),
             dtype=float,
         )
 
@@ -147,7 +158,7 @@ class GymVecEnv(gym.Env):
             "action_mask": action_mask_info["mask"],
             "action_mask_info": action_mask_info,
             "observation_normalized": True,
-            "observation_encoder": "deterministic_scale_v1",
+            "observation_encoder": "physical_rsu_v1" if self._physical_mode else "deterministic_scale_v1",
         }
         if self._recorder is not None:
             self._recorder.record_reset(state, info)
@@ -177,7 +188,7 @@ class GymVecEnv(gym.Env):
             "action_invalid": bool(action_metadata.get("invalid_action", False)),
             "action_invalid_reason": str(action_metadata.get("invalid_reason", "none")),
             "observation_normalized": True,
-            "observation_encoder": "deterministic_scale_v1",
+            "observation_encoder": "physical_rsu_v1" if self._physical_mode else "deterministic_scale_v1",
             "decision_observation_trace_record": pre_action_trace_record,
         }
         if self._recorder is not None:
@@ -196,12 +207,15 @@ class GymVecEnv(gym.Env):
 
     def _encode_observation(self, state: dict[str, Any]) -> list[float]:
         raw_observation = self._build_raw_observation(state)
-        return self._normalizer.normalize(
-            raw_observation=raw_observation,
+        normalized = self._normalizer.normalize(
+            raw_observation=raw_observation[:9],
             state=state,
             episode_step_index=self._episode_step_index,
             max_steps=getattr(self._core_env, "_max_steps", 16),
         )
+        if self._physical_mode:
+            normalized.extend(raw_observation[9:])
+        return normalized
 
     def _build_raw_observation(self, state: dict[str, Any]) -> list[float]:
         workflow = state.get("workflow", {})
@@ -243,6 +257,28 @@ class GymVecEnv(gym.Env):
             current_rsu_cache_size,
             float(mean_future_load),
         ]
+        if self._physical_mode:
+            physical = dict(state.get("physical_state") or {})
+            rows = sorted(
+                list(physical.get("rsus") or []), key=lambda row: str(row.get("rsu_id", ""))
+            )
+            if len(rows) > PHYSICAL_MAX_RSUS:
+                raise ValueError("physical observation supports at most four RSUs")
+            for index in range(PHYSICAL_MAX_RSUS):
+                if index >= len(rows):
+                    raw_observation.extend([0.0] * len(PHYSICAL_RSU_FEATURES))
+                    continue
+                row = rows[index]
+                capacity = max(float(row.get("cache_capacity_bytes", 1.0)), 1.0)
+                slots = max(float(row.get("compute_slots", 1.0)), 1.0)
+                raw_observation.extend([
+                    1.0,
+                    min(float(row.get("cache_used_bytes", 0.0)) / capacity, 1.0),
+                    min(float(row.get("cache_reserved_bytes", 0.0)) / capacity, 1.0),
+                    min(float(row.get("compute_running_count", 0.0)) / slots, 1.0),
+                    float(np.tanh(float(row.get("compute_queued_count", 0.0)) / 4.0)),
+                    float(np.tanh(float(row.get("model_loading_count", 0.0)) / 4.0)),
+                ])
         return raw_observation
 
     def _build_decision_observation_trace_record(self, action: int) -> dict[str, Any]:
@@ -251,9 +287,11 @@ class GymVecEnv(gym.Env):
         semantic_state = self._build_compatible_semantic_state(state)
         raw_observation = self._build_raw_observation(state)
         flattened = self._encode_observation(state)
-        feature_name_to_index = {
-            name: index for index, name in enumerate(FLAT_OBSERVATION_FEATURE_NAMES)
-        }
+        feature_names = (
+            PHYSICAL_OBSERVATION_FEATURE_NAMES
+            if self._physical_mode else FLAT_OBSERVATION_FEATURE_NAMES
+        )
+        feature_name_to_index = {name: index for index, name in enumerate(feature_names)}
         feature_values = {
             name: float(flattened[index]) for name, index in feature_name_to_index.items()
         }
@@ -288,7 +326,9 @@ class GymVecEnv(gym.Env):
             "time_index": int(state.get("time_index", 0)),
             "captured_phase": "pre_action",
             "controller_identity": "single_environment_action_controller",
-            "observation_contract_version": "gym_vec_flat_semantic_v1",
+            "observation_contract_version": (
+                "gym_vec_physical_rsu_v1" if self._physical_mode else "gym_vec_flat_semantic_v1"
+            ),
             "raw_semantic_fields": {
                 "primary_vehicle_id": vehicle_id,
                 "current_rsu_id": current_rsu_id,
@@ -301,11 +341,11 @@ class GymVecEnv(gym.Env):
             "feature_name_to_index": feature_name_to_index,
             "flattened_feature_values": feature_values,
             "feature_availability": {
-                name: True for name in FLAT_OBSERVATION_FEATURE_NAMES
+                name: True for name in feature_names
             },
             "normalization": {
                 "kind": "deterministic_scale_and_tanh",
-                "version": "deterministic_scale_v1",
+                "version": "physical_rsu_v1" if self._physical_mode else "deterministic_scale_v1",
                 "fitted_on_data": False,
             },
             "information_scopes": {

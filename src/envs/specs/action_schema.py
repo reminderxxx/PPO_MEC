@@ -120,6 +120,8 @@ class ActionMaskBuilder:
         if preconditions["distinct_predicted_next_rsu"]:
             if preconditions["target_adapter_ready"]:
                 invalid_reasons["1"] = "target_adapter_already_ready"
+            elif preconditions["target_adapter_loading"]:
+                invalid_reasons["1"] = "target_adapter_loading"
             else:
                 mask[1] = True
         else:
@@ -206,6 +208,12 @@ class ActionAdapter:
                 return self._invalid_noop_control(
                     metadata=metadata,
                     invalid_reason="target_adapter_already_ready",
+                    offload_strategy="invalid_predictive_prefetch_noop",
+                )
+            if preconditions["target_adapter_loading"]:
+                return self._invalid_noop_control(
+                    metadata=metadata,
+                    invalid_reason="target_adapter_loading",
                     offload_strategy="invalid_predictive_prefetch_noop",
                 )
             return ControlAction(
@@ -346,6 +354,11 @@ def _build_action_preconditions(state: dict[str, Any]) -> dict[str, Any]:
         rsu_id=predicted_handoff_target_rsu_id,
         adapter_id=required_adapter,
     )
+    target_adapter_loading = _rsu_is_loading_adapter(
+        state=state,
+        rsu_id=predicted_next_rsu_id,
+        adapter_id=required_adapter,
+    )
     return {
         "has_workflow_node": bool(state.get("current_workflow_node")),
         "primary_vehicle": primary_vehicle,
@@ -357,6 +370,7 @@ def _build_action_preconditions(state: dict[str, Any]) -> dict[str, Any]:
         "distinct_predicted_next_rsu": distinct_predicted_next_rsu,
         "distinct_handoff_target": distinct_handoff_target,
         "target_adapter_ready": target_adapter_ready,
+        "target_adapter_loading": target_adapter_loading,
         "handoff_target_adapter_ready": handoff_target_adapter_ready,
         "next_rsu_sequence_horizon": len(next_rsu_sequence),
     }
@@ -375,4 +389,18 @@ def _rsu_has_adapter(
             continue
         cached = {str(item) for item in rsu.get("cached_adapter_ids", [])}
         return str(adapter_id) in cached
+    return False
+
+
+def _rsu_is_loading_adapter(
+    *, state: dict[str, Any], rsu_id: str | None, adapter_id: str | None
+) -> bool:
+    if rsu_id is None or adapter_id is None:
+        return False
+    physical = state.get("physical_state") or {}
+    for rsu in physical.get("rsus") or []:
+        if str(rsu.get("rsu_id")) == str(rsu_id):
+            return str(adapter_id) in {
+                str(item) for item in rsu.get("loading_adapter_ids", [])
+            }
     return False

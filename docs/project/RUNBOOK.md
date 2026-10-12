@@ -5,6 +5,15 @@
 
 # Runbook
 
+## 物理环境 v1（2026-10-12）
+
+先运行 `python scripts/run_physical_env_acceptance.py --output-path /tmp/ppo_mec_physical_acceptance.json`；
+验收核对跨步加载、共享争用、DAG 前驱输出、切换后旧站续算与事件独立重算。再用
+`python scripts/benchmark_physical_env.py --help` 查看非正式 NGSIM＋Alibaba 入口参数。
+输入必须是本地完整 CSV，不能用 Git LFS pointer；输出目录由脚本生成新 run ID，旧 formal/holdout
+结果不得混用。配置示例为 `configs/environment/physical_env_v1_synthetic.json`，仅 synthetic。
+完整接口、限制与工作包映射见 `physical_env_v1_implementation_20261012.md`。
+
 ## 最小机制证据闭环（2026-10-05）
 
 冻结方案与结果分别见 `mechanism_evidence_closure_plan_20261005.md` 和

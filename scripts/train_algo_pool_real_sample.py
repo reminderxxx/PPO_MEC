@@ -17,9 +17,11 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from src.agents.registry import build_agent, get_algo_spec, list_trainable_agents
+from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.data.mobility.replay_provider import ReplayProvider
 from src.envs.core.predictor_manager import PredictorManager
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
+from src.envs.core.physical_vec_workflow_env import PhysicalVecWorkflowCoreEnv
 from src.envs.wrappers.gym_vec_env import GymVecEnv
 from src.evaluators.main_results_support import (
     apply_frozen_window_plan,
@@ -38,6 +40,7 @@ from src.evaluators.formal_window_consumption import (
 )
 from src.metrics.recorder import EpisodeRecorder
 from src.metrics.cache_efficiency_metrics import reduce_cache_efficiency_summary
+from src.metrics.physical_event_metrics import reduce_physical_events
 from src.metrics.formal_nullable_metrics import (
     FORMAL_NULLABLE_METRIC_AGGREGATION_CONTRACT_VERSION,
     reduce_nullable_metric_rows,
@@ -49,6 +52,7 @@ from src.runtime.typed_model_cache_runtime import (
     resolve_model_cache_runtime,
     sha256_value,
 )
+from src.runtime.physical_env_config import load_physical_env_config, physical_env_config_identity
 from src.runtime.formal_training_contract import (
     FormalTrainingContractError,
     audited_agent_config,
@@ -137,6 +141,7 @@ def build_parser() -> argparse.ArgumentParser:
         default="",
         help="Shared legacy/typed runtime YAML; typed fields may not be overridden on the CLI.",
     )
+    parser.add_argument("--physical_env_config", type=str, default="")
     parser.add_argument(
         "--formal_protocol_path",
         type=str,
@@ -431,6 +436,14 @@ def validate_serialized_formal_checkpoint(
 
 def main() -> None:
     args = parse_args()
+    physical_env_kwargs = None
+    physical_env_manifest = None
+    if args.physical_env_config:
+        physical_env_kwargs, physical_env_manifest = load_physical_env_config(
+            args.physical_env_config
+        )
+        if args.formal_protocol_path or args.formal_exogenous_request_execution:
+            raise ValueError("physical environment requires a new protocol; legacy formal inputs are forbidden")
     reject_permanently_invalid_formal_references(
         [
             args.output_root,
@@ -614,10 +627,28 @@ def main() -> None:
                 "window_class": "manual",
             }
         ]
-    adapter_catalog = load_runtime_catalog(runtime_contract, root=ROOT_DIR)
+    adapter_catalog = (
+        AdapterCatalog.from_json(ROOT_DIR / "src/data/model_catalog/typed_model_cache_controlled.json")
+        if physical_env_kwargs is not None
+        else load_runtime_catalog(runtime_contract, root=ROOT_DIR)
+    )
     cache_capacity_profile = dict(runtime_contract["cache_capacity_profile"])
     if not cache_capacity_profile.get("enabled"):
         cache_capacity_profile = None
+    if physical_env_kwargs is not None:
+        required_eviction = get_algo_spec(args.agent_name).get("required_eviction_policy")
+        if required_eviction not in (None, "lru"):
+            raise ValueError("physical typed cache currently supports LRU eviction only")
+        cache_capacity_profile = (
+            {
+                "model_cache_profile_id": "typed_base_adapter_state_v1",
+                "enabled": True,
+                "unit": "mb",
+                "capacity_mb": physical_env_kwargs["cache_capacity_bytes_per_rsu"] / (1024 * 1024),
+                "eviction_policy": "lru",
+            }
+            if required_eviction == "lru" else None
+        )
     window_plan_identity = {
         "path": str(window_payload.get("frozen_window_plan_path") or args.window_plan_path or "runtime_selected"),
         "protocol_version": str(window_payload.get("frozen_window_plan_protocol_version") or "runtime_selected_v1"),
@@ -691,6 +722,12 @@ def main() -> None:
     resume_metadata: dict[str, Any] = {}
     if args.resume_checkpoint_path:
         resume_metadata = load_checkpoint_training_metadata(args.resume_checkpoint_path)
+        if physical_env_manifest is not None and (
+            resume_metadata.get("environment_version") != "physical_vec_env_v1"
+            or resume_metadata.get("physical_environment_config_sha256")
+            != physical_env_config_identity(physical_env_manifest)
+        ):
+            raise ValueError("resume checkpoint physical environment identity mismatch")
         validate_resume_checkpoint_schedule(
             resume_metadata,
             checkpoint_every_updates=args.checkpoint_every_updates,
@@ -802,7 +839,7 @@ def main() -> None:
                 },
             )
         recorder = EpisodeRecorder(prefetch_validation_window=6)
-        core_env = VecWorkflowCoreEnv(
+        core_kwargs = dict(
             mobility_provider=ReplayProvider(trajectory_frames=clone_frames(mobility_bundle.frames)),
             workflow_state=clone_workflow_state(workflow_state),
             adapter_catalog=adapter_catalog,
@@ -816,7 +853,16 @@ def main() -> None:
             primary_vehicle_selection=args.primary_vehicle_selection,
             reward_positive_offset=args.reward_positive_offset,
             cache_capacity_profile=cache_capacity_profile,
-            formal_request_exposure_trace=formal_request_exposure_trace,
+        )
+        core_env = (
+            PhysicalVecWorkflowCoreEnv(
+                **{**core_kwargs, "max_steps": args.max_steps}, **physical_env_kwargs
+            )
+            if physical_env_kwargs is not None
+            else VecWorkflowCoreEnv(
+                **core_kwargs,
+                formal_request_exposure_trace=formal_request_exposure_trace,
+            )
         )
         env = GymVecEnv(core_env=core_env, recorder=recorder)
         trainer = MARLOnPolicyTrainer(
@@ -830,6 +876,7 @@ def main() -> None:
         summary, rollout = trainer.collect_episode(
             run_metadata={
                 "script": "scripts/train_algo_pool_real_sample.py",
+                "physical_environment_config": physical_env_manifest,
                 "run_id": run_id,
                 "agent_name": args.agent_name,
                 "workflow_id": workflow_state.workflow_id,
@@ -869,7 +916,17 @@ def main() -> None:
             }
         )
         summary["episode_success"] = bool(summary.get("episode_status", {}).get("completed", False))
-        summary["cache_efficiency_metrics"] = reduce_cache_efficiency_summary(summary).to_dict()
+        if physical_env_kwargs is not None:
+            event_trace = core_env.export_physical_events()
+            summary["physical_event_trace"] = event_trace
+            summary["physical_event_summary"] = reduce_physical_events(event_trace).to_dict()
+            summary["workflow_physical_metrics"] = core_env.export_workflow_physical_metrics()
+            summary["cache_efficiency_metrics"] = {
+                "availability": "unavailable",
+                "reason": "legacy_cache_event_reducer_does_not_apply_to_physical_events_v1",
+            }
+        else:
+            summary["cache_efficiency_metrics"] = reduce_cache_efficiency_summary(summary).to_dict()
         if formal_request_exposure_trace is not None:
             endpoint_metrics = compute_formal_endpoint_metrics(
                 summary["cache_event_trace"],
@@ -910,6 +967,11 @@ def main() -> None:
             )
             checkpoint_metadata = {
                 "run_id": run_id,
+                "environment_version": "physical_vec_env_v1" if physical_env_manifest else "legacy_vec_env",
+                "physical_environment_config_sha256": (
+                    physical_env_config_identity(physical_env_manifest)
+                    if physical_env_manifest else None
+                ),
                 "agent_name": args.agent_name,
                 "config_profile": args.profile,
                 "primary_vehicle_selection": args.primary_vehicle_selection,
@@ -964,29 +1026,44 @@ def main() -> None:
                     else None
                 ),
                 "request_execution_mode": (
-                    "replay_driven_exogenous_request_exposure"
-                    if args.formal_exogenous_request_execution
-                    else "legacy_endogenous_progression"
+                    "physical_event_driven_workflow_v1"
+                    if physical_env_manifest else (
+                        "replay_driven_exogenous_request_exposure"
+                        if args.formal_exogenous_request_execution
+                        else "legacy_endogenous_progression"
+                    )
                 ),
                 "is_smoke_checkpoint": args.profile == "smoke",
                 "script": "scripts/train_algo_pool_real_sample.py",
-                "typed_runtime_provenance": build_checkpoint_provenance(
-                    root=ROOT_DIR,
-                    agent_name=args.agent_name,
-                    training_seed=args.random_seed,
-                    runtime_contract=runtime_contract,
-                    reward_positive_offset=args.reward_positive_offset,
-                    train_window_plan_identity=window_plan_identity,
+                "typed_runtime_provenance": (
+                    None if physical_env_manifest else build_checkpoint_provenance(
+                        root=ROOT_DIR,
+                        agent_name=args.agent_name,
+                        training_seed=args.random_seed,
+                        runtime_contract=runtime_contract,
+                        reward_positive_offset=args.reward_positive_offset,
+                        train_window_plan_identity=window_plan_identity,
+                    )
+                ),
+                "physical_runtime_provenance": (
+                    {
+                        "environment_version": "physical_vec_env_v1",
+                        "physical_environment_config_sha256": physical_env_config_identity(physical_env_manifest),
+                        "parameter_evidence": physical_env_manifest["parameter_evidence"],
+                        "typed_catalog_fingerprint": adapter_catalog.canonical_fingerprint(),
+                    }
+                    if physical_env_manifest else None
                 ),
             }
             annotate_checkpoint(latest_path, checkpoint_metadata)
-            validate_serialized_formal_checkpoint(
-                latest_path,
-                resolved_training=resolved_training,
-                agent_name=args.agent_name,
-                seed=args.random_seed,
-                runtime_contract_sha256=runtime_contract["runtime_contract_sha256"],
-            )
+            if physical_env_manifest is None:
+                validate_serialized_formal_checkpoint(
+                    latest_path,
+                    resolved_training=resolved_training,
+                    agent_name=args.agent_name,
+                    seed=args.random_seed,
+                    runtime_contract_sha256=runtime_contract["runtime_contract_sha256"],
+                )
             if should_save_checkpoint(update_index, args.checkpoint_every_updates):
                 agent.save(str(checkpoint_path))
                 annotate_checkpoint(checkpoint_path, checkpoint_metadata)
@@ -1021,6 +1098,12 @@ def main() -> None:
     )
     summary_payload = {
         "run_id": run_id,
+        "environment_version": "physical_vec_env_v1" if physical_env_manifest else "legacy_vec_env",
+        "physical_environment_config_sha256": (
+            physical_env_config_identity(physical_env_manifest)
+            if physical_env_manifest else None
+        ),
+        "physical_environment_config": physical_env_manifest,
         "non_formal_rehearsal": bool(args.non_formal_rehearsal),
         "formal_performance_evidence": False if args.non_formal_rehearsal else None,
         "agent_name": args.agent_name,
@@ -1105,9 +1188,12 @@ def main() -> None:
             else None
         ),
         "request_execution_mode": (
-            "replay_driven_exogenous_request_exposure"
-            if args.formal_exogenous_request_execution
-            else "legacy_endogenous_progression"
+            "physical_event_driven_workflow_v1"
+            if physical_env_manifest else (
+                "replay_driven_exogenous_request_exposure"
+                if args.formal_exogenous_request_execution
+                else "legacy_endogenous_progression"
+            )
         ),
         "request_exposure_fingerprints": sorted(
             {
@@ -1116,9 +1202,9 @@ def main() -> None:
                 if row.get("request_exposure_fingerprint")
             }
         ),
-        "resolved_model_cache_runtime": runtime_contract,
-        "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
-        "cache_capacity_profile": runtime_contract["cache_capacity_profile"],
+        "resolved_model_cache_runtime": runtime_contract if physical_env_manifest is None else None,
+        "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"] if physical_env_manifest is None else None,
+        "cache_capacity_profile": cache_capacity_profile,
         "train_window_plan_identity": window_plan_identity,
         "formal_window_consumption_binding": window_binding,
         "formal_nullable_metric_aggregation_contract_version": (
