@@ -10,6 +10,7 @@
 - NGSIM 八车真实轨迹已可用于同窗并发 replay；四站位置、覆盖、回传/无线和计算容量仍是推定或受控值。没有与 NGSIM 对齐的可核验道路底图/真实 RSU 部署。
 - Alibaba 是真实调度 DAG 而非同源车载 AI 任务；模型权重、任务输出和跨站状态在 `vec_competition_v1` 中仍是受控元数据，未实测端到端语义正确性。
 - 新 replay 不接旧五动作 agent/正式训练与 benchmark，不能修补 v70 错段/重叠、baseline 预算和 formal/holdout 缺口；详见 `vec_competition_engineering_contract.md`。
+- `vec_final_engineering_gap_review_20261012.md` 按 `tmc_review_policy_v3_20260621` 列出完整 13 类缺口；因缺正式 checkpoint、互斥 formal/holdout 与公平 baseline，论文 verdict 是 `Unverifiable`，不得把工程单窗 8/8 交付写成算法收益。
 
 ## 2026-10-09：v70 窗口身份与强基线可比性（OPEN）
 

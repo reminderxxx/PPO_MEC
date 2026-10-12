@@ -9,6 +9,7 @@
 
 - 新增 `vec_competition_v1`，使用同一 NGSIM 连续时间窗内八辆观测车、八个 Alibaba DAG job、四个推定 RSU；显式竞争缓存、radio/backhaul 与计算槽，并记录迁移和交付账本。
 - 当前为工程诊断；真实底图/站位、无线及模型测量、正式 agent 训练消费端、独立统计与论文结果均未闭环。范围与验收见 `vec_competition_engineering_contract.md`。
+- 固定提交 `4fd8549` 的本地工程产物为 `artifacts/analysis/vec_competition_v1_20261012_4fd8549/`；四站八车单窗完成只属于受控 replay。完整论文审查见 `vec_final_engineering_gap_review_20261012.md`，正式性能 verdict 为 `Unverifiable`（E0）。
 
 ## 2026-10-09：CSCWD 强基线与贡献证据只读审查
 
