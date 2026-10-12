@@ -314,13 +314,38 @@ class PhysicalVecWorkflowCoreEnv:
             vehicle_id: next((item for item in sequence if item is not None and item != current.get(vehicle_id)), None)
             for vehicle_id, sequence in sequences.items()
         }
+        dwell_time = self._predictor.predict_dwell_time(self.vehicles, self.rsu_states)
+        confidence, uncertainty = self._predictor.predict_confidence(
+            self.vehicles, current, sequences, dwell_time
+        )
+        handoff_eta = {
+            vehicle_id: next(
+                (float(index + 1) * self._control_step_s for index, item in enumerate(sequence)
+                 if item is not None and item != current.get(vehicle_id)),
+                None,
+            )
+            for vehicle_id, sequence in sequences.items()
+        }
+        candidate_probabilities = {}
+        for vehicle_id, sequence in sequences.items():
+            non_null = [item for item in sequence if item is not None]
+            denominator = len(non_null)
+            candidate_probabilities[vehicle_id] = {
+                rsu_id: non_null.count(rsu_id) / denominator
+                for rsu_id in sorted(set(non_null))
+            } if denominator else {}
         return {
             "next_rsu_sequence": sequences,
             "predicted_next_rsu_by_vehicle": first,
             "predicted_first_handoff_rsu_by_vehicle": handoff_target,
             "predicted_handoff_vehicle_ids": [vehicle_id for vehicle_id, item in handoff_target.items() if item],
             "future_load": {rsu.rsu_id: float(len(rsu.active_vehicle_ids)) for rsu in self.rsu_states},
-            "dwell_time_by_vehicle": self._predictor.predict_dwell_time(self.vehicles, self.rsu_states),
+            "dwell_time_by_vehicle": dwell_time,
+            "predicted_handoff_eta_s_by_vehicle": handoff_eta,
+            "prediction_confidence_by_vehicle": confidence,
+            "prediction_uncertainty_by_vehicle": uncertainty,
+            "next_rsu_candidate_probability_by_vehicle": candidate_probabilities,
+            "prediction_probability_semantics": "uncalibrated_horizon_vote_share",
             "prediction_evidence": "current_and_past_frames_only",
         }
 

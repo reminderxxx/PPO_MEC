@@ -62,6 +62,25 @@ def test_cache_load_waits_across_steps_then_output_and_delivery_complete() -> No
     assert info["physical_event_trace"] == env.export_physical_events()
 
 
+def test_prediction_exposes_uncalibrated_distribution_eta_and_confidence() -> None:
+    env = PhysicalVecWorkflowCoreEnv(
+        mobility_provider=ReplayProvider(_frames(handoff_at=3)),
+        workflow_state=_graph(),
+        rsu_states=[RSUState("rsu_a", 0.0, 0.0, 30.0), RSUState("rsu_b", 100.0, 0.0, 30.0)],
+    )
+    state, _ = env.reset()
+    predictions = state["predictions"]
+    assert predictions["prediction_probability_semantics"] == "uncalibrated_horizon_vote_share"
+    assert predictions["prediction_evidence"] == "current_and_past_frames_only"
+    assert 0.0 <= predictions["prediction_confidence_by_vehicle"]["v1"] <= 1.0
+    assert 0.0 <= predictions["prediction_uncertainty_by_vehicle"]["v1"] <= 1.0
+    probabilities = predictions["next_rsu_candidate_probability_by_vehicle"]["v1"]
+    if probabilities:
+        assert abs(sum(probabilities.values()) - 1.0) < 1e-9
+    eta = predictions["predicted_handoff_eta_s_by_vehicle"]["v1"]
+    assert eta is None or eta > 0.0
+
+
 def test_running_old_rsu_continues_through_handoff_and_forwards_result() -> None:
     env = PhysicalVecWorkflowCoreEnv(
         mobility_provider=ReplayProvider(_frames(handoff_at=3)),
