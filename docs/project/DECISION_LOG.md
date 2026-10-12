@@ -2,6 +2,12 @@
 
 ## 2026-10-12：八车四站先做跨源轨迹驱动仿真
 
+纠正决定（同日）：八车 `trace_*` 算法池只保留为选站环境与训练接口联调；它没有让策略控制
+cache/offload/handoff，不再作为 SA-GHMAPPO、正式 MAPPO 或近邻论文方法的比较候选。
+后续若研究八车联合控制，先冻结共同动作与观测合同，再接原主方法和代表性通用/方向型/论文方法；
+不得将新 `trace_*` 类改名为旧 registry 或论文方法。独立审查见
+`eight_vehicle_baseline_validity_review_20261012.md`。
+
 算法池补充决定：固定六种学习策略和四种规则策略，使用同一 24/1/8 窗口划分、三个 seed、每个学习策略每 seed
 320 episode；最终 checkpoint 直接评估，不根据评估窗口挑模型。PPO/MAPPO 和 DQN 家族的更新机制不同，
 相同 episode 数不代表优化步数完全公平。旧 `sa_ghmappo`、`mappo`、`qmix`、`controller_mat` 等算法使用不同

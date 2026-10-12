@@ -5,6 +5,15 @@
 
 ﻿# Progress
 
+## 2026-10-12：八车算法池用途纠正
+
+- 独立审查确认，`20261012T073902076174Z` 只比较每车目标 RSU 选择；adapter 拉取/LRU 与 handoff
+  传输由环境自动处理，未运行原 `sa_ghmappo`、正式 `mappo` 或论文近邻方法。其上一节的奖励表仅是
+  环境/训练/日志联调记录，状态改为 `INVALID_FOR_SA_GHMAPPO_ALGORITHM_COMPARISON`，不得进入论文主表。
+- 合格对照需在同一联合控制合同下包含主方法、通用 RL 代表、DAG/cache/handoff 方向对照和核验后的
+  同方向论文方案，并补齐机制机会与主要终点。完整只读审查见
+  `eight_vehicle_baseline_validity_review_20261012.md`；论文算法有效性继续为 `Unverifiable`。
+
 ## 2026-10-12：八车共享策略 PPO 单次训练及奖励结果
 
 同日算法池补充：从已推送 commit `05f7ec2` 的 clean worktree 执行 run

@@ -13,6 +13,9 @@ Alibaba DAG，共享四个模拟 RSU 的计算、链路与 adapter cache，输�
 不复用现有 `ppo` / `sa_ghmappo` checkpoint 或正式算法 registry。
 `scripts/benchmark_eight_vehicle_algorithms.py` 在同一八车动作合同和相同窗口上训练六种探索性学习策略、
 评估四种规则策略，并输出逐请求事件与原仓库算法的合同排除清单；其结果仍是非正式仿真诊断。
+**用途纠正：**该入口只比较每车选择目标 RSU 的策略，缓存拉取、淘汰与 handoff 传输由环境自动执行；
+不能用其奖励表比较 SA-GHMAPPO、正式 MAPPO 或同方向论文方法。见
+[`八车算法对比有效性纠正审查`](docs/project/eight_vehicle_baseline_validity_review_20261012.md)。
 
 最小机制证据闭环（共享缓存四配置、连续/重跑/后缀恢复、12 个有界决策场景）见
 [results](docs/project/mechanism_evidence_closure_results_20261005.md)；结论是 bounded diagnostic，非 formal、holdout、

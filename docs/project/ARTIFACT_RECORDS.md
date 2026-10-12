@@ -7,6 +7,11 @@
 
 ## 2026-10-12 eight-vehicle algorithm pool diagnostic
 
+**2026-10-12 纠正状态：`INVALID_FOR_SA_GHMAPPO_ALGORITHM_COMPARISON`。** 该 run 的奖励和完成数
+只反映四站选址子问题的联调；不能充当主方法、正式 MAPPO、DAG/cache/handoff 方法或论文近邻算法的
+baseline 结果。历史 artifact 不覆写；原因和有效比较门槛见
+`eight_vehicle_baseline_validity_review_20261012.md`。
+
 - run ID：`20261012T073902076174Z`；路径：
   `artifacts/training/eight_vehicle_algorithm_diagnostic/20261012T073902076174Z/`；execution commit：
   `05f7ec20dad802fa0174088832b0b0a817bdbfd7`。`manifest.json` 保留完整命令、数据路径、输入指纹、

@@ -5,6 +5,14 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-12：八车算法池的动作空间不覆盖主方法（OPEN BLOCKER）
+
+- 目前八车回放只有逐车目标 RSU 动作；adapter fetch/LRU eviction/handoff transfer 被环境自动执行。
+  SA-GHMAPPO 的 cache/offload/handoff 联合动作与 graph/hierarchical 结构没有进入该 run，
+  `trace_mappo` 等新类也不是原 registry 算法。此前十臂奖励表不能用于主方法或论文算法比较。
+- 必须先冻结并实现共同联合控制合同，再用原主方法、匹配通用 RL、方向型方法和经原论文核验的近邻方案
+  同条件训练评估；见 `eight_vehicle_baseline_validity_review_20261012.md`。
+
 ## 2026-10-12：八车四 RSU 诊断仍缺实测成本与训练合同（OPEN）
 
 - 新多请求回放只有跨源配对的 NGSIM 轨迹与 Alibaba DAG；四站覆盖、计算、链路、缓存和 handoff 成本为显式假设。

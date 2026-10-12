@@ -9,6 +9,10 @@
 
 算法池诊断（默认 seed 7/13/29，每种学习策略各 320 episodes；24 个训练窗口、跳过 1 个合格窗口、8 个评估窗口）：
 
+**仅用于八车选站环境、训练接口和事件记账联调。** 此环境不提供 cache/offload/handoff 联合动作，
+该入口不能作为 SA-GHMAPPO 或正式 MAPPO 的对比实验；具体审查见
+`eight_vehicle_baseline_validity_review_20261012.md`。
+
 ```bash
 .venv/bin/python scripts/benchmark_eight_vehicle_algorithms.py \
   --mobility_csv_path 'data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
