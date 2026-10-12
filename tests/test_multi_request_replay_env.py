@@ -62,6 +62,16 @@ def test_window_requires_all_vehicles_to_persist_in_one_segment() -> None:
         select_continuous_window(frames, vehicle_count=8, window_length=3)
 
 
+def test_window_excludes_duplicate_vehicle_records() -> None:
+    frames = [
+        {"time_index": step, "source_segment_id": "one", "vehicles": [_vehicle(f"v{i}") for i in range(8)]}
+        for step in range(2)
+    ]
+    frames[1]["vehicles"].append(_vehicle("v0"))
+    with pytest.raises(RuntimeError, match="persistent vehicles"):
+        select_continuous_window(frames, vehicle_count=8, window_length=2)
+
+
 def test_uncovered_target_is_rejected() -> None:
     frames = [
         {"time_index": step, "source_segment_id": "one", "vehicles": [_vehicle("v0")]}

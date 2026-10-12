@@ -2,6 +2,10 @@
 
 ## 2026-10-12 八车四 RSU 轨迹驱动诊断
 
+- `src/agents/ppo_agent.py` 中的 `TraceDrivenMultiRequestPPO`：独立实验性共享策略 PPO，不注册为正式 baseline。
+- `scripts/train_eight_vehicle_ppo.py`：多个不重叠 NGSIM 窗口的训练、间隔与评估，保存诊断 checkpoint 和逐窗口奖励。
+- `tests/test_trace_driven_ppo.py`：非法 RSU 动作 mask 回归。
+- `artifacts/training/eight_vehicle_ppo_diagnostic/`：训练 manifest、最终 checkpoint、逐 episode 和逐窗口结果；不进入 Git。
 - `src/envs/core/multi_request_replay_env.py`：独立多请求帧级环境，共享四站 compute/link/cache 容量。
 - `scripts/run_eight_vehicle_simulation.py`：NGSIM 连续八车与 Alibaba 八 DAG 的确定性跨源配对及回放入口。
 - `tests/test_multi_request_replay_env.py`：八请求争用同一计算槽、窗口连续性和非法目标测试。

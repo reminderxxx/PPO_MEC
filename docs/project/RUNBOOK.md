@@ -7,6 +7,22 @@
 
 ## 八车四 RSU 轨迹驱动诊断（2026-10-12）
 
+共享策略 PPO 诊断训练（单 seed、320 episodes；默认 24 个训练窗口，跳过 1 个合格窗口，再评估 8 个窗口）：
+
+```bash
+.venv/bin/python scripts/train_eight_vehicle_ppo.py \
+  --mobility_csv_path 'data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
+  --workflow_csv_path data/raw/workflow/alibaba2018/batch_task.csv \
+  --max_mobility_rows 250000 --window_length 120 --episodes 320 \
+  --train_windows 24 --gap_windows 1 --eval_windows 8 --seed 7
+```
+
+输出写入 `artifacts/training/eight_vehicle_ppo_diagnostic/<UTC-run-id>/` 的 `manifest.json`、
+`final_checkpoint.pt` 与 `results.json`；逐 episode 训练奖励和八个逐窗口评估奖励均保留。
+这是单 seed、假设成本、跨源配对的诊断训练；不同窗口不能自动称独立车辆/请求分布，
+PPO 策略也不是现有正式 SA-GHMAPPO 或 PPO checkpoint。训练过程中不读取评估奖励；最终 checkpoint
+直接评估，不在八窗口中挑选最佳 checkpoint。
+
 在有原始 NGSIM 和 Alibaba 文件的工作区执行；隔离 worktree 可用显式绝对路径引用原始文件。输出目录
 `artifacts/diagnostics/eight_vehicle_simulation/<UTC-run-id>/` create-only，包含 `manifest.json`、
 `request_events.jsonl` 和 `summary.json`，不含原始 CSV。示例：

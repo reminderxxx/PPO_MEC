@@ -2,6 +2,9 @@
 
 ## 八车四 RSU 轨迹驱动诊断（2026-10-12）
 
+- `src/agents/ppo_agent.py` 中 `TraceDrivenMultiRequestPPO` 只消费多请求回放当前帧观测，对每辆未完成车辆
+  在覆盖内四站产生动作；训练脚本做 PPO 更新，保持现有 `PPOAgent`/registry 与正式 checkpoint 消费端不变。
+- `scripts/train_eight_vehicle_ppo.py` 与回放环境复用 NGSIM/Alibaba loader，但训练及评估独立输出到诊断根目录。
 - `src/envs/core/multi_request_replay_env.py` 从已有 `RSUMapper`、`VehicleState`、`WorkflowGraphState` 消费只读语义对象；
   它拥有独立的八请求、共享资源和逐帧事件状态，不修改 `VecWorkflowCoreEnv`、action codec 或训练器。
 - `scripts/run_eight_vehicle_simulation.py` 消费 `NGSIMProvider`、`WorkflowDatasetBuilder`、`build_sample_rsus`，

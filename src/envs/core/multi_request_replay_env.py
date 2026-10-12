@@ -6,7 +6,7 @@ models, emulate a radio, or claim a measured vehicle-to-workflow joint trace.
 
 from __future__ import annotations
 
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from copy import deepcopy
 from dataclasses import dataclass
 from math import dist
@@ -46,9 +46,11 @@ def select_continuous_window(
         segment = window[0].get("source_segment_id")
         if any(frame.get("source_segment_id") != segment for frame in window):
             continue
-        common = set(_vehicle_ids(window[0]))
+        common = {vehicle_id for vehicle_id, count in Counter(_vehicle_ids(window[0])).items() if count == 1}
         for frame in window[1:]:
-            common.intersection_update(_vehicle_ids(frame))
+            common.intersection_update(
+                vehicle_id for vehicle_id, count in Counter(_vehicle_ids(frame)).items() if count == 1
+            )
             if len(common) < vehicle_count:
                 break
         if len(common) >= vehicle_count:
@@ -117,6 +119,7 @@ class MultiRequestReplayEnv:
     def observe(self) -> dict[str, Any]:
         vehicles = self.frames[self.frame_index]["vehicles"]
         associations = self.mapper.associate(vehicles)
+        associated_counts = Counter(item for item in associations.values() if item is not None)
         return {
             "frame_index": self.frame_index,
             "time_index": int(self.frames[self.frame_index]["time_index"]),
@@ -126,12 +129,27 @@ class MultiRequestReplayEnv:
                 "workflow_id": self.workflows[vehicle.vehicle_id].workflow_id,
                 "current_node_id": self.workflows[vehicle.vehicle_id].current_node_id,
                 "completed": self.workflows[vehicle.vehicle_id].is_completed,
+                "position_x": float(vehicle.position_x),
+                "position_y": float(vehicle.position_y),
+                "speed": float(vehicle.speed),
+                "required_adapter": (
+                    self.workflows[vehicle.vehicle_id].current_node().required_adapter
+                    if self.workflows[vehicle.vehicle_id].current_node() is not None else None
+                ),
+                "remaining_nodes": len(self.workflows[vehicle.vehicle_id].nodes)
+                - len(self.workflows[vehicle.vehicle_id].completed_node_ids),
+                "last_service_rsu_id": self.last_service_rsu[vehicle.vehicle_id],
             } for vehicle in vehicles},
             "rsus": {rsu.rsu_id: {
                 "cached_adapter_ids": list(self.cache[rsu.rsu_id]),
                 "loading_adapter_ids": list(self.loading[rsu.rsu_id]),
                 "compute_slots": self.costs.compute_slots_per_rsu,
                 "link_slots": self.costs.link_slots_per_rsu,
+                "adapter_slots": self.costs.adapter_slots_per_rsu,
+                "associated_vehicle_count": associated_counts[rsu.rsu_id],
+                "position_x": float(rsu.position_x),
+                "position_y": float(rsu.position_y),
+                "coverage_radius": float(rsu.coverage_radius),
             } for rsu in self.rsus},
         }
 
