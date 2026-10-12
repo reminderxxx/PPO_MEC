@@ -5,6 +5,26 @@
 
 # Runbook
 
+## 八车四 RSU 轨迹驱动诊断（2026-10-12）
+
+在有原始 NGSIM 和 Alibaba 文件的工作区执行；隔离 worktree 可用显式绝对路径引用原始文件。输出目录
+`artifacts/diagnostics/eight_vehicle_simulation/<UTC-run-id>/` create-only，包含 `manifest.json`、
+`request_events.jsonl` 和 `summary.json`，不含原始 CSV。示例：
+
+```bash
+.venv/bin/python scripts/run_eight_vehicle_simulation.py \
+  --mobility_csv_path 'data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
+  --workflow_csv_path data/raw/workflow/alibaba2018/batch_task.csv \
+  --max_mobility_rows 250000 --window_length 120
+```
+
+入口选首个同段、连续 120 帧都有八辆车的窗口，按车辆 ID 和 Alibaba `ordered` DAG 顺序一一配对；
+默认 `rsu_coverage_factor=0.75`、每站一计算槽/一链路槽/两 adapter 槽，adapter 获取和 handoff 状态
+各耗一帧。控制动作可由环境 API 为每车选择覆盖内 RSU；此入口只运行最近覆盖站 baseline，不训练算法。
+RSU 几何及全部成本为假设值，结果是 cross-source diagnostic，不能当成实测、正式 benchmark 或真实推理。
+八个请求假定同时到达；每节点默认一计算帧，不使用 Alibaba 原始 `start_time` 或节点输入/输出字节；
+RSU 几何由整个诊断窗口生成，未来正式评估不能直接沿用这一选择规则。
+
 ## 最小机制证据闭环（2026-10-05）
 
 冻结方案与结果分别见 `mechanism_evidence_closure_plan_20261005.md` 和

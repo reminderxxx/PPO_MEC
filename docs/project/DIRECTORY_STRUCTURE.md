@@ -1,5 +1,12 @@
 ﻿# Directory Structure
 
+## 2026-10-12 八车四 RSU 轨迹驱动诊断
+
+- `src/envs/core/multi_request_replay_env.py`：独立多请求帧级环境，共享四站 compute/link/cache 容量。
+- `scripts/run_eight_vehicle_simulation.py`：NGSIM 连续八车与 Alibaba 八 DAG 的确定性跨源配对及回放入口。
+- `tests/test_multi_request_replay_env.py`：八请求争用同一计算槽、窗口连续性和非法目标测试。
+- `artifacts/diagnostics/eight_vehicle_simulation/`：本地诊断 manifest、逐请求 JSONL 和 summary；不进入 Git 或正式结果。
+
 ## 2026-10-05 最小机制证据闭环
 
 - `configs/experiment/mechanism_evidence_closure_v1.json`：A/C 冻结矩阵、成本模型、预算和命令。

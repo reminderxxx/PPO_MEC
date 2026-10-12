@@ -1,5 +1,12 @@
 # Code Module Map
 
+## 八车四 RSU 轨迹驱动诊断（2026-10-12）
+
+- `src/envs/core/multi_request_replay_env.py` 从已有 `RSUMapper`、`VehicleState`、`WorkflowGraphState` 消费只读语义对象；
+  它拥有独立的八请求、共享资源和逐帧事件状态，不修改 `VecWorkflowCoreEnv`、action codec 或训练器。
+- `scripts/run_eight_vehicle_simulation.py` 消费 `NGSIMProvider`、`WorkflowDatasetBuilder`、`build_sample_rsus`，
+  生成跨源配对 manifest、request events 和诊断 summary。它不写正式 checkpoint 或 main-results schema。
+
 ## 2026-10-05 bounded mechanism evidence
 
 - `scripts/run_mechanism_evidence_closure.py`：只读复用 native request ledgers，构建 A 的公平成本表；通过正常

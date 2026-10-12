@@ -5,6 +5,13 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-12：八车四 RSU 诊断仍缺实测成本与训练合同（OPEN）
+
+- 新多请求回放只有跨源配对的 NGSIM 轨迹与 Alibaba DAG；四站覆盖、计算、链路、缓存和 handoff 成本为显式假设。
+- 最近站 baseline 的 8/8 完成仅证明共享容量与逐请求记录可执行；未运行现有 SA-GHMAPPO、多请求算法训练、
+  实际模型推理或实体 RSU。后续若要做正式算法比较，需冻结多请求 observation/action/reward、外生到达、
+  成本校准与全部 baseline 消费端，并将诊断结果与正式产物隔离。
+
 ## 2026-10-09：v70 窗口身份与强基线可比性（OPEN）
 
 - v70 mixed/full 的 `selected_window_plan` 是 Peachtree，原始 rows/episode receipt 是 Lankershim，ID 交集为 0；普通 frozen-plan 路径传入的 `expected_window_id` 未被普通 mobility loader 校验。需要独立实现任务修复身份链和 rollout 前错段负例。

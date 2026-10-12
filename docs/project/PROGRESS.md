@@ -5,6 +5,16 @@
 
 ﻿# Progress
 
+## 2026-10-12：八车四 RSU 轨迹驱动诊断入口
+
+- 独立多请求回放已让八个 NGSIM 连续车辆分别执行八个 Alibaba DAG，并争用四个仿真 RSU 的共享容量；
+  输出每帧每请求状态与显式来源/成本 manifest。一次 120 帧本地诊断在第 28 帧达到 8/8 请求、70/70 节点完成，
+  产生 compute queue 73 次、adapter fetch 3 次、handoff state transfer 2 次。该数值仅是未校准默认参数下的
+  最近站 baseline 功能见证，不作为算法或论文性能结论。
+- 探索中 `auto_dominant_tight` 默认 0.45 覆盖系数只完成 7/8，其中一辆车全程未被覆盖；将显式
+  `rsu_coverage_factor` 设为 0.75 后得到上述 8/8。此参数调整看过诊断结果，因此不能作为冻结正式比较。
+- 未接算法训练、真实模型推理、实体 RSU 或联合请求日志；正式训练和对比仍待多请求控制合同与成本校准。
+
 ## 2026-10-09：CSCWD 强基线与贡献证据只读审查
 
 - 已从 v70 mixed/full 原始 rows、episode receipt、checkpoint manifest 和统计包复核旧奖励均值；这些仍是开发协议描述性结果。

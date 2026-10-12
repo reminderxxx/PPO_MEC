@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-10-12：八车四站先做跨源轨迹驱动仿真
+
+- 决定：独立实现八请求共享资源回放，使用 NGSIM 同段连续八车与 Alibaba 八个不同 DAG 的固定顺序配对；
+  四站由轨迹几何生成，计算、链路、缓存和状态传输成本均为显式帧级假设。
+- 决定：此入口只验证并发环境和逐请求记录，不接旧单主车 checkpoint、正式 Protocol、holdout 或论文主表；
+  后续训练须先冻结多请求 observation/action/reward contract 并校准成本，再统一接入 baseline 消费端。
+- 边界：跨源配对不是原始车辆请求联合日志；单机逻辑 RSU 不是四台实体设备，帧级完成不等于模型推理成功。
+
 ## 2026-10-05：机制证据优先，不晋级 RL
 
 - 决定：保留原生 typed-cache candidate 作为 opt-in bounded mechanism，正式协议不静默切换。
