@@ -7,6 +7,19 @@
 
 ## 2026-10-12：八车共享策略 PPO 单次训练及奖励结果
 
+同日算法池补充：从已推送 commit `05f7ec2` 的 clean worktree 执行 run
+`20261012T073902076174Z`；六种新八车合同学习策略各用 3 seed × 320 episode，四种规则策略用相同
+3 seed × 8 eval 窗口。共 18 个最终 checkpoint、5,760 个训练 episode、240 个策略-seed-窗口评估行和
+58,861 条逐请求事件。八个 eval 窗口在 seed 间复用，只有八个外层窗口单元。
+按策略汇总的平均原始奖励：`trace_ppo 60.7700`、`trace_mappo 60.8658`、`trace_dqn/trace_ddqn 60.5875`、
+`trace_dueling_dqn/trace_dueling_ddqn 60.5967`、`nearest 60.8650`、`uniform_random 60.8617`、
+`least_associated 60.9138`、`cache_affinity 60.8050`。所有策略均完成 174/192 个重复评估请求，
+等价于每 seed 58/64；奖励差距主要是完成时机。未按结果调参、删窗口或换 checkpoint。
+`audit.json` 对 checkpoint 哈希、窗口原始时间互斥、训练/评估行、事件与奖励逐帧重算均通过。
+这是新 `trace_*` 算法合同上的探索性结果；原 registry 的 SA-GHMAPPO、MAPPO、QMIX 等未在八车环境运行。
+正式论文证据缺 formal/holdout/support，按 `tmc_review_policy_v3_20260621` 为 `Unverifiable`。
+
+
 - run `20261012T071927073309Z` 从 commit `5a85d5d` 完成 seed 7 的 320 episode、40 次 PPO 更新，
   24 个训练窗口与 8 个时间不重叠的评估窗口（中间跳过 1 个合格窗口）。最终 checkpoint 和逐请求事件保存在
   `artifacts/training/eight_vehicle_ppo_diagnostic/20261012T071927073309Z/`。

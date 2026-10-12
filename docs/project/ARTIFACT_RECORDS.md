@@ -5,6 +5,25 @@
 
 # Artifact Records
 
+## 2026-10-12 eight-vehicle algorithm pool diagnostic
+
+- run ID：`20261012T073902076174Z`；路径：
+  `artifacts/training/eight_vehicle_algorithm_diagnostic/20261012T073902076174Z/`；execution commit：
+  `05f7ec20dad802fa0174088832b0b0a817bdbfd7`。`manifest.json` 保留完整命令、数据路径、输入指纹、
+  24/1/8 窗口、成本假设和原算法排除理由；`results.json` 保留 5,760 训练行与 240 评估行；
+  18 个最终 `*.pt` checkpoint 和 58,861 条 `eval_request_events.jsonl` 逐请求事件均存在。
+- 三个 seed 为 7/13/29，每个学习策略每 seed 320 episode；六学习策略为新合同上的 PPO、集中 critic MAPPO、
+  DQN、DDQN、dueling DQN、dueling DDQN，另有最近站、均匀随机、最少关联负载和 cache affinity 四规则臂。
+  八个 eval 窗口在三个 seed 间复用，不能把 24 行视为独立道路窗口。
+- 平均原始奖励（按固定 24 个 seed-window 行描述）：PPO `60.7700`、MAPPO `60.8658`、DQN/DDQN
+  `60.5875`、dueling DQN/DDQN `60.5967`、最近站 `60.8650`、随机 `60.8617`、最少关联负载
+  `60.9138`、cache affinity `60.8050`。十臂请求完成数均为 174/192（每 seed 58/64），
+  完成节点均值均为 63.125；奖励微差不足以宣称学习方法优越。
+- `audit.json` 在 2026-10-12 复核 18 个 checkpoint SHA-256、5,760 训练行、240 唯一评估键、
+  原始时间窗口互斥和逐帧事件/奖励守恒；诊断完整性 `passed`。形式证据等级 `E0_UNAVAILABLE`、
+  paper-ready verdict `Unverifiable`：无正式 checkpoint/protocol/holdout/support，未做文献 novelty 审查。
+
+
 ## 2026-10-12 eight-vehicle shared-actor PPO diagnostic
 
 - run ID：`20261012T071927073309Z`；路径：`artifacts/training/eight_vehicle_ppo_diagnostic/20261012T071927073309Z/`；
