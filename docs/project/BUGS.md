@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-13：v2 开发集暴露确定性策略与机制激活 blocker（OPEN）
+
+- `20261013T083022Z_development` 三 seed 原始审查见 `eight_vehicle_joint_v2_dev_review_20261013.md`。SA-GHMAPPO seed 27 greedy 完成均值 `0.5/8`，大量选 action 3 且 adapter 未就绪；MAPPO seed 7、PPO seed 17 和其他对照亦有 seed 依赖失败。sample 三 seed 各算法均 `8/8`。修复 PPO rollout/目标合同并未消除 greedy 退化。
+- 节点工作量全为一帧；成功策略几乎只用 action 0，未激活有效 handoff/prepare。缓存虽发生驱逐，SA 的成功结果与 DAG/cache 方向基线完全相同，model cache 友好优势未验证。
+- 下一独立实现轮应先做 logits/mask/概率和 action 3 可行性诊断，再冻结多帧负载与机制机会协议，保持 dev/formal/holdout 边界。当前开发运行不能用于新 paper claim；formal/holdout/support 缺失，`Unverifiable`。
+
 ## 2026-10-12：八车实现合同已修复，性能与系统真实性仍开放
 
 - **FIXED / opt-in v2**：masked 动作 PPO 主目标及未舍入旧概率；raw-policy 元数据保存；完整团队回报；

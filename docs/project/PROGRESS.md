@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-13：八车 v2 七算法开发集完成，主方法优势仍未证实
+
+- 冻结命令的 `20261013T083022Z_development` 已完成 7 算法 × 3 seed × 24 episode；504 train、126 update、21 个 checkpoint、各 168 条 greedy/sample dev 和 144,061 条事件通过哈希、数量与逐帧奖励复算。原始产物位于 `artifacts/eight_vehicle_joint_v2_development_20261012/`；审查见 `eight_vehicle_joint_v2_dev_review_20261013.md`。
+- SA-GHMAPPO greedy 平均奖励 `43.748`、完成 `5.5/8`，MAPPO 为 `42.396`、`5.333/8`；SA seed 27 仍只有 `0.5/8`，其他算法也有 seed 依赖的 action 3 坍缩。sample 各算法均 `8/8`，不能以训练/采样成功代替部署时的确定性策略。
+- 所有节点仍是一帧工作量；成功执行几乎全是 action 0，未实现 handoff 准备或状态迁移增益。缓存加载/驱逐虽发生，但无法据此支持“主方法 model cache 更优”。formal/holdout/support 未运行，论文结论继续 `Unverifiable`；不更新 canonical 或论文主表。
+
 ## 2026-10-12：八车 v2 环境与算法合同修复完成局部验收
 
 - 中心任务分派并集成 PPO/恢复合同、typed cache、执行迁移、预测共享观察与特征消费；修改入口、模块和配置边界见 `CODE_MODULE_MAP.md` / `RUNBOOK.md`。
