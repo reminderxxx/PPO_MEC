@@ -275,4 +275,15 @@ def test_pending_result_can_follow_vehicle_via_paid_versioned_edge_forwarding():
     assert restored["output_transfer_bytes"] == 0
     delivered = env.step_controls({"v0": JointRequestControl("b")})[3]["events"][0]
     assert delivered["status"] == "node_completed" and delivered["output_transfer_bytes"] == 2
+    assert delivered["output_source_rsu_id"] == "b"
     assert env.workflows["v0"].is_completed and env.execution_location["v0"] == "b"
+
+
+def test_waiting_control_still_records_the_actual_output_downlink_source():
+    env = make_env(count=1, nodes=1, input_size=2)
+    warm(env)
+    env.step_controls({"v0": JointRequestControl("a")})
+    env.step_controls({"v0": JointRequestControl("a")})
+    event = env.step_controls({"v0": JointRequestControl()})[3]["events"][0]
+    assert event["target_rsu_id"] is None and event["output_source_rsu_id"] == "a"
+    assert event["status"] == "node_completed" and event["output_transfer_link_frames"] == 1

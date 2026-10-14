@@ -236,9 +236,11 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
                 transfers.append(self._transfer_state_v2(vid, control.prepare_target, link_left))
             input_result = {"bytes": 0, "link_frames": 0}
             output_result = {"bytes": 0, "link_frames": 0, "completed": False}
+            output_source = None
             completed, status = False, "waiting"
             if vid in self.output_pending:
                 output_result = self._output(vid, state["reachable_execution_rsu_ids"], link_left, target)
+                output_source = self.output_pending.get(vid, {}).get("rsu_id", self.execution_location[vid])
                 if "state_transfer" in output_result:
                     transfers.append(output_result["state_transfer"])
                 completed, status = output_result["completed"], output_result["status"]
@@ -290,6 +292,7 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
                 "state_transfer_link_frames": sum(t["link_frames"] for t in transfers),
                 "input_transfer_bytes": input_result["bytes"], "input_transfer_link_frames": input_result["link_frames"],
                 "output_transfer_bytes": output_result["bytes"], "output_transfer_link_frames": output_result["link_frames"],
+                "output_source_rsu_id": output_source,
                 "state_version_before": version_before, "state_version_after": self.state_version[vid],
                 "state_payload_bytes": self.state_payload_bytes[vid], "work_progress": self.work_progress[vid],
                 "work_units_required": self._work_required(node), "association_handoff": handoff,
