@@ -1,5 +1,9 @@
 # Code Module Map
 
+## 八车开发曲线隔离（2026-10-14）
+
+`scripts/launch_eight_vehicle_joint_experiment.py` 在可选固定间隔保存训练中的 checkpoint；另构建同 registry 类型的恢复副本做 greedy 开发评价，再恢复 Python/NumPy/PyTorch 随机状态。训练 agent 不被开发评价调用；默认执行路径、物理环境、PPO 目标和正式 checkpoint 消费端不变。`tests/test_joint_experiment_launcher.py` 验证曲线、checkpoint 哈希及开启/关闭曲线时相同训练轨迹。
+
 ## 八车 v2 合同修复与任务交付（2026-10-12）
 
 | 修改线 | 实现位置 | 已落实内容 |

@@ -50,6 +50,8 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--holdout_gap_windows", type=int, default=15)
     parser.add_argument("--episodes", type=int, default=24)
     parser.add_argument("--update_every", type=int, default=4)
+    parser.add_argument("--development_eval_every", type=int, default=0,
+                        help="Opt-in checkpoint and greedy dev curve interval in episodes; 0 disables it")
     parser.add_argument("--seeds", type=int, nargs="+", default=[7, 17, 27])
     parser.add_argument("--agents", nargs="+", choices=AGENTS, default=list(AGENTS))
     parser.add_argument("--output_root", type=Path, default=ROOT / "artifacts/eight_vehicle_joint_sim")
@@ -287,6 +289,12 @@ def main() -> None:
         raise ValueError("strict_cold_cache_mask requires environment revision v2")
     if args.environment_revision == "v2" and not (args.development_only or args.smoke or args.preflight_only):
         raise ValueError("v2 is development-only until a new independent evaluation protocol is frozen; use --development_only")
+    if args.development_eval_every < 0 or (args.development_eval_every and (
+        args.environment_revision != "v2" or not args.development_only
+        or args.development_eval_every > args.episodes
+        or args.development_eval_every % args.update_every != 0
+    )):
+        raise ValueError("development_eval_every requires v2 development_only, an update boundary, and <= episodes")
     if not np.isfinite(args.sa_auxiliary_coef) or args.sa_auxiliary_coef < 0:
         raise ValueError("sa_auxiliary_coef must be finite and nonnegative")
     if len(set(args.agents)) != len(args.agents):
@@ -322,6 +330,7 @@ def main() -> None:
         "git_commit": git_commit, "command": sys.argv, "agents": args.agents, "seeds": args.seeds,
         "git_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip()),
         "episodes_per_agent_seed": args.episodes, "update_every": args.update_every,
+        "development_eval_every": args.development_eval_every,
         "window_length": args.window_length, "max_mobility_rows": args.max_mobility_rows,
         "mobility_csv_path": str(args.mobility_csv_path.resolve()),
         "workflow_csv_path": str(args.workflow_csv_path.resolve()),
@@ -387,6 +396,38 @@ def main() -> None:
                                   "episode": episode_index, "sample_count": len(pending),
                                   "update": update})
                     pending = []
+                if args.development_eval_every and (episode_index + 1) % args.development_eval_every == 0:
+                    rng_state = (random.getstate(), np.random.get_state(), torch.random.get_rng_state())
+                    curve_checkpoint = (output / "curve_checkpoints" /
+                                        f"{name}_seed{seed}_episode{episode_index+1}.pt")
+                    curve_checkpoint.parent.mkdir(parents=True, exist_ok=True)
+                    agent.save(str(curve_checkpoint))
+                    _append_jsonl(output / "curve_checkpoints.jsonl", {
+                        "agent": name, "seed": seed, "episode": episode_index + 1,
+                        "path": str(curve_checkpoint), "sha256": _hash_file(curve_checkpoint),
+                        "environment_revision": args.environment_revision,
+                        "observation_contract": manifest["observation_contract"],
+                        "agent_options": _agent_options(name, args),
+                    })
+                    # Probe a restored snapshot so dev evaluation cannot mutate the
+                    # live trainer. Restore RNG streams before its next rollout.
+                    try:
+                        evaluation_agent = build_agent(name, random_seed=seed, train_epochs=2,
+                                                       batch_size=64, **_agent_options(name, args))
+                        evaluation_agent.load(str(curve_checkpoint))
+                        for window in splits["dev"]:
+                            curve_summary, _, _ = _episode(
+                                evaluation_agent, window, workflows, rsus,
+                                deterministic=True, collect=False,
+                                environment_options=environment_options)
+                            _append_jsonl(output / "dev_curve.jsonl", {
+                                "agent": name, "seed": seed, "episode": episode_index + 1,
+                                **curve_summary,
+                            })
+                    finally:
+                        random.setstate(rng_state[0])
+                        np.random.set_state(rng_state[1])
+                        torch.random.set_rng_state(rng_state[2])
                 if episode_index == 0 or (episode_index + 1) % args.update_every == 0:
                     print(f"TRAIN agent={name} seed={seed} episode={episode_index+1}/{args.episodes} "
                           f"completed={summary['completed_requests']}/8", flush=True)

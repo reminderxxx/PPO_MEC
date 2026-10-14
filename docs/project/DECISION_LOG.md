@@ -1,5 +1,11 @@
 ﻿# Decision Log
 
+## 2026-10-14：把计算强度与状态大小分轴，并固定开发曲线
+
+既有八车默认设置全部 DAG 节点单帧完成，96 episode 的 SA/MAPPO 贪心回报完全相同。训练窗口资格探针在保持四站、原始 NGSIM/Alibaba 和共同动作合同下，先按源输入单位预定多帧计算量，再检查未完成请求是否经历换站。`workflow_profile_unit_bytes=256, workload_bytes_per_unit=1024` 可激活跨帧执行，但同时把状态字节放大 256 倍；因此下一开发实验采用**等计算量**的 `workflow_profile_unit_bytes=1, workload_bytes_per_unit=4`，将状态字节与计算强度解耦。两者均为受控代理，不能称实测 FLOPs 或网络字节。
+
+开发曲线固定每 24 episode 记录一次 greedy checkpoint，不依曲线挑选最优 checkpoint；正式评价仍使用第 96 episode 的末端 checkpoint。曲线评价在恢复副本上执行并恢复 RNG，隔离训练轨迹。只在开发集测试 SA、MAPPO 和第一方缓存 PPO；旧 formal 已查看，不能重作盲测。
+
 ## 2026-10-14：先隔离冷缓存动作退化，再决定是否引入学习型预测
 
 `eight_vehicle_joint_v2_budget_review_20261014.md` 已定位共同 action 3 的冷缓存停滞；本轮以 opt-in v2 mask 做最小独立实现，所有算法在 adapter 未就绪时都只能通过其他合法动作（包括 action 0）推进。保留旧默认合同，另标识新动作合同与开发协议；不得把规则修复归为 SA-GHMAPPO 独有算法贡献。新旧结果只能作开发诊断，若正式采用，须冻结新 protocol、从头同条件重训并建立独立 formal/holdout。

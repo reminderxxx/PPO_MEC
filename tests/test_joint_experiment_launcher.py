@@ -125,6 +125,42 @@ def test_main_v2_cold_mask_records_distinct_contract(monkeypatch, tmp_path):
     assert manifest["costs"]["strict_cold_cache_mask"] is True
 
 
+@pytest.mark.parametrize("name", ["sa_ghmappo", "mappo", "cache_offload_drl"])
+def test_development_curve_saves_restorable_snapshots_without_opening_formal(monkeypatch, tmp_path, name):
+    window, workflows, rsus = _fixture()
+    monkeypatch.setattr(launcher, "_load_protocol", lambda args: (
+        {name: [window] for name in ("train", "dev", "formal", "holdout")}, workflows, rsus))
+    raw = tmp_path / "fixture.csv"
+    raw.write_text("synthetic_fixture_only")
+    output = tmp_path / "runs"
+    monkeypatch.setattr(sys, "argv", ["launch_eight_vehicle_joint_experiment.py",
+        "--environment_revision", "v2", "--development_only",
+        "--episodes", "4", "--update_every", "2", "--development_eval_every", "2",
+        "--agents", name, "--seeds", "13", "--mobility_csv_path", str(raw),
+        "--workflow_csv_path", str(raw), "--output_root", str(output)])
+    launcher.main()
+    run = next(output.iterdir())
+    curve = [json.loads(line) for line in (run / "dev_curve.jsonl").read_text().splitlines()]
+    checkpoints = [json.loads(line) for line in (run / "curve_checkpoints.jsonl").read_text().splitlines()]
+    final = json.loads((run / "dev.jsonl").read_text().strip())
+    assert [row["episode"] for row in curve] == [2, 4]
+    assert [row["episode"] for row in checkpoints] == [2, 4]
+    assert all(launcher._hash_file(launcher.Path(row["path"])) == row["sha256"]
+               for row in checkpoints)
+    assert final["reward"] == curve[-1]["reward"]
+    assert not (run / "formal.jsonl").exists() and not (run / "holdout.jsonl").exists()
+    control_output = tmp_path / "control_runs"
+    monkeypatch.setattr(sys, "argv", ["launch_eight_vehicle_joint_experiment.py",
+        "--environment_revision", "v2", "--development_only",
+        "--episodes", "4", "--update_every", "2", "--agents", name, "--seeds", "13",
+        "--mobility_csv_path", str(raw), "--workflow_csv_path", str(raw),
+        "--output_root", str(control_output)])
+    launcher.main()
+    control = next(control_output.iterdir())
+    assert (run / "train.jsonl").read_text() == (control / "train.jsonl").read_text()
+    assert (run / "updates.jsonl").read_text() == (control / "updates.jsonl").read_text()
+
+
 def test_v2_formal_execution_rejected_before_loading_data(monkeypatch):
     monkeypatch.setattr(sys, "argv", ["launcher", "--environment_revision", "v2"])
     monkeypatch.setattr(launcher, "_load_protocol", lambda args: pytest.fail("formal must not load"))

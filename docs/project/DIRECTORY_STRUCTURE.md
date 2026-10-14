@@ -1,5 +1,11 @@
 ﻿# Directory Structure
 
+## 2026-10-14 开发训练曲线与机制机会
+
+- `scripts/launch_eight_vehicle_joint_experiment.py`：可选 `--development_eval_every`；在 update 边界输出 `curve_checkpoints/`、`curve_checkpoints.jsonl` 与 `dev_curve.jsonl`。训练仅用原 agent，开发评价读取独立恢复副本并恢复随机状态；默认值 0 不生成曲线。
+- `artifacts/joint_mechanism_opportunity_20261014/`：仅训练窗口的固定负载与固定动作资格诊断，含事前条件、原始逐窗口 JSON 和脚本；该目录为本地实验产物，不进入 Git。
+- `artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/`：预定的 96 episode 开发实验根目录；manifest 记录负载和曲线间隔，formal/holdout 不运行。
+
 ## 2026-10-14 八车冷缓存动作合同诊断
 
 - `src/envs/core/multi_request_joint_control_env.py`：v2 可选共同 cold-cache mask；adapter 未就绪时 action 3 不合法，action 0 仍可请求加载。原 v2 默认行为保留。

@@ -5,6 +5,25 @@
 
 # Runbook
 
+## 八车多帧机制开发实验与收敛曲线（2026-10-14）
+
+训练窗口资格记录在 `artifacts/joint_mechanism_opportunity_20261014/`。Alibaba 节点 `input_size=8..23`；旧默认工作量全为 1。固定 `workflow_profile_unit_bytes=1, workload_bytes_per_unit=4` 后工作量为 `2..5.75`，而状态输出仍按 1 个受控 profile byte/单位计算。20 个训练窗口的固定 action 0 检查有 22 次未完成请求关联换站；固定 action 4 准备规则有 4 次到站状态就绪。两规则没有改变完成数，微小训练窗口奖励差不用于选算法或调物理参数。所有字节和计算单位均未实测。
+
+下列运行只训练和评价开发集；`--development_eval_every 24` 在第 24/48/72/96 回合写 `curve_checkpoints.jsonl`、哈希绑定的 `curve_checkpoints/` 与 `dev_curve.jsonl`。曲线只诊断学习过程，最终 `dev.jsonl` 仍使用最后 checkpoint。完整本机原始路径与输入 SHA-256 由 manifest 保存。
+
+```bash
+.venv/bin/python scripts/launch_eight_vehicle_joint_experiment.py \
+  --environment_revision v2 --development_only --strict_cold_cache_mask \
+  --agents sa_ghmappo mappo cache_offload_drl --seeds 7 17 27 \
+  --episodes 96 --update_every 4 --development_eval_every 24 \
+  --workflow_profile_unit_bytes 1 --workload_bytes_per_unit 4 \
+  --mobility_csv_path '/absolute/path/to/NGSIM.csv' \
+  --workflow_csv_path '/absolute/path/to/alibaba/batch_task.csv' \
+  --output_root artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014
+```
+
+增加训练量、改变工作量或观察曲线均不能把该开发实验转为论文结论；formal/holdout 仍未开启。下一合同修复应先核对 base/adapter 对象选择、缓存字节特征和状态迁移提前量，再冻结新的独立测试。
+
 ## 八车冷缓存动作合同开发对照（2026-10-14）
 
 `--strict_cold_cache_mask` 仅适用于 `--environment_revision v2 --development_only`。它对所有算法共同禁用当前 adapter 未就绪时的 steady offload action 3，允许 action 0 发起拉取；原 v2 默认 mask 不变。此开关改变动作可行域，必须从头训练并分别保存新旧 checkpoint；新 manifest 使用 `semantic_discrete_5_per_request_v2_cold_cache_mask`，不能把旧 checkpoint 的结果当作同合同对照。仍只执行 train/dev，不开启 formal/holdout。
