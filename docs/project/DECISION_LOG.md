@@ -1,5 +1,9 @@
 ﻿# Decision Log
 
+## 2026-10-14：将候选站执行与缓存对象纳入下一版共同动作合同（设计草案）
+
+新的多帧开发 run `20261014T074430Z_development` 表明，6/8 开发窗口在只用关联站执行的当前合同下容量不足，虽然每个车辆帧都有至少两个覆盖内 RSU；预测准备动作仅在 13/7,680 个完整车辆帧合法。三算法四个 24 回合间隔 checkpoint 奖励全部相同。决定停止在此 v2 合同上盲增训练量，先设计可控执行目标、当前/未来 DAG base+adapter admission、状态版本预复制和共同物理计账。设计与公平性门槛见 `joint_control_v3_design_20261014.md`。该文档尚为 `DESIGN_DRAFT`，没有改动 live 动作/观察合同或 checkpoint；任何正式迁移均需各算法及消费端同步实现和重训。
+
 ## 2026-10-14：把计算强度与状态大小分轴，并固定开发曲线
 
 既有八车默认设置全部 DAG 节点单帧完成，96 episode 的 SA/MAPPO 贪心回报完全相同。训练窗口资格探针在保持四站、原始 NGSIM/Alibaba 和共同动作合同下，先按源输入单位预定多帧计算量，再检查未完成请求是否经历换站。`workflow_profile_unit_bytes=256, workload_bytes_per_unit=1024` 可激活跨帧执行，但同时把状态字节放大 256 倍；因此下一开发实验采用**等计算量**的 `workflow_profile_unit_bytes=1, workload_bytes_per_unit=4`，将状态字节与计算强度解耦。两者均为受控代理，不能称实测 FLOPs 或网络字节。

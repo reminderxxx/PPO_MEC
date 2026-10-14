@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-14：多帧负载下候选站不可控，预测迁移机会不足（OPEN BLOCKER）
+
+- 开发 run `20261014T074430Z_development` 的三算法 96 episode × 3 seed 四个 checkpoint 奖励/完成率完全相同，均 `43.279593`、`2.625/8`；主方法未获优势。6/8 开发窗口的固定关联 RSU 工作量超过单站 120 帧容量，而每个车辆帧有 2–3 个可达站。当前动作不选择非关联站，车端 adapter 未声明；仅增加训练预算不能突破此物理动作上限。容量重新分配只是忽略传输/缓存的乐观可行性证明，不能写成已经解决。
+- 7,680 个开发车辆帧仅 13 帧允许预测准备 action 4，最终执行期没有关联换站、状态预迁移或车端计算。单 base + 五个合成 adapter 也不能检验跨 base model-cache 管理；SA 默认辅助系数 0，公共常速度预测不等于已训练 surrogate。必须先冻结共同候选站执行、未来 DAG base/adapter 与状态版本/传输合同，补齐公平 baseline 消费端，再设计机制活跃且容量可行的独立协议。设计草案见 `joint_control_v3_design_20261014.md`；formal/holdout 未开启。
+
 ## 2026-10-14：四倍预算仍无法辨认主方法优势；缓存基线特征错配（OPEN BLOCKER）
 
 - 同 cold-cache 合同 96 episode 原始审计见 `joint_cold_mask_budget96_cache_baseline_review_20261014.md`：SA 与 MAPPO 在三 seed × 八窗口 greedy 完全同动作同奖励；缓存基线仅在 seed 17 有微小负差。70/70 节点均完成，平均 66.383740 距零惩罚上界 70 仅 3.616260；等待项占主要差额。训练量继续加大不能凭当前证据产生可归因的 SA 优势。

@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-14：多帧联合控制 96 回合曲线完成，确认动作与容量瓶颈
+
+- `20261014T074430Z_development` 在同 cold-cache 合同下把 70 个 Alibaba 节点设为 2–5.75 单位跨帧工作，固定 SA-GHMAPPO、MAPPO、第一方缓存 PPO × 3 seed × 96 episode，按 24 回合保存 checkpoint 与独立开发曲线。864 train、216 update、9 最终/36 曲线 checkpoint、72 最终 greedy/72 sample、288 曲线评估与 17,280 帧奖励收据核验通过；原件在 `artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/`，审查见 `joint_mechanism_budget96_review_20261014.md`。
+- 三算法 24 个配对开发窗口均值完全相同：奖励 `43.279593`、完整请求 `2.625/8`、完成节点 `52/70`；24/48/72/96 四个 greedy 曲线端点也全部相同。SA 与 MAPPO 的 critic 末期 explained variance 约 0.72–0.77，价值学习存在，但没有转为可见的贪心收益；不能称最高奖励或收敛。
+- 静态机会审计证明 8 个开发窗口中的 6 个在当前只能关联站执行、车端 adapter 不可用的合同下，单站固定工作量超过 120 帧容量；全部 7,680 车辆帧有至少 2 个覆盖内站点，乐观静态改派可把最小单站峰值降到 57.75–98.5。action 4 仅 13/7,680 帧满足预测合法条件，最终 greedy 无执行期换站/预迁移。下一版共同动作设计见 `joint_control_v3_design_20261014.md`，尚未实现。formal/holdout/support 未开启，论文结论 `Unverifiable`。
+
 ## 2026-10-14：同冷缓存合同 96 episode 与缓存基线审查
 
 - `20261014T071053Z_development` 在完全相同数据、窗口、三 seed、物理/动作合同下，将 SA-GHMAPPO、MAPPO 和 `cache_offload_drl` 从 24 增至 96 episode/seed；9 个训练前缀逐条一致。864 train、216 update、9 checkpoint、72 greedy/72 sampled dev、逐帧奖励与哈希的 14 项审计均通过。原件和独立账本见 `artifacts/eight_vehicle_joint_v2_cold_mask_budget96_20261014/`，结论见 `joint_cold_mask_budget96_cache_baseline_review_20261014.md`。
