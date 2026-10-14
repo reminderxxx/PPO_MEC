@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-14：四倍预算仍无法辨认主方法优势；缓存基线特征错配（OPEN BLOCKER）
+
+- 同 cold-cache 合同 96 episode 原始审计见 `joint_cold_mask_budget96_cache_baseline_review_20261014.md`：SA 与 MAPPO 在三 seed × 八窗口 greedy 完全同动作同奖励；缓存基线仅在 seed 17 有微小负差。70/70 节点均完成，平均 66.383740 距零惩罚上界 70 仅 3.616260；等待项占主要差额。训练量继续加大不能凭当前证据产生可归因的 SA 优势。
+- `cache_offload_drl` 的 `paper_grade_independent_baseline=true` 与第一方 PPO 实现身份易误导为外部 DDPG 忠实复现；`_occupancy()` 使用旧 adapter 槽位而非 typed cache 字节占用，`_demand_score()` 在当前 predictor 缺 `cache_demand` 时恒为 0。修复时需同步全部 actor feature 生产/消费端，不单边削弱基线；已有 dev 数值不因事后修复追认为正式比较。
+- action 0 在缓存已就绪时可以低成本执行，冷态又能发起拉取；五动作没有未来 DAG 对象、显式 base/adapter 选取、候选执行站或驱逐控制。所有节点一帧完成，执行期换站、预测预取和状态迁移均为 0。下一实现轮先冻结可辨识的共同控制与负载合同，随后再做同预算、中途 checkpoint、独立 formal/holdout 评估；本审查轮不修改策略和环境。
+
 ## 2026-10-14：opt-in 冷缓存修复后策略同质化（OPEN BLOCKER）
 
 - 开发专用共同 mask 已禁止未就绪 adapter 时的 action 3；旧默认仍保留。24 episode 同条件重训使 SA/MAPPO 的失败 seed 恢复，但 SA、MAPPO 与 cache 方向基线所有 greedy 决策都选 action 0，24 个配对 dev 行完全打平，且状态提前准备和执行期 handoff 均为 0。不能把共同规则修复写成 SA 算法优势；证据见 `joint_predictor_cold_mask_dev_review_20261014.md`。

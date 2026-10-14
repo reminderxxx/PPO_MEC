@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-14：同冷缓存合同 96 episode 与缓存基线审查
+
+- `20261014T071053Z_development` 在完全相同数据、窗口、三 seed、物理/动作合同下，将 SA-GHMAPPO、MAPPO 和 `cache_offload_drl` 从 24 增至 96 episode/seed；9 个训练前缀逐条一致。864 train、216 update、9 checkpoint、72 greedy/72 sampled dev、逐帧奖励与哈希的 14 项审计均通过。原件和独立账本见 `artifacts/eight_vehicle_joint_v2_cold_mask_budget96_20261014/`，结论见 `joint_cold_mask_budget96_cache_baseline_review_20261014.md`。
+- SA 和 MAPPO 在 24 个配对 greedy 开发窗口均为 `66.383740`、`8/8`，全部选 action 0；缓存基线 `66.372424`、`8/8`，微小差异只来自 seed 17 的 4 个窗口。96 episode 没有建立 SA 相对 MAPPO 的奖励优势；critic explained variance 近零，不能据端点平局宣称训练已收敛。
+- `cache_offload_drl` 是自建 PPO 领域对照，不是 Xue 等 2023 TVT 的 DDPG 忠实复现；其旧槽位占用率与 v2 字节容量不一致，`cache_demand` 两特征在本联合预测器下恒零。共同动作合同的 action 0 兼具反应式拉取和当前站执行，当前 DAG 全是一帧节点，成功轨迹无执行期 handoff/提前准备。开发运行不支持 model-cache 友好性或论文级最高奖励结论，formal/holdout/support 未开启。
+
 ## 2026-10-14：冷缓存合同开发对照消除死锁但三算法打平
 
 - 独立 opt-in 共同 cold-cache mask 在同原始数据、窗口、seed、24 episode 与物理成本下重训 SA-GHMAPPO、MAPPO、cache 方向基线。新 run `20261014T064956Z_development` 的 216 train、54 update、9 checkpoint、72 greedy/72 sample dev 和逐帧收据通过 14 项审计；详情见 `joint_predictor_cold_mask_dev_review_20261014.md` 与 `artifacts/eight_vehicle_joint_v2_cold_mask_20261014/`。

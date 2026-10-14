@@ -9,6 +9,7 @@
 
 ## Live 文档
 
+- `joint_cold_mask_budget96_cache_baseline_review_20261014.md`：同冷缓存合同四倍训练量、缓存基线身份与特征、奖励上限和主方法可辨识性审查；仅开发证据。
 - `eight_vehicle_baseline_validity_review_20261012.md`：纠正八车选站诊断与 SA-GHMAPPO/正式 MAPPO/论文方法对比的合同错位，明确有效 baseline 三类和重新运行门槛。
 - `mechanism_evidence_closure_results_20261005.md`：共享缓存公平成本、两节点重跑/恢复和 12 场景决策空间结果；
   明确 Pareto 边界、ALPR 负结果和不启动 RL 的结论
