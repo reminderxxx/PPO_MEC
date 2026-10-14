@@ -36,15 +36,21 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
                  shared_state_enabled: bool = True,
                  shared_state_delay_frames: int = 1,
                  shared_state_interval_frames: int = 1,
+                 strict_cold_cache_mask: bool = False,
                  prediction_provider: Any = None,
                  shared_state_channel: Any = None, **kwargs: Any) -> None:
         if environment_revision not in {"v1", "v2"}:
             raise ValueError("unknown joint environment revision")
+        if strict_cold_cache_mask and environment_revision != "v2":
+            raise ValueError("strict_cold_cache_mask requires environment revision v2")
         for value in (rsu_work_units_per_frame, vehicle_work_units_per_frame,
                       workload_bytes_per_unit, state_bytes_per_link_frame, workflow_profile_unit_bytes):
             if not isfinite(value) or value <= 0:
                 raise ValueError("work and transfer rates must be finite and positive")
         self.environment_revision = environment_revision
+        self.strict_cold_cache_mask = bool(strict_cold_cache_mask)
+        if self.strict_cold_cache_mask:
+            self.action_contract = "semantic_discrete_5_per_request_v2_cold_cache_mask"
         self.observation_contract = f"joint_request_observation_{environment_revision}"
         self.rsu_work_units_per_frame = float(rsu_work_units_per_frame)
         self.vehicle_work_units_per_frame = float(vehicle_work_units_per_frame)
@@ -205,9 +211,14 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
                     key: deepcopy(value) for key, value in shared_snapshot["metadata"].items()
                     if key not in {"transmitted_bytes", "total_transmitted_bytes"}
                 }
+            action_mask = ActionMaskBuilder().build_mask(state)
+            if self.strict_cold_cache_mask and not state["current_adapter_ready"]:
+                # Steady offload cannot itself fetch a missing model. Keep the
+                # cache-fill action available to every algorithm on cold starts.
+                action_mask[3] = False
             result[vehicle.vehicle_id] = {
                 "semantic_state": state,
-                "action_mask": ActionMaskBuilder().build_mask(state),
+                "action_mask": action_mask,
                 "action_contract": self.action_contract,
             }
             if self.environment_revision == "v2":
@@ -727,6 +738,7 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
             "environment_revision": self.environment_revision,
             "action_contract": self.action_contract,
             "observation_contract": self.observation_contract,
+            "strict_cold_cache_mask": self.strict_cold_cache_mask,
             "replay_costs": asdict(self.costs),
         }
         if self.environment_revision == "v1":

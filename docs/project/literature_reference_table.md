@@ -21,6 +21,15 @@
 | 仿真型 VEC 卸载 | [Asynchronous Federated Based Vehicular Edge Computation Offloading](https://doi.org/10.1109/TVT.2024.3444784) | IEEE TVT, 73(12):19350–19360, 2024；IEEE 摘要核验，全文实验细节待核验 | IEEE 摘要建立车辆/RSU 任务与队列模型，并将结果明确称为 simulation outcomes；说明仿真评估是 VEC 论文的一种实验形态。 | PPO_MEC 可在冻结的模型和外生输入下训练八车并发控制，但必须公开 RSU、链路、算力、请求映射的来源与校准范围，不得把模型结果写成现场实测。 | Experimental methodology / 仿真口径说明。 |
 | VEC 仿真平台与校验 | [VEC-Sim: A Simulation Platform for Evaluating Service Caching and Computation Offloading Policies in Vehicular Edge Networks](https://doi.org/10.1016/j.comnet.2024.110985) | Computer Networks, 257:110985, 2025；出版社页面与 arXiv 摘要核验 | 建立面向 VEC 的 service caching 与计算卸载仿真平台，模拟车辆移动和变化的服务访问模式，并报告与真实基准的对照校验；其缓存对象为 service，不是 adapter。 | PPO_MEC 可借鉴对移动性、请求过程和成本模型逐项校验的实验方法；本项目 NGSIM 与 Alibaba 的跨源配对及 RSU/cache/链路参数仍须明确为合成条件，并以模型与 adapter 实测和机制指标补足外推证据。 | Experimental methodology / 模拟器可信度与 service-cache 语义边界。 |
 
+### 2026-10-14：车辆预测与迁移候选
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| GRU/图卷积预测与迁移 | [AI-Enabled Spatial-Temporal Mobility Awareness Service Migration for Connected Vehicles](https://doi.org/10.1109/TMC.2023.3271655) | IEEE TMC, 23(4):3274–3290, 2024；IEEE 页面核验 | 以 GRU 和图卷积提取交通空间关系与多时间尺度驾驶信息，再以主动迁移和 Lyapunov 优化处理服务可靠性与能耗。 | 说明神经预测加主动迁移已有 TMC 近邻；PPO_MEC 的可检验差异必须是连续 DAG 执行状态、base/adapter 驻留与跨 RSU 提前准备的联合收益，不能把换成 GRU/图网络本身当贡献。 | Predictor choice / 强最近邻与 novelty 边界。 |
+| LSTM 预测服务站与主动迁移 | [LSTM-based Mobility Prediction for Proactive Service Migration in Vehicular Edge Computing](https://doi.org/10.23919/IFIPNetworking70592.2026.11579216) | IFIP Networking, 2026；IEEE 页面核验 | 多预测时域 LSTM 预测 serving base station，接入 Simu5G/SUMO 的 MEC 编排器比较主动与被动迁移；摘要指出预测错误会显著损害 RTT。 | 可借鉴直接预测未来服务站和错误预测成本的验证方法；PPO_MEC 还需对 adapter/base 预装、DAG 状态版本、共享 surrogate 延迟和错误预取代价做闭环评价。 | Predictor baseline / prediction-error robustness。 |
+| NGSIM LSTM 轨迹基线 | [An LSTM Network for Highway Trajectory Prediction](https://doi.org/10.1109/ITSC.2017.8317913) | IEEE ITSC, 2017；会议卷页 353–359 由后续论文参考文献核对，IEEE 原文细节待核验 | 使用 LSTM 预测高速车辆未来纵横向轨迹，并在 NGSIM US-101 轨迹上评价；说明 LSTM 是可解释的序列学习基线。 | PPO_MEC 应先以冻结窗口比较常速度与 LSTM 的 RSU 切换/到达时机、校准和策略收益；轨迹误差改善不能直接代替 cache/handoff 决策收益。 | Predictor baseline / NGSIM 方法参考。 |
+| 分布式车辆轨迹预测 | [FDG-VTP: A Fully Decentralized Gossip Vehicular Trajectory Prediction Model](https://doi.org/10.1109/TVT.2026.3670044) | IEEE TVT, 75(8):15602–15612, 2026；IEEE 页面核验 | 研究车联网中去中心化 gossip 轨迹预测，为预测信息的分布式获取提供近邻；本文摘要以车辆预测为主，未核验其是否包含边缘模型缓存。 | PPO_MEC 的 shared surrogate 应单独计量 RSU 间消息延迟、字节与不确定性；不把此车辆轨迹模型当 adapter cache 或连续 DAG 的直接 baseline。 | Shared-state / predictor dissemination discussion。 |
+
 ### 2026-10-11：汇报近邻补充
 
 | 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |

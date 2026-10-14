@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+八车 v2 现提供开发专用 `--strict_cold_cache_mask`：当前 RSU 的 adapter 尚未就绪时，所有算法都不能选不发起加载的 steady offload action 3，仍可用 action 0 请求模型。该开关采用独立动作合同与 manifest，需从头训练；尚不构成主方法性能优势。预测器当前仍为因果常速度外推，离线精度与迁移收益须分开验证。
+
 八车环境与算法合同修复已作为 `--environment_revision v2 --development_only` 接入同一入口。
 v2 提供 typed base/adapter 字节缓存、版本化状态增量迁移、工作量与父依赖检查、因果车辆预测、
 有延迟的 RSU 状态共享，以及精确 masked 五动作 PPO。所有七种算法共同读取新缓存/执行观测；

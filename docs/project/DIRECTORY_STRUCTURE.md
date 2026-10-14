@@ -1,5 +1,11 @@
 ﻿# Directory Structure
 
+## 2026-10-14 八车冷缓存动作合同诊断
+
+- `src/envs/core/multi_request_joint_control_env.py`：v2 可选共同 cold-cache mask；adapter 未就绪时 action 3 不合法，action 0 仍可请求加载。原 v2 默认行为保留。
+- `scripts/launch_eight_vehicle_joint_experiment.py`：`--strict_cold_cache_mask` 启用独立开发协议与动作合同，写入 manifest；各算法在同一设置下重训。
+- `artifacts/analysis/joint_predictor_qualification_20261014/`：开发窗口上的常速度换站预检，仅本地诊断，不含策略收益。
+
 ## 2026-10-12 八车 v2 修复
 
 - `src/envs/core/joint_model_cache.py`：八车开发合同的独立 typed base/adapter 字节缓存。

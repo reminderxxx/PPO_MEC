@@ -32,7 +32,6 @@ from src.envs.core.multi_request_replay_env import ReplayCosts, select_continuou
 from src.evaluators.real_sample_support import build_sample_rsus, discover_ngsim_csv, summarize_mobility_frames
 
 AGENTS = ("sa_ghmappo", "ppo", "mappo", "dqn", "dag_offload_drl", "cache_offload_drl", "dt_handoff_drl")
-CONTRACT = "semantic_discrete_5_per_request_v1"
 PROTOCOL = "eight_vehicle_joint_sim_v1_1"
 PPO_AGENTS = {"sa_ghmappo", "ppo", "mappo", "dag_offload_drl", "cache_offload_drl", "dt_handoff_drl"}
 
@@ -63,6 +62,8 @@ def arguments() -> argparse.Namespace:
                         help="v2 JSON list of statically preloaded adapters for all vehicles, or per-vehicle map")
     parser.add_argument("--prediction_horizon_frames", type=int, default=3)
     parser.add_argument("--disable_prediction", action="store_true")
+    parser.add_argument("--strict_cold_cache_mask", action="store_true",
+                        help="v2 diagnostic: allow steady offload only after the current adapter is ready")
     parser.add_argument("--disable_shared_state", action="store_true")
     parser.add_argument("--shared_state_delay_frames", type=int, default=1)
     parser.add_argument("--shared_state_interval_frames", type=int, default=1)
@@ -249,6 +250,7 @@ def _environment_options(args: argparse.Namespace) -> dict:
     options = {
         "environment_revision": "v2",
         "prediction_enabled": not args.disable_prediction,
+        "strict_cold_cache_mask": args.strict_cold_cache_mask,
         "prediction_horizon_frames": args.prediction_horizon_frames,
         "shared_state_enabled": not args.disable_shared_state,
         "shared_state_delay_frames": args.shared_state_delay_frames,
@@ -281,6 +283,8 @@ def _agent_options(name: str, args: argparse.Namespace) -> dict:
 
 def main() -> None:
     args = arguments()
+    if args.strict_cold_cache_mask and args.environment_revision != "v2":
+        raise ValueError("strict_cold_cache_mask requires environment revision v2")
     if args.environment_revision == "v2" and not (args.development_only or args.smoke or args.preflight_only):
         raise ValueError("v2 is development-only until a new independent evaluation protocol is frozen; use --development_only")
     if not np.isfinite(args.sa_auxiliary_coef) or args.sa_auxiliary_coef < 0:
@@ -302,8 +306,10 @@ def main() -> None:
                             for window in windows] for name, windows in splits.items()}
     git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     manifest = {
-        "run_id": run_id, "protocol": PROTOCOL if args.environment_revision == "v1" else "eight_vehicle_joint_sim_v2_development",
-        "action_contract": CONTRACT, "environment_revision": args.environment_revision,
+        "run_id": run_id, "protocol": PROTOCOL if args.environment_revision == "v1" else (
+            "eight_vehicle_joint_sim_v2_cold_mask_development" if args.strict_cold_cache_mask
+            else "eight_vehicle_joint_sim_v2_development"),
+        "action_contract": probe_env.action_contract, "environment_revision": args.environment_revision,
         "environment_options": environment_options,
         "observation_contract": getattr(probe_env, "observation_contract", "legacy_semantic_v1"),
         "agent_options": {name: _agent_options(name, args) for name in args.agents},

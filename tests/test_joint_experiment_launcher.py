@@ -105,6 +105,26 @@ def test_main_v2_writes_complete_development_package_without_formal(monkeypatch,
     assert any("frame_cost_receipt" in event for event in events)
 
 
+def test_main_v2_cold_mask_records_distinct_contract(monkeypatch, tmp_path):
+    window, workflows, rsus = _fixture()
+    monkeypatch.setattr(launcher, "_load_protocol", lambda args: (
+        {name: [window] for name in ("train", "dev", "formal", "holdout")}, workflows, rsus))
+    raw = tmp_path / "fixture.csv"
+    raw.write_text("synthetic_fixture_only")
+    output = tmp_path / "runs"
+    monkeypatch.setattr(sys, "argv", ["launch_eight_vehicle_joint_experiment.py",
+        "--environment_revision", "v2", "--smoke", "--strict_cold_cache_mask",
+        "--episodes", "1", "--update_every", "1", "--agents", "mappo", "--seeds", "13",
+        "--mobility_csv_path", str(raw), "--workflow_csv_path", str(raw),
+        "--output_root", str(output)])
+    launcher.main()
+    manifest = json.loads((next(output.iterdir()) / "manifest.json").read_text())
+    assert manifest["protocol"] == "eight_vehicle_joint_sim_v2_cold_mask_development"
+    assert manifest["action_contract"] == "semantic_discrete_5_per_request_v2_cold_cache_mask"
+    assert manifest["environment_options"]["strict_cold_cache_mask"] is True
+    assert manifest["costs"]["strict_cold_cache_mask"] is True
+
+
 def test_v2_formal_execution_rejected_before_loading_data(monkeypatch):
     monkeypatch.setattr(sys, "argv", ["launcher", "--environment_revision", "v2"])
     monkeypatch.setattr(launcher, "_load_protocol", lambda args: pytest.fail("formal must not load"))

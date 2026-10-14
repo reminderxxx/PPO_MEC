@@ -5,6 +5,22 @@
 
 # Runbook
 
+## 八车冷缓存动作合同开发对照（2026-10-14）
+
+`--strict_cold_cache_mask` 仅适用于 `--environment_revision v2 --development_only`。它对所有算法共同禁用当前 adapter 未就绪时的 steady offload action 3，允许 action 0 发起拉取；原 v2 默认 mask 不变。此开关改变动作可行域，必须从头训练并分别保存新旧 checkpoint；新 manifest 使用 `semantic_discrete_5_per_request_v2_cold_cache_mask`，不能把旧 checkpoint 的结果当作同合同对照。仍只执行 train/dev，不开启 formal/holdout。
+
+```bash
+.venv/bin/python scripts/launch_eight_vehicle_joint_experiment.py \
+  --environment_revision v2 --development_only --strict_cold_cache_mask \
+  --agents sa_ghmappo mappo cache_offload_drl --seeds 7 17 27 \
+  --episodes 24 --update_every 4 \
+  --mobility_csv_path '/absolute/path/to/NGSIM.csv' \
+  --workflow_csv_path '/absolute/path/to/alibaba/batch_task.csv' \
+  --output_root artifacts/eight_vehicle_joint_v2_cold_mask_development
+```
+
+预测器仍为因果常速度外推。离线 3/10/20 帧 RSU 切换检查原始记录在 `artifacts/analysis/joint_predictor_qualification_20261014/`；这不是学得的预测器或策略性能比较。学习型 LSTM/GRU 须只在训练窗口拟合，按独立开发窗口比较换站事件、目标站、提前量和错误预取代价。
+
 ## 八车 v2 开发验证（2026-10-12）
 
 在已有真实 CSV 的工作区使用同一 launcher，显式选择 v2。这里只提供复现命令；本次实现验收只执行

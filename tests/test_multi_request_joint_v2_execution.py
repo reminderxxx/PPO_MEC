@@ -42,6 +42,18 @@ def _warm(env, rsu="a"):
     env._sync_cache_view()
 
 
+def test_strict_cold_cache_mask_is_shared_and_opt_in():
+    strict = _env(strict_cold_cache_mask=True)
+    cold = strict.decision_states()["v0"]
+    assert cold["action_contract"] == "semantic_discrete_5_per_request_v2_cold_cache_mask"
+    assert cold["action_mask"][0] and not cold["action_mask"][3]
+    with pytest.raises(ValueError, match="illegal semantic action"):
+        strict.step_actions({"v0": 3})
+    _warm(strict)
+    assert strict.decision_states()["v0"]["action_mask"][3]
+    assert _env().decision_states()["v0"]["action_mask"][3]
+
+
 def test_workload_controls_compute_and_progress_is_visible():
     env = _env(input_size=3072)
     _warm(env)
