@@ -36,7 +36,7 @@ PROTOCOL = "eight_vehicle_joint_sim_v1_1"
 PPO_AGENTS = {"sa_ghmappo", "ppo", "mappo", "dag_offload_drl", "cache_offload_drl", "dt_handoff_drl"}
 
 
-def arguments() -> argparse.Namespace:
+def arguments(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mobility_csv_path", type=Path, default=discover_ngsim_csv(ROOT))
     parser.add_argument("--workflow_csv_path", type=Path, default=ROOT / "data/raw/workflow/alibaba2018/batch_task.csv")
@@ -76,7 +76,7 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--workload_bytes_per_unit", type=float, default=1024.0)
     parser.add_argument("--workflow_profile_unit_bytes", type=int, default=1)
     parser.add_argument("--state_bytes_per_link_frame", type=int, default=1024)
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def _hash_file(path: Path) -> str:

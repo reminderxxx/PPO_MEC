@@ -87,7 +87,7 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
         self.previous_positions: dict[str, tuple[float, float]] = {}
         self.previous_associations: dict[str, str | None] = {}
         self.vehicle_compute_progress: dict[str, int] = {vehicle_id: 0 for vehicle_id in self.workflows}
-        if self.environment_revision == "v2":
+        if self.environment_revision in {"v2", "v3"}:
             self.state_version = {vehicle_id: 0 for vehicle_id in self.workflows}
             self.state_payload_bytes = {vehicle_id: 0 for vehicle_id in self.workflows}
             self.execution_location = {vehicle_id: None for vehicle_id in self.workflows}
@@ -111,9 +111,9 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
         return observation
 
     def _causal_predictions(self, vehicles: list[VehicleState], associations: dict[str, str | None]) -> dict:
-        if self.environment_revision == "v2" and not self.prediction_enabled:
+        if self.environment_revision in {"v2", "v3"} and not self.prediction_enabled:
             return {}
-        if self.environment_revision == "v2" and self.prediction_provider is not None:
+        if self.environment_revision in {"v2", "v3"} and self.prediction_provider is not None:
             return self.prediction_provider.predict(
                 vehicles, associations, self.rsus, self.mapper,
                 self.frame_index)
@@ -169,7 +169,7 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
                  "associated_vehicle_count": counts[rsu.rsu_id]}
                 for rsu in self.rsus]
         shared_snapshot = None
-        if self.environment_revision == "v2":
+        if self.environment_revision in {"v2", "v3"}:
             rsus = [{**row, **self.model_cache.snapshot(row["rsu_id"])} for row in rsus]
             shared_snapshot = self.shared_state_channel.snapshot(rsus, self.frame_index)
             self._frame_shared_state_bytes = int(shared_snapshot["metadata"]["transmitted_bytes"])
@@ -201,7 +201,7 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
                 "predictions": predictions,
                 "handoff_events": [],
             }
-            if self.environment_revision == "v2":
+            if self.environment_revision in {"v2", "v3"}:
                 self._augment_execution_state(state, vehicle.vehicle_id)
                 state["rsus"] = self.shared_state_channel.actor_rsus(
                     rsus, associations[vehicle.vehicle_id], shared_snapshot)
@@ -221,7 +221,7 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
                 "action_mask": action_mask,
                 "action_contract": self.action_contract,
             }
-            if self.environment_revision == "v2":
+            if self.environment_revision in {"v2", "v3"}:
                 result[vehicle.vehicle_id]["action_mask"][2] = (
                     vehicle.base_model_id == node.required_base_model and state["vehicle_adapter_ready"])
                 result[vehicle.vehicle_id]["centralized_critic_state"] = {
@@ -272,7 +272,7 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
 
     def step_actions(self, actions: dict[str, int]) -> tuple[dict, float, bool, dict]:
         """Apply one legal native semantic action per active request and frame."""
-        if self.environment_revision == "v2":
+        if self.environment_revision in {"v2", "v3"}:
             return self._step_actions_v2(actions)
         if self.frame_index >= len(self.frames):
             raise RuntimeError("episode ended")
@@ -405,7 +405,7 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
         result["association_handoff_count"] = sum(event["association_handoff"] for event in self.events)
         result["prepared_on_arrival_count"] = sum(event["prepared_on_arrival"] for event in self.events)
         result["handoff_failed_count"] = sum(event["handoff_failed"] for event in self.events)
-        if self.environment_revision == "v2":
+        if self.environment_revision in {"v2", "v3"}:
             result.update({
                 "environment_revision": "v2", "observation_contract": self.observation_contract,
                 "state_transfer_bytes": sum(event["state_transfer_bytes"] for event in self.events),

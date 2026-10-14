@@ -5,6 +5,22 @@
 
 # Runbook
 
+## 候选站、模型与状态的 v3 工程验证（2026-10-14）
+
+此入口只接受原 v2 **开发** manifest，检查 NGSIM/Alibaba SHA-256，并重建完全相同的 train 或 dev 窗口。默认仅用 20 train 窗口，以关联站反应式和当前可达站固定分配两种规则验证新合同。两规则使用相同输入/输出成本，结果仅证明动作敏感性。balanced 规则由当前活跃请求的确定性协调器分配，不使用未来轨迹；它不是已训练的 MAPPO/SA。
+
+```bash
+python scripts/verify_joint_target_control.py \
+  --source_manifest artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/20261014T074430Z_development/manifest.json \
+  --split train --windows 20 \
+  --output_root artifacts/joint_target_control_engineering
+python -m pytest tests/test_multi_request_target_control_env.py tests/test_verify_joint_target_control.py tests/test_joint_model_cache.py tests/test_multi_request_joint_v2_execution.py tests/test_joint_experiment_launcher.py tests/test_algo_pool_contract.py tests/test_checkpoint_compat.py -q
+```
+
+`JointRequestControl` 指定执行 RSU/本车/等待、模型目标站和已知 DAG 节点、base-only 或 base+adapter admission、状态准备目标、依赖安全有序驱逐及 0..3 优先级。输入、输出、模型和状态争用 RSU 数据链路槽；节点在输出送达后完成。窗口结束时未送达输出不计节点成功。非法目标/依赖/重复驱逐在执行前拒绝。控制面共享 JSON 仅收费，尚不占数据链路；车辆预载 adapter 与无上限状态存储沿用受控声明。成本仍为合成代理。
+
+v3 的观察/动作合同独立，旧 registry 五动作和旧 checkpoint 不允许直接执行。输出初始 `status=running` manifest，全部规则成功才标 `complete`，生产 `results.jsonl`/`events.jsonl`，每帧只有一个费用收据并附每站链路槽使用量。算法/checkpoint 适配、学习型预测器与真实成本校准仍需后续实现。缓存 PPO 新 checkpoint 另记录 `cache_feature_contract=typed_byte_occupancy_v2`；缺字段的历史 checkpoint 恢复 `legacy_adapter_slots_v1`。
+
 ## 八车多帧机制开发实验与收敛曲线（2026-10-14）
 
 训练窗口资格记录在 `artifacts/joint_mechanism_opportunity_20261014/`。Alibaba 节点 `input_size=8..23`；旧默认工作量全为 1。固定 `workflow_profile_unit_bytes=1, workload_bytes_per_unit=4` 后工作量为 `2..5.75`，而状态输出仍按 1 个受控 profile byte/单位计算。20 个训练窗口的固定 action 0 检查有 22 次未完成请求关联换站；固定 action 4 准备规则有 4 次到站状态就绪。两规则没有改变完成数，微小训练窗口奖励差不用于选算法或调物理参数。所有字节和计算单位均未实测。

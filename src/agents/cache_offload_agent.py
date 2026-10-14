@@ -33,13 +33,16 @@ def _rsu_by_id(semantic_state: dict[str, Any], rsu_id: Any) -> dict[str, Any]:
     return {}
 
 
-def _occupancy(rsu: dict[str, Any]) -> float:
+def _occupancy(rsu: dict[str, Any], typed_bytes: bool = True) -> float:
+    if typed_bytes and "capacity_bytes" in rsu and "occupied_bytes" in rsu:
+        capacity = max(float(rsu["capacity_bytes"]), 1.0)
+        return _clamp01(float(rsu["occupied_bytes"]) / capacity)
     capacity = max(float(rsu.get("cache_capacity", rsu.get("adapter_cache_capacity", 1.0)) or 1.0), 1.0)
     return _clamp01(float(len(rsu.get("cached_adapter_ids", []) or [])) / capacity)
 
 
-def _free_ratio(rsu: dict[str, Any]) -> float:
-    return 1.0 - _occupancy(rsu) if rsu else 0.0
+def _free_ratio(rsu: dict[str, Any], typed_bytes: bool = True) -> float:
+    return 1.0 - _occupancy(rsu, typed_bytes) if rsu else 0.0
 
 
 def _adapter_ready(rsu: dict[str, Any], adapter_id: str | None) -> float:
@@ -66,7 +69,9 @@ def _demand_score(predictions: dict[str, Any], rsu_id: Any) -> float:
         return 0.0
 
 
-def _build_cache_feature_tensor(semantic_state: dict[str, Any]) -> torch.Tensor:
+def _build_cache_feature_tensor(semantic_state: dict[str, Any],
+                               feature_contract: str = "typed_byte_occupancy_v2") -> torch.Tensor:
+    typed_bytes = feature_contract == "typed_byte_occupancy_v2"
     primary_vehicle = _resolve_primary_vehicle(semantic_state)
     vehicle_id = str(primary_vehicle.get("vehicle_id", ""))
     current_rsu_id = primary_vehicle.get("associated_rsu_id")
@@ -90,21 +95,21 @@ def _build_cache_feature_tensor(semantic_state: dict[str, Any]) -> torch.Tensor:
     predicted_rsu = _rsu_by_id(semantic_state, predicted_next_rsu_id)
     target_rsu = _rsu_by_id(semantic_state, predicted_target_rsu_id)
     rsus = list(semantic_state.get("rsus", []) or [])
-    occupancies = [_occupancy(rsu) for rsu in rsus]
+    occupancies = [_occupancy(rsu, typed_bytes) for rsu in rsus]
     future_load = predictions.get("future_load", {}) if isinstance(predictions, dict) else {}
     current_load = float(future_load.get(current_rsu_id, 0.0) or 0.0) / 10.0
     predicted_load = float(future_load.get(predicted_next_rsu_id, 0.0) or 0.0) / 10.0
     target_load = float(future_load.get(predicted_target_rsu_id, 0.0) or 0.0) / 10.0
     features = [
-        _occupancy(current_rsu),
+        _occupancy(current_rsu, typed_bytes),
         sum(occupancies) / max(len(occupancies), 1) if occupancies else 0.0,
         max(occupancies) if occupancies else 0.0,
         _adapter_ready(current_rsu, required_adapter),
         _adapter_ready(predicted_rsu, required_adapter),
         _adapter_ready(target_rsu, required_adapter),
-        _free_ratio(current_rsu),
-        _free_ratio(predicted_rsu),
-        _free_ratio(target_rsu),
+        _free_ratio(current_rsu, typed_bytes),
+        _free_ratio(predicted_rsu, typed_bytes),
+        _free_ratio(target_rsu, typed_bytes),
         current_load,
         predicted_load,
         target_load,
@@ -123,8 +128,10 @@ class _CacheOffloadPolicyNetwork(nn.Module):
         hidden_dim: int = 64,
         joint_observation_enabled: bool = False,
         hidden_dims: tuple[int, int] = (64, 64),
+        feature_contract: str = "typed_byte_occupancy_v2",
     ) -> None:
         super().__init__()
+        self.feature_contract = feature_contract
         self.encoder = FlatSemanticEncoder(
             hidden_dim=hidden_dim,
             **({"joint_observation_enabled": True} if joint_observation_enabled else {}),
@@ -160,7 +167,7 @@ class _CacheOffloadPolicyNetwork(nn.Module):
         event_logit_temperature: float | None = None,
     ) -> dict[str, Any]:
         encoded = dict(self.encoder(semantic_state))
-        cache_features = _build_cache_feature_tensor(semantic_state)
+        cache_features = _build_cache_feature_tensor(semantic_state, self.feature_contract)
         cache_embedding = self.cache_projection(cache_features.unsqueeze(0)).squeeze(0)
         slow_context = self.slow_norm(encoded["slow_context"] + cache_embedding)
         fast_context = self.fast_norm(encoded["fast_context"] + 0.55 * cache_embedding)
@@ -197,6 +204,9 @@ class CacheOffloadDRLAgent(PPOBaseAgent):
     support_level = "trainable"
 
     def __init__(self, **kwargs: Any) -> None:
+        self._cache_feature_contract = kwargs.pop("cache_feature_contract", "typed_byte_occupancy_v2")
+        if self._cache_feature_contract not in {"typed_byte_occupancy_v2", "legacy_adapter_slots_v1"}:
+            raise ValueError("unsupported cache_feature_contract")
         super().__init__(
             agent_name="cache_offload_drl",
             policy_type="cache_offload_drl_policy",
@@ -241,6 +251,7 @@ class CacheOffloadDRLAgent(PPOBaseAgent):
             hidden_dim=self._hidden_dim,
             joint_observation_enabled=self._joint_observation_enabled,
             hidden_dims=self._hidden_dims,
+            feature_contract=self._cache_feature_contract,
         ).to(self._device)
         self._optimizer = torch.optim.Adam(self._network.parameters(), lr=self._learning_rate)
         self.baseline_config = {
@@ -254,7 +265,10 @@ class CacheOffloadDRLAgent(PPOBaseAgent):
             "surrogate_enhanced_head": False,
             "centralized_critic": True,
             "ctde_scope": "controller_level_cache_execution_handoff",
-            "paper_grade_independent_baseline": True,
+            "paper_grade_independent_baseline": False,
+            "implementation_origin": "first_party_cache_augmented_ppo_not_external_paper_reproduction",
+            "cache_feature_contract": self._cache_feature_contract,
+            "cache_demand_feature_source": "published_predictions.cache_demand_or_zero_when_absent",
             "reference_basis": "Joint service/model caching and computation offloading DRL literature.",
             "excluded_sa_mechanisms": [
                 "graph_encoder",
@@ -278,6 +292,18 @@ class CacheOffloadDRLAgent(PPOBaseAgent):
                 "observation_contract": self.observation_contract,
                 "action_contract": self.action_contract,
                 "domain_feature_block": "model_cache_offload_scalars",
+                "cache_feature_contract": self._cache_feature_contract,
             }
         )
         return config
+
+    def load(self, path: str) -> None:
+        # Tensor dimensions alone cannot detect changed occupancy units.
+        checkpoint = torch.load(path, map_location=self._device)
+        contract = checkpoint.get("config", {}).get("cache_feature_contract", "legacy_adapter_slots_v1")
+        if contract not in {"typed_byte_occupancy_v2", "legacy_adapter_slots_v1"}:
+            raise ValueError("unsupported checkpoint cache_feature_contract")
+        super().load(path)
+        self._cache_feature_contract = contract
+        self._network.feature_contract = contract
+        self.baseline_config["cache_feature_contract"] = contract

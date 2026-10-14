@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+联合控制 v3 的工程入口为 `scripts/verify_joint_target_control.py`：在原始 train/dev 窗口上验证明确的执行站、当前/未来 DAG base/adapter admission、依赖安全显式驱逐、状态预复制与计算优先级。输入上传、结果回传、模型和状态共用 RSU 数据链路槽，节点在结果送达后计完成。新合同 `joint_parameterized_control_v3` 暂由固定规则验证，旧五动作学习策略会被拒绝；v3 算法/checkpoint 适配仍待实现。源数据和窗口按 manifest/hash 重建，输出含逐帧费用收据；详见 [`RUNBOOK`](docs/project/RUNBOOK.md)。
+
 八车 v2 开发入口现支持 `--development_eval_every`：按固定 episode 间隔保存可校验 checkpoint，并用独立加载的副本计算 greedy 开发曲线；该诊断不打开 formal/holdout，也不改变训练的随机序列。机制机会先由训练窗口核验，再用相同成本和动作合同比较算法；详见 [`RUNBOOK`](docs/project/RUNBOOK.md)。
 
 八车 v2 现提供开发专用 `--strict_cold_cache_mask`：当前 RSU 的 adapter 尚未就绪时，所有算法都不能选不发起加载的 steady offload action 3，仍可用 action 0 请求模型。该开关采用独立动作合同与 manifest，需从头训练；尚不构成主方法性能优势。预测器当前仍为因果常速度外推，离线精度与迁移收益须分开验证。

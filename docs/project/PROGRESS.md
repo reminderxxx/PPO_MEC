@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-14：显式候选站与模型/状态工程合同已落地
+
+- 在原八车实验的干净分支上实现 `MultiRequestTargetControlEnv` / `JointRequestControl`：覆盖内执行站、已知 DAG base/adapter admission、依赖安全显式驱逐、状态 prepare、计算优先级和输入/结果传输；输出送达后才计节点完成，待返回结果可经付费版本状态转发到新站。315 项目标回归、语法与 diff 检查通过；交付细节见 `joint_target_control_engineering_20261014.md`。
+- 新入口 `verify_joint_target_control.py` 校验 source manifest/data hash/时间窗并输出固定规则的独立事件/帧收据。当前两窗口 dirty 开发见证已产生动作差异，完整 clean train 回放待提交后执行。v3 学习网络/checkpoint 适配未实现，旧策略明确拒绝；成本与共享控制面仍有代理边界，不作论文优势判断。
+- 第一方缓存 PPO 的新 occupancy 特征改用 typed 字节（含 base/在途），checkpoint 显式记录特征版本，历史模型自动保持旧槽位语义；不再标为外部论文独立复现。公开参考与新增近邻已登记文献表，主目录未提交算法工作保持原状。
+
 ## 2026-10-14：精确同分经 72 次独立回放复现，确认比较缺乏动作辨识力
 
 - 用户质疑三算法奖励完全相同后，追加只读检查 `joint_reward_identity_audit_20261014.md`：9 个最终网络 tensor 哈希不同、24→96 回合参数均更新、实际 loader 恢复的全部权重与文件严格一致；独立重跑所有 72 个 greedy dev 执行，奖励和物理轨迹哈希均复现。每窗 9 个评估的未舍入回报也相同，未发现模型混用、结果复用或舍入假同分。

@@ -9,6 +9,7 @@
 
 ## Live 文档
 
+- `joint_target_control_engineering_20261014.md`：显式目标站、未来模型对象、状态/结果转发与共享数据链路的工程实现、参考来源与验收边界。
 - `joint_reward_identity_audit_20261014.md`：9 个网络权重/加载/更新、72 次独立回放、未舍入回报与反事实动作检查；确认精确同分来自当前比较缺乏动作辨识力。
 - `joint_mechanism_budget96_review_20261014.md`：多帧工作量、96 回合曲线、开发奖励同分与候选站容量上限的原件审查；不作为论文结果。
 - `joint_control_v3_design_20261014.md`：可控执行站、base/adapter 预置、状态预复制和同合同算法对照的下一版设计草案；尚未实现。

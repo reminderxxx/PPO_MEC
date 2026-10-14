@@ -199,6 +199,57 @@ class JointModelCache:
         if obj.object_id in self.pending[rsu_id]:
             return {**result, "status": "already_loading"}
         closure = (*obj.dependency_ids, obj.object_id)
+        return self._request_closure(rsu_id, closure, result, available_link_slots)
+
+    def request_base_model(self, rsu_id: str, base_model_id: str,
+                           available_link_slots: int | None = None) -> dict[str, Any]:
+        """Explicit base-only admission for the parameterized engineering contract."""
+        if not self._frame_open:
+            raise RuntimeError("begin_frame must precede admission")
+        result = {"status": "unknown_or_incompatible_model", "link_slots_consumed": 0,
+                  "admitted_object_ids": [], "evicted_object_ids": []}
+        obj = next((obj for obj in self.objects.values()
+                    if obj.object_type == "base_model" and obj.base_model_id == base_model_id), None)
+        if obj is None:
+            return result
+        if obj.object_id in self.resident[rsu_id]:
+            self.resident[rsu_id].move_to_end(obj.object_id)
+            return {**result, "status": "already_cached"}
+        if obj.object_id in self.pending[rsu_id]:
+            return {**result, "status": "already_loading"}
+        return self._request_closure(rsu_id, (obj.object_id,), result, available_link_slots,
+                                     fetch_status="base_model_fetch")
+
+    def validate_eviction(self, rsu_id: str, object_ids: Iterable[str]) -> list[str]:
+        """Validate the complete ordered eviction before any cache mutation."""
+        victims = list(object_ids)
+        if len(victims) != len(set(victims)):
+            raise ValueError("duplicate eviction object")
+        remaining = set(self.resident[rsu_id])
+        for key in victims:
+            if key not in remaining or self.objects[key].pinned:
+                raise ValueError("eviction requires an unpinned resident object")
+            dependents = {dep for item in (*remaining, *self.pending[rsu_id])
+                          for dep in self.objects[item].dependency_ids}
+            if key in dependents:
+                raise ValueError("eviction would orphan a resident or pending adapter")
+            remaining.remove(key)
+        return victims
+
+    def evict_objects(self, rsu_id: str, object_ids: Iterable[str]) -> dict[str, Any]:
+        if not self._frame_open:
+            raise RuntimeError("begin_frame must precede eviction")
+        victims = self.validate_eviction(rsu_id, object_ids)
+        size = sum(self.objects[key].resident_size_bytes for key in victims)
+        for key in victims:
+            self.resident[rsu_id].pop(key)
+        self.evicted_bytes[rsu_id] += size
+        self.eviction_count[rsu_id] += len(victims)
+        return {"evicted_object_ids": victims, "evicted_bytes": size}
+
+    def _request_closure(self, rsu_id: str, closure: tuple[str, ...], result: dict[str, Any],
+                         available_link_slots: int | None, *,
+                         fetch_status: str = "adapter_fetch") -> dict[str, Any]:
         resident, pending = self.resident[rsu_id], self.pending[rsu_id]
         missing = [key for key in closure if key not in resident and key not in pending]
         closure_bytes = sum(self.objects[key].resident_size_bytes for key in closure)
@@ -223,7 +274,7 @@ class JointModelCache:
             pending[key] = self.objects[key].transfer_size_bytes
         started = ready_to_start[:available]
         self.active[rsu_id].update(started)
-        return {**result, "status": "adapter_fetch", "link_slots_consumed": len(started),
+        return {**result, "status": fetch_status, "link_slots_consumed": len(started),
                 "admitted_object_ids": missing, "evicted_object_ids": victims,
                 "reserved_bytes": needed}
 

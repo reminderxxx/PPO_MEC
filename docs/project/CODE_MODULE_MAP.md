@@ -1,5 +1,9 @@
 # Code Module Map
 
+## 显式候选站工程合同（2026-10-14）
+
+`multi_request_target_control_env.py` 复用 v2 的 typed cache、因果预测和版本化状态工具，但用 `JointRequestControl` 执行站/cache 对象/prepare/priority 合同独立执行；节点完成包含输入传输、计算和输出送达。`joint_model_cache.py` 增加 base-only admission 和事务前验证的依赖安全显式驱逐。`verify_joint_target_control.py` 从已有开发 manifest 校验数据 hash、重建 train/dev 窗口，输出新合同的两个规则与独立帧收据；不通过旧 registry 冒充 RL 对比。v3 控制面共享消息仍只计 JSON 费用，不竞争数据链路。`cache_offload_agent.py` 修复 typed 字节占用特征，并通过 checkpoint 的 `cache_feature_contract` 恢复旧槽位语义，避免历史模型被静默改变输入单位。
+
 ## 八车开发曲线隔离（2026-10-14）
 
 `scripts/launch_eight_vehicle_joint_experiment.py` 在可选固定间隔保存训练中的 checkpoint；另构建同 registry 类型的恢复副本做 greedy 开发评价，再恢复 Python/NumPy/PyTorch 随机状态。训练 agent 不被开发评价调用；默认执行路径、物理环境、PPO 目标和正式 checkpoint 消费端不变。`tests/test_joint_experiment_launcher.py` 验证曲线、checkpoint 哈希及开启/关闭曲线时相同训练轨迹。

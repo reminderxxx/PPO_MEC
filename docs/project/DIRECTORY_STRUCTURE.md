@@ -1,5 +1,12 @@
 ﻿# Directory Structure
 
+## 2026-10-14 显式目标站工程入口
+
+- `src/envs/core/multi_request_target_control_env.py`：新参数化执行/cache/state/priority 合同，输入/输出送达与逐帧数据链路账本。
+- `scripts/verify_joint_target_control.py`：原开发 manifest/hash/窗口重建和 train/dev 固定规则工程验证；输出初始/完成 manifest、`results.jsonl` 与 `events.jsonl`。
+- `tests/test_multi_request_target_control_env.py`、`tests/test_verify_joint_target_control.py`：动作差异、依赖/字节/版本、旧策略拒绝、源数据/窗口身份和输出消费链。
+- `artifacts/joint_target_control_engineering/`：独立工程回放产物，不进入 Git，不作为 RL 排名。
+
 ## 2026-10-14 开发训练曲线与机制机会
 
 - `scripts/launch_eight_vehicle_joint_experiment.py`：可选 `--development_eval_every`；在 update 边界输出 `curve_checkpoints/`、`curve_checkpoints.jsonl` 与 `dev_curve.jsonl`。训练仅用原 agent，开发评价读取独立恢复副本并恢复随机状态；默认值 0 不生成曲线。

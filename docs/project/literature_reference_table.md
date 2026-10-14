@@ -13,6 +13,16 @@
 
 ## 维护规范
 
+### 2026-10-14：工程链路与可复用项目参考
+
+| 方向 | 论文 / 项目 | Venue / 状态 | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 使用边界 |
+|---|---|---|---|---|---|
+| MAPPO 实现合同 | [marlbenchmark/on-policy](https://github.com/marlbenchmark/on-policy)，对应已登记 MAPPO 论文 | 作者官方开源实现；本轮核验 README 与 `onpolicy/algorithms/utils/act.py` | 分离 actor/critic 的观察与动作分布，提供 available-action 处理；README 强调 rollout、PPO epochs、minibatches 和参数共享对复现的影响。 | 新参数化控制必须先冻结动作/掩码、actor/critic 信息和训练预算，再适配 SA/MAPPO；不以网络名替代复现证据。 | 本轮只读参考，没有复制源码、安装依赖或宣称完成外部 MAPPO benchmark。 |
+| base/adapter 资源分层 | [S-LoRA 官方项目](https://github.com/S-LoRA/S-LoRA)，对应已登记 MLSys 2024 论文 | 官方仓库在 2024-12-02 归档，Apache-2.0；本轮核验状态 | adapter 按活跃请求装入 GPU，base/adapter/KV 等资源独立管理；提供真实与 dummy 权重的不同验证方式。 | PPO_MEC 的 base-only 与 adapter 依赖 admission、驻留/在途字节账本可按此分层审查；跨 RSU、车辆覆盖和 DAG 状态迁移仍是不同问题。 | 作为工程设计参考；归档仓库不是当前默认推理依赖，未执行 CUDA 服务。 |
+| 车辆移动与通信资源 | [Adaptive Task Offloading and Resource Management for Vehicular Edge Computing](https://ieeexplore.ieee.org/document/11122339/) | IEEE TVT, 75(1):1521–1535, 2026；DOI 10.1109/TVT.2025.3597459；IEEE 摘要/元数据核验 | 联合移动引起的链路变化、单区/跨区卸载、迁移与通信/计算资源分配。 | 候选站执行需同时检查覆盖和模型/状态就绪，并对输入、结果与迁移传输收费；本工程当前仅帧级合成链路，动态信道和功率分配未实现。 | 全文公式及 baseline 细节待核验，不称忠实复现。 |
+| 路径与数据缓存 | [Joint Computation Offloading and Data Caching in Multi-Access Edge Computing Enabled Internet of Vehicles](https://ieeexplore.ieee.org/abstract/document/10148810) | IEEE TVT, 72(11):14939–14954, 2023；DOI 10.1109/TVT.2023.3285073；IEEE 摘要/元数据核验 | 显式执行模式、数据传输路径、子信道与缓存更新；不同负载下采用不同优化方法。 | PPO_MEC 新合同对执行站、输入上传和输出送达显式建模；data cache 与 base/adapter 权重 cache 语义不同，不能混用 claim。 | 尚未复现其能量采集、SAGA/DQN 或原实验。 |
+| 移动性与主动替换 | [Mobility-Aware Proactive Edge Caching for Connected Vehicles Using Federated Learning](https://ieeexplore.ieee.org/document/9181482) | IEEE TITS, 22(8):5341–5351, 2021；DOI 10.1109/TITS.2020.3017474；IEEE 摘要/元数据核验 | 随车辆移动变化的内容需求、主动缓存与 mobility-aware 替换。 | 可参考错误预取和驻留时间的评估；PPO_MEC 对象为模型权重与执行状态，并需证明连续 DAG 完成收益，而非仅内容命中率。 | content cache 不是 adapter cache；未实现其联邦学习或预测器。 |
+
 ### 2026-10-12：实验形态参考
 
 | 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
