@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-12
+更新日期：2026-10-14
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -19,6 +19,7 @@
 |---|---|---|---|---|---|
 | 多 RSU 轨迹驱动评估 | [Vehicular Edge Computing Networks Optimization via DRL-Based Communication Resource Allocation and Load Balancing](https://doi.org/10.1109/TMC.2025.3559707) | IEEE TMC, 24(9):9222–9237, 2025；IEEE 摘要核验，全文实验细节待核验 | IEEE 摘要明确描述多任务、多 RSU 协作卸载与负载均衡，并称基于真实车辆轨迹评价；这支持区分真实轨迹驱动仿真与实体 RSU 部署，不能据摘要断言其使用了真实 RSU。 | PPO_MEC 若用 NGSIM 八车与 Alibaba 八 DAG，只能声明跨源、受控配对的轨迹驱动多请求实验；真实 RSU 算力/链路及联合请求日志仍需独立证据。 | Experimental setup / 真实性声明边界。 |
 | 仿真型 VEC 卸载 | [Asynchronous Federated Based Vehicular Edge Computation Offloading](https://doi.org/10.1109/TVT.2024.3444784) | IEEE TVT, 73(12):19350–19360, 2024；IEEE 摘要核验，全文实验细节待核验 | IEEE 摘要建立车辆/RSU 任务与队列模型，并将结果明确称为 simulation outcomes；说明仿真评估是 VEC 论文的一种实验形态。 | PPO_MEC 可在冻结的模型和外生输入下训练八车并发控制，但必须公开 RSU、链路、算力、请求映射的来源与校准范围，不得把模型结果写成现场实测。 | Experimental methodology / 仿真口径说明。 |
+| VEC 仿真平台与校验 | [VEC-Sim: A Simulation Platform for Evaluating Service Caching and Computation Offloading Policies in Vehicular Edge Networks](https://doi.org/10.1016/j.comnet.2024.110985) | Computer Networks, 257:110985, 2025；出版社页面与 arXiv 摘要核验 | 建立面向 VEC 的 service caching 与计算卸载仿真平台，模拟车辆移动和变化的服务访问模式，并报告与真实基准的对照校验；其缓存对象为 service，不是 adapter。 | PPO_MEC 可借鉴对移动性、请求过程和成本模型逐项校验的实验方法；本项目 NGSIM 与 Alibaba 的跨源配对及 RSU/cache/链路参数仍须明确为合成条件，并以模型与 adapter 实测和机制指标补足外推证据。 | Experimental methodology / 模拟器可信度与 service-cache 语义边界。 |
 
 ### 2026-10-11：汇报近邻补充
 

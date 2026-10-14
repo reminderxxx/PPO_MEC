@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-14：真实控制对象与规模外推仍未闭环（OPEN BLOCKER）
+
+- 当前轨迹驱动仿真使用 NGSIM 车位和 Alibaba DAG，但逐车请求配对、adapter 身份、模型/状态大小、RSU 算力与链路均非同源实测；五动作没有显式未来 DAG adapter、base 预备、任意目标站或资源份额控制，base 加载与 LRU 驱逐仍是环境自动机制。真实 model cache 友好与边缘传输收益不能据此归因给 SA-GHMAPPO。
+- 只读预检虽发现至少 16 辆持续车辆的 120 帧窗口有 80 个，launcher 仍写死 8 车 4 站；全部合格轨迹来自一个路段，早期 handoff 稀少。放大资源/规模可能只放大拥塞或改变 RSU 几何，不能自动提高机制可辨识度。证据与必要控制见 `joint_environment_scale_action_review_20261014.md`。
+
 ## 2026-10-14：加大训练量后 SA 冷缓存贪心死锁仍开放（OPEN BLOCKER）
 
 - 同环境 24→96 episode 对照中，SA-GHMAPPO seed 27 greedy 从 `0.5/8` 降至 `0/8`；其 `7,680` 次决策全选 action 3，adapter 全部未就绪，而 sample 仍 `8/8`。MAPPO 一个失败 seed 被救回，DAG 两个成功 seed 退化，说明预算影响非单调。原始证据及边界见 `eight_vehicle_joint_v2_budget_review_20261014.md`。

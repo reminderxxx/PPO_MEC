@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-14：联合环境真实性、动作与规模只读预检
+
+- 原始输入与代码审查见 `joint_environment_scale_action_review_20261014.md`；可复核输入预检位于 `artifacts/analysis/eight_vehicle_scale_preflight_20261014/`。NGSIM 前 80 万行中，120 帧不重叠窗口持续至少 16 车的有 80 个，Alibaba 可选 32 个独立工作流；全部合格轨迹来自 Peachtree，实验入口仍写死 8 车 4 站。
+- 配对开发窗口的轨迹关联切换在 8 车 4 站前 20 帧为 0 次、16 车 4 站为 2 次、16 车 6 站为 7 次；这仅说明可能有 handoff，不证明有未完成 DAG 或模型/状态准备收益。扩容需与跨帧负载、缓存竞争和资源比例分轴设计。
+- 当前五动作缺显式 base/future-adapter 对象、候选站与资源分配，base 由请求 adapter 时自动装载；训练使用真实轨迹/DAG 但联合请求和边缘成本为合成。建议先独立冻结可执行控制合同与成本校准，再做规模和预算实验。本轮无策略重训或新论文性能结论，`Unverifiable`。
+
 ## 2026-10-14：96 episode 受控训练量诊断完成
 
 - `20261014T035709Z_development` 在同 v2 原始数据、窗口、环境与 seed 上把五算法每 seed 训练量从 24 提至 96 episode；15 个最终 checkpoint、1,440 train、360 update、各 120 条 greedy/sample dev 和逐帧奖励核算通过。计划、命令、原始结果在 `artifacts/eight_vehicle_joint_v2_budget96_20261014/`，审查见 `eight_vehicle_joint_v2_budget_review_20261014.md`。
