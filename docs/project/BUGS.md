@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-14：加大训练量后 SA 冷缓存贪心死锁仍开放（OPEN BLOCKER）
+
+- 同环境 24→96 episode 对照中，SA-GHMAPPO seed 27 greedy 从 `0.5/8` 降至 `0/8`；其 `7,680` 次决策全选 action 3，adapter 全部未就绪，而 sample 仍 `8/8`。MAPPO 一个失败 seed 被救回，DAG 两个成功 seed 退化，说明预算影响非单调。原始证据及边界见 `eight_vehicle_joint_v2_budget_review_20261014.md`。
+- action 3 在有节点时始终合法但不发起当前 adapter 加载；action 0 在缺缓存时拉取，已缓存时仍可当前站执行且不额外占链路。共同动作合同允许全部车辆 greedy 选 action 3 时无人启动加载。团队奖励下的采样搭便车是待条件概率/反事实日志定量核验的解释，不可当作已证实的唯一根因。
+- 96 episode 每算法约 64,000 决策、24 轮更新后 critic 解释方差仍近零；训练量/价值尺度诊断仍需做，但不再盲增训练量追求有利 seed。机制机会与正式证据缺口照旧开放。
+
 ## 2026-10-13：v2 开发集暴露确定性策略与机制激活 blocker（OPEN）
 
 - `20261013T083022Z_development` 三 seed 原始审查见 `eight_vehicle_joint_v2_dev_review_20261013.md`。SA-GHMAPPO seed 27 greedy 完成均值 `0.5/8`，大量选 action 3 且 adapter 未就绪；MAPPO seed 7、PPO seed 17 和其他对照亦有 seed 依赖失败。sample 三 seed 各算法均 `8/8`。修复 PPO rollout/目标合同并未消除 greedy 退化。

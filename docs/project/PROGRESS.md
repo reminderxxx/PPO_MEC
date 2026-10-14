@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-14：96 episode 受控训练量诊断完成
+
+- `20261014T035709Z_development` 在同 v2 原始数据、窗口、环境与 seed 上把五算法每 seed 训练量从 24 提至 96 episode；15 个最终 checkpoint、1,440 train、360 update、各 120 条 greedy/sample dev 和逐帧奖励核算通过。计划、命令、原始结果在 `artifacts/eight_vehicle_joint_v2_budget96_20261014/`，审查见 `eight_vehicle_joint_v2_budget_review_20261014.md`。
+- MAPPO greedy 从 `5.333/8` 升至 `8/8`；SA-GHMAPPO 从 `5.5/8` 降至 `5.333/8`，seed 27 变成 `0/8` 且 `7,680/7,680` 次选无缓存拉取的 action 3；DAG 基线从 `8/8` 降至 `2.667/8`。cache 基线仍 `8/8`。所有算法的 sample 仍 `8/8`。
+- 因而训练量不足可能影响部分策略，但单独增加训练量不能消除主方法确定性退化。下一轮优先追踪冷/热缓存条件概率与共同 action 0/3 合同，暂停继续盲增预算；模型缓存、预测与 handoff 优势仍未验证，论文结论 `Unverifiable`。
+
 ## 2026-10-13：八车 v2 七算法开发集完成，主方法优势仍未证实
 
 - 冻结命令的 `20261013T083022Z_development` 已完成 7 算法 × 3 seed × 24 episode；504 train、126 update、21 个 checkpoint、各 168 条 greedy/sample dev 和 144,061 条事件通过哈希、数量与逐帧奖励复算。原始产物位于 `artifacts/eight_vehicle_joint_v2_development_20261012/`；审查见 `eight_vehicle_joint_v2_dev_review_20261013.md`。
