@@ -166,3 +166,13 @@ class MAPPOAgent(PPOBaseAgent):
                 "cache_warm_start_guard",
             ],
         }
+
+
+from src.agents.ppo_agent import ParameterizedControlPPO
+
+
+class ParameterizedMAPPOAgent(ParameterizedControlPPO):
+    """v3 shared request actor with a current full-state centralized critic."""
+    def __init__(self, **kwargs):
+        kwargs.pop('method', None)
+        super().__init__(method='mappo', **kwargs)

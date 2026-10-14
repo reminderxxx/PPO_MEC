@@ -2144,3 +2144,7 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - `docs/project/literature_reference_table.md` 新增 10 篇相关近邻，包含 TMC delay-reliability/cache-assisted offloading、TITS multi-edge/multi-vehicle orchestration、IoTJ DAG meta-RL、FGCS DT dual-timescale cache/offload、JSA agentic workflow scheduling 等；查重审计为 119 entries、title/DOI/URL duplicate 均为 0。
 - 新增 `docs/project/top_journal_paper_structure_gap_review_20260928.md`，逐段拆解 Introduction、全文论证链、可模仿写法和 PPO_MEC 缺口，并给出 9 段 Introduction 模板。
 - 当前 TMC-ready verdict 仍为 `Unverifiable / E1_DOCUMENTED`：G14C v16 formal/holdout/support 未闭环，仓库未发现 integrated manuscript；本轮没有修改算法、配置或实验结果。
+
+## 2026-10-14 v3 学习实现阶段
+
+三方法 opt-in 参数化控制及训练窗口 GRU、SA DAG/surrogate 已实现；新增合同检查 6 passed、相关回归 322 passed。生产入口 smoke 和固定 128 episode × 3 seed × 5 配置开发对比待回收。本阶段不更新 canonical、不打开 holdout；论文优势 UNVERIFIED。见 `joint_parameterized_learning_20261014.md`。

@@ -784,3 +784,7 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 - `configs/acceptance/two_node_workflow_suffix_recovery_v1.json`：DAG、prompt、模型资源 hash、生成参数、判据、
   目标读取白名单与 4-generate 预算。
 - `tests/test_workflow_suffix_recovery.py`：状态依赖、篡改/冲突拒绝、旧 PEFT 回执字段与汇总负例。
+
+## 2026-10-14 v3 学习适配
+
+`ppo_agent.py` 承载公共参数化 PPO 概率/更新/checkpoint，`mappo_agent.py`、`cache_offload_agent.py`、`sa_ghmappo_agent.py` 分别提供 opt-in 类，registry 直接映射；不建包装 package。环境 control dataclass 在 act 时延迟导入，避免 env/runtime/registry import 环。`joint_learned_prediction.py` 不依赖策略；开发 runner 拟合并向环境注入冻结 provider。

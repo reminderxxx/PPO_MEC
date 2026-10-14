@@ -245,6 +245,19 @@ def validate_agent_eviction_binding(agent_name: str, cache_capacity_profile: dic
 
 def build_agent(agent_name: str, **kwargs: Any) -> BaseAgent:
     """Build an agent by registry name."""
+    contract = kwargs.pop("control_contract", None)
+    if contract is not None:
+        if contract != "joint_parameterized_control_v3":
+            raise ValueError("unknown control contract")
+        from src.agents.mappo_agent import ParameterizedMAPPOAgent
+        from src.agents.cache_offload_agent import ParameterizedCacheOffloadAgent
+        from src.agents.sa_ghmappo_agent import ParameterizedSAGHMAPPOAgent
+        parameterized = {"mappo": ParameterizedMAPPOAgent,
+                         "cache_offload_drl": ParameterizedCacheOffloadAgent,
+                         "sa_ghmappo": ParameterizedSAGHMAPPOAgent}
+        if agent_name not in parameterized:
+            raise ValueError("agent has no parameterized v3 implementation")
+        return parameterized[agent_name](**kwargs)
     if agent_name not in ALGO_REGISTRY:
         raise KeyError(f"unknown agent: {agent_name}")
     agent_class = ALGO_REGISTRY[agent_name]["class"]

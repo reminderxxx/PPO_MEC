@@ -1252,3 +1252,7 @@ claim map 必须报告 `UNAVAILABLE`。
 ## 2026-09-08 G14R20-A
 
 固定提交 continuation 被定义为独立待批准的新规则；新 run 发布门禁不变。proposal/结构/资格/批准/执行分离，本轮真实执行权限恒为 false。保护快照是验收基线而非原始授权凭据。 详见 `fixed_commit_continuation_contract.md`。
+
+## 2026-10-14 参数化学习与模型边界
+
+采用单独 v3 checkpoint 合同重新实现 SA 主机制；不强行移植旧五动作权重。所有比较方法具有相同目标、cache、prepare、priority 与控制周期，SA 只增加 DAG message/surrogate，额外模型容量如实记录。预测用训练窗口 GRU，surrogate 用训练 rollout 实际 return/cost，不用未来真值部署。自动 typed LRU 仍共用，learned eviction 与 causal transition surrogate 尚缺。预算与固定最终 checkpoint 预先冻结于 `joint_parameterized_learning_20261014.md`。

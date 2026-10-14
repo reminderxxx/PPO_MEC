@@ -307,3 +307,13 @@ class CacheOffloadDRLAgent(PPOBaseAgent):
         self._cache_feature_contract = contract
         self._network.feature_contract = contract
         self.baseline_config["cache_feature_contract"] = contract
+
+
+from src.agents.ppo_agent import ParameterizedControlPPO
+
+
+class ParameterizedCacheOffloadAgent(ParameterizedControlPPO):
+    """First-party v3 PPO baseline with an additional typed cache context encoder."""
+    def __init__(self, **kwargs):
+        kwargs.pop('method', None)
+        super().__init__(method='cache_offload_drl', **kwargs)

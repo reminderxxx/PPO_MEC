@@ -444,3 +444,17 @@ class SAGHMAPPOAgent(SAGHMAPPOBaseAgent):
         ):
             if field_name in kwargs:
                 self.ablation_config[field_name] = kwargs[field_name]
+
+
+from src.agents.ppo_agent import ParameterizedControlPPO
+
+
+class ParameterizedSAGHMAPPOAgent(ParameterizedControlPPO):
+    """v3 DAG message encoder, autoregressive controllers, learned return surrogate.
+
+    This is a versioned implementation of the main mechanisms, not a claim that
+    legacy five-action checkpoint parameters transfer to the new architecture.
+    """
+    def __init__(self, **kwargs):
+        kwargs.pop('method', None)
+        super().__init__(method='sa_ghmappo', **kwargs)

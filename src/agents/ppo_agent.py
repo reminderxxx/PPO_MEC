@@ -163,3 +163,204 @@ class TraceDrivenMultiRequestPPO(nn.Module):
         distribution, values = self.distribution_and_value(features, mask)
         actions = distribution.logits.argmax(dim=-1) if deterministic else distribution.sample()
         return actions, distribution.log_prob(actions), values
+
+# v3 is opt-in and has separate checkpoint/probability contracts from legacy PPO.
+import numpy as np
+from pathlib import Path
+
+
+class ParameterizedControlPPO(nn.Module):
+    """Exact autoregressive joint PPO over execution, cache, and state/priority.
+
+    Target commitment is a public controller option, released on node change or
+    coverage loss. Cache decisions use a shared four-frame period. Typed LRU is
+    the common fallback; explicit victim selection is not learned in this version.
+    """
+    action_contract = 'joint_parameterized_control_v3'
+    checkpoint_contract = 'parameterized_control_ppo_v1'
+    max_nodes, max_rsus = 32, 4
+
+    def __init__(self, *, method='mappo', surrogate_enabled=True, prediction_enabled=True,
+                 learning_rate=3e-4, seed=7):
+        super().__init__()
+        torch.manual_seed(seed)
+        self.method, self.surrogate_enabled = method, bool(surrogate_enabled and method == 'sa_ghmappo')
+        self.prediction_enabled = prediction_enabled
+        self.options = dict(method=method, surrogate_enabled=surrogate_enabled,
+                            prediction_enabled=prediction_enabled, learning_rate=learning_rate, seed=seed)
+        self.graph_encoder = nn.Sequential(nn.Linear(4, 16), nn.Tanh())
+        self.graph_message = nn.Sequential(nn.Linear(32, 16), nn.Tanh())
+        self.cache_encoder = nn.Sequential(nn.Linear(16, 16), nn.Tanh())
+        self.heads = nn.ModuleList([nn.Sequential(nn.Linear(64, 64), nn.Tanh(), nn.Linear(64, 1)) for _ in range(3)])
+        self.surrogates = nn.ModuleList([nn.Sequential(nn.Linear(64, 32), nn.Tanh(), nn.Linear(32, 3)) for _ in range(3)])
+        self.critic = nn.Sequential(nn.Linear(32, 64), nn.Tanh(), nn.Linear(64, 1))
+        self.optimizer = torch.optim.Adam(self.parameters(), lr=learning_rate)
+        self.reset_controller()
+
+    def reset_controller(self):
+        self.commitments = {}
+
+    def _features(self, decision, frame):
+        if decision.get('action_contract') != self.action_contract:
+            raise ValueError('parameterized agent requires v3 decision contract')
+        s = decision['semantic_state']; vid = s['primary_vehicle_id']; current = s['current_workflow_node']
+        workflow = s['workflow']; nodes = workflow['nodes']; done = set(workflow['completed_node_ids'])
+        if len(nodes) > self.max_nodes or len(s['rsus']) != self.max_rsus:
+            raise ValueError('v3 learning contract supports <=32 nodes and exactly four RSUs')
+        ids = sorted(r['rsu_id'] for r in s['rsus']); rsus = {r['rsu_id']: r for r in s['rsus']}
+        pred = s['predictions'] if self.prediction_enabled else {}
+        future = pred.get('predicted_next_rsu_by_vehicle', {}).get(vid)
+        confidence = pred.get('prediction_confidence_by_vehicle', {}).get(vid, 0.)
+        def feature(rid=None, node=None, kind='adapter', priority=0):
+            r = rsus.get(rid, {}); node = node or current
+            base = node['required_base_model']; adapter = node['required_adapter']
+            cached = adapter in r.get('cached_adapter_ids', [])
+            ready_base = base in r.get('ready_base_model_ids', [])
+            return [float(rid is not None), float(rid in s['reachable_execution_rsu_ids']),
+                float(rid == s['execution_location']), float(rid == s['associations'][vid]),
+                float(cached), float(adapter in r.get('loading_adapter_ids', [])), float(ready_base),
+                float(r.get('occupied_bytes', 0))/max(r.get('capacity_bytes', 1), 1),
+                float(r.get('associated_vehicle_count', 0))/8, float(rid in s['input_received_targets']),
+                float(rid == future)*confidence, float(pred.get('future_load', {}).get(rid, 0))/8,
+                float(node['node_id'] == current['node_id']), float(node['input_size'])/32,
+                float(kind == 'base_model'), priority/3]
+        own = [frame/120, len(done)/max(len(nodes), 1), (len(nodes)-len(done))/32,
+            s['current_node_work_units_progress']/32, s['current_node_work_units_required']/32,
+            s['execution_state_payload_bytes']/4096, s['execution_state_version']/120,
+            float(s['current_node_parents_ready']), float(s['vehicle_adapter_ready']),
+            float(bool(s['output_pending'])), len(s['input_received_targets'])/4,
+            confidence, float(pred.get('dwell_time', {}).get(vid, 0))/3,
+            float(s['shared_state'].get('available', False)),
+            float(s['shared_state'].get('age_frames') or 0)/8, float(len(s['reachable_execution_rsu_ids']))/4]
+        graph = np.zeros((32, 4), np.float32); adjacency = np.zeros((32, 32), np.float32)
+        index = {n['node_id']: j for j, n in enumerate(nodes)}
+        for j, n in enumerate(nodes):
+            graph[j] = [n['input_size']/32, n['output_size']/32, float(n['node_id'] in done), float(n['node_id']==current['node_id'])]
+        for a, b in workflow['edges']:
+            adjacency[index[b], index[a]] = 1
+        adjacency /= np.maximum(adjacency.sum(1, keepdims=True), 1)
+        targets = [None, *ids, 'vehicle']; target_features = [feature(r) for r in targets]
+        target_features[-1] = [0., 0., float(s['execution_location']==f'vehicle:{vid}'), 0.,
+                                  float(s['vehicle_adapter_ready']), 0., 1., 0., 0., 1., 0., 0., 1., current['input_size']/32, 0., 0.]
+        mask = [r in decision['control_space']['execution_targets'] or
+                (r == 'vehicle' and decision['control_space']['vehicle_execution_available']) for r in targets]
+        old = self.commitments.get(vid)
+        if old and old[0] == current['node_id'] and old[1] in targets and mask[targets.index(old[1])]:
+            mask = [r == old[1] for r in targets]
+        # Cache noop + every uncompleted known DAG base/adapter at every RSU.
+        cache = [(None, None, 'adapter')]; cache_features = [feature()]; cache_mask = [True]
+        for n in nodes:
+            for rid in ids:
+                for kind in ('base_model', 'adapter'):
+                    r = rsus[rid]
+                    ready = n['required_base_model'] in r.get('ready_base_model_ids', []) if kind=='base_model' else (
+                        n['required_adapter'] in r.get('cached_adapter_ids', []) or n['required_adapter'] in r.get('loading_adapter_ids', []))
+                    cache.append((rid, n['node_id'], kind)); cache_features.append(feature(rid, n, kind))
+                    cache_mask.append(frame % 4 == 0 and n['node_id'] not in done and not ready)
+        event = [(rid, priority) for rid in [None, *ids] for priority in range(4)]
+        event_features = [feature(rid, priority=priority) for rid, priority in event]
+        event_mask = [rid is None or (s['execution_state_version'] > 0 and
+            s['state_copies_by_rsu'].get(rid, {}).get('version') != s['execution_state_version'] and
+            rid != s['execution_location']) for rid, priority in event]
+        critic = list(own)
+        c = decision['centralized_critic_state']
+        for r in sorted(c['rsus'], key=lambda r: r['rsu_id']):
+            critic += [r.get('occupied_bytes', 0)/max(r.get('capacity_bytes', 1), 1),
+                       r.get('associated_vehicle_count', 0)/8, len(r.get('loading_adapter_ids', []))/8,
+                       sum(w['execution_location']==r['rsu_id'] for w in c['joint_workflows'].values())/8]
+        arrays = dict(own=np.array(own, np.float32), graph=graph, adjacency=adjacency,
+                      graph_mask=np.array([j<len(nodes) for j in range(32)]), critic=np.array(critic, np.float32))
+        for j, (f, m) in enumerate(zip((target_features, cache_features, event_features), (mask, cache_mask, event_mask))):
+            count = (6, len(cache), 20)[j]
+            arrays[f'f{j}'] = np.zeros((count, 16), np.float32); arrays[f'f{j}'][:len(f)] = f
+            arrays[f'm{j}'] = np.zeros(count, bool); arrays[f'm{j}'][:len(m)] = m
+        return arrays, (targets, cache, event), vid, current['node_id']
+
+    def distributions(self, data, *, actions=None, deterministic=False):
+        own = data['own']; batch = len(own)
+        if self.method == 'sa_ghmappo':
+            encoded = self.graph_encoder(data['graph'])
+            messages = torch.bmm(data['adjacency'], encoded)
+            encoded = self.graph_message(torch.cat((encoded, messages), -1))
+            weight = data['graph_mask'].float().unsqueeze(-1)
+            context = (encoded*weight).sum(1)/weight.sum(1).clamp(min=1)
+        elif self.method == 'cache_offload_drl':
+            context = self.cache_encoder(data['f0'][:, 1:5]).mean(1)
+        else:
+            context = own.new_zeros(batch, 16)
+        condition = own.new_zeros(batch, 16); selected, logs, entropies, surrogates = [], [], [], []
+        for j in range(3):
+            f = data[f'f{j}']; n = f.shape[1]
+            x = torch.cat((own[:, None].expand(-1,n,-1), context[:,None].expand(-1,n,-1), f,
+                           condition[:,None].expand(-1,n,-1)), -1)
+            logits = self.heads[j](x).squeeze(-1)
+            predicted = self.surrogates[j](x.detach()) if self.surrogate_enabled else logits.new_zeros(batch, n, 3)
+            if self.surrogate_enabled:
+                logits = logits + .3*(predicted[..., 0]-predicted[..., 1]-predicted[..., 2]).detach().tanh()
+            dist = Categorical(logits=logits.masked_fill(~data[f'm{j}'], -1e9))
+            action = actions[:,j] if actions is not None else (dist.logits.argmax(-1) if deterministic else dist.sample())
+            if not bool(data[f'm{j}'].gather(1,action[:,None]).all()):
+                raise ValueError('action outside stored behavior mask')
+            selected.append(action); logs.append(dist.log_prob(action)); entropies.append(dist.entropy())
+            surrogates.append(predicted[torch.arange(batch), action])
+            condition = f[torch.arange(batch), action]
+        return torch.stack(selected,1), torch.stack(logs,1).sum(1), torch.stack(entropies,1).sum(1), self.critic(data['critic']).squeeze(-1), torch.stack(surrogates,1)
+
+    @torch.no_grad()
+    def act_controls(self, decisions, frame, *, deterministic=False):
+        from src.envs.core.multi_request_target_control_env import JointRequestControl
+        items = [self._features(decision, frame) for decision in decisions.values()]
+        cache_count = max(len(item[0]['m1']) for item in items)
+        for item in items:
+            missing = cache_count-len(item[0]['m1'])
+            item[0]['f1'] = np.pad(item[0]['f1'], ((0,missing),(0,0)))
+            item[0]['m1'] = np.pad(item[0]['m1'], (0,missing))
+        data = {k: torch.as_tensor(np.stack([item[0][k] for item in items])) for k in items[0][0]}
+        actions, logs, _, values, _ = self.distributions(data, deterministic=deterministic)
+        controls = {}
+        for item, action in zip(items, actions.tolist()):
+            _, candidates, vid, node = item
+            target = candidates[0][action[0]]; cache_target, cache_node, kind = candidates[1][action[1]]
+            prepare, priority = candidates[2][action[2]]
+            controls[vid] = JointRequestControl(target, cache_target, cache_node, kind, prepare, priority=priority)
+            # Waiting remains a one-frame decision; active service stays until node/coverage changes.
+            self.commitments[vid] = (node, target) if target is not None else None
+        return controls, dict(data=data, actions=actions, logs=logs, values=values, vehicle_ids=list(decisions))
+
+    def update(self, rollouts, *, epochs=4):
+        cache_count = max(r['data']['m1'].shape[1] for r in rollouts)
+        for r in rollouts:
+            missing = cache_count-r['data']['m1'].shape[1]
+            r['data']['f1'] = torch.nn.functional.pad(r['data']['f1'], (0,0,0,missing))
+            r['data']['m1'] = torch.nn.functional.pad(r['data']['m1'], (0,missing))
+        data = {k: torch.cat([r['data'][k] for r in rollouts]) for k in rollouts[0]['data']}
+        actions = torch.cat([r['actions'] for r in rollouts]); old = torch.cat([r['logs'] for r in rollouts])
+        targets = torch.cat([r['returns'] for r in rollouts]); costs = torch.cat([r.get('cost_targets', torch.zeros(len(r['returns']), 2)) for r in rollouts]); old_values = torch.cat([r['values'] for r in rollouts])
+        advantage = targets-old_values; advantage = (advantage-advantage.mean())/advantage.std().clamp(min=1e-6)
+        losses = []
+        for _ in range(epochs):
+            for index in torch.randperm(len(actions)).split(512):
+                batch = {k: v[index] for k,v in data.items()}
+                _, logs, entropy, value, surrogate = self.distributions(batch, actions=actions[index])
+                ratio = (logs-old[index]).exp()
+                policy = -torch.minimum(ratio*advantage[index], ratio.clamp(.8,1.2)*advantage[index]).mean()
+                value_loss = (value-targets[index]).square().mean()
+                surrogate_targets = torch.cat((targets[index,None], costs[index]), -1)
+                auxiliary = (surrogate-surrogate_targets[:,None]).square().mean() if self.surrogate_enabled else value_loss*0
+                loss = policy + .5*value_loss - .01*entropy.mean() + .2*auxiliary
+                self.optimizer.zero_grad(); loss.backward(); torch.nn.utils.clip_grad_norm_(self.parameters(), .5); self.optimizer.step()
+                losses.append([float(policy.detach()),float(value_loss.detach()),float(auxiliary.detach())])
+        return dict(policy_loss=float(np.mean(losses,0)[0]),value_loss=float(np.mean(losses,0)[1]),
+                    surrogate_loss=float(np.mean(losses,0)[2]), samples=len(actions))
+
+    def save_checkpoint(self, path):
+        torch.save(dict(contract=self.checkpoint_contract, action_contract=self.action_contract,
+                        options=self.options, state_dict=self.state_dict(), optimizer=self.optimizer.state_dict()), path)
+
+    @classmethod
+    def from_checkpoint(cls, path):
+        saved = torch.load(path, map_location='cpu', weights_only=False)
+        if saved.get('contract') != cls.checkpoint_contract or saved.get('action_contract') != cls.action_contract:
+            raise ValueError('incompatible v3 checkpoint')
+        obj = cls(**saved['options']); obj.load_state_dict(saved['state_dict']); obj.optimizer.load_state_dict(saved['optimizer'])
+        return obj
