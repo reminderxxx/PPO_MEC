@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-14：精确同分经 72 次独立回放复现，确认比较缺乏动作辨识力
+
+- 用户质疑三算法奖励完全相同后，追加只读检查 `joint_reward_identity_audit_20261014.md`：9 个最终网络 tensor 哈希不同、24→96 回合参数均更新、实际 loader 恢复的全部权重与文件严格一致；独立重跑所有 72 个 greedy dev 执行，奖励和物理轨迹哈希均复现。每窗 9 个评估的未舍入回报也相同，未发现模型混用、结果复用或舍入假同分。
+- 第一窗口始终 action 0 与冷态 0/热态 3 均为 `41.92351660156253`、51 节点、2/8；诊断性关闭 cold mask 后始终 action 3 为 `−9.936680`、0 节点。确认动作影响冷加载，但本批学习策略只采用效果退化的 0/3，固定轮转计算与不可控执行站决定相同轨迹。容量限制解释低完成率；精确同分另由动作辨识力不足解释，不能据此评价一般算法优劣。原件见 `artifacts/joint_reward_identity_audit_20261014/`。
+
 ## 2026-10-14：多帧联合控制 96 回合曲线完成，确认动作与容量瓶颈
 
 - `20261014T074430Z_development` 在同 cold-cache 合同下把 70 个 Alibaba 节点设为 2–5.75 单位跨帧工作，固定 SA-GHMAPPO、MAPPO、第一方缓存 PPO × 3 seed × 96 episode，按 24 回合保存 checkpoint 与独立开发曲线。864 train、216 update、9 最终/36 曲线 checkpoint、72 最终 greedy/72 sample、288 曲线评估与 17,280 帧奖励收据核验通过；原件在 `artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/`，审查见 `joint_mechanism_budget96_review_20261014.md`。

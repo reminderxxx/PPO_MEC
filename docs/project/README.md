@@ -9,6 +9,7 @@
 
 ## Live 文档
 
+- `joint_reward_identity_audit_20261014.md`：9 个网络权重/加载/更新、72 次独立回放、未舍入回报与反事实动作检查；确认精确同分来自当前比较缺乏动作辨识力。
 - `joint_mechanism_budget96_review_20261014.md`：多帧工作量、96 回合曲线、开发奖励同分与候选站容量上限的原件审查；不作为论文结果。
 - `joint_control_v3_design_20261014.md`：可控执行站、base/adapter 预置、状态预复制和同合同算法对照的下一版设计草案；尚未实现。
 - `joint_cold_mask_budget96_cache_baseline_review_20261014.md`：同冷缓存合同四倍训练量、缓存基线身份与特征、奖励上限和主方法可辨识性审查；仅开发证据。

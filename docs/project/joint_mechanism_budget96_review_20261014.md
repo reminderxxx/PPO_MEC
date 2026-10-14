@@ -9,6 +9,8 @@
 - `evidence_level`: 开发集原件已独立核对；完整论文证据缺 formal/holdout/support，按政策为 `E0_UNAVAILABLE`（开发核对不等于政策 `E2`）
 - `verdict`: `Unverifiable`（SA-GHMAPPO 相对 MAPPO 或缓存方向 PPO 的最高奖励、收敛、model-cache 友好性、paper-ready）
 
+同日补充：`joint_reward_identity_audit_20261014.md` 已核验 9 个不同网络的实际加载/参数更新，并独立重放全部 72 个 greedy 开发执行。精确同分可复现；容量不足解释低完成率，同分还由本批实际动作效果退化与固定执行调度解释，不能仅凭容量上限归因。
+
 ## Evidence inventory 与协议
 
 - 运行原件：`artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/20261014T074430Z_development/`，包含 `manifest.json`、`train.jsonl`、`updates.jsonl`、最终与曲线 checkpoint、`dev_curve.jsonl`、`dev.jsonl`、`dev_sampled.jsonl`、`dev_events.jsonl`；启动命令在 manifest，上级 `training.log` 记录 `RUN_COMPLETE`。NGSIM / Alibaba 原始文件 SHA-256 也在 manifest。
