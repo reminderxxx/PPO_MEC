@@ -5,6 +5,13 @@
 
 # Artifact Records
 
+## 2026-10-14 eight-vehicle v2 cold-cache-mask development diagnostic
+
+- Run `20261014T064956Z_development`，路径 `artifacts/eight_vehicle_joint_v2_cold_mask_20261014/20261014T064956Z_development/`，执行 commit `6865720fdaea1debac337e212651274a35339483`，`git_dirty=false`；新合同 `semantic_discrete_5_per_request_v2_cold_cache_mask`，formal/holdout 未运行。
+- `manifest.json`、9 checkpoint 与 SHA-256、216 train、54 update、72 greedy/72 sample dev、48,295 事件、7,980 帧收据均在本地；`independent_audit.json` 的 14 项完整性及奖励守恒核对全通过。`cold_mask_comparison.json` 核验与旧 24 episode 开发 run 的输入、窗口、工作流、站位、物理成本和奖励一致，差异为共同动作 mask。
+- SA-GHMAPPO、MAPPO、cache 方向基线 greedy 奖励均 `66.383740`、完成均 `8/8`，各 `8,037` 次决策全选 action 0；三者同轨迹同结果，不能当主方法优势。独立审查见 `joint_predictor_cold_mask_dev_review_20261014.md`；论文证据等级 `E0_UNAVAILABLE`，verdict `Unverifiable`。
+- 本地 predictor 输入预检 `artifacts/analysis/joint_predictor_qualification_20261014/` 仅评估换站预测，不包含学习型预测器或策略收益。
+
 ## 2026-10-12 eight-vehicle joint-control internal simulation
 
 - Run root：`artifacts/eight_vehicle_joint_sim/20261012T080927Z_formal_sim/`；执行 commit `b97477d5111d199909904a6513b852c42d278635`。

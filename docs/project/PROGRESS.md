@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-14：冷缓存合同开发对照消除死锁但三算法打平
+
+- 独立 opt-in 共同 cold-cache mask 在同原始数据、窗口、seed、24 episode 与物理成本下重训 SA-GHMAPPO、MAPPO、cache 方向基线。新 run `20261014T064956Z_development` 的 216 train、54 update、9 checkpoint、72 greedy/72 sample dev 和逐帧收据通过 14 项审计；详情见 `joint_predictor_cold_mask_dev_review_20261014.md` 与 `artifacts/eight_vehicle_joint_v2_cold_mask_20261014/`。
+- SA 原失败 seed 27 与 MAPPO 原失败 seed 7 均恢复；三算法 greedy 均 `8/8`、奖励 `66.384`，逐请求动作全为 action 0。共同动作修复解决冷缓存停滞，但没有 SA 特有增益，缓存/预测/迁移优势仍 `Unverifiable`。
+- 离线预测预检在实际八车四站开发窗口只有 4 次换站事件，常速度预测 3 帧目标相关的 12 个连续 vehicle-frame 全命中；相关帧不等于 12 个独立事件。先做机制机会和错误预测成本，再决定是否训练 LSTM/GRU；本轮没有训练学习型预测器或开启 formal/holdout。
+
 ## 2026-10-14：联合环境真实性、动作与规模只读预检
 
 - 原始输入与代码审查见 `joint_environment_scale_action_review_20261014.md`；可复核输入预检位于 `artifacts/analysis/eight_vehicle_scale_preflight_20261014/`。NGSIM 前 80 万行中，120 帧不重叠窗口持续至少 16 车的有 80 个，Alibaba 可选 32 个独立工作流；全部合格轨迹来自 Peachtree，实验入口仍写死 8 车 4 站。

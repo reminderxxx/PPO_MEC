@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-14：opt-in 冷缓存修复后策略同质化（OPEN BLOCKER）
+
+- 开发专用共同 mask 已禁止未就绪 adapter 时的 action 3；旧默认仍保留。24 episode 同条件重训使 SA/MAPPO 的失败 seed 恢复，但 SA、MAPPO 与 cache 方向基线所有 greedy 决策都选 action 0，24 个配对 dev 行完全打平，且状态提前准备和执行期 handoff 均为 0。不能把共同规则修复写成 SA 算法优势；证据见 `joint_predictor_cold_mask_dev_review_20261014.md`。
+- 八车四站开发窗口仅 4 次原始换站，最早发生在第 50 帧；3 帧常速度预测在其中 12 个相关 vehicle-frame 全命中，样本高度相关且没有下游收益机会。贸然换 LSTM/GRU/Mamba 不能解释当前落后；仍需多帧工作流、目标端 cache 准备、误预测损失与独立窗口证据。
+
 ## 2026-10-14：真实控制对象与规模外推仍未闭环（OPEN BLOCKER）
 
 - 当前轨迹驱动仿真使用 NGSIM 车位和 Alibaba DAG，但逐车请求配对、adapter 身份、模型/状态大小、RSU 算力与链路均非同源实测；五动作没有显式未来 DAG adapter、base 预备、任意目标站或资源份额控制，base 加载与 LRU 驱逐仍是环境自动机制。真实 model cache 友好与边缘传输收益不能据此归因给 SA-GHMAPPO。
