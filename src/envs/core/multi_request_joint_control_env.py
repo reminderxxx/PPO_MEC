@@ -36,6 +36,7 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
                  shared_state_enabled: bool = True,
                  shared_state_delay_frames: int = 1,
                  shared_state_interval_frames: int = 1,
+                 service_load_sharing: bool = False,
                  strict_cold_cache_mask: bool = False,
                  prediction_provider: Any = None,
                  shared_state_channel: Any = None, **kwargs: Any) -> None:
@@ -73,6 +74,7 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
         self.shared_state_enabled = bool(shared_state_enabled)
         self.shared_state_delay_frames = shared_state_delay_frames
         self.shared_state_interval_frames = shared_state_interval_frames
+        self.service_load_sharing = bool(service_load_sharing)
         self._provided_prediction_provider = prediction_provider
         self._provided_shared_state_channel = shared_state_channel
         self.prediction_provider = prediction_provider
@@ -171,6 +173,15 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
         shared_snapshot = None
         if self.environment_revision in {"v2", "v3"}:
             rsus = [{**row, **self.model_cache.snapshot(row["rsu_id"])} for row in rsus]
+            if self.service_load_sharing:
+                declared = getattr(self, "previous_service_targets", {})
+                for row in rsus:
+                    members = [vid for vid, target in declared.items()
+                               if target == row["rsu_id"] and not self.workflows[vid].is_completed]
+                    row["service_request_count"] = len(members)
+                    row["service_work_units"] = sum(max(0.0,
+                        self._work_required(self.workflows[vid].current_node()) - self.work_progress[vid])
+                        for vid in members)
             shared_snapshot = self.shared_state_channel.snapshot(rsus, self.frame_index)
             self._frame_shared_state_bytes = int(shared_snapshot["metadata"]["transmitted_bytes"])
         result = {}
@@ -759,10 +770,11 @@ class MultiRequestJointControlEnv(MultiRequestReplayEnv):
             "model_cache_eviction_policy": self.model_cache.eviction_policy,
             "prediction_enabled": self.prediction_enabled,
             "prediction_horizon_frames": self.prediction_horizon_frames,
-            "prediction_source": "causal_constant_velocity_v1",
+            "prediction_source": getattr(self.prediction_provider, "prediction_source", "causal_constant_velocity_v1"),
             "shared_state_enabled": self.shared_state_enabled,
             "shared_state_delay_frames": self.shared_state_delay_frames,
             "shared_state_interval_frames": self.shared_state_interval_frames,
+            "service_load_sharing": self.service_load_sharing,
             "shared_state_cost_source": "serialized_json_proxy_not_measured_radio",
             "reward_coefficients": {
                 "completed_node": 1.0, "unfinished_request_frame": -0.01,

@@ -181,19 +181,23 @@ class ParameterizedControlPPO(nn.Module):
     max_nodes, max_rsus = 32, 4
 
     def __init__(self, *, method='mappo', surrogate_enabled=True, prediction_enabled=True,
-                 learning_rate=3e-4, seed=7):
+                 learning_rate=3e-4, seed=7, productive_controls=False):
         super().__init__()
         torch.manual_seed(seed)
         self.method, self.surrogate_enabled = method, bool(surrogate_enabled and method == 'sa_ghmappo')
         self.prediction_enabled = prediction_enabled
+        self.productive_controls = bool(productive_controls)
+        feature_width = 20 if self.productive_controls else 16
+        own_width = 20 if self.productive_controls else 16
+        input_width = own_width+16+2*feature_width
         self.options = dict(method=method, surrogate_enabled=surrogate_enabled,
-                            prediction_enabled=prediction_enabled, learning_rate=learning_rate, seed=seed)
+                            prediction_enabled=prediction_enabled, learning_rate=learning_rate, seed=seed, productive_controls=productive_controls)
         self.graph_encoder = nn.Sequential(nn.Linear(4, 16), nn.Tanh())
         self.graph_message = nn.Sequential(nn.Linear(32, 16), nn.Tanh())
-        self.cache_encoder = nn.Sequential(nn.Linear(16, 16), nn.Tanh())
-        self.heads = nn.ModuleList([nn.Sequential(nn.Linear(64, 64), nn.Tanh(), nn.Linear(64, 1)) for _ in range(3)])
-        self.surrogates = nn.ModuleList([nn.Sequential(nn.Linear(64, 32), nn.Tanh(), nn.Linear(32, 3)) for _ in range(3)])
-        self.critic = nn.Sequential(nn.Linear(32, 64), nn.Tanh(), nn.Linear(64, 1))
+        self.cache_encoder = nn.Sequential(nn.Linear(feature_width, 16), nn.Tanh())
+        self.heads = nn.ModuleList([nn.Sequential(nn.Linear(input_width, 64), nn.Tanh(), nn.Linear(64, 1)) for _ in range(3)])
+        self.surrogates = nn.ModuleList([nn.Sequential(nn.Linear(input_width, 32), nn.Tanh(), nn.Linear(32, 3)) for _ in range(3)])
+        self.critic = nn.Sequential(nn.Linear(own_width+16, 64), nn.Tanh(), nn.Linear(64, 1))
         self.optimizer = torch.optim.Adam(self.parameters(), lr=learning_rate)
         self.reset_controller()
 
@@ -216,14 +220,17 @@ class ParameterizedControlPPO(nn.Module):
             base = node['required_base_model']; adapter = node['required_adapter']
             cached = adapter in r.get('cached_adapter_ids', [])
             ready_base = base in r.get('ready_base_model_ids', [])
-            return [float(rid is not None), float(rid in s['reachable_execution_rsu_ids']),
+            features = [float(rid is not None), float(rid in s['reachable_execution_rsu_ids']),
                 float(rid == s['execution_location']), float(rid == s['associations'][vid]),
                 float(cached), float(adapter in r.get('loading_adapter_ids', [])), float(ready_base),
                 float(r.get('occupied_bytes', 0))/max(r.get('capacity_bytes', 1), 1),
-                float(r.get('associated_vehicle_count', 0))/8, float(rid in s['input_received_targets']),
+                float(r.get('service_request_count', r.get('associated_vehicle_count', 0)))/8, float(rid in s['input_received_targets']),
                 float(rid == future)*confidence, float(pred.get('future_load', {}).get(rid, 0))/8,
                 float(node['node_id'] == current['node_id']), float(node['input_size'])/32,
                 float(kind == 'base_model'), priority/3]
+            if self.productive_controls:
+                features += [float(rid == site) for site in ids]
+            return features
         own = [frame/120, len(done)/max(len(nodes), 1), (len(nodes)-len(done))/32,
             s['current_node_work_units_progress']/32, s['current_node_work_units_required']/32,
             s['execution_state_payload_bytes']/4096, s['execution_state_version']/120,
@@ -232,6 +239,13 @@ class ParameterizedControlPPO(nn.Module):
             confidence, float(pred.get('dwell_time', {}).get(vid, 0))/3,
             float(s['shared_state'].get('available', False)),
             float(s['shared_state'].get('age_frames') or 0)/8, float(len(s['reachable_execution_rsu_ids']))/4]
+        if self.productive_controls:
+            vehicle = next(v for v in s['vehicles'] if v['vehicle_id']==vid)
+            reference = rsus[ids[0]]; radius = max(reference['coverage_radius'], 1.)
+            own += [sorted(v['vehicle_id'] for v in s['vehicles']).index(vid)/7,
+                (vehicle['position_x']-reference['position_x'])/radius,
+                (vehicle['position_y']-reference['position_y'])/radius,
+                sum(r.get('service_request_count',0) for r in rsus.values())/8]
         graph = np.zeros((32, 4), np.float32); adjacency = np.zeros((32, 32), np.float32)
         index = {n['node_id']: j for j, n in enumerate(nodes)}
         for j, n in enumerate(nodes):
@@ -242,8 +256,12 @@ class ParameterizedControlPPO(nn.Module):
         targets = [None, *ids, 'vehicle']; target_features = [feature(r) for r in targets]
         target_features[-1] = [0., 0., float(s['execution_location']==f'vehicle:{vid}'), 0.,
                                   float(s['vehicle_adapter_ready']), 0., 1., 0., 0., 1., 0., 0., 1., current['input_size']/32, 0., 0.]
+        if self.productive_controls:
+            target_features[-1] += [0.]*4
         mask = [r in decision['control_space']['execution_targets'] or
                 (r == 'vehicle' and decision['control_space']['vehicle_execution_available']) for r in targets]
+        if self.productive_controls and any(mask[1:]):
+            mask[0] = False
         old = self.commitments.get(vid)
         if old and old[0] == current['node_id'] and old[1] in targets and mask[targets.index(old[1])]:
             mask = [r == old[1] for r in targets]
@@ -272,7 +290,7 @@ class ParameterizedControlPPO(nn.Module):
                       graph_mask=np.array([j<len(nodes) for j in range(32)]), critic=np.array(critic, np.float32))
         for j, (f, m) in enumerate(zip((target_features, cache_features, event_features), (mask, cache_mask, event_mask))):
             count = (6, len(cache), 20)[j]
-            arrays[f'f{j}'] = np.zeros((count, 16), np.float32); arrays[f'f{j}'][:len(f)] = f
+            arrays[f'f{j}'] = np.zeros((count, len(own)), np.float32); arrays[f'f{j}'][:len(f)] = f
             arrays[f'm{j}'] = np.zeros(count, bool); arrays[f'm{j}'][:len(m)] = m
         return arrays, (targets, cache, event), vid, current['node_id']
 
@@ -288,7 +306,7 @@ class ParameterizedControlPPO(nn.Module):
             context = self.cache_encoder(data['f0'][:, 1:5]).mean(1)
         else:
             context = own.new_zeros(batch, 16)
-        condition = own.new_zeros(batch, 16); selected, logs, entropies, surrogates = [], [], [], []
+        condition = own.new_zeros(batch, data['f0'].shape[-1]); selected, logs, entropies, surrogates = [], [], [], []
         for j in range(3):
             f = data[f'f{j}']; n = f.shape[1]
             x = torch.cat((own[:, None].expand(-1,n,-1), context[:,None].expand(-1,n,-1), f,
@@ -297,9 +315,17 @@ class ParameterizedControlPPO(nn.Module):
             predicted = self.surrogates[j](x.detach()) if self.surrogate_enabled else logits.new_zeros(batch, n, 3)
             if self.surrogate_enabled:
                 logits = logits + .3*(predicted[..., 0]-predicted[..., 1]-predicted[..., 2]).detach().tanh()
-            dist = Categorical(logits=logits.masked_fill(~data[f'm{j}'], -1e9))
+            mask = data[f'm{j}']
+            if self.productive_controls and j == 1:
+                # Resource binding is part of the conditional distribution, not a post-action override.
+                matching = (f[...,16:] == condition[:,None,16:]).all(-1) & (f[...,12] == 1) & (f[...,14] == 0)
+                eligible = matching & mask
+                cold = (condition[:,0] == 1) & ~((condition[:,4] == 1) & (condition[:,6] == 1)) & (condition[:,5] == 0)
+                gate = cold & eligible.any(1)
+                mask = torch.where(gate[:,None], eligible, mask)
+            dist = Categorical(logits=logits.masked_fill(~mask, -1e9))
             action = actions[:,j] if actions is not None else (dist.logits.argmax(-1) if deterministic else dist.sample())
-            if not bool(data[f'm{j}'].gather(1,action[:,None]).all()):
+            if not bool(mask.gather(1,action[:,None]).all()):
                 raise ValueError('action outside stored behavior mask')
             selected.append(action); logs.append(dist.log_prob(action)); entropies.append(dist.entropy())
             surrogates.append(predicted[torch.arange(batch), action])

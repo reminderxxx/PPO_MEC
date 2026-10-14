@@ -566,3 +566,5 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 `docs/project/formal_environment_identity_projection_contract.md`。
 
 参数化 v3 学习入口为 `scripts/train_joint_parameterized_control.py`：SA、MAPPO 和 first-party cache PPO 通过显式 `control_contract` 使用同一执行/缓存/状态优先级合同，训练窗口拟合冻结 GRU，SA 增加 DAG 编码与 return/cost surrogate。固定预算与边界见 [开发合同](docs/project/joint_parameterized_learning_20261014.md)；这是内部开发验证。
+
+参数化学习现另有 `--productive_controls`：所有方法共同增加站点 identity、有延迟的服务目标负载共享和冷缓存条件供给 mask；旧 checkpoint 路径保持默认关闭。独立审查及修复合同见 `docs/project/joint_parameterized_representation_review_20261014.md`、`docs/project/joint_parameterized_productive_contract_20261014.md`。

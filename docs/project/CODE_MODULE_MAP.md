@@ -788,3 +788,5 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 ## 2026-10-14 v3 学习适配
 
 `ppo_agent.py` 承载公共参数化 PPO 概率/更新/checkpoint，`mappo_agent.py`、`cache_offload_agent.py`、`sa_ghmappo_agent.py` 分别提供 opt-in 类，registry 直接映射；不建包装 package。环境 control dataclass 在 act 时延迟导入，避免 env/runtime/registry import 环。`joint_learned_prediction.py` 不依赖策略；开发 runner 拟合并向环境注入冻结 provider。
+
+参数化 productive opt-in 在 PPO 公共概率层实施 conditional cache mask，不在环境执行后替换 action；共享负载的生产由 joint 环境负责，延迟/字节费消费仍经 SharedStateChannel，三算法共享相同观察与约束。

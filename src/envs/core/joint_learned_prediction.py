@@ -67,6 +67,7 @@ def fit_predictor(train_windows, *, seed=101, epochs=30):
 
 
 class LearnedMobilityPredictor(CausalMobilityPredictor):
+    prediction_source = 'causal_residual_gru_v1'
     def __init__(self, bundle):
         super().__init__(horizon=bundle['horizon'])
         self.model = ResidualMobilityGRU(self.horizon)

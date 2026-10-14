@@ -391,3 +391,5 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 
 - `scripts/train_joint_parameterized_control.py`：固定预算 v3 学习/消融；`artifacts/joint_parameterized_learning/`：对应非正式产物。
 - `src/envs/core/joint_learned_prediction.py`：训练窗口拟合、冻结因果 GRU 推断。
+
+- `artifacts/joint_parameterized_learning_productive/seed<seed>/`：独立 productive v2 开发再训练，保留原 v1 目录。

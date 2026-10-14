@@ -2148,3 +2148,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 ## 2026-10-14 v3 学习实现阶段
 
 三方法 opt-in 参数化控制及训练窗口 GRU、SA DAG/surrogate 已实现；新增合同检查 6 passed、相关回归 322 passed。生产入口 smoke 和固定 128 episode × 3 seed × 5 配置开发对比待回收。本阶段不更新 canonical、不打开 holdout；论文优势 UNVERIFIED。见 `joint_parameterized_learning_20261014.md`。
+
+2026-10-14：独立表示审查已记录三 seed SA 的贪心退化和目标 identity 缺失；初轮完整 baseline/ablation 正在回收。productive v2 修复采用独立阶段，新增4项测试、相关回归327 passed，下一轮同预算冻结再训练，不改奖惩、不晋级论文。

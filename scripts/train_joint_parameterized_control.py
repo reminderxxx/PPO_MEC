@@ -72,6 +72,7 @@ def main():
     p.add_argument('--agents',nargs='+',default=['sa_ghmappo','mappo','cache_offload_drl','sa_no_surrogate','sa_no_prediction'])
     p.add_argument('--output_root',type=Path,default=ROOT/'artifacts/joint_parameterized_learning')
     p.add_argument('--threads',type=int,default=1)
+    p.add_argument('--productive_controls',action='store_true')
     a = p.parse_args()
     if a.episodes < 4 or a.episodes % 4 or a.episodes % a.eval_every:
         raise ValueError('budget must be a positive multiple of update=4 and eval_every')
@@ -93,12 +94,14 @@ def main():
             raise ValueError('split differs')
     options = {k:v for k,v in source['environment_options'].items() if k not in ('environment_revision','strict_cold_cache_mask')}
     options['model_cache_config'] = source['costs']['model_cache']
+    if a.productive_controls:
+        options['service_load_sharing'] = True
     run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ_development')
     output = a.output_root/run_id; output.mkdir(parents=True,exist_ok=False)
     metadata = dict(run_id=run_id,status='running',command=sys.argv,
         git_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         git_dirty=bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),
-        protocol='joint_parameterized_ppo_development_v1',action_contract='joint_parameterized_control_v3',
+        protocol='joint_parameterized_ppo_productive_v2' if a.productive_controls else 'joint_parameterized_ppo_development_v1',productive_controls=a.productive_controls,action_contract='joint_parameterized_control_v3',
         observation_contract='joint_request_observation_v3',development_only=True,paper_claim_ready=False,
         holdout_status='sealed_not_evaluated',source_manifest_sha256=_hash_file(a.source_manifest),
         raw_data_sha256=source['raw_data_sha256'],splits={k:source['splits'][k] for k in ('train','dev')},
@@ -135,7 +138,7 @@ def main():
             for seed in a.seeds:
                 random.seed(seed); np.random.seed(seed)
                 agent = build_agent(algorithm,control_contract='joint_parameterized_control_v3',seed=seed,
-                    surrogate_enabled=name!='sa_no_surrogate',prediction_enabled=name!='sa_no_prediction')
+                    surrogate_enabled=name!='sa_no_surrogate',prediction_enabled=name!='sa_no_prediction',productive_controls=a.productive_controls)
                 initial_hash = hashlib.sha256(b''.join(v.detach().numpy().tobytes() for v in agent.state_dict().values())).hexdigest()
                 rollout_buffer = []
                 for ep in range(1,a.episodes+1):

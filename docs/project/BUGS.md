@@ -815,3 +815,5 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 ## 2026-10-14 v3 学习边界
 
 参数化学习当前限制四站/最多32节点，显式 eviction 不学习，typed LRU 共同兜底。SA surrogate 是 observation-conditioned return/cost 回归，非完整动力学或因果反事实；持续 fetch 全成本只进入团队 return。GRU 冷启动零历史和位置 RMSE→handoff收益的关系未验证。三 seed/八 dev 和未实测链路不足论文优势结论。
+
+2026-10-14：参数化 v1 的条件控制特征缺站点 identity，同状态不同站可能无法绑定 cache→execution。已单独记录审查，新增 opt-in productive v2 identity/共享服务负载/公共冷站供给条件；能否带来主机制优势仍待同预算回收。旧 v1 贪心 wait/adapter-starvation 的负结果必须保留。

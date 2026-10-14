@@ -89,3 +89,50 @@ def test_registry_import_in_fresh_process():
     import subprocess, sys
     result = subprocess.run([sys.executable, '-c', 'from src.agents.registry import build_agent; build_agent("mappo", control_contract="joint_parameterized_control_v3")'], capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize('name',['sa_ghmappo','mappo','cache_offload_drl'])
+def test_productive_identity_cold_binding_and_probability(name,tmp_path):
+    env=four_site_env();agent=build_agent(name,control_contract=env.action_contract,productive_controls=True)
+    state=env.decision_states()['v0'];data,candidates,_,_=agent._features(state,0)
+    assert not np.array_equal(data['f0'][2],data['f0'][3])
+    commands,roll=agent.act_controls(env.decision_states(),0)
+    for vid,c in commands.items():
+        assert c.execution_target is not None and c.cache_target==c.execution_target
+        assert c.cache_node_id==env.workflows[vid].current_node_id and c.cache_kind=='adapter'
+    _,logs,_,_,_=agent.distributions(roll['data'],actions=roll['actions'])
+    assert torch.allclose(logs,roll['logs'],atol=1e-6)
+    # A mismatching cache target has zero conditional behavior probability.
+    bad=roll['actions'].clone()
+    f=roll['data']['f1'][0]
+    other=next(j for j in range(1,len(f)) if f[j,12]==1 and f[j,14]==0 and
+        not torch.equal(f[j,16:],roll['data']['f0'][0,bad[0,0],16:]))
+    bad[0,1]=other
+    with pytest.raises(ValueError,match='behavior mask'):
+        agent.distributions(roll['data'],actions=bad)
+    env.step_controls(commands)
+    for t in range(1,13):
+        commands,roll=agent.act_controls(env.decision_states(),t)
+        env.step_controls(commands)
+        if t%4:assert all(c.cache_target is None for c in commands.values())
+    path=tmp_path/'productive.pt';agent.save_checkpoint(path); restored=type(agent).from_checkpoint(path)
+    assert restored.productive_controls
+    roll['returns']=roll['values']+torch.tensor([1.,-1.]);agent.update([roll],epochs=1)
+
+
+def test_service_load_shared_with_delay_and_charged_bytes():
+    from src.envs.core.multi_request_target_control_env import JointRequestControl
+    env=four_site_env();env.service_load_sharing=True
+    first=env.decision_states()['v0']['semantic_state']
+    assert next(r for r in first['rsus'] if r['rsu_id']=='b').get('service_request_count') is None
+    controls={'v0':JointRequestControl('a'),'v1':JointRequestControl('b')}
+    env.step_controls(controls)
+    states=env.decision_states()['v0']['semantic_state']
+    rows={r['rsu_id']:r for r in states['rsus']}
+    assert rows['a']['service_request_count']==1 and rows['b']['service_request_count']==0
+    env.step_controls(controls)
+    states=env.decision_states()['v0']['semantic_state']
+    assert next(r for r in states['rsus'] if r['rsu_id']=='b')['service_request_count']==1
+    assert states['shared_state']['age_frames']==1
+    assert env.configuration()['service_load_sharing'] is True
+    assert env.summary()['shared_state_transmitted_bytes']>0

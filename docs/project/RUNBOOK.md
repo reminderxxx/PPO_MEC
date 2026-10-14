@@ -1735,3 +1735,5 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 ## 2026-10-14 参数化控制开发训练
 
 在八车研究 worktree 使用项目 `.venv/bin/python scripts/train_joint_parameterized_control.py --source_manifest artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/20261014T074430Z_development/manifest.json --episodes 128 --eval_every 32 --seeds 7 17 27`。默认五配置含两项 SA 消融。输出 `artifacts/joint_parameterized_learning/<run_id>/`；只读取训练/开发窗口，最终 checkpoint 固定，不打开 formal/holdout。完整合同见 `joint_parameterized_learning_20261014.md`。
+
+同预算再训练可加 `--productive_controls --output_root artifacts/joint_parameterized_learning_productive/seed7 --seeds 7`，另外 seed17/27 使用各自 output_root。必须保留初轮结果，不跨控制约束直接比较算法优势。该模式所有算法都获得 service_load_sharing 和公共条件 mask。
