@@ -1817,3 +1817,6 @@ python scripts/audit_joint_stream_workloads.py <full_timestamp_directory>
 2026-10-16 FIFO修正：当前完整工程root为`artifacts/joint_stream_workloads_v2/`，workload/protocol v2；v1 `joint_stream_workloads/`停止129单元，仅历史诊断，不能resume/拼接。三规则和216预算不变，raw auditor另验证发布清单的FIFO启动顺序。
 
 2026-10-16 准入保护v3：当前完整工程root为`artifacts/joint_stream_workloads_v3/`，workload/protocol v3；v2完整216原件保留为资源保护审计失败证据，不拼接/排名。stream本地准入hook以实际LRU和当帧声明依赖拒绝危险可选动作；旧v3默认物理/费用/事件不变。
+
+
+2026-10-16 v3完整回收：接受root为`artifacts/joint_stream_workloads_v3/20261015T172250Z_engineering`（216单元审计通过）。只读查看`audit.json`、`workload_analysis.json`和`report_validation.json`；固定结果报告为`joint_stream_workload_results_review_20261016.md`。无活动训练/实验需恢复，不重启v1/v2；旧stream执行命令是复现入口，不是待执行任务。后处理本地脚本`python artifacts/analyze_joint_stream_v3.py`读取成功launcher并核验原train帧、分层配对和对象生命周期，不改源码/模型。该脚本和raw产物仅在本地产物目录，Git记录源码和报告；需要异机复核时按manifest保留完整产物。

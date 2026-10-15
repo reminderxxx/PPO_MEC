@@ -5,6 +5,15 @@
 
 # Artifact Records
 
+## 2026-10-16 joint stream v3 fixed engineering matrix
+
+- Root `artifacts/joint_stream_workloads_v3/20261015T172250Z_engineering`；源码 `868b0e9fc3db994c7d9aaea4331368c83d71121f`；216单元/416940事件/71757收据/6完整重放通过，全部结果保留。原train两段互斥480帧会话，72匹配scenario，各三规则；非72独立时间窗口。
+- gain对象使用1012/1079（93.79%），naive1170/2911（40.19%）；跨请求驻留复用存在。gain配对reward+1.222289、完成请求差0；long−0.083333，c070奖励−15.476341/请求−1。不能作为SA新学习收益或任务长度因果证明。
+- 原件 `manifest.json`、`protocol.pt`、`results.jsonl`、`events.jsonl`、receipts、`audit.json`；后处理 `workload_analysis.json`、表格核验 `report_validation.json`。launcher完成记录`artifacts/joint_stream_v3_launcher_result.json`，训练新增0。
+- SHA256：manifest `832292df2d2ca84467bb4482ed765ccbcc41235cff48ef4cec24626c2e116c1e`；audit `a93865b7ef2a177c9d8478213ae7fcb3aede2db39ae6c5a7d88bbe87e8eb6fc7`；results `6fbcae0c20c82cd422456170dbca2d433f442e1632c7f3c9f3e6c89d1dbf0c19`。
+- 前轮v1因FIFO停止129已记录单元；v2完整216但准入审计失败；全部保留，不拼入v3。含各前检，本阶段606已记录工程单元，另≤1未记录中止单元/42帧诊断/兼容重放单列；无新增RL。
+- 完整报告[joint_stream_workload_results_review_20261016.md](joint_stream_workload_results_review_20261016.md)。formal/holdout封存、canonical不变，paper E0_UNAVAILABLE / Unverifiable。
+
 ## 2026-10-16 joint delivery v2 fixed-final development comparison
 
 - 源9b9c0d7、八主两辅助各128×seeds7/17/27，共3840回合；主120checkpoint/389044事件/55741收据/60重放，移动240policy+24off/182332事件/30重放，旧cache48/48重放均通过。另独立重建原始主表/曲线/预算/SHA及seed27两次零更新回退诊断通过。

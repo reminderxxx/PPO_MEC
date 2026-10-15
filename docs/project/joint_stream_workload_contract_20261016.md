@@ -1,5 +1,8 @@
 # 持续请求 / 多模型工程合同（v3为当前实现）
 
+当前完成状态（2026-10-16）：源码868b0e9，v3冻结216全部通过独立事件/费用/准入及6次完整重放；411回归与旧11模型重放通过，RL新增0。接受root `artifacts/joint_stream_workloads_v3/20261015T172250Z_engineering`；结果/负例与下一阶段合同门槛见[joint_stream_workload_results_review_20261016.md](joint_stream_workload_results_review_20261016.md)。旧SA/MAPPO合同仍不可直接使用。
+
+
 日期2026-10-16；准入缺陷前审见joint_stream_admission_review_20261016.md / 2d348e6：v2全部216已完成，但raw审计拦下c039/frame41延迟LRU驱逐自身fusion依赖，故资源保护未通过。原件/42帧复现/失败日志保留，不用其排序选参数。v3保持全部216矩阵/规则/费用/资源，增加所有方法共用的本地真实缓存准入校验，拒绝危险可选预取并明确记0模型槽/字节；显式驱逐不能跨当前依赖。新workload/protocol v3、独立root `artifacts/joint_stream_workloads_v3/`重新全跑；下文v1/v2为历史阶段。
 
 前阶段日期2026-10-16；同帧FIFO缺陷前审见joint_stream_fifo_review_20261016.md / 58a8b03。v1完整工程在129单元后停止（另至多1未记录），与得分无关，原件/stop_record保留；下文v1阶段记录为历史。v2以发布清单顺序处理同帧同车请求，环境和必要下界一致，新workload/protocol v2、独立root `artifacts/joint_stream_workloads_v2/`，重新完整216而不拼接。action/observation字段结构保持v1，旧裸v3控制仍拒绝。新增两项逆词典序FIFO回归与独立raw启动顺序审计；资源/规则/矩阵不改。
