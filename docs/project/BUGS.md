@@ -839,3 +839,5 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 2026-10-15：partial v3可推进前缀，但服务工作量预约没有预测/预约目的站数据链路时隙；正net proxy存在无实际收益、多耗state帧反例。full开发曲线32→128下降，不支持只加训练量作为唯一修复。主三组仍待完整回收。
 
 2026-10-15：图输出大小/32范围25–50，对比输入0.25–0.71875；partial v3三full模型首dev初始图tanh近饱和55%–91%。见joint_feature_scale_review_20261015.md；排序因果关系UNVERIFIED，本轮比较不中途改尺度。
+
+2026-10-15最终：partial v3主比较完整回收，奖励小均值领先不稳健、完成请求落后；9次prepare仅2帧推进，目的站链路预约/真实净收益校准未闭环，图尺度近饱和风险仍open；训练回报上升伴dev回退，不能单靠增加训练量。完整证据见joint_partial_control_results_review_20261015.md。

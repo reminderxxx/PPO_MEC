@@ -245,3 +245,5 @@
 - joint_partial_prediction_support_review_20261015.md：生命周期v3固定权重预测贡献及负例，主比较排序待完整回收。
 
 - joint_feature_scale_review_20261015.md：首dev图表示尺度及激活饱和独立诊断，尚未做因果修复实验。
+
+- joint_partial_control_results_review_20261015.md：生命周期v3三组同预算最终结果、全部原始账本/9模型重放、预测局部贡献和剩余缺口。

@@ -576,3 +576,5 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 严格门控的独立审查发现部分预复制被排除，新增 `--partial_preparation` 分支，按ETA内可推进量及到站残余/增量成本判断，模型单独预取与state收益分开。三配置同预算再训练见 `docs/project/joint_partial_preparation_contract_20261015.md`，旧七配置保留。
 
 2026-10-15：partial控制入口升级为生命周期v3，完整重训根目录`artifacts/joint_coordinated_partial_control_v2/`；旧试跑留存，详见[修复合同](docs/project/joint_partial_preparation_contract_20261015.md)。
+
+2026-10-15：生命周期v3三组同预算训练及原始账本重放已完整回收；SA奖励均值第一但完成率仍落后，详见[独立最终结果](docs/project/joint_partial_control_results_review_20261015.md)，不作论文晋级。

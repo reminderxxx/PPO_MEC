@@ -2171,3 +2171,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 2026-10-15：partial生命周期v3固定full权重预测开关support已回收（零训练）：24单元1胜1负22平，奖励+0.0295703、完成+0.0416667；有部分预复制实际推进，但多次被链路队列挡住，保留−0.01反例。完整三组仍训练，不能提前晋级；见joint_partial_prediction_support_review_20261015.md。
 
 2026-10-15：新增只读图尺度witness，发现图输出量纲与输入尺度不匹配、大量tanh近饱和；未改变已启动协议。见joint_feature_scale_review_20261015.md。
+
+2026-10-15：生命周期v3三组各128×3seed全部完成（1152episode），36checkpoint/71308事件/11000费用收据核验通过，9final模型首dev完整事件重放一致。SA reward57.660698、完成6.708333；MAPPO57.375365/6.750000；no-pred57.521120/6.916667。奖励均值第一但优势集中单窗、完成率落后，未达双指标目标/收敛。见joint_partial_control_results_review_20261015.md；formal/holdout仍封存。

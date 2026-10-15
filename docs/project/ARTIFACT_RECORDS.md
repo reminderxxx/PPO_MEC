@@ -1648,3 +1648,5 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 准备，public preflight 不等于完整正式评估；无正式训练、formal performance、holdout、G14D/G15 或论文结论。
 
 2026-10-15：joint_coordinated_control/seed{7,17,27}/20261015T015625Z_development，source84028c1，七配置128×3seed；审计artifacts/joint_coordinated_audit_20261015/joint_coordinated_control_audit.json，84checkpoint/21final重放通过，paper E0_UNAVAILABLE。完整结果见joint_coordinated_results_review_20261015.md。
+
+2026-10-15：joint_coordinated_partial_control_v2/seed{7,17,27}/20261015T030133Z_development，source e96f6ac，三配置128×3seed全部完成；36checkpoint、71308事件、11000帧收据、9final首dev重放通过。审计artifacts/joint_coordinated_audit_20261015/joint_coordinated_partial_control_v2_audit.json。奖励SA57.660698>no-pred57.521120>MAPPO57.375365，但SA完成6.708333较低，无paper晋级。旧joint_coordinated_partial_control三run以run_abort.json留存516episode；四次smoke48episode不入主表。本次有效训练3840，含中止/smoke总4404。

@@ -1,5 +1,6 @@
 """Read-only artifact audit; never updates policy weights or chooses checkpoints."""
 from collections import Counter,defaultdict
+from math import hypot
 from datetime import datetime,timezone
 import hashlib,json,sys
 from pathlib import Path

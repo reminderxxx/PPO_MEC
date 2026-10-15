@@ -1759,3 +1759,5 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 2026-10-15：`scripts/audit_joint_prediction_effects.py <experiment>`分解固定权重预测开关的24单元原始费用、完成帧及prepare事件；不是单动作因果归因，不训练、不选模型。probe允许其他比较方法仍训练，但要求full最终128全部8dev已写入、计划Git/seed匹配、checkpoint不变。
 
 2026-10-15：python scripts/audit_joint_feature_scale.py <experiment>保存只读初始图表示witness；不能当成整个rollout分布或排序因果检验。
+
+2026-10-15完整回收：joint_coordinated_partial_control_v2三seed manifest均complete。复核命令python scripts/audit_joint_coordinated_control.py joint_coordinated_partial_control_v2，36checkpoint/71308事件/11000收据/9final首dev事件重放通过。source e96f6ac；审计器首次positive-opportunity路径漏math.hypot导入已修正，保留初次失败日志并完整重跑通过；未改算法或原始产物。最终结果见joint_partial_control_results_review_20261015.md。
