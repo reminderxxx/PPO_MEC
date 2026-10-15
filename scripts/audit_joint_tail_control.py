@@ -35,11 +35,18 @@ def main():
         if plan:assert not m['git_dirty'] and m['git_commit']==plan['source_commit'] and m['episodes']==plan['episodes'] and m['seeds']==plan['seeds']
         prepared=Path(m['prepared_protocol']);assert _hash_file(prepared)==m['prepared_manifest_sha256']
         protocol=json.loads(prepared.read_text())
+        if plan:
+            assert m['prepared_manifest_sha256']==plan['prepared_manifest_sha256']
+            assert m['prediction_sha256']==plan['predictor_sha256']
+            assert m['primary_panels']==plan['primary_panels']==protocol['primary_panels']==dict(base=.5,tight=.5)
+            assert m['return_gamma']==(.99 if m['agent']=='sa_discounted' else 1.)
         assert _hash_file(prepared.parent/'protocol.pt')==protocol['protocol_sha256']
         assert _hash_file(prepared.parent/'predictor.pt')==m['prediction_sha256']==protocol['predictor_sha256']
         if plan:assert not protocol['git_dirty'] and protocol['git_commit']==plan['source_commit']
         assert not set(protocol['predictor']['fit_offsets']) & set(protocol['predictor']['validation_offsets'])
         intervals=protocol['source_splits']
+        assert set(protocol['predictor']['fit_offsets'])=={w['frame_offset'] for w in intervals['train'][:16]}
+        assert set(protocol['predictor']['validation_offsets'])=={w['frame_offset'] for w in intervals['train'][16:]}
         for left in intervals['train']:
             for right in intervals['dev']:
                 assert left['source_segment_id']!=right['source_segment_id'] or left['time_end']<right['time_start'] or right['time_end']<left['time_start']
@@ -49,6 +56,8 @@ def main():
         assert public_scenarios(data['scenarios'])==protocol['scenarios']
         assert _hash_file(Path(protocol['source_manifest']))==protocol['source_manifest_sha256']
         windows={w['scenario_id']:w for w in data['scenarios']['dev']}
+        assert len(windows)==16
+        assert all(sum(w['panel']==panel for w in windows.values())==8 for panel in ('base','tight'))
         rows=read(path.parent/'dev.jsonl');tr=read(path.parent/'training.jsonl');pr=read(path.parent/'train_probe.jsonl')
         assert len(tr)==m['episodes']*len(m['seeds'])
         assert len(rows)==len(m['seeds'])*(m['episodes']//m['eval_every'])*16
@@ -102,6 +111,7 @@ def main():
                     predict.append(dict(seed=c['seed'],scenario_id=w['scenario_id'],panel=w['panel'],reward_on=on['reward'],reward_off=off['reward'],delta_reward=on['reward']-off['reward'],delta_completed=on['completed_requests']-off['completed_requests']))
                 assert tensor_hash(agent)==before and _hash_file(cp)==c['sha256']
         dev+=rows;training+=tr;probes+=pr
+        print(json.dumps(dict(agent=m['agent'],raw_audited=True,checkpoints_checked=checkpoints,reproductions=len(reproductions))),flush=True)
     if plan:
         for seed in plan['seeds']:
             assert initial[('sa_ghmappo',seed)]==initial[('sa_no_prediction',seed)]==initial[('sa_discounted',seed)]==initial[('sa_no_surrogate',seed)]
