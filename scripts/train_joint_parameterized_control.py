@@ -154,7 +154,7 @@ def main():
         from src.agents.registry import ALGO_REGISTRY
         supported={'sa_ghmappo','mappo','ppo','dqn','cache_offload_drl','dag_offload_drl','dt_handoff_drl'}
         metadata['baseline_contract_inventory']={name:dict(scheduled_supported=name in supported,legacy_action_contract=spec['action_contract'],reason='parameterized implementation included' if name in supported else 'legacy action/checkpoint contract; not silently substituted') for name,spec in ALGO_REGISTRY.items()}
-        metadata['training'].update(actor_objective='conditional_head_ppo_action_conditioned_policy_average_baseline',credit='half_local_half_team_mc_with_action_conditioned_baselines',link_calendar='eight_frame_public_io_model_state_intents_current_environment_grants',feature_scale='declared_service_frames_log1p_over_log121',stability='linear_lr_3e-4_to_3e-5_and_kl_limit_0.02; sa_constant_update_disables_both',entropy='per_head_divided_by_log_legal_candidate_count',train_probe_indices=[0,5,10,15],prediction_horizon=8,dqn='three_stage_bellman_replay4096_batch128_32_steps_per4episodes_target_sync2updates_epsilon0.3_to0.05; no_PPO_loss')
+        metadata['training'].update(actor_objective='conditional_head_ppo_action_conditioned_policy_average_baseline',credit='half_local_half_team_mc_with_action_conditioned_baselines',link_calendar='eight_frame_public_io_model_state_intents_current_environment_grants',feature_scale='declared_service_frames_log1p_over_log121',stability='linear_lr_3e-4_to_3e-5_and_kl_limit_0.02; sa_constant_update_disables_both',entropy='per_head_divided_by_log_legal_candidate_count',train_probe_indices=[0,5,10,15],prediction_horizon=8,dqn='three_stage_bellman_replay4096_batch128_32_steps_per4episodes_target_sync2updates_epsilon0.3_to0.05; terminal_observed_team_tail_credit_matches_shared_return; no_PPO_loss')
         metadata['limitations'].append('action-conditioned policy-average baseline is learned from on-policy returns, not an exact causal Q oracle; 3-frame future link reservations are estimates; existing model transfers nonpreemptive')
     manifest = output/'manifest.json'
     manifest.write_text(json.dumps(metadata,indent=2)+'\n')
@@ -185,7 +185,7 @@ def main():
                     **(dict(coordinated_controls=True,coordination_enabled=name!='sa_no_coordination',
                             credit_mode='team' if name=='sa_team_credit' else 'request_team_blend',partial_preparation_enabled=a.partial_preparation,output_aware_cache=a.partial_preparation,
                             migration_gate_enabled=name!='sa_ungated_prediction',
-                            **(dict(scheduled_controls=True,stability_enabled=name!='sa_constant_update',training_budget=a.episodes) if a.scheduled_controls else {})) if a.coordinated_controls else {}))
+                            **(dict(scheduled_controls=True,stability_enabled=name!='sa_constant_update',training_budget=a.episodes,**(dict(terminal_team_tail=True) if algorithm=='dqn' else {})) if a.scheduled_controls else {})) if a.coordinated_controls else {}))
                 initial_hash = hashlib.sha256(b''.join(v.detach().numpy().tobytes() for v in agent.state_dict().values())).hexdigest()
                 rollout_buffer = []
                 for ep in range(1,a.episodes+1):

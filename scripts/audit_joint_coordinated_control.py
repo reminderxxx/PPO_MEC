@@ -2,7 +2,7 @@
 from collections import Counter,defaultdict
 from math import hypot
 from datetime import datetime,timezone
-import hashlib,json,sys
+import hashlib,json,sys,subprocess
 from pathlib import Path
 import numpy as np
 import torch
@@ -22,23 +22,42 @@ def main():
  experiment = sys.argv[1] if len(sys.argv)>1 else 'joint_coordinated_control'
  plan_path=ROOT/f'artifacts/{experiment}/comparison_plan.json'
  plan=json.loads(plan_path.read_text()) if plan_path.exists() else None
+ amendment_path=ROOT/f'artifacts/{experiment}/comparison_amendment_1.json'
+ amendment=json.loads(amendment_path.read_text()) if amendment_path.exists() else None
  locations=[(ROOT/f'artifacts/{experiment}'/group/f'seed{seed}',names,seed) for group,names in plan['groups'].items() for seed in plan['seeds']] if plan else [(ROOT/f'artifacts/{experiment}/seed{seed}',None,seed) for seed in (7,17,27)]
+ if amendment:
+  locations += [(ROOT/f'artifacts/{experiment}'/group/f'seed{seed}',names,seed) for group,names in amendment['replacement_groups'].items() for seed in plan['seeds']]
+ def source_for(path):
+  return amendment['source_commit'] if amendment and path.relative_to(ROOT/f'artifacts/{experiment}').parts[0] in amendment['replacement_groups'] else plan['source_commit']
+ def name_for(path,name):
+  return amendment['aliases'].get(name,name) if amendment and path.relative_to(ROOT/f'artifacts/{experiment}').parts[0]==amendment['original_group'] else name
  candidates=[list(location.glob('*/manifest.json')) for location,names,seed in locations]
  assert all(len(paths)==1 for paths in candidates), 'exactly one prespecified run per seed and group required'
  manifests=[paths[0] for paths in candidates]
  sources=[json.loads(p.read_text()) for p in manifests]
  assert not any((p.parent/'run_abort.json').exists() for p in manifests), 'aborted pilot is not a complete comparison'
  assert all(s['status']=='complete' and not s['git_dirty'] and s.get('coordinated_controls') for s in sources)
- assert len({s['git_commit'] for s in sources})==1
+ if not amendment:assert len({s['git_commit'] for s in sources})==1
  if plan:
   assert all(source['agents']==names and source['seeds']==[seed] and source.get('scheduled_controls') for source,(_,names,seed) in zip(sources,locations))
-  assert all(source['git_commit'].startswith(plan['source_commit']) for source in sources)
+  assert all(source['git_commit']==source_for(path) for source,path in zip(sources,manifests))
   assert all(source['training']['episodes']==plan['episodes'] for source in sources)
  if not plan:assert all(source['agents']==sources[0]['agents'] for source in sources)
  all_agents=[name for names in plan['groups'].values() for name in names] if plan else sources[0]['agents']
+ if amendment:
+  all_agents += list(amendment['aliases'].values())
+  for filename,expected in amendment['shared_source_files'].items():
+   for commit in (plan['source_commit'],amendment['source_commit']):
+    assert hashlib.sha256(subprocess.check_output(['git','show',f'{commit}:{filename}'],cwd=ROOT)).hexdigest()==expected
+  for commit in (plan['source_commit'],amendment['source_commit']):
+   code=subprocess.check_output(['git','show',f'{commit}:scripts/train_joint_parameterized_control.py'],cwd=ROOT,text=True)
+   episode_source=code[code.index('def episode('):code.index('def main(')]
+   assert hashlib.sha256(episode_source.encode()).hexdigest()==amendment['shared_episode_sha256']
  assert len(all_agents)==len(set(all_agents))
  for k in ('source_manifest_sha256','raw_data_sha256','splits','training','environment_options','costs','predictor'):
-  assert all(s[k]==sources[0][k] for s in sources),k
+  if amendment and k=='training':
+   assert all({a:b for a,b in s[k].items() if a!='dqn'}=={a:b for a,b in sources[0][k].items() if a!='dqn'} for s in sources),k
+  else:assert all(s[k]==sources[0][k] for s in sources),k
  all_windows=sources[0]['splits']['train']+sources[0]['splits']['dev']
  for i,a in enumerate(all_windows):
   for b in all_windows[i+1:]:
@@ -144,7 +163,7 @@ def main():
    assert dict(mechanisms)==r['mechanisms']
    traces[key]=hashlib.sha256(json.dumps(group,sort_keys=True).encode()).hexdigest()
    audit_counts['events']+=len(group);audit_counts['receipts']+=len(receipts)
-  rows+=dev
+  rows += [{**r,'agent':name_for(path,r['agent'])} for r in dev]
  assert len(set(checkpoint_hashes))==len(checkpoint_hashes)
  # Equal tensors are allowed for a zero-opportunity prediction ablation; record rather than invent distinct models.
  unique_tensor_count=len(set(tensor_hashes))
@@ -198,7 +217,7 @@ def main():
     event=json.loads(line);grouped[identity(event)].append(event)
   for key,group in grouped.items():
    counts,concentration=audit_events(group,window_map[key[3]],rsus)
-   physical[str(key)]=counts;concentrations[str(key)]=concentration
+   labeled=(name_for(path,key[0]),*key[1:]);physical[str(labeled)]=counts;concentrations[str(labeled)]=concentration
  window=splits['dev'][0]
  reproduction=[]
  for path,s in zip(manifests,sources):
@@ -223,14 +242,14 @@ def main():
     error=torch.cat(errors)*10
     surrogate_diagnostics=dict(return_rmse_reward_units=float(error[:,0].square().mean().sqrt()),cache_mae_initial_link_slots=float(error[:,1].abs().mean()),state_mae_link_slots=float(error[:,2].abs().mean()))
    if surrogate_diagnostics and s.get('scheduled_controls'):surrogate_diagnostics['cache_mae_declared_admission_link_frames']=surrogate_diagnostics.pop('cache_mae_initial_link_slots')
-   key=(c['agent'],c['seed'],budget,window['frame_offset']);close(row['reward'],next(r['reward'] for r in final if identity(r)==key))
+   key=(name_for(path,c['agent']),c['seed'],budget,window['frame_offset']);close(row['reward'],next(r['reward'] for r in final if identity(r)==key))
    original=[]
    with (path.parent/'events.jsonl').open() as f:
     for line in f:
      e=json.loads(line)
-     if identity(e)==key:original.append({k:v for k,v in e.items() if k not in ('agent','seed','episode','frame_offset')})
+     if identity(e)==(c['agent'],c['seed'],budget,window['frame_offset']):original.append({k:v for k,v in e.items() if k not in ('agent','seed','episode','frame_offset')})
    assert json.loads(json.dumps(env.events))==original
-   reproduction.append(dict(agent=c['agent'],seed=c['seed'],frame_offset=window['frame_offset'],reward=row['reward'],events_equal=True,surrogate_diagnostics=surrogate_diagnostics))
+   reproduction.append(dict(agent=name_for(path,c['agent']),seed=c['seed'],frame_offset=window['frame_offset'],reward=row['reward'],events_equal=True,surrogate_diagnostics=surrogate_diagnostics))
  report=dict(reviewed_at=datetime.now(timezone.utc).isoformat(),literature_cutoff='2026-10-15',target_venue='IEEE TMC',
     policy_version='tmc_review_policy_v3_20260621',artifact_run_id=[str(p.parent.relative_to(ROOT)) for p in manifests],
     git_commit=sources[0]['git_commit'],experiment=experiment,evidence_level='E0_UNAVAILABLE_for_paper; development_raw_audited_and_first_window_reproduced',
@@ -238,6 +257,7 @@ def main():
     physical_attribution=physical,service_concentrations=concentrations,checkpoint_count=len(checkpoint_hashes),unique_tensor_count=unique_tensor_count,counts=dict(audit_counts),summary=summary,curves=curves,paired=paired,reproductions=reproduction,
     statistical_scope='descriptive paired development comparison; 3 seeds, 8 adjacent intervals sharing same source/vehicles; no independence or significance claim',
     literature_novelty='not assessed in this engineering round',paper_claim_ready=False)
+ if amendment:report.update(comparison_amendment_sha256=_hash_file(amendment_path),source_commits=sorted({s['git_commit'] for s in sources}),legacy_terminal_credit_reported_separately=True)
  if plan:report.update(comparison_plan_sha256=_hash_file(plan_path),configurations=all_agents)
  destination=ROOT/'artifacts/joint_coordinated_audit_20261015'/f'{experiment.replace("/","_")}_audit.json'
  destination.write_text(json.dumps(report,indent=2)+'\n')

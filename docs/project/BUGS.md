@@ -843,3 +843,5 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 2026-10-15最终：partial v3主比较完整回收，奖励小均值领先不稳健、完成请求落后；9次prepare仅2帧推进，目的站链路预约/真实净收益校准未闭环，图尺度近饱和风险仍open；训练回报上升伴dev回退，不能单靠增加训练量。完整证据见joint_partial_control_results_review_20261015.md。
 
 2026-10-15 scheduled：旧prefix控制的链路被偷占、图尺度与surrogate重复扣费用已新增独立合同修复；未来槽仍为估计，动作Q仍为学习的counterfactual baseline而非因果oracle。后期回退通过固定greedy train probe/梯度KL日志/constant-update对照核验，尚无新效果结论。
+
+2026-10-15：Scheduled DQN terminal信用缺team tail，已独立审查/修复；terminal_team_tail默认false兼容旧checkpoint，scheduled新入口DQN明确true。原轮旧DQN不作为同信用主baseline，修正版同预算单独回收；不据原旧DQN低分证明主方法优势。

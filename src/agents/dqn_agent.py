@@ -479,7 +479,7 @@ class ScheduledDQNAgent(ScheduledControlPPO):
     """
     checkpoint_contract='scheduled_parameterized_dqn_v1'
 
-    def __init__(self, **kwargs):
+    def __init__(self, *, terminal_team_tail=False, **kwargs):
         from copy import deepcopy
         kwargs.pop('method',None);kwargs['surrogate_enabled']=False
         super().__init__(method='dqn',**kwargs)
@@ -487,6 +487,7 @@ class ScheduledDQNAgent(ScheduledControlPPO):
         for p in self.target_heads.parameters():p.requires_grad_(False)
         self.optimizer=torch.optim.Adam(self.heads.parameters(),lr=self.options['learning_rate'])
         self.replay=deque(maxlen=4096);self.epsilon=.3
+        self.terminal_team_tail=bool(terminal_team_tail);self.options['terminal_team_tail']=self.terminal_team_tail
 
     def _choice_distribution(self,logits,mask,deterministic):
         from torch.distributions import Categorical
@@ -502,6 +503,15 @@ class ScheduledDQNAgent(ScheduledControlPPO):
         out['f1']=torch.nn.functional.pad(out['f1'],(0,0,0,missing));out['m1']=torch.nn.functional.pad(out['m1'],(0,missing));out['node1']=torch.nn.functional.pad(out['node1'],(0,missing),value=-1)
         return out
 
+    def _transition_reward(self,rollout,index,vid,terminal):
+        total=sum(rollout['request_rewards'].values());count=rollout['initial_request_count']
+        reward=(.5*rollout['request_rewards'][vid]+.5*total/count)/10
+        if self.terminal_team_tail and terminal:
+            # Already discounted, observed team tail from the complete episode.
+            # This is a training label only; it never enters action features.
+            reward+=.5*(float(rollout['returns'][index])-total/10)/count
+        return reward
+
     def update(self,rollouts,*,epochs=4):
         # Buffer boundaries include multiple complete episodes; frame index resets mark terminals.
         for t,r in enumerate(rollouts):
@@ -509,8 +519,7 @@ class ScheduledDQNAgent(ScheduledControlPPO):
             for index,vid in enumerate(r['vehicle_ids']):
                 data=self._replay_data(r['data'],index);nxt=following['vehicle_ids'].index(vid) if following is not None and vid in following['vehicle_ids'] else None
                 next_data=self._replay_data(following['data'],nxt) if nxt is not None else data
-                total=sum(r['request_rewards'].values());count=r['initial_request_count']
-                reward=(.5*r['request_rewards'][vid]+.5*total/count)/10
+                reward=self._transition_reward(r,index,vid,nxt is None)
                 self.replay.append((data,r['actions'][index:index+1].clone(),next_data,reward,nxt is None))
         losses=[]
         for _ in range(8*epochs):

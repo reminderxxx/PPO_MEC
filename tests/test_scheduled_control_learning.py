@@ -134,3 +134,14 @@ def test_cost_auxiliary_counts_each_admitted_object_minimum_slot_not_fractional_
     # Cold closure has an 8-byte base and 2-byte adapter, each needing a distinct
     # slot at 8 bytes/frame: two future slots, not just the one admitted now.
     assert torch.isclose(rolls[0]['cost_targets'][:,0].max(),torch.tensor(.2))
+
+
+def test_dqn_terminal_credit_matches_full_team_tail_and_old_checkpoint_option(tmp_path):
+    r=dict(request_rewards={'v0':1.,'v1':0.},initial_request_count=2,returns=torch.tensor([.199]))
+    old=policy('dqn');fixed=policy('dqn',terminal_team_tail=True)
+    assert all(torch.equal(value,fixed.state_dict()[key]) for key,value in old.state_dict().items())
+    assert old._transition_reward(r,0,'v0',True)==pytest.approx(.075)
+    assert fixed._transition_reward(r,0,'v0',True)==pytest.approx(.09975)
+    assert fixed._transition_reward(r,0,'v0',False)==pytest.approx(.075)
+    fixed.save_checkpoint(tmp_path/'tail.pt')
+    assert type(fixed).from_checkpoint(tmp_path/'tail.pt').terminal_team_tail

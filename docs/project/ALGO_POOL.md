@@ -232,3 +232,5 @@ baseline 闭环额外写出：
 `--scheduled_controls`已接SA/MAPPO/PPO/DQN/cache_offload_drl/dag_offload_drl/dt_handoff_drl；另有SA-no-prediction与constant-update消融。PPO为local critic、MAPPO为central critic；DQN为真正replay+target Bellman三stage实现。三个方向型DRL仍是first-party PPO扩展（typed-cache context / DAG scalar context / raw-DT context），不是外部论文完整复现或三种off-policy算法。不能因为简称DRL就把它们当成独立学习家族。
 
 QMIX、MAT、IPPO、DQN变体等旧五动作实现保留，但当前未适配显式参数化候选/新checkpoint合同；新manifest逐项记录支持/排除原因，不能直接拼旧实验奖励。TD3/SAC/MADDPG仍遵守未稳定合同不入live registry的规则。本轮新结果是开发比较，不晋级paper-grade/canonical。
+
+2026-10-15：scheduled DQN terminal_team_tail选项补齐任务退出后的共同团队尾回报；新入口true，旧checkpoint默认false可评估重放。旧目标DQN作为legacy-terminal诊断单列，纠正后DQN同预算重训；不能混为同一credit算法挑最好结果。

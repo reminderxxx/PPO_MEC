@@ -15,18 +15,24 @@ def avg(values):
 def main():
     experiment=sys.argv[1] if len(sys.argv)>1 else 'joint_scheduled_control'
     root=ROOT/'artifacts'/experiment;plan=json.loads((root/'comparison_plan.json').read_text())
+    ap=root/'comparison_amendment_1.json';amendment=json.loads(ap.read_text()) if ap.exists() else None
+    groups=dict(plan['groups'])
+    if amendment:groups.update(amendment['replacement_groups'])
     summary={};checkpoints={};all_manifest=[]
-    for group,names in plan['groups'].items():
+    for group,original_names in groups.items():
+        label=lambda name:amendment['aliases'].get(name,name) if amendment and group==amendment['original_group'] else name
+        names=[label(name) for name in original_names]
         per_agent={name:dict(training=[],dev=[],probe=[],representation=[]) for name in names}
         for seed in plan['seeds']:
             paths=list((root/group/f'seed{seed}').glob('*/manifest.json'));assert len(paths)==1
             path=paths[0];m=json.loads(path.read_text());all_manifest.append(str(path.relative_to(ROOT)))
-            assert m['status']=='complete' and not m['git_dirty'] and m['git_commit']==plan['source_commit']
-            assert m['agents']==names and m['seeds']==[seed]
+            assert m['status']=='complete' and not m['git_dirty'] and m['git_commit']==(amendment['source_commit'] if amendment and group in amendment['replacement_groups'] else plan['source_commit'])
+            assert m['agents']==original_names and m['seeds']==[seed]
             for kind,filename in [('training','training.jsonl'),('dev','dev.jsonl'),('probe','train_probe.jsonl'),('representation','representation_diagnostics.jsonl')]:
                 for row in read(path.parent/filename):
-                    if row['agent'] in per_agent:per_agent[row['agent']][kind].append(row)
-            for c in m['checkpoints']:checkpoints[(c['agent'],seed,c['episode'])]=(path.parent/c['path'],c)
+                    name=label(row['agent'])
+                    if name in per_agent:per_agent[name][kind].append(dict(row,agent=name))
+            for c in m['checkpoints']:checkpoints[(label(c['agent']),seed,c['episode'])]=(path.parent/c['path'],c)
         for name,data in per_agent.items():
             curves={};training=data['training'];updates=[r for r in training if r['losses'] is not None]
             assert len(training)==plan['episodes']*len(plan['seeds'])
