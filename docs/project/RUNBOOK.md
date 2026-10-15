@@ -1753,3 +1753,5 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 2026-10-15：--coordinated_controls --partial_preparation 现选择partial v3（output_aware_cache=true）；新完整比较根目录artifacts/joint_coordinated_partial_control_v2，旧partial_control下run_abort.json标识中止工程试跑。
 
 2026-10-15：`scripts/audit_joint_coordinated_control.py <experiment>`只读核验完整manifest、原始费用/请求ledger、模型hash与全部最终checkpoint首dev窗口事件重放；`scripts/probe_joint_coordinated_prediction.py <experiment>`执行预声明的固定权重预测开关（零训练）。中止试跑被拒绝。
+
+2026-10-15：`scripts/audit_joint_prediction_opportunities.py <experiment>`在最终full原始事件上做真实/预测3帧覆盖机会影子清点，只读、真实未来不传入控制器；不把候选帧视为独立事件或净收益证明。

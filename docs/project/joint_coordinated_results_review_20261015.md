@@ -42,3 +42,5 @@ SA对MAPPO奖励+0.147751、完成+0.166667，仅2/3seed奖励更高；对去预
 ## 6. 文献novelty
 
 本轮无新文献检索，不作novelty结论。3帧预测、零延迟控制意图总线、合成模型/状态成本、serial DAG控制及观测型surrogate仍是工程与外推边界。
+
+补充只读真实轨迹核验：`python scripts/audit_joint_prediction_opportunities.py joint_coordinated_control`，产物`artifacts/joint_coordinated_audit_20261015/joint_coordinated_control_opportunities.json`。在confidence门限内、当前执行站仍覆盖且3帧真实未来存在可达替代站的9请求帧，预测覆盖影子也为9帧，均为同一离站事件三seed复现；只说明此小样本没有观察到3帧内漏报，不外推预测器总体准确性。真实未来只用于审计，不进入策略。

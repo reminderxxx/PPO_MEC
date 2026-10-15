@@ -800,3 +800,5 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 2026-10-15：joint_control_planning.remaining_model_frames统一output-only零模型需求与观测在途模型剩余费用，CoordinatedControlPPO的output_aware_cache选项同步mask/费用/机会生产与checkpoint消费。
 
 2026-10-15：`scripts/audit_joint_coordinated_control.py <experiment>`只读核验完整manifest、原始费用/请求ledger、模型hash与全部最终checkpoint首dev窗口事件重放；`scripts/probe_joint_coordinated_prediction.py <experiment>`执行预声明的固定权重预测开关（零训练）。中止试跑被拒绝。
+
+2026-10-15：`scripts/audit_joint_prediction_opportunities.py <experiment>`在最终full原始事件上做真实/预测3帧覆盖机会影子清点，只读、真实未来不传入控制器；不把候选帧视为独立事件或净收益证明。
