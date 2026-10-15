@@ -1,6 +1,8 @@
-# 持续请求 / 多模型工程合同 v1
+# 持续请求 / 多模型工程合同（v2为当前实现）
 
-日期2026-10-16；独立前审见joint_stream_workload_review_20261016.md（5bc4ca6），用户授权后实现。本合同先识别环境是否提供可用预取机会，不启动SA训练、不产生新RL排名。
+日期2026-10-16；同帧FIFO缺陷前审见joint_stream_fifo_review_20261016.md / 58a8b03。v1完整工程在129单元后停止（另至多1未记录），与得分无关，原件/stop_record保留；下文v1阶段记录为历史。v2以发布清单顺序处理同帧同车请求，环境和必要下界一致，新workload/protocol v2、独立root `artifacts/joint_stream_workloads_v2/`，重新完整216而不拼接。action/observation字段结构保持v1，旧裸v3控制仍拒绝。新增两项逆词典序FIFO回归与独立raw启动顺序审计；资源/规则/矩阵不改。
+
+原日期2026-10-16；独立前审见joint_stream_workload_review_20261016.md（5bc4ca6），用户授权后实现。本合同先识别环境是否提供可用预取机会，不启动SA训练、不产生新RL排名。
 
 ## 生命周期与接口
 

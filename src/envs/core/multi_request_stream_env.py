@@ -28,10 +28,10 @@ class StreamingRequestControl(JointRequestControl):
 
 class MultiRequestStreamEnv(MultiRequestTargetControlEnv):
     action_contract = 'joint_stream_control_v1'
-    stream_contract = 'joint_fifo_workload_stream_v1'
+    stream_contract = 'joint_fifo_workload_stream_v2'
 
     def __init__(self, *, frames, arrivals, catalog, **kwargs):
-        self.arrivals = sorted(deepcopy(list(arrivals)), key=lambda a: (a.frame, a.vehicle_id, a.request_id))
+        self.arrivals = sorted(deepcopy(list(arrivals)), key=lambda a: (a.frame, a.vehicle_id))
         self.catalog_objects = list(catalog)
         ids = [v.vehicle_id for v in frames[0]['vehicles']]
         if not self.arrivals or len({a.request_id for a in self.arrivals}) != len(self.arrivals):
@@ -192,5 +192,6 @@ class MultiRequestStreamEnv(MultiRequestTargetControlEnv):
     def configuration(self):
         return {**super().configuration(),'workload_contract':self.stream_contract,'action_contract':self.action_contract,
             'observation_contract':self.observation_contract,'arrival_contract':'exogenous_frame_release_per_vehicle_fifo',
+            'same_frame_fifo_tie':'published_schedule_list_order',
             'cache_lifetime':'persistent_within_session_cold_on_reset_no_cross_split',
             'future_visibility':'unreleased_requests_hidden','catalog':[asdict(o) for o in self.catalog_objects]}

@@ -44,7 +44,7 @@ def catalog_from_pool(pool, families):
 
 def capacity_lower_bounds(arrivals, horizon, rsu_count, rates):
     compute=io=0;finish={};violations=[]
-    for a in sorted(arrivals,key=lambda a:(a.frame,a.request_id)):
+    for a in sorted(arrivals,key=lambda a:(a.frame,a.vehicle_id)):
         c=sum(ceil(max(1,n.input_size*rates['workflow_profile_unit_bytes']/rates['workload_bytes_per_unit'])/rates['rsu_work_units_per_frame']) for n in a.workflow.nodes)
         data=sum(ceil(max(1,n.input_size*rates['workflow_profile_unit_bytes'])/rates.get('input_bytes_per_link_frame',1024))+ceil(max(1,n.output_size*rates['workflow_profile_unit_bytes'])/rates.get('output_bytes_per_link_frame',1024)) for n in a.workflow.nodes)
         compute+=c;io+=data;finish[a.vehicle_id]=max(a.frame,finish.get(a.vehicle_id,0))+c+data

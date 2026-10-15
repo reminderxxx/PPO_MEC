@@ -1813,3 +1813,5 @@ python scripts/audit_joint_stream_workloads.py <full_timestamp_directory>
 ```
 
 完整运行要求clean source，固定72scenario×3规则=216单元、训练0；不重复跑已有目录、不打开formal/holdout。所有原件包括空闲帧费用保留，audit通过后再分析各负载/容量层，不能跨不同请求数简单用总奖励排名。旧learning checkpoint不消费新stream合同，后续必须独立适配并重新冻结公平训练预算。
+
+2026-10-16 FIFO修正：当前完整工程root为`artifacts/joint_stream_workloads_v2/`，workload/protocol v2；v1 `joint_stream_workloads/`停止129单元，仅历史诊断，不能resume/拼接。三规则和216预算不变，raw auditor另验证发布清单的FIFO启动顺序。

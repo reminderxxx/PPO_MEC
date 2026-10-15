@@ -143,3 +143,25 @@ def test_profile_mapping_preserves_original_dag_and_request_ids_are_distinct():
     rates=dict(workflow_profile_unit_bytes=1,workload_bytes_per_unit=1,rsu_work_units_per_frame=1)
     bound=capacity_lower_bounds(arrivals,20,1,rates)
     assert not bound['all_delivery_necessary_bound_pass'] and bound['fifo_serial_bound_violations']
+
+
+def test_same_frame_fifo_preserves_published_order_not_request_name():
+    arrivals=[WorkflowArrival(0,'v',wf('z_first',10)),WorkflowArrival(0,'v',wf('a_second'))]
+    e=make(arrivals)
+    assert e.decision_states()['v']['semantic_state']['request_id']=='v/z_first'
+    assert e.decision_states()['v']['semantic_state']['queued_workflows'][0]['request_id']=='v/a_second'
+    from src.envs.core.joint_stream_workloads import capacity_lower_bounds
+    rates=dict(workflow_profile_unit_bytes=1,workload_bytes_per_unit=1,rsu_work_units_per_frame=1)
+    b=capacity_lower_bounds(arrivals,5,1,rates)
+    assert b['fifo_serial_bound_violations']==['v/z_first','v/a_second']
+
+
+def test_batch_and_stream_share_request_order_when_names_sort_backwards():
+    for later in [0,10]:
+        e=make([WorkflowArrival(0,'v',wf('z_first')),WorkflowArrival(later,'v',wf('a_second'))])
+        order=[]
+        while not e._control_episode_done():
+            _,_,_,info=e.step_controls(controls(e))
+            for x in info['events']:
+                if not order or order[-1]!=x['request_id']:order.append(x['request_id'])
+        assert order==['v/z_first','v/a_second']

@@ -270,3 +270,5 @@
 
 - joint_delivery_completion_guard_review_20261015.md：离站前结束却准备的有界错误、v1停止和成本记录。
 - joint_delivery_control_v2_contract_20261015.md：保留predeparture交付、合同v2拒绝v1与从头同预算的独立修复。
+
+- `joint_stream_fifo_review_20261016.md`：同帧名字排序破坏FIFO对照的独立审查与v1停止/v2修复边界。

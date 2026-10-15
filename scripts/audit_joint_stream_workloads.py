@@ -18,6 +18,7 @@ def canonical(event):return (json.dumps(event,sort_keys=True,separators=(',',':'
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('root',type=Path);a=p.parse_args();home=a.root.resolve();torch.set_num_threads(1)
     m=json.loads((home/'manifest.json').read_text());assert m['status']=='complete'
+    assert m['protocol']=='joint_stream_workload_engineering_v2'
     if not m['smoke']:assert not m['git_dirty']
     for file,sha in m['output_sha256'].items():assert _hash_file(home/file)==sha
     for file,sha in m['source_fingerprints'].items():assert _hash_file(ROOT/file)==sha, file
@@ -87,6 +88,13 @@ def main():
         assert row['model_transfer_link_frames']==model_frames[key]
         assert row['completed_requests']==sum(r['completed'] for r in row['per_request'])
         for r in row['per_request']:assert r['completion_frame_index']==event_finishes.get((key,r['request_id']))
+        for vid in {r['vehicle_id'] for r in cases[key[0]]['arrivals']}:
+            expected=[r['request_id'] for r in sorted(cases[key[0]]['arrivals'],key=lambda r:r['frame']) if r['vehicle_id']==vid]
+            started=sorted([r for r in row['per_request'] if r['vehicle_id']==vid and r['start_frame'] is not None],key=lambda r:r['start_frame'])
+            assert [r['request_id'] for r in started]==expected[:len(started)]
+            for i,r in enumerate(started):
+                assert r['start_frame']>=r['arrival_frame']
+                if i:assert started[i-1]['completion_frame_index'] is not None and started[i-1]['completion_frame_index']<r['start_frame']
     # Read-only policy reproduction of first/last scenario, all three rules.
     data=torch.load(home/'protocol.pt',weights_only=False);pm=json.loads(Path(m['source_protocol']).read_text());bundle=torch.load(Path(m['source_protocol']).parent/'predictor.pt',weights_only=False);replays=[]
     for c in [data['cases'][i] for i in sorted({0,len(data['cases'])-1})]:

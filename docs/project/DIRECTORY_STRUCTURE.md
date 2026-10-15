@@ -427,3 +427,5 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 - `src/envs/core/joint_stream_rules.py`：三种无训练工程规则与异构LRU/净收益保护。
 - `scripts/run_joint_stream_workloads.py` / `scripts/audit_joint_stream_workloads.py`：score-blind216单元生产与独立raw消费/6次重放。
 - `artifacts/joint_stream_workloads/<timestamp>_engineering/`：manifest、protocol.pt、results/events/receipts及audit.json；不进入Git、不替代既有delivery结果。
+
+2026-10-16 FIFO修正：当前完整工程root为`artifacts/joint_stream_workloads_v2/`，workload/protocol v2；v1 `joint_stream_workloads/`停止129单元，仅历史诊断，不能resume/拼接。三规则和216预算不变，raw auditor另验证发布清单的FIFO启动顺序。
