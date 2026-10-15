@@ -1,0 +1,11 @@
+# 延迟缓存视图与实际准入：独立缺陷审查
+
+reviewed_at: 2026-10-16（Asia/Shanghai）；literature_cutoff: 2026-10-15；target_venue: IEEE TMC；policy_version: tmc_review_policy_v3_20260621；Git source: 13016c7；artifact_run_id: artifacts/joint_stream_workloads_v2/20261015T165320Z_engineering；evidence: 原事件与42帧有界重放，paper E0_UNAVAILABLE/Unverifiable。
+
+216工程单元完整运行，独立raw审计在c039/gain_prefetch/frame41拦下：peachtree:85为未来task7准备control adapter，实际LRU驱逐自己当前task6需要的fusion，随后adapter_not_ready。不能报告资源保护通过或按本轮均值选优。前次用户可见“其他请求”是审计团队依赖类别的初始描述；具体首例是本请求自己依赖，保护范围同样须包含自己与其他请求。
+
+admission_failure.json保存首个违反项；admission_failure_witness.json由冻结13016c7重放42帧，真实复现同一驱逐。观测resident顺序包含旧perception/tracking；实际缓存已含f1_tracking，fusion实际位于LRU首位。准入前又有peer touch改变顺序。策略只依据延迟快照的预检查无法保证真实准入不驱逐当前依赖。是可复现实现边界，与算法reward排序无关；未用全表分数选择修复。
+
+独立实现：保留策略的因果估计，在stream缓存准入端再按本地真实resident/pending/对象字节和本帧全部声明执行目标做无突变LRU预演；可选预取若会驱逐当前模型则拒绝并输出明确receipt、0模型槽/字节。需求来自本帧已发布任务/意图，不读未来轨迹、未来请求或未来reward；所有规则/后续方法共用，属本地资源可行性约束。当前必需模型的竞争与自动LRU仍保留，不冒称全局最优；显式驱逐也不能越过当前依赖保护。
+
+新workload/protocol v3、独立root joint_stream_workloads_v3，216全矩阵不改资源/费用/规则/样本并从头运行。v2全部原件、失败audit和launcher_result保留，不覆盖/拼接，不隐瞒成本。新测试包括可选预取拒绝自身/同站他人当前依赖，现有正向付费预取仍须通过，历史v3默认动作事件不变。无RL新增训练；formal/holdout封存。
