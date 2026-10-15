@@ -154,6 +154,10 @@ def delivery_migration_opportunities(state, calendar, *, decisions=None, targets
             return confidence*(node_delivery_utility(times,after,horizon,prefix_count)-base)-.01*extra-(1-confidence)*.01*budget
         cache_net=benefit(cache_after,mb) if mb else 0.
         state_net=benefit(state_after,prefix) if prefix else 0.
+        # Utility subtraction must not turn a mathematically zero margin into
+        # a legal preparation because of 1e-17 cancellation noise.
+        cache_net=0. if abs(cache_net)<1e-9 else cache_net
+        state_net=0. if abs(state_net)<1e-9 else state_net
         if max(cache_net,state_net)<=0:continue
         result[rid]=dict(eta_frames=eta,prepare_frames=full,prepare_budget_frames=prefix,reactive_frames=before,
             residual_recovery_frames=residual,arrival_delay_frames=state_after,saved_delay_frames=max(0,before-state_after),

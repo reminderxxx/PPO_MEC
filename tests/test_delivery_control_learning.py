@@ -158,6 +158,9 @@ def test_request_finishing_before_departure_never_prepares():
     from src.envs.core.joint_delivery_planning import node_delivery_times
     assert node_delivery_times(s,'a')==[4.]
     assert not delivery_migration_opportunities(s,{r['rsu_id']:[None]*8 for r in s['rsus']})
+    s['predictions']['predicted_positions_by_vehicle']['v0']=[[1,0],[6,0]]
+    assert not delivery_migration_opportunities(s,{r['rsu_id']:[None]*8 for r in s['rsus']})  # exactly zero net, not +8e-18
+    s['predictions']['predicted_positions_by_vehicle']['v0']=[[1,0],[2,0],[3,0],[4,0],[5,0],[6,0]]
     other=deepcopy(s);other['primary_vehicle_id']='v1';other['current_node_work_units_required']=20
     decisions={'v0':{'semantic_state':s},'v1':{'semantic_state':other}}
     assert delivery_migration_opportunities(s,{r['rsu_id']:[None]*8 for r in s['rsus']},decisions=decisions,targets={'v0':'a','v1':'a'})
