@@ -2189,3 +2189,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 奖励排序：no-pred58.226779 > SA57.981931 > MAPPO57.732622 > PPO57.661388 > DT57.583436 > DAG57.210631 > cache56.762605 > corrected DQN53.964010。SA完成6.958333/8，低于MAPPO7.041667、DT7.0、no-pred7.25；双指标目标未达。
 - SA train probe32→128 +.432827，而dev−.270637；seed27持续回退主导差异。稳定更新较恒定更新奖励+.911063，但KL早停0次、仍高熵，不可声称收敛或唯一因果解释。预测固定权重局部收益保留，去预测独立训练更优，不能混为同一证据。
 - 完整独立审查：joint_scheduled_control_results_review_20261015.md。formal/holdout封存、canonical不更新、论文E0_UNAVAILABLE；下一实现阶段先围绕尾部交付/信用和训练覆盖负例建witness，不在本审查内调参。
+
+2026-10-15独立尾部定位：seed27固定权重仅关闭surrogate事件头干预，奖励56.343598→57.837427、请求6→7.125；关闭其他头无改善。priority被观测return残差重排已形成干预证据；gamma.99与有限时域评估也不一致。见joint_tail_regression_review_20261015.md；先审查、后独立实现，不追认新算法优势。
