@@ -261,3 +261,5 @@
 - joint_tail_mobility_support_contract_20261015.md：固定原布局/多站可选高移动的零训练探索支持协议，保留冻结主结果。
 
 - joint_tail_control_results_review_20261015.md：十组完整回收、120checkpoint/60主重放、零训练移动分层/30重放、预测挤占冷模型负例和剩余目标/信用缺口。
+
+- joint_delivery_control_contract_20261015.md：预测准备资源保护、团队节点信用、缓存残差与固定完整基线预算的新实现合同。

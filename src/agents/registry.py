@@ -252,6 +252,22 @@ def build_agent(agent_name: str, **kwargs: Any) -> BaseAgent:
         from src.agents.mappo_agent import ParameterizedMAPPOAgent
         from src.agents.cache_offload_agent import ParameterizedCacheOffloadAgent
         from src.agents.sa_ghmappo_agent import ParameterizedSAGHMAPPOAgent
+        delivery=kwargs.pop('delivery_controls',False)
+        if delivery:
+            kwargs.pop('tail_controls',None);kwargs.pop('scheduled_controls',None);kwargs.pop('coordinated_controls',None)
+            from src.agents.ppo_agent import DeliveryControlPPO
+            from src.agents.sa_ghmappo_agent import DeliverySAGHMAPPOAgent
+            from src.agents.mappo_agent import DeliveryMAPPOAgent
+            from src.agents.cache_offload_agent import DeliveryCacheOffloadAgent
+            from src.agents.dag_offload_agent import DeliveryDAGOffloadAgent
+            from src.agents.dt_handoff_agent import DeliveryDTHandoffAgent
+            from src.agents.dqn_agent import DeliveryDQNAgent
+            mapping={'sa_ghmappo':DeliverySAGHMAPPOAgent,'mappo':DeliveryMAPPOAgent,
+                     'cache_offload_drl':DeliveryCacheOffloadAgent,'dag_offload_drl':DeliveryDAGOffloadAgent,
+                     'dt_handoff_drl':DeliveryDTHandoffAgent,'dqn':DeliveryDQNAgent}
+            if agent_name=='ppo':return DeliveryControlPPO(method='ppo',**kwargs)
+            if agent_name not in mapping:raise ValueError('agent has no team-delivery implementation')
+            return mapping[agent_name](**kwargs)
         tail=kwargs.pop('tail_controls',False)
         scheduled=kwargs.pop("scheduled_controls",False) or tail
         if scheduled:

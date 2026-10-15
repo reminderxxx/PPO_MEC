@@ -554,3 +554,14 @@ from src.agents.ppo_agent import TailControlPPO
 
 class TailDQNAgent(ScheduledDQNAgent,TailControlPPO):
     checkpoint_contract='tail_parameterized_dqn_v1'
+
+
+from src.agents.ppo_agent import DeliveryControlPPO
+
+
+class DeliveryDQNAgent(ScheduledDQNAgent,DeliveryControlPPO):
+    checkpoint_contract='delivery_parameterized_dqn_v1'
+
+    def _transition_reward(self,rollout,index,vid,terminal):
+        count=rollout['initial_request_count']
+        return float(rollout['returns'][index])/count if terminal else sum(rollout['request_rewards'].values())/(10*count)

@@ -413,3 +413,5 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 
 - `scripts/audit_joint_tail_capacity.py`：与算法分数无关的资源必要容量上界。
 - `scripts/joint_tail_mobility_support.py`、root/mobility_support_plan.json与artifacts/joint_tail_control/mobility_support/：独立零训练高移动支持集；evaluation.json不混为训练manifest。
+
+2026-10-15：`artifacts/joint_delivery_control/`为团队节点开发比较独立root（protocol字节复用、十group、comparison_plan、audit/prediction_probe）；`joint_delivery_preflight*`与`joint_delivery_witness`为工程/只读证据，非主结果。

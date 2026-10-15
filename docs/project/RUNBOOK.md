@@ -1779,3 +1779,9 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 2026-10-15：独立高移动support使用`python scripts/joint_tail_mobility_support.py prepare --root artifacts/joint_tail_control`先冻结规则/数据，再以`evaluate --agent <name>`评价每个完整最终模型group；十组结束后`collect`核验原始费用与30次首窗重放。`python scripts/audit_joint_tail_capacity.py <protocol_manifest> <output_json>`检查必要容量上界。support条件不足即Unavailable；root原主表及权重不变，不增加训练。
 
 2026-10-15 tail完整回收：`artifacts/joint_tail_control/audit.json`是已完成的十组开发主审计；`mobility_support/audit.json`是晚定义零训练探索审计，不能替代主表。预算/版本/全结果/失败例与paper边界见`joint_tail_control_results_review_20261015.md`，不再引用其运行中状态。
+
+## 2026-10-15 delivery独立开发入口
+
+`python scripts/prepare_joint_delivery_control.py --output_root artifacts/joint_delivery_control/protocol`按hash复制冻结tail协议与GRU（不重拟合），再用`python scripts/train_joint_delivery_control.py --protocol artifacts/joint_delivery_control/protocol/manifest.json --agent <name> --seeds 7 17 27 --episodes 128 --eval_every 32 --output_root artifacts/joint_delivery_control/<name>`逐组启动。先保存根comparison_plan，完成后`python scripts/audit_joint_tail_control.py artifacts/joint_delivery_control --delivery`。旧默认auditor/旧checkpoint不混用。预算和保护边界见`joint_delivery_control_contract_20261015.md`。
+
+推荐统一运行`python scripts/launch_joint_delivery_comparison.py`：要求clean source、root不存在，先冻结主协议及复用mobile分层，再启动十组、回收两项审计。`evaluate_joint_delivery_support.py`仅评价同组最终模型；launcher未完成时先查看progress和子进程，不能重复启动已有root。

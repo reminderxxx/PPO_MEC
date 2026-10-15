@@ -20,7 +20,10 @@ def avg(values):return statistics.mean(list(values))
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('roots',nargs='+',type=Path)
-    p.add_argument('--smoke',action='store_true');a=p.parse_args();torch.set_num_threads(1)
+    p.add_argument('--smoke',action='store_true');p.add_argument('--delivery',action='store_true');a=p.parse_args();torch.set_num_threads(1)
+    if a.delivery:
+        global make_agent
+        from scripts.train_joint_delivery_control import make_agent
     a.roots=[r.resolve() for r in a.roots]
     root=a.roots[0];plan=None if a.smoke else json.loads((root/'comparison_plan.json').read_text())
     paths=[p for r in a.roots for p in r.glob('*/*/manifest.json')]
@@ -37,6 +40,9 @@ def main():
     for path,m in zip(paths,manifests):
         assert m['status']=='complete'
         if plan:assert not m['git_dirty'] and m['git_commit']==plan['source_commit'] and m['episodes']==plan['episodes'] and m['seeds']==plan['seeds']
+        if a.delivery:
+            assert m['credit']=='team_mc_per_initial_request_including_terminal_tail' and m['return_gamma']==1.
+            assert m['entropy_anneal']==(m['agent']!='sa_fixed_entropy')
         prepared=Path(m['prepared_protocol']);assert _hash_file(prepared)==m['prepared_manifest_sha256']
         protocol=json.loads(prepared.read_text())
         if plan:
@@ -44,9 +50,12 @@ def main():
             assert m['prediction_sha256']==plan['predictor_sha256']
             assert m['primary_panels']==plan['primary_panels']==protocol['primary_panels']==dict(base=.5,tight=.5)
             assert m['return_gamma']==(.99 if m['agent']=='sa_discounted' else 1.)
+        if a.delivery:
+            parent=Path(protocol['parent_prepared_manifest']);assert _hash_file(parent)==protocol['parent_prepared_manifest_sha256']
+            original=json.loads(parent.read_text());assert protocol['protocol_sha256']==original['protocol_sha256'] and protocol['predictor_sha256']==original['predictor_sha256']
         assert _hash_file(prepared.parent/'protocol.pt')==protocol['protocol_sha256']
         assert _hash_file(prepared.parent/'predictor.pt')==m['prediction_sha256']==protocol['predictor_sha256']
-        if plan:assert not protocol['git_dirty'] and protocol['git_commit']==plan['source_commit']
+        if plan:assert not protocol['git_dirty'] and protocol['git_commit']==plan.get('prepared_source_commit',plan['source_commit'])
         assert not set(protocol['predictor']['fit_offsets']) & set(protocol['predictor']['validation_offsets'])
         intervals=protocol['source_splits']
         assert set(protocol['predictor']['fit_offsets'])=={w['frame_offset'] for w in intervals['train'][:16]}
@@ -75,6 +84,11 @@ def main():
         assert grouped.keys()==final.keys()
         for key,es in grouped.items():
             row=final[key];reward=0.
+            by_frame=defaultdict(list)
+            if a.delivery:
+                from scripts.audit_joint_delivery_resources import audit_optional_cache_evictions
+                for event in es:by_frame[event['frame_index']].append(event)
+                work_by_vehicle=dict(zip(windows[key[1]]['vehicle_ids'],data['workflows']))
             receipts=[]
             for e in es:
                 w=windows[key[1]];assert e['time_index']==w['frames'][e['frame_index']]['time_index']
@@ -84,6 +98,12 @@ def main():
                     assert abs(sum(receipt['request_rewards'].values())-sum(components.values()))<1e-8
                     assert all(0<=used<=1 for used in receipt['link_usage_by_rsu'].values());receipts_count+=1
                 vid=e['vehicle_id'];grants=e['link_reservation_grants']
+                if a.delivery:audit_optional_cache_evictions(e,by_frame[e['frame_index']],work_by_vehicle)
+                if a.delivery and e['control']['prepare_target'] is not None:
+                    assert e['control_planning']['link_calendar'][e['control']['prepare_target']][0] is None
+                if a.delivery and e['control']['cache_target'] is not None:
+                    cal=e['control_planning']['link_calendar'][e['control']['cache_target']];span=e['control_planning']['cache_admission_span']
+                    assert span<=len(cal) and all(x is None or x==[vid,'model'] for x in cal[:span])
                 for transfer in e['state_transfers']:
                     if transfer['link_frames'] and transfer['target'] in grants:
                         assert grants[transfer['target']]['vehicle_id']==vid and grants[transfer['target']]['kind']=='state'
@@ -116,6 +136,10 @@ def main():
                 original=[{k:v for k,v in e.items() if k not in ('agent','seed','episode','scenario_id','panel','frame_offset')} for e in grouped[(c['seed'],w['scenario_id'])]]
                 assert json.loads(json.dumps(env.events))==original
                 assert abs(row['reward']-final[(c['seed'],w['scenario_id'])]['reward'])<1e-8
+                if a.delivery:
+                    for rr in rolls:
+                        with torch.no_grad():measured=agent._evaluate(rr['data'],actions=rr['actions'],deterministic=True)[1]
+                        assert torch.allclose(measured,rr['head_logs'],atol=1e-6)
                 if agent.return_gamma==1.:assert abs(float(rolls[0]['returns'][0])*10-row['reward'])<1e-5
                 reproductions.append(dict(agent=m['agent'],seed=c['seed'],scenario_id=w['scenario_id'],events_equal=True))
             if m['agent']=='sa_ghmappo' and not a.smoke:
@@ -137,7 +161,7 @@ def main():
     if plan:
         assert len(predict)==48
         for seed in plan['seeds']:
-            assert initial[('sa_ghmappo',seed)]==initial[('sa_no_prediction',seed)]==initial[('sa_discounted',seed)]==initial[('sa_no_surrogate',seed)]
+            assert initial[('sa_ghmappo',seed)]==initial[('sa_no_prediction',seed)]==initial[('sa_fixed_entropy' if a.delivery else 'sa_discounted',seed)]==initial[('sa_no_surrogate',seed)]
         assert len({m['prepared_manifest_sha256'] for m in manifests})==1
     summary={};curves={};paired={}
     for m in manifests:
@@ -160,7 +184,7 @@ def main():
                 by_panel={panel:dict(reward=avg(r['reward'] for r in values if r['panel']==panel),completed=avg(r['completed_requests'] for r in values if r['panel']==panel)) for panel in ('base','tight')},
                 by_seed={str(seed):dict(reward=avg(r['reward'] for r in values if r['seed']==seed),completed=avg(r['completed_requests'] for r in values if r['seed']==seed)) for seed in m['seeds']},
                 by_seed_panel={f'{seed}_{panel}':dict(reward=avg(r['reward'] for r in values if r['seed']==seed and r['panel']==panel),completed=avg(r['completed_requests'] for r in values if r['seed']==seed and r['panel']==panel)) for seed in m['seeds'] for panel in ('base','tight')},
-                updates={key:avg(u[key] for u in updates if key in u) for key in ('gradient_steps','learning_rate','value_loss','surrogate_loss','approx_kl','kl_early_stop','normalized_entropy','q_mse','epsilon') if any(key in u for u in updates)})
+                updates={key:avg(u[key] for u in updates if key in u) for key in ('gradient_steps','learning_rate','value_loss','surrogate_loss','approx_kl','kl_early_stop','normalized_entropy','q_mse','epsilon','actor_gradient_norm','surrogate_gradient_norm','graph_residual_gate','entropy_coefficient') if any(key in u for u in updates)})
     if plan:
         full={(r['seed'],r['scenario_id']):r for r in dev if r['agent']=='sa_ghmappo' and r['episode']==plan['episodes']}
         for name in summary:
@@ -168,7 +192,7 @@ def main():
             other={(r['seed'],r['scenario_id']):r for r in dev if r['agent']==name and r['episode']==plan['episodes']}
             ds=[full[k]['reward']-other[k]['reward'] for k in full]
             paired[name]=dict(reward=avg(ds),completed=avg(full[k]['completed_requests']-other[k]['completed_requests'] for k in full),wins=sum(d>1e-9 for d in ds),losses=sum(d< -1e-9 for d in ds))
-    destination=(root if not a.smoke else ROOT/'artifacts/joint_tail_preflight_audit')
+    destination=(root if not a.smoke else ROOT/('artifacts/joint_delivery_preflight_audit' if a.delivery else 'artifacts/joint_tail_preflight_audit'))
     destination.mkdir(exist_ok=True)
     report=dict(reviewed_at=datetime.now(timezone.utc).isoformat(),literature_cutoff='2026-10-15',target_venue='IEEE TMC',
         policy_version='tmc_review_policy_v3_20260621',source_commit=manifests[0]['git_commit'],
@@ -179,6 +203,10 @@ def main():
         prediction_off_events=str(off_events.relative_to(ROOT)) if off_events else None,
         prediction_off_events_sha256=_hash_file(off_events) if off_events else None,
         statistical_scope='descriptive; base/tight and cohorts share raw intervals; no significance/independent-cluster claim',paper_claim_ready=False)
+    if a.delivery and plan and 'legacy_cache_reference' in plan:
+        legacy=root/'legacy_cache_reference/audit.json';proof=json.loads(legacy.read_text())
+        assert proof['events_equal_cells']==48 and proof['training_added']==0
+        report['legacy_cache_reference']=dict(path=str(legacy.relative_to(ROOT)),sha256=_hash_file(legacy),summary=proof['summary'])
     (destination/'audit.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(dict(output=str(destination/'audit.json'),counts=report['counts'],summary=summary,paired=paired),indent=2))
 

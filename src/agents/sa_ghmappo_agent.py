@@ -487,3 +487,12 @@ class TailSAGHMAPPOAgent(TailControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method',None)
         super().__init__(method='sa_ghmappo',**kwargs)
+
+
+from src.agents.ppo_agent import DeliveryControlPPO
+
+
+class DeliverySAGHMAPPOAgent(DeliveryControlPPO):
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='sa_ghmappo',**kwargs)

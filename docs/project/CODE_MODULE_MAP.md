@@ -816,3 +816,9 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 `joint_training_scenarios.py`只接受轨迹/RSU，不读取agent或回报；prepare脚本连接NGSIM loader并冻结公共场景/predictor。`joint_learned_prediction.py`新增按原区间分组fit/validation的opt-in，旧默认不变。各算法文件Tail类通过registry显式flag选择；共同PPO hook维持旧scheduled数学表达，Tail子类限定surrogate准备范围并统一critic单位，DQN保留独立replay/Bellman。训练/审计脚本共同消费scenario_id和panel，旧frame_offset消费者不混用。
 
 2026-10-15：joint_tail_mobility_support.py仅在预定义原dev区间按外生几何筛cohort，共享原GRU并加载已冻结最终模型；producer/consumer/hash与actor源1667分开绑定，不修改训练器。audit_joint_tail_capacity.py给必要上界，不能将无违例写成可行性证明。
+
+2026-10-15：`joint_delivery_planning.py`负责两阶段已选站reactive链路日历、连续非抢占模型span、当前模型依赖/LRU预取guard与节点交付净收益；不依赖agent/真实future。算法文件中的Delivery类沿用PPO/DQN合同，SA缓存/图残差、团队信用与surrogate独立梯度；registry显式delivery_controls。prepare/train_joint_delivery_control生产端与audit_joint_tail_control --delivery消费端成对版本化，旧默认不变。
+
+`launch_joint_delivery_comparison.py`统一冻结预算/source指纹、启动并回收十组和主/补充审计；`evaluate_joint_delivery_support.py`字节复用固定mobile分层并接新factory、逐事件保护检查，不重新选车或训练。
+
+`audit_joint_delivery_cache_reference.py`只读重放上一轮强缓存模型，核对全部48单元原始事件；不重训、不替换新同合同缓存基线。

@@ -2207,3 +2207,9 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 独立容量审查tight7/8必要上界不支持全8完成。全部原结果保留；晚定义mobile_base探索support（≥2站全程可达/几何排序）0新增训练：240policy+24off、198774事件/30重放通过。full59.388970/8 > no-pred59.192464/7.791667，仍低于cache59.715258/8；同权重预测+.022625488、完成0（3胜3负18平），不替代主结果。
 - 真实负例：seed17/dev_2760_tight，预测离站基本正确，状态准备占用冷adapter准入槽，peachtree:137少送2节点，奖励−1.931024。准备net漏团队机会成本；state gate还用整图finish估值，与节点奖励错位，有界fixture反例通过；实际漏机会范围待反事实验证。混合local/team信用仍非纯团队边际信用。
 - 相关375+2测试、旧11重放、新preflight4重放、最终90次重放与审计均通过。详见joint_tail_control_results_review_20261015.md；formal/holdout封存、canonical不更新、paper E0_UNAVAILABLE/Unverifiable，不作优势或cache普遍友好结论。
+
+2026-10-15 delivery独立实现：旧47/49节点负例精确回放，新reactive calendar拦三次有害准备；团队信用/节点utility、两阶段概率与缓存基线初始actor一致等局部检查通过。当前模型保护与连续model闭包span一并补齐，完整回归/真实preflight收尾；新同预算完整比较尚未启动。见joint_delivery_control_contract_20261015.md。
+
+2026-10-15 delivery验收完成：393相关测试、16项随机/确定性概率检查及旧11重放通过；新preflight2checkpoint/27025事件/3757收据/4次base/tight完整事件与逐帧策略概率核验通过。两轮工程16 RL episode单列。未知远站状态guard和DQN审计模式错误已修复、失败日志保留；下一步clean source冻结3840完整训练，仍无性能优势声明。
+
+2026-10-15 delivery开跑前最终验收：394相关测试、当前新consumer的2checkpoint/27025事件/3757收据/4次两panel事件和策略概率重放通过；新增独立raw依赖检查确认可选预取没有驱逐同帧他者当前模型。十组预算及额外零训练旧强缓存重放在开跑前冻结，source待clean commit记录。
