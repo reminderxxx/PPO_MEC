@@ -1270,3 +1270,5 @@ claim map 必须报告 `UNAVAILABLE`。
 2026-10-15 独立覆盖影子审查发现9个离站请求帧因7帧完整复制>1–3帧ETA被挡住，另立partial阶段，允许有净收益的前缀推进和单独模型预取；三主配置各128×3seed，旧七配置仍完成/保留。该修复不追认严格版本预测收益，依据见 `joint_coordinated_gate_review_20261015.md`。
 
 2026-10-15：partial v3使用output_aware_cache，输出传输不要求base/adapter、费用识别在途模型剩余量；旧partial试跑中止留存，所有三组从头同预算重训，不混用旧checkpoint。
+
+2026-10-15：scheduled合同同时更新producer/consumer并保留旧默认；公共预测/预约固定8帧以覆盖前置约7帧传输诊断，所有方法共享相同GRU/预算；不将外部论文复现标签附于first-party方向PPO。主表固定最终128，不选峰；stable与constant-update同预算，区分交互公平与DQN replay优化步数。

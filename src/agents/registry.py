@@ -252,6 +252,22 @@ def build_agent(agent_name: str, **kwargs: Any) -> BaseAgent:
         from src.agents.mappo_agent import ParameterizedMAPPOAgent
         from src.agents.cache_offload_agent import ParameterizedCacheOffloadAgent
         from src.agents.sa_ghmappo_agent import ParameterizedSAGHMAPPOAgent
+        scheduled=kwargs.pop("scheduled_controls",False)
+        if scheduled:
+            kwargs.pop('coordinated_controls',None)
+            from src.agents.ppo_agent import ScheduledControlPPO
+            from src.agents.mappo_agent import ScheduledMAPPOAgent
+            from src.agents.sa_ghmappo_agent import ScheduledSAGHMAPPOAgent
+            from src.agents.cache_offload_agent import ScheduledCacheOffloadAgent
+            from src.agents.dag_offload_agent import ScheduledDAGOffloadAgent
+            from src.agents.dt_handoff_agent import ScheduledDTHandoffAgent
+            from src.agents.dqn_agent import ScheduledDQNAgent
+            mapping={'sa_ghmappo':ScheduledSAGHMAPPOAgent,'mappo':ScheduledMAPPOAgent,
+                     'cache_offload_drl':ScheduledCacheOffloadAgent,'dag_offload_drl':ScheduledDAGOffloadAgent,
+                     'dt_handoff_drl':ScheduledDTHandoffAgent,'dqn':ScheduledDQNAgent}
+            if agent_name=='ppo':return ScheduledControlPPO(method='ppo',**kwargs)
+            if agent_name not in mapping:raise ValueError('agent has no scheduled parameterized implementation')
+            return mapping[agent_name](**kwargs)
         coordinated = kwargs.pop("coordinated_controls", False)
         if coordinated:
             from src.agents.mappo_agent import CoordinatedMAPPOAgent

@@ -466,3 +466,75 @@ class DuelingDDQNAgent(DQNAgent):
             dueling=True,
             **kwargs,
         )
+
+
+from src.agents.ppo_agent import ScheduledControlPPO
+
+
+class ScheduledDQNAgent(ScheduledControlPPO):
+    """Replay/target-network DQN on execution→cache→event micro-transitions.
+
+    Each physical frame ends the three-stage MDP transition. Intermediate
+    discounts are one; the physical next frame uses gamma=.99. No PPO loss.
+    """
+    checkpoint_contract='scheduled_parameterized_dqn_v1'
+
+    def __init__(self, **kwargs):
+        from copy import deepcopy
+        kwargs.pop('method',None);kwargs['surrogate_enabled']=False
+        super().__init__(method='dqn',**kwargs)
+        self.target_heads=deepcopy(self.heads)
+        for p in self.target_heads.parameters():p.requires_grad_(False)
+        self.optimizer=torch.optim.Adam(self.heads.parameters(),lr=self.options['learning_rate'])
+        self.replay=deque(maxlen=4096);self.epsilon=.3
+
+    def _choice_distribution(self,logits,mask,deterministic):
+        from torch.distributions import Categorical
+        if deterministic:return Categorical(logits=logits.masked_fill(~mask,-1e9))
+        probs=self.epsilon*mask.float()/mask.sum(1,keepdim=True)
+        probs=probs.scatter_add(1,logits.argmax(1)[:,None],probs.new_full((len(probs),1),1-self.epsilon))
+        return Categorical(probs=probs)
+
+    @staticmethod
+    def _replay_data(data,index):
+        out={k:v[index:index+1].detach().clone() for k,v in data.items()}
+        missing=257-out['m1'].shape[1]
+        out['f1']=torch.nn.functional.pad(out['f1'],(0,0,0,missing));out['m1']=torch.nn.functional.pad(out['m1'],(0,missing));out['node1']=torch.nn.functional.pad(out['node1'],(0,missing),value=-1)
+        return out
+
+    def update(self,rollouts,*,epochs=4):
+        # Buffer boundaries include multiple complete episodes; frame index resets mark terminals.
+        for t,r in enumerate(rollouts):
+            following=rollouts[t+1] if t+1<len(rollouts) and float(rollouts[t+1]['data']['own'][0,0])>float(r['data']['own'][0,0]) else None
+            for index,vid in enumerate(r['vehicle_ids']):
+                data=self._replay_data(r['data'],index);nxt=following['vehicle_ids'].index(vid) if following is not None and vid in following['vehicle_ids'] else None
+                next_data=self._replay_data(following['data'],nxt) if nxt is not None else data
+                total=sum(r['request_rewards'].values());count=r['initial_request_count']
+                reward=(.5*r['request_rewards'][vid]+.5*total/count)/10
+                self.replay.append((data,r['actions'][index:index+1].clone(),next_data,reward,nxt is None))
+        losses=[]
+        for _ in range(8*epochs):
+            if len(self.replay)<128:break
+            sample=random.sample(self.replay,128)
+            data={k:torch.cat([x[0][k] for x in sample]) for k in sample[0][0]};actions=torch.cat([x[1] for x in sample]);nxt={k:torch.cat([x[2][k] for x in sample]) for k in sample[0][2]}
+            *_,q,maxima=self._evaluate(data,actions=actions,return_details=True)
+            with torch.no_grad():
+                *_,_,targets=self._evaluate(data,actions=actions,deterministic=True,return_details=True,target=True)
+                *_,_,future=self._evaluate(nxt,deterministic=True,return_details=True,target=True)
+                expected=torch.stack((targets[:,1],targets[:,2],torch.tensor([x[3] for x in sample])+.99*torch.tensor([not x[4] for x in sample])*future[:,0]),1)
+            loss=torch.nn.functional.smooth_l1_loss(q,expected)
+            self.optimizer.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(self.heads.parameters(),.5);self.optimizer.step();losses.append(float(loss.detach()))
+        self.completed_updates+=1
+        if int(self.completed_updates)%2==0:self.target_heads.load_state_dict(self.heads.state_dict())
+        self.epsilon=max(.05,.3-.25*min(1.,float(self.completed_updates)*4/self.training_budget))
+        return dict(policy_loss=0.,value_loss=float(np.mean(losses)) if losses else 0.,surrogate_loss=0.,samples=sum(len(r['actions']) for r in rollouts),gradient_steps=len(losses),replay_size=len(self.replay),epsilon=self.epsilon)
+
+    def save_checkpoint(self,path):
+        super().save_checkpoint(path)
+        saved=torch.load(path,weights_only=False);saved['epsilon']=self.epsilon
+        # Checkpoints are evaluation snapshots, not replay-complete training-resume snapshots.
+        saved['training_resume_supported']=False;torch.save(saved,path)
+
+    @classmethod
+    def from_checkpoint(cls,path):
+        obj=super().from_checkpoint(path);obj.epsilon=torch.load(path,weights_only=False)['epsilon'];return obj

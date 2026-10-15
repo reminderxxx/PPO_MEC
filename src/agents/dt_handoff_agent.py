@@ -277,3 +277,13 @@ class DTHandoffDRLAgent(PPOBaseAgent):
             }
         )
         return config
+
+
+from src.agents.ppo_agent import ScheduledControlPPO
+
+
+class ScheduledDTHandoffAgent(ScheduledControlPPO):
+    """Opt-in scheduled parameterized dt_handoff_drl implementation."""
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='dt_handoff_drl',**kwargs)

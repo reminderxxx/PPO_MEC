@@ -278,3 +278,13 @@ class DAGOffloadDRLAgent(PPOBaseAgent):
             }
         )
         return config
+
+
+from src.agents.ppo_agent import ScheduledControlPPO
+
+
+class ScheduledDAGOffloadAgent(ScheduledControlPPO):
+    """Opt-in scheduled parameterized dag_offload_drl implementation."""
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='dag_offload_drl',**kwargs)

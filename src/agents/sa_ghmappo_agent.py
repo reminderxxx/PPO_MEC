@@ -468,3 +468,13 @@ class CoordinatedSAGHMAPPOAgent(CoordinatedControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method',None)
         super().__init__(method='sa_ghmappo',**kwargs)
+
+
+from src.agents.ppo_agent import ScheduledControlPPO
+
+
+class ScheduledSAGHMAPPOAgent(ScheduledControlPPO):
+    """Opt-in scheduled parameterized sa_ghmappo implementation."""
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='sa_ghmappo',**kwargs)

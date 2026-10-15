@@ -186,3 +186,13 @@ class CoordinatedMAPPOAgent(CoordinatedControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method',None)
         super().__init__(method='mappo',**kwargs)
+
+
+from src.agents.ppo_agent import ScheduledControlPPO
+
+
+class ScheduledMAPPOAgent(ScheduledControlPPO):
+    """Opt-in scheduled parameterized mappo implementation."""
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='mappo',**kwargs)

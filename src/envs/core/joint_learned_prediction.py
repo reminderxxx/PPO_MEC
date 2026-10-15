@@ -38,16 +38,17 @@ def prediction_samples(windows, history=8, horizon=3):
     return np.asarray(xs), np.asarray(ys)
 
 
-def fit_predictor(train_windows, *, seed=101, epochs=30):
+def fit_predictor(train_windows, *, seed=101, epochs=30, horizon=3):
+    if type(horizon) is not int or horizon<1:raise ValueError('positive integer forecast horizon required')
     if len(train_windows) < 2:
         raise ValueError('predictor requires separate train fit/validation windows')
     torch.manual_seed(seed)
     cut = max(1, int(len(train_windows)*.8))
-    x, y = prediction_samples(train_windows[:cut])
-    vx, vy = prediction_samples(train_windows[cut:])
+    x, y = prediction_samples(train_windows[:cut],horizon=horizon)
+    vx, vy = prediction_samples(train_windows[cut:],horizon=horizon)
     scale = float(max(np.std(x), 1e-3))
     x, y, vx, vy = [torch.as_tensor(a / scale) for a in (x, y, vx, vy)]
-    model = ResidualMobilityGRU()
+    model = ResidualMobilityGRU(horizon)
     optimizer = torch.optim.Adam(model.parameters(), lr=.003)
     generator = torch.Generator().manual_seed(seed)
     for _ in range(epochs):
@@ -56,10 +57,10 @@ def fit_predictor(train_windows, *, seed=101, epochs=30):
             optimizer.zero_grad(); loss.backward(); optimizer.step()
     with torch.no_grad():
         learned = float(((model(vx)-vy)*scale).square().mean().sqrt())
-        cv = vx[:, -1:, :] * torch.arange(1, 4)[None, :, None]
+        cv = vx[:, -1:, :] * torch.arange(1, horizon+1)[None, :, None]
         constant = float(((cv-vy)*scale).square().mean().sqrt())
     bundle = {'contract': 'causal_residual_gru_v1', 'state_dict': model.state_dict(),
-              'scale': scale, 'horizon': 3, 'history': 8, 'seed': seed, 'epochs': epochs,
+              'scale': scale, 'horizon': horizon, 'history': 8, 'seed': seed, 'epochs': epochs,
               'fit_offsets': [w['frame_offset'] for w in train_windows[:cut]],
               'validation_offsets': [w['frame_offset'] for w in train_windows[cut:]],
               'validation_rmse_position': learned, 'constant_velocity_rmse_position': constant}

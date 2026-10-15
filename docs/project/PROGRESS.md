@@ -2173,3 +2173,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 2026-10-15：新增只读图尺度witness，发现图输出量纲与输入尺度不匹配、大量tanh近饱和；未改变已启动协议。见joint_feature_scale_review_20261015.md。
 
 2026-10-15：生命周期v3三组各128×3seed全部完成（1152episode），36checkpoint/71308事件/11000费用收据核验通过，9final模型首dev完整事件重放一致。SA reward57.660698、完成6.708333；MAPPO57.375365/6.750000；no-pred57.521120/6.916667。奖励均值第一但优势集中单窗、完成率落后，未达双指标目标/收敛。见joint_partial_control_results_review_20261015.md；formal/holdout仍封存。
+
+2026-10-15：独立scheduled实现已接入目的站当前槽grant/8帧公共预约、动作条件policy-average信用、service-frame图尺度与relative surrogate；恢复PPO/DQN/cache/DAG/DT参数化基线。362项相关回归通过，真实入口smoke核验中，固定128×3seed八主配置及constant-update support待冻结运行。见joint_scheduled_control_contract_20261015.md。

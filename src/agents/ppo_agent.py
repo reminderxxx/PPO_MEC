@@ -605,3 +605,181 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
                 losses.append([float(policy.detach()),float(vf.detach()),float(aux.detach())])
         means=np.mean(losses,0)
         return dict(policy_loss=float(means[0]),value_loss=float(means[1]),surrogate_loss=float(means[2]),samples=len(actions))
+
+
+class ScheduledControlPPO(CoordinatedControlPPO):
+    """Versioned link-calendar, service-scaled, action-conditioned control learner."""
+    checkpoint_contract='scheduled_parameterized_ppo_v1'
+
+    def __init__(self, *, stability_enabled=True, training_budget=128, planning_horizon=8, **kwargs):
+        kwargs.update(partial_preparation_enabled=True,output_aware_cache=True)
+        super().__init__(**kwargs)
+        self.stability_enabled=bool(stability_enabled);self.training_budget=int(training_budget);self.planning_horizon=int(planning_horizon)
+        self.options.update(stability_enabled=stability_enabled,training_budget=training_budget,planning_horizon=planning_horizon)
+        self.action_values=nn.ModuleList([nn.Sequential(nn.Linear(116,64),nn.Tanh(),nn.Linear(64,1)) for _ in range(3)])
+        self.domain_encoder=nn.Sequential(nn.Linear(4,16),nn.Tanh())
+        self.register_buffer('completed_updates',torch.zeros((),dtype=torch.int64))
+        self.register_buffer('surrogate_mse',torch.ones(()))
+        self.optimizer=torch.optim.Adam(self.parameters(),lr=self.options['learning_rate'])
+
+    def _coordinated_features(self,decision,frame,reservations):
+        from src.envs.core.joint_link_reservation import reserved_migration_opportunities,service_scale
+        data,candidates,vid,node,work=super()._coordinated_features(decision,frame,reservations)
+        s=decision['semantic_state'];rates=s['control_cost_parameters'];nodes=s['workflow']['nodes'];lookup={n['node_id']:n for n in nodes}
+        calendar=getattr(self,'_calendar',{r['rsu_id']:[None]*self.planning_horizon for r in s['rsus']})
+        opportunities=reserved_migration_opportunities(s,calendar,prediction_enabled=self.prediction_enabled)
+        # Rebuild forecast fields before applying the v4 opportunity gate (v3 may have cleared them).
+        raw=super(CoordinatedControlPPO,self)._features(decision,frame)[0]
+        data['m2']=raw['m2'].copy()
+        data['own'][11:13]=raw['own'][11:13]
+        for j in range(3):data[f'f{j}'][:,10:12]=raw[f'f{j}'][:,10:12]
+        if self.method!='dt_handoff_drl' and not opportunities:
+            data['own'][11:13]=0
+            for j in range(3):data[f'f{j}'][:,10:12]=0
+        data['own'][12]*=3/self.planning_horizon
+        horizon=s['episode_frames_remaining'];den=max(1.,s['current_node_work_units_required'])
+        data['own'][3]=min(1.,s['current_node_work_units_progress']/den)
+        data['own'][4]=service_scale(s['current_node_work_units_required']/rates['rsu_work_units_per_frame'])
+        data['own'][5]=service_scale(s['execution_state_payload_bytes']/rates['state_bytes_per_frame'])
+        data['critic'][:20]=data['own']
+        if self.method=='ppo':data['critic'][20:]=0  # Local critic, same public actor observations.
+        for k,n in enumerate(nodes):
+            data['graph'][k,0]=service_scale(n['input_size']*rates['profile_unit_bytes']/rates['workload_bytes_per_unit']/rates['rsu_work_units_per_frame'])
+            data['graph'][k,1]=service_scale(n['output_size']*rates['profile_unit_bytes']/rates['output_bytes_per_frame'])
+        for j in range(3):
+            for k,f in enumerate(data[f'f{j}']):
+                rid=(candidates[j][k] if j==0 else candidates[j][k][0]);nid=(candidates[1][k][1] or node) if j==1 else node
+                n=lookup[nid];f[13]=service_scale(n['input_size']*rates['profile_unit_bytes']/rates['input_bytes_per_frame'])
+                f[31]=service_scale(n['output_size']*rates['profile_unit_bytes']/rates['output_bytes_per_frame'])
+                f[30]=np.clip((horizon-work+float(data['prior0'][k])*max(4.,horizon)/4)/max(1.,horizon),-1,1) if j==0 else service_scale(work);op=opportunities.get(rid,{})
+                f[24]=op.get('cache_net_reward_proxy' if j==1 else 'state_net_reward_proxy',0.) if j else op.get('net_reward_proxy',0.)
+                f[25]=op.get('eta_frames',0)/self.planning_horizon
+                f[26]=op.get('prepare_budget_frames',0)/self.planning_horizon
+                if rid in calendar:
+                    grant=calendar[rid][0];available=grant is None or grant[0]==vid
+                    if j==1:data['m1'][k]&=available and (grant is None or grant[1]=='model')
+                    if j==2 and rid is not None:data['m2'][k]&=available and (grant is None or grant[1]=='state') and op.get('prepare_feasible',False)
+            data[f'f{j}'][:,20:22]=np.log1p(np.maximum(0,data[f'f{j}'][:,20:22]*120))/np.log1p(120)
+        data['opportunity_count']=np.asarray(len(opportunities),np.int64)
+        data['domain']=np.array([len(nodes)/32,len(s['workflow']['edges'])/64,service_scale(work),len(s['workflow']['completed_node_ids'])/max(1,len(nodes))],np.float32)
+        if self.method=='dt_handoff_drl':data['domain']=np.array([data['own'][11],data['own'][12],data['f0'][:,10].max(),data['f0'][:,11].mean()],np.float32)
+        self._feature_opportunities=opportunities
+        return data,candidates,vid,node,work
+
+    def _evaluate(self,data,*,actions=None,deterministic=False,return_details=False,target=False):
+        own=data['own'];batch=len(own)
+        latent=self.graph_encoder(data['graph']);latent=self.graph_message(torch.cat((latent,torch.bmm(data['adjacency'],latent)),-1))
+        if self.method=='sa_ghmappo':
+            weight=data['graph_mask'].float().unsqueeze(-1);context=(latent*weight).sum(1)/weight.sum(1).clamp(min=1)
+        elif self.method=='cache_offload_drl':context=self.cache_encoder(data['f0'][:,1:5]).mean(1)
+        elif self.method in ('dt_handoff_drl','dag_offload_drl'):context=self.domain_encoder(data['domain'])
+        else:context=own.new_zeros(batch,16)
+        condition=own.new_zeros(batch,32);execution=None;chosen=[];logs=[];entropies=[];surrogate=[];values=[];active=[];baselines=[];selected_q=[];maxima=[]
+        heads=self.target_heads if target else self.heads
+        for j in range(3):
+            f=data[f'f{j}'];mask=data[f'm{j}'].clone();n=f.shape[1]
+            same=(f[...,16:20]==condition[:,None,16:20]).all(-1)
+            if j==1:
+                eligible=same&(f[...,12]==1)&(f[...,14]==0)&mask
+                cold=(condition[:,0]==1)&~((condition[:,4]==1)&(condition[:,6]==1))&(condition[:,5]==0)&~own[:,9].bool()
+                mask=torch.where((cold&eligible.any(1))[:,None],eligible,mask)
+            if j==2:
+                cache_conflict=(condition[:,0]==1)[:,None]&same
+                exec_conflict=(f[...,16:20]==execution[:,None,16:20]).all(-1)&(execution[:,0]==1)[:,None]
+                mask&=~((cache_conflict|exec_conflict)&(f[...,0]==1))
+            idx=data[f'node{j}'];graph=latent.gather(1,idx.clamp(min=0)[...,None].expand(-1,-1,16))
+            graph=graph*(idx>=0)[...,None] if self.method=='sa_ghmappo' else torch.zeros_like(graph)
+            x=torch.cat((own[:,None].expand(-1,n,-1),context[:,None].expand(-1,n,-1),f,condition[:,None].expand(-1,n,-1),graph),-1)
+            logits=own.new_full((batch,n),-1e9);predictions=own.new_zeros(batch,n,3);q=own.new_zeros(batch,n)
+            valid=x[mask];logits[mask]=heads[j](valid).squeeze(-1)
+            if self.surrogate_enabled:
+                raw=self.surrogates[j](valid.detach());est=torch.cat((raw[:,:1],torch.nn.functional.softplus(raw[:,1:])),1);predictions[mask]=est
+                # Return targets already include physical costs. Centering cancels common return drift;
+                # subtracting the cost estimate again would double-charge an action.
+                center=(predictions[...,0]*mask).sum(1)/mask.sum(1).clamp(min=1)
+                relative=predictions[...,0]-center[:,None]
+                if j:relative=predictions[...,0]-predictions[:,0:1,0]
+                reliability=1/(1+10*self.surrogate_mse.sqrt())
+                logits=logits+.3*reliability*relative.detach().tanh()
+            if j==0:logits=logits+data['prior0']
+            dist=self._choice_distribution(logits,mask,deterministic)
+            action=actions[:,j] if actions is not None else (dist.logits.argmax(-1) if deterministic else dist.sample())
+            if not bool(mask.gather(1,action[:,None]).all()):raise ValueError('action outside stored scheduled behavior mask')
+            q[mask]=self.action_values[j](valid.detach()).squeeze(-1)
+            if self.method=='dqn':q=logits
+            baselines.append((dist.probs.detach()*q).sum(1));selected_q.append(q.gather(1,action[:,None]).squeeze(1));maxima.append(logits.masked_fill(~mask,-1e9).max(1).values)
+            chosen.append(action);logs.append(dist.log_prob(action));entropies.append(dist.entropy()/mask.sum(1).float().log().clamp(min=1))
+            values.append(self.prefix_values[j](torch.cat((data['critic'],condition.detach()),-1)).squeeze(-1));surrogate.append(predictions[torch.arange(batch),action]);active.append(mask.sum(1)>1)
+            condition=f[torch.arange(batch),action]
+            if j==0:execution=condition
+        result=(torch.stack(chosen,1),torch.stack(logs,1),torch.stack(entropies,1),self.critic(data['critic']).squeeze(-1),torch.stack(surrogate,1),torch.stack(values,1),torch.stack(active,1))
+        if return_details:return (*result,torch.stack(baselines,1),torch.stack(selected_q,1),torch.stack(maxima,1))
+        return result
+
+    def _choice_distribution(self,logits,mask,deterministic):
+        return Categorical(logits=logits.masked_fill(~mask,-1e9))
+
+    @torch.no_grad()
+    def act_controls(self,decisions,frame,*,deterministic=False):
+        from dataclasses import replace
+        from copy import deepcopy
+        from src.envs.core.multi_request_target_control_env import JointRequestControl
+        from src.envs.core.joint_link_reservation import public_link_calendar,control_link_claims,book_control
+        from src.envs.core.joint_control_planning import workflow_service_frames
+        ids=sorted(decisions);shift=frame%len(ids);ids=ids[shift:]+ids[:shift]
+        targets={v:old[1] for v,old in self.target_memory.items() if v in decisions}
+        self._calendar=public_link_calendar(decisions,targets,horizon=self.planning_horizon)
+        reservations={v:(old[1],workflow_service_frames(decisions[v]['semantic_state'])) for v,old in self.target_memory.items() if v in decisions and old[1] in decisions[v]['semantic_state']['reachable_execution_rsu_ids']}
+        controls={};rolls=[];diagnostics={};opportunities=0
+        for vid in ids:
+            data,candidates,_,node,work=self._coordinated_features(decisions[vid],frame,reservations)
+            plans=deepcopy(self._feature_opportunities);calendar=deepcopy(self._calendar)
+            batch={k:torch.as_tensor(v).unsqueeze(0) for k,v in data.items()}
+            a,logs,entropy,value,surrogate,prefix,enabled,baseline,q,_=self._evaluate(batch,deterministic=deterministic,return_details=True)
+            target=candidates[0][int(a[0,0])];cache,nid,kind=candidates[1][int(a[0,1])];prepare,priority=candidates[2][int(a[0,2])]
+            control=JointRequestControl(target,cache,nid,kind,prepare,priority=priority)
+            claims=control_link_claims(decisions[vid]['semantic_state'],control,self._calendar)
+            controls[vid]=replace(control,link_reservations=claims);book_control(self._calendar,vid,claims,decisions[vid]['semantic_state'],control)
+            old=self.target_memory.get(vid);since=old[2] if old and old[0]==node and old[1]==target else frame
+            self.target_memory[vid]=(node,target,since);reservations[vid]=(target,work);opportunities+=len(plans)
+            diagnostics[vid]=dict(migration_candidates=plans,reserved_service_frames={rid:sum(w for v,(r,w) in reservations.items() if v!=vid and r==rid) for rid in self._calendar},link_calendar=calendar)
+            rolls.append(dict(data=batch,actions=a,logs=logs.sum(1),head_logs=logs,values=value,prefix_values=prefix,active_heads=enabled,counterfactual_baselines=baseline))
+        count=max(r['data']['m1'].shape[1] for r in rolls);self._pad_cache(rolls,count)
+        result={k:torch.cat([r[k] for r in rolls]) for k in rolls[0] if k!='data'}
+        result['data']={k:torch.cat([r['data'][k] for r in rolls]) for k in rolls[0]['data']};result['vehicle_ids']=ids
+        self.last_diagnostics=dict(migration_opportunities=opportunities,request_order=ids,by_vehicle=diagnostics)
+        return controls,result
+
+    def update(self,rollouts,*,epochs=4):
+        self._pad_cache(rollouts,max(r['data']['m1'].shape[1] for r in rollouts))
+        data={k:torch.cat([r['data'][k] for r in rollouts]) for k in rollouts[0]['data']}
+        actions=torch.cat([r['actions'] for r in rollouts]);old=torch.cat([r['head_logs'] for r in rollouts])
+        targets=torch.cat([r['credit_targets'] for r in rollouts]);team=torch.cat([r['returns'] for r in rollouts]);active=torch.cat([r['active_heads'] for r in rollouts])
+        baseline=torch.cat([r['counterfactual_baselines'] for r in rollouts]);advantages=targets[:,None]-baseline
+        for j in range(3):
+            sample=advantages[active[:,j],j]
+            if len(sample)>1:advantages[:,j]=(advantages[:,j]-sample.mean())/sample.std().clamp(min=1e-6)
+        costs=torch.cat([r['cost_targets'] for r in rollouts]);losses=[];kls=[];clips=[];entropies=[];qerrors=[];stopped=False
+        progress=min(1.,float(self.completed_updates)*4/max(1,self.training_budget-4))
+        lr=self.options['learning_rate']*(1-.9*progress) if self.stability_enabled else self.options['learning_rate']
+        for group in self.optimizer.param_groups:group['lr']=lr
+        for _ in range(epochs):
+            for index in torch.randperm(len(actions)).split(512):
+                batch={k:v[index] for k,v in data.items()}
+                _,logs,entropy,value,surrogate,prefix,enabled,cf,q,_=self._evaluate(batch,actions=actions[index],return_details=True)
+                logratio=logs-old[index];ratio=logratio.exp();weight=enabled.float();den=weight.sum().clamp(min=1)
+                kl=(((ratio-1)-logratio)*weight).sum()/den
+                if self.stability_enabled and float(kl.detach())>.02:stopped=True;break
+                objective=torch.minimum(ratio*advantages[index],ratio.clamp(.8,1.2)*advantages[index])
+                policy=-(objective*weight).sum()/den
+                vf=(prefix-targets[index,None]).square().mean()+(value-team[index]).square().mean()+(q-targets[index,None]).square().mean()
+                expected=torch.cat((targets[index,None],costs[index]),-1)[:,None]
+                aux=(surrogate-expected).square().mean() if self.surrogate_enabled else vf*0
+                loss=policy+.5*vf-.01*(entropy*weight).sum()/den+.2*aux
+                self.optimizer.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(self.parameters(),.5);self.optimizer.step()
+                if self.surrogate_enabled:self.surrogate_mse.mul_(.95).add_(.05*(surrogate[...,0].detach()-targets[index,None]).square().mean())
+                losses.append([float(policy.detach()),float(vf.detach()),float(aux.detach())]);kls.append(float(kl.detach()));clips.append(float((((ratio-1).abs()>.2)*weight).sum().detach()/den));entropies.append(float((entropy*weight).sum().detach()/den));qerrors.append(float((q.detach()-targets[index,None]).square().mean()))
+            if stopped:break
+        self.completed_updates+=1
+        means=np.mean(losses,0) if losses else [0.,0.,0.]
+        return dict(policy_loss=float(means[0]),value_loss=float(means[1]),surrogate_loss=float(means[2]),samples=len(actions),gradient_steps=len(losses),learning_rate=lr,approx_kl=float(np.mean(kls)) if kls else 0.,clip_fraction=float(np.mean(clips)) if clips else 0.,normalized_entropy=float(np.mean(entropies)) if entropies else 0.,q_mse=float(np.mean(qerrors)) if qerrors else 0.,kl_early_stop=int(stopped))

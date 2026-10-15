@@ -4,7 +4,8 @@ from collections import defaultdict,Counter
 import json,sys
 root=Path(__file__).resolve().parents[1];base=root/'artifacts/joint_coordinated_audit_20261015';groups=defaultdict(list)
 experiment=sys.argv[1] if len(sys.argv)>1 else 'joint_coordinated_partial_control_v2'
-suffix='_'+experiment if experiment!='joint_coordinated_control' else ''
+key=experiment.replace('/','_')
+suffix='_'+key if experiment!='joint_coordinated_control' else ''
 for seed in (7,17,27):
  p=next((root/f'artifacts/{experiment}/seed{seed}').glob('*/events.jsonl'))
  for line in p.open():
@@ -32,5 +33,5 @@ for seed in (7,17,27):
    if e['control']['prepare_target'] is not None or (e['control']!=other['control'] and not changes):
     changes.append(dict(frame=e['frame_index'],vehicle_id=e['vehicle_id'],on_control=e['control'],off_control=other['control'],on_status=e['status'],off_status=other['status'],on_state_transfers=e['state_transfers'],off_state_transfers=other['state_transfers']))
   report.append(dict(seed=seed,frame_offset=off,on=metrics(on),off=metrics(disabled),selected_changes=changes))
-(base/f'{experiment}_prediction_effects.json').write_text(json.dumps(dict(scope='fixed-weight combined prediction features/mask intervention; not isolated causal state-action effect',different_event_cells=len(report),rows=report),indent=2)+'\n')
+(base/f'{key}_prediction_effects.json').write_text(json.dumps(dict(scope='fixed-weight combined prediction features/mask intervention; not isolated causal state-action effect',different_event_cells=len(report),rows=report),indent=2)+'\n')
 for r in report:print(r['seed'],r['frame_offset'],r['on'],r['off'])

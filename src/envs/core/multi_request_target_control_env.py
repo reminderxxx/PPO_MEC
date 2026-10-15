@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
+from contextlib import contextmanager
 from math import isfinite
 from typing import Any
 
@@ -22,22 +23,26 @@ class JointRequestControl:
     prepare_target: str | None = None
     evict_object_ids: tuple[str, ...] = ()
     priority: int = 0
+    link_reservations: tuple[tuple[str, str], ...] = ()
 
 
 class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
     action_contract = "joint_parameterized_control_v3"
 
     def __init__(self, *, input_bytes_per_link_frame: int = 1024,
-                 output_bytes_per_link_frame: int = 1024, coordination_intent_enabled: bool = False, **kwargs: Any) -> None:
+                 output_bytes_per_link_frame: int = 1024, coordination_intent_enabled: bool = False, link_reservation_enabled: bool = False, **kwargs: Any) -> None:
         if any(not isfinite(value) or value < 1 or int(value) != value for value in
                (input_bytes_per_link_frame, output_bytes_per_link_frame)):
             raise ValueError("input/output rates must be positive integer bytes")
         if "environment_revision" in kwargs or "strict_cold_cache_mask" in kwargs:
             raise ValueError("target control uses its own v3 contract")
         self.coordination_intent_enabled = bool(coordination_intent_enabled)
+        self.link_reservation_enabled = bool(link_reservation_enabled)
         self.input_bytes_per_link_frame = int(input_bytes_per_link_frame)
         self.output_bytes_per_link_frame = int(output_bytes_per_link_frame)
         super().__init__(environment_revision="v2", **kwargs)
+        if self.link_reservation_enabled and self.costs.link_slots_per_rsu!=1:
+            raise ValueError("scheduled link contract currently requires one slot per RSU")
         self.environment_revision = "v3"
         self.observation_contract = "joint_request_observation_v3"
 
@@ -65,6 +70,8 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
                          input_received_targets=sorted(target for owner, node, target in self.input_received
                                                        if owner == vid and node == self.workflows[vid].current_node_id),
                          output_pending=dict(self.output_pending.get(vid, {})))
+            if self.link_reservation_enabled:
+                state['input_remaining_bytes_by_rsu']={target:amount for (owner,node,target),amount in self.input_remaining.items() if owner==vid and node==self.workflows[vid].current_node_id}
             state['episode_frames_remaining']=len(self.frames)-self.frame_index
             state['control_cost_parameters'] = dict(rsu_work_units_per_frame=self.rsu_work_units_per_frame,
                 profile_unit_bytes=self.workflow_profile_unit_bytes,workload_bytes_per_unit=self.workload_bytes_per_unit,
@@ -93,6 +100,12 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
                 raise ValueError("controls must be JointRequestControl objects")
             if type(control.priority) is not int or control.priority not in range(4):
                 raise ValueError("priority must be an integer in 0..3")
+            if control.link_reservations and not self.link_reservation_enabled:
+                raise ValueError("link reservations require scheduled environment")
+            if len({rid for rid,kind in control.link_reservations})!=len(control.link_reservations):
+                raise ValueError("one reservation per request and destination")
+            if any(rid not in rsus or kind not in {'model','input','output','state'} for rid,kind in control.link_reservations):
+                raise ValueError("invalid link reservation")
             space = decisions[vid]["control_space"]
             if control.execution_target == "vehicle":
                 if not space["vehicle_execution_available"]:
@@ -204,6 +217,19 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         return {"status": "node_completed" if completed else "output_transfer",
                 "bytes": moved, "link_frames": 1, "completed": completed}
 
+    @contextmanager
+    def _link_scope(self, vid, kind, link_left):
+        blocked={rid:link_left[rid] for rid,grant in getattr(self,'_link_grants',{}).items() if grant!=(vid,kind)}
+        for rid in blocked:link_left[rid]=0
+        try:yield
+        finally:
+            for rid,amount in blocked.items():link_left[rid]=amount
+
+    def _control_record(self, control):
+        record=asdict(control)
+        if not self.link_reservation_enabled:record.pop('link_reservations')
+        return record
+
     def step_controls(self, controls: dict[str, JointRequestControl]) -> tuple[dict, float, bool, dict]:
         if self.frame_index >= len(self.frames) or all(w.is_completed for w in self.workflows.values()):
             raise RuntimeError("episode ended")
@@ -216,6 +242,16 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
             intents = [{'vehicle_id':vid,'execution_target':control.execution_target,
                         'service_frames':workflow_service_frames(decisions[vid]['semantic_state'])}
                        for vid,control in controls.items()]
+            if self.link_reservation_enabled:
+                for intent in intents:
+                    state=decisions[intent['vehicle_id']]['semantic_state']
+                    from src.envs.core.joint_link_reservation import execution_link_need
+                    intent.update(link_need=execution_link_need(state,controls[intent['vehicle_id']].execution_target),
+                                  output_release_service_frames=state['current_node_service_steps_remaining'],
+                                  node_output_bytes=state['current_workflow_node']['output_size']*self.workflow_profile_unit_bytes,link_reservations=controls[intent['vehicle_id']].link_reservations,
+                                  output_pending=state['output_pending'],input_received_targets=state['input_received_targets'],
+                                  input_remaining_bytes_by_rsu=state.get('input_remaining_bytes_by_rsu',{}),
+                                  state_payload_bytes=state['execution_state_payload_bytes'],state_version=state['execution_state_version'])
             intent_bytes = len(json.dumps({'frame':self.frame_index,'intents':intents},sort_keys=True,separators=(',',':')).encode())
         occupied = self.model_cache.begin_frame()
         link_left = {r.rsu_id: self.costs.link_slots_per_rsu - occupied[r.rsu_id] for r in self.rsus}
@@ -226,6 +262,11 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         shift = self.frame_index % len(ids)
         tie_order = ids[shift:] + ids[:shift]
         order = sorted(tie_order, key=lambda vid: -controls[vid].priority)
+        self._link_grants={}
+        if self.link_reservation_enabled:
+            for owner in order:
+                for rid,kind in controls[owner].link_reservations:
+                    self._link_grants.setdefault(rid,(owner,kind))
         events, completed_now = [], 0
         for vid in order:
             control = controls[vid]
@@ -241,22 +282,26 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
             cache = {"status": "none", "link_slots_consumed": 0, "evicted_object_ids": []}
             if control.cache_node_id is not None:
                 cache_node = next(n for n in self.workflows[vid].nodes if n.node_id == control.cache_node_id)
-                if control.cache_kind == "base_model":
-                    cache = self.model_cache.request_base_model(control.cache_target,
-                        cache_node.required_base_model, available_link_slots=link_left[control.cache_target])
-                else:
-                    cache = self.model_cache.request_adapter(control.cache_target, cache_node.required_adapter,
-                        cache_node.required_base_model, available_link_slots=link_left[control.cache_target])
-                link_left[control.cache_target] -= cache["link_slots_consumed"]
+                with self._link_scope(vid,"model",link_left):
+                    if control.cache_kind == "base_model":
+                        cache = self.model_cache.request_base_model(control.cache_target,
+                            cache_node.required_base_model, available_link_slots=link_left[control.cache_target])
+                    else:
+                        cache = self.model_cache.request_adapter(control.cache_target, cache_node.required_adapter,
+                            cache_node.required_base_model, available_link_slots=link_left[control.cache_target])
+                    link_left[control.cache_target] -= cache["link_slots_consumed"]
             transfers = []
             if control.prepare_target is not None:
-                transfers.append(self._transfer_state_v2(vid, control.prepare_target, link_left))
+                with self._link_scope(vid,"state",link_left):
+                    transfers.append(self._transfer_state_v2(vid, control.prepare_target, link_left))
             input_result = {"bytes": 0, "link_frames": 0}
             output_result = {"bytes": 0, "link_frames": 0, "completed": False}
             output_source = None
             completed, status = False, "waiting"
             if vid in self.output_pending:
-                output_result = self._output(vid, state["reachable_execution_rsu_ids"], link_left, target)
+                phase="state" if target in state['reachable_execution_rsu_ids'] and target!=self.output_pending[vid]['rsu_id'] and not self._state_ready(vid,target) else "output"
+                with self._link_scope(vid,phase,link_left):
+                    output_result = self._output(vid, state["reachable_execution_rsu_ids"], link_left, target)
                 output_source = self.output_pending.get(vid, {}).get("rsu_id", self.execution_location[vid])
                 if "state_transfer" in output_result:
                     transfers.append(output_result["state_transfer"])
@@ -269,9 +314,10 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
                     if association is None:
                         status = "state_unavailable_no_coverage"
                     else:
-                        local_link = {location: link_left[association]}
-                        transfer = self._transfer_state_v2(vid, location, local_link)
-                        link_left[association] = local_link[location]
+                        with self._link_scope(vid,"state",link_left):
+                            local_link = {location: link_left[association]}
+                            transfer = self._transfer_state_v2(vid, location, local_link)
+                            link_left[association] = local_link[location]
                         transfers.append(transfer)
                         status = "state_restore" if transfer["link_frames"] else "state_link_queue"
                 else:
@@ -279,13 +325,15 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
                     status = "vehicle_fallback_completed" if completed else "vehicle_compute"
             elif target is not None:
                 if not self._state_ready(vid, target):
-                    transfer = self._transfer_state_v2(vid, target, link_left)
+                    with self._link_scope(vid,"state",link_left):
+                        transfer = self._transfer_state_v2(vid, target, link_left)
                     transfers.append(transfer)
                     status = "state_restore" if transfer["link_frames"] else "state_link_queue"
                 elif not self.model_cache.is_ready(target, node.required_adapter, node.required_base_model):
                     status = "adapter_not_ready"
                 elif (vid, node.node_id, target) not in self.input_received:
-                    input_result = self._input(vid, node, target, link_left)
+                    with self._link_scope(vid,"input",link_left):
+                        input_result = self._input(vid, node, target, link_left)
                     status = input_result["status"]
                 elif compute_left[target] < 1:
                     status = "compute_queue"
@@ -300,7 +348,7 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
                 "vehicle_id": vid, "request_id": f"{vid}/{self.workflows[vid].workflow_id}",
                 "workflow_id": self.workflows[vid].workflow_id, "node_id": node.node_id,
                 "associated_rsu_id": association, "target_rsu_id": target,
-                "control": asdict(control), "cache_target_rsu_id": control.cache_target,
+                "control": self._control_record(control), "cache_target_rsu_id": control.cache_target,
                 "cache_action_status": cache["status"], "cache_request": cache,
                 "explicit_evicted_object_ids": list(control.evict_object_ids),
                 "state_action_status": transfers[-1]["status"] if transfers else "none",
@@ -319,6 +367,9 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
                 "environment_revision": "v3",
             })
             self.previous_service_targets[vid] = target
+        if self.link_reservation_enabled:
+            for event in events:
+                event['link_reservation_grants']={rid:dict(vehicle_id=owner,kind=kind,background_occupied=occupied[rid]) for rid,(owner,kind) in self._link_grants.items()}
         cache_events = self.model_cache.advance()
         link_usage = {target: self.costs.link_slots_per_rsu - left for target, left in link_left.items()}
         if any(not 0 <= used <= self.costs.link_slots_per_rsu for used in link_usage.values()):

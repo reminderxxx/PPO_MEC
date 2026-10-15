@@ -247,3 +247,5 @@
 - joint_feature_scale_review_20261015.md：首dev图表示尺度及激活饱和独立诊断，尚未做因果修复实验。
 
 - joint_partial_control_results_review_20261015.md：生命周期v3三组同预算最终结果、全部原始账本/9模型重放、预测局部贡献和剩余缺口。
+
+- joint_scheduled_control_contract_20261015.md：8帧预测/链路预约、动作信用及尺度修复，恢复七算法和去预测主比较、后期稳定性对照的事前合同。

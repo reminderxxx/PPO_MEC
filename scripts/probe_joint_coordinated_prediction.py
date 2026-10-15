@@ -17,8 +17,9 @@ def main():
  destination=ROOT/'artifacts/joint_coordinated_audit_20261015'
  experiment=sys.argv[1] if len(sys.argv)>1 else 'joint_coordinated_control'
  partial=experiment!='joint_coordinated_control'
- suffix='_'+experiment if partial else ''
- plan_path=destination/(f'support_plan_{experiment}.json' if partial else 'support_plan.json')
+ key=experiment.replace('/','_')
+ suffix='_'+key if partial else ''
+ plan_path=destination/(f'support_plan_{key}.json' if partial else 'support_plan.json')
  plan=json.loads(plan_path.read_text())
  source=json.loads((ROOT/'artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/20261014T074430Z_development/manifest.json').read_text())
  splits,workflows,rsus=_load_protocol(arguments(source['command'][1:]));rows=[]
@@ -32,7 +33,7 @@ def main():
    assert m['git_commit'].startswith(plan['source_commit']) and plan['seeds']==[7,17,27]
    path=directory/f'sa_ghmappo_seed{seed}_ep128.pt';saved=torch.load(path,weights_only=False)
    checkpoint_hash=_hash_file(path)
-   cls=type(build_agent('sa_ghmappo',control_contract=m['action_contract'],coordinated_controls=True,**{k:v for k,v in saved['options'].items() if k!='method'}))
+   cls=type(build_agent('sa_ghmappo',control_contract=m['action_contract'],coordinated_controls=True,scheduled_controls=m.get('scheduled_controls',False),**{k:v for k,v in saved['options'].items() if k!='method'}))
    agent=cls.from_checkpoint(path);agent.prediction_enabled=False
    trained_hash=hashlib.sha256(b''.join(v.numpy().tobytes() for v in agent.state_dict().values())).hexdigest()
    provider=LearnedMobilityPredictor(torch.load(directory/'predictor.pt',weights_only=False))

@@ -20,14 +20,24 @@ def identity(r):return r['agent'],r['seed'],r['episode'],r['frame_offset']
 def main():
  torch.set_num_threads(1)
  experiment = sys.argv[1] if len(sys.argv)>1 else 'joint_coordinated_control'
- candidates=[list((ROOT/f'artifacts/{experiment}/seed{s}').glob('*/manifest.json')) for s in (7,17,27)]
- assert all(len(paths)==1 for paths in candidates), 'exactly one prespecified run per seed required'
+ plan_path=ROOT/f'artifacts/{experiment}/comparison_plan.json'
+ plan=json.loads(plan_path.read_text()) if plan_path.exists() else None
+ locations=[(ROOT/f'artifacts/{experiment}'/group/f'seed{seed}',names,seed) for group,names in plan['groups'].items() for seed in plan['seeds']] if plan else [(ROOT/f'artifacts/{experiment}/seed{seed}',None,seed) for seed in (7,17,27)]
+ candidates=[list(location.glob('*/manifest.json')) for location,names,seed in locations]
+ assert all(len(paths)==1 for paths in candidates), 'exactly one prespecified run per seed and group required'
  manifests=[paths[0] for paths in candidates]
  sources=[json.loads(p.read_text()) for p in manifests]
  assert not any((p.parent/'run_abort.json').exists() for p in manifests), 'aborted pilot is not a complete comparison'
  assert all(s['status']=='complete' and not s['git_dirty'] and s.get('coordinated_controls') for s in sources)
  assert len({s['git_commit'] for s in sources})==1
- for k in ('source_manifest_sha256','raw_data_sha256','splits','training','environment_options','costs','agents','predictor'):
+ if plan:
+  assert all(source['agents']==names and source['seeds']==[seed] and source.get('scheduled_controls') for source,(_,names,seed) in zip(sources,locations))
+  assert all(source['git_commit'].startswith(plan['source_commit']) for source in sources)
+  assert all(source['training']['episodes']==plan['episodes'] for source in sources)
+ if not plan:assert all(source['agents']==sources[0]['agents'] for source in sources)
+ all_agents=[name for names in plan['groups'].values() for name in names] if plan else sources[0]['agents']
+ assert len(all_agents)==len(set(all_agents))
+ for k in ('source_manifest_sha256','raw_data_sha256','splits','training','environment_options','costs','predictor'):
   assert all(s[k]==sources[0][k] for s in sources),k
  all_windows=sources[0]['splits']['train']+sources[0]['splits']['dev']
  for i,a in enumerate(all_windows):
@@ -45,6 +55,12 @@ def main():
   assert set(bundle['fit_offsets'])|set(bundle['validation_offsets'])==train_offsets
   assert not set(bundle['fit_offsets'])&set(bundle['validation_offsets'])
   training=read(directory/'training.jsonl');dev=read(directory/'dev.jsonl')
+  if s.get('scheduled_controls'):
+   probes=read(directory/'train_probe.jsonl');representations=read(directory/'representation_diagnostics.jsonl')
+   assert len(probes)==4*len(s['agents'])*(budget//s['training']['eval_every'])
+   assert len(representations)==len(s['agents'])*(budget//s['training']['eval_every'])
+   assert {r['frame_offset'] for r in probes}=={s['splits']['train'][i]['frame_offset'] for i in (0,5,10,15)}
+   assert all(0<=r['first_dev_initial_graph_tanh_saturation']<=1 for r in representations)
   assert len(training)==budget*len(s['agents'])
   assert len(dev)==8+8*len(s['agents'])*(budget//s['training']['eval_every'])
   for name in s['agents']:
@@ -104,6 +120,20 @@ def main():
       assert chosen['net_reward_proxy']>0 and chosen['prepare_feasible']
       assert chosen.get('prepare_budget_frames',chosen['prepare_frames'])+chosen['model_prefetch_frames']<=chosen['eta_frames']
       if 'state_net_reward_proxy' in chosen:assert chosen['state_net_reward_proxy']>0
+   if s.get('scheduled_controls'):
+    for e in group:
+     grants=e['link_reservation_grants'];vid=e['vehicle_id'];control=e['control']
+     for target,kind in control['link_reservations']:
+      assert target in grants
+     for transfer in e['state_transfers']:
+      if transfer['link_frames'] and transfer['target'] in grants:
+       assert grants[transfer['target']]['vehicle_id']==vid and grants[transfer['target']]['kind']=='state'
+     if e['cache_request']['link_slots_consumed'] and control['cache_target'] in grants:
+      grant=grants[control['cache_target']];assert grant['vehicle_id']==vid and grant['kind']=='model'
+     if e['output_transfer_link_frames'] and e['output_source_rsu_id'] in grants:
+      grant=grants[e['output_source_rsu_id']];assert grant['vehicle_id']==vid and grant['kind']=='output'
+     if e['input_transfer_link_frames'] and e['target_rsu_id'] in grants:
+      grant=grants[e['target_rsu_id']];assert grant['vehicle_id']==vid and grant['kind']=='input'
    assert dict(mechanisms)==r['mechanisms']
    traces[key]=hashlib.sha256(json.dumps(group,sort_keys=True).encode()).hexdigest()
    audit_counts['events']+=len(group);audit_counts['receipts']+=len(receipts)
@@ -117,7 +147,7 @@ def main():
  summary={};curves={};paired={}
  metrics=['reward','completed_requests','completed_nodes','steps','cache_fetch_count','state_transfer_link_frames',
           'model_transfer_link_frames','association_handoff_count','prepared_on_arrival_count','handoff_failed_count','service_target_change_count']
- for name in ['reachable_balanced_reactive',*sources[0]['agents']]:
+ for name in ['reachable_balanced_reactive',*all_agents]:
   group=[r for r in final if r['agent']==name]
   summary[name]={k:float(np.mean([r[k] for r in group])) for k in metrics}
   summary[name]['mechanisms']={k:float(np.mean([r['mechanisms'][k] for r in group])) for k in group[0]['mechanisms']}
@@ -127,7 +157,7 @@ def main():
       completed=float(np.mean([r['completed_requests'] for r in rows if r['agent']==name and r['episode']==ep])))
       for ep in sorted({r['episode'] for r in rows if r['agent']==name})}
  sa={(r['seed'],r['frame_offset']):r for r in final if r['agent']=='sa_ghmappo'}
- for name in sources[0]['agents']:
+ for name in all_agents:
   if name=='sa_ghmappo':continue
   other={(r['seed'],r['frame_offset']):r for r in final if r['agent']==name}
   differences=[sa[k]['reward']-other[k]['reward'] for k in sa]
@@ -169,7 +199,7 @@ def main():
   for c in s['checkpoints']:
    if c['episode']!=budget:continue
    saved=torch.load(path.parent/c['path'],weights_only=False)
-   agent=build_agent(saved['options']['method'],control_contract=s['action_contract'],coordinated_controls=True,**{k:v for k,v in saved['options'].items() if k!='method'})
+   agent=build_agent(saved['options']['method'],control_contract=s['action_contract'],coordinated_controls=True,scheduled_controls=s.get('scheduled_controls',False),**{k:v for k,v in saved['options'].items() if k!='method'})
    agent=type(agent).from_checkpoint(path.parent/c['path'])
    env=MultiRequestTargetControlEnv(frames=window['frames'],vehicle_workflows=dict(zip(window['vehicle_ids'],workflows)),
       rsu_states=rsus,costs=ReplayCosts(**s['costs']['replay_costs']),prediction_provider=provider,**s['environment_options'])
@@ -185,6 +215,7 @@ def main():
       errors.append((prediction-actual[:,None]).reshape(-1,3))
     error=torch.cat(errors)*10
     surrogate_diagnostics=dict(return_rmse_reward_units=float(error[:,0].square().mean().sqrt()),cache_mae_initial_link_slots=float(error[:,1].abs().mean()),state_mae_link_slots=float(error[:,2].abs().mean()))
+   if surrogate_diagnostics and s.get('scheduled_controls'):surrogate_diagnostics['cache_mae_declared_admission_link_frames']=surrogate_diagnostics.pop('cache_mae_initial_link_slots')
    key=(c['agent'],c['seed'],budget,window['frame_offset']);close(row['reward'],next(r['reward'] for r in final if identity(r)==key))
    original=[]
    with (path.parent/'events.jsonl').open() as f:
@@ -200,7 +231,8 @@ def main():
     physical_attribution=physical,service_concentrations=concentrations,checkpoint_count=len(checkpoint_hashes),unique_tensor_count=unique_tensor_count,counts=dict(audit_counts),summary=summary,curves=curves,paired=paired,reproductions=reproduction,
     statistical_scope='descriptive paired development comparison; 3 seeds, 8 adjacent intervals sharing same source/vehicles; no independence or significance claim',
     literature_novelty='not assessed in this engineering round',paper_claim_ready=False)
- destination=ROOT/'artifacts/joint_coordinated_audit_20261015'/f'{experiment}_audit.json'
+ if plan:report.update(comparison_plan_sha256=_hash_file(plan_path),configurations=all_agents)
+ destination=ROOT/'artifacts/joint_coordinated_audit_20261015'/f'{experiment.replace("/","_")}_audit.json'
  destination.write_text(json.dumps(report,indent=2)+'\n')
  print(json.dumps({'audit':str(destination),'summary':summary,'paired':paired},indent=2))
 def audit_events(group,window,rsus):

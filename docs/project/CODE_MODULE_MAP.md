@@ -806,3 +806,5 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 2026-10-15：`scripts/audit_joint_prediction_effects.py <experiment>`分解固定权重预测开关的24单元原始费用、完成帧及prepare事件；不是单动作因果归因，不训练、不选模型。probe允许其他比较方法仍训练，但要求full最终128全部8dev已写入、计划Git/seed匹配、checkpoint不变。
 
 2026-10-15：scripts/audit_joint_feature_scale.py只读最终full首dev初始已知DAG图尺度/encoder激活，不拟合归一化、不调用策略更新。
+
+2026-10-15：joint_link_reservation.py负责公共需求calendar、保守net与actual control claims；MultiRequestTargetControlEnv opt-in裁决owner/kind当前grant；ScheduledControlPPO在ppo_agent.py提供共同条件分布、动作Q baseline、尺度、稳定更新；各算法根文件提供明确Scheduled类，dqn_agent.py独立Bellman/replay/target loss。registry的scheduled_controls分支直接导入，不修改legacy注册身份。audit/probe消费scheduled options并支持分part计划和嵌套目录。

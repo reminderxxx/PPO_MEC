@@ -4,6 +4,7 @@ import argparse
 from collections import Counter
 from datetime import datetime, timezone
 import hashlib
+from math import ceil
 import json
 from pathlib import Path
 import random
@@ -36,6 +37,7 @@ def episode(env, agent=None, *, deterministic=False, event_file=None, identity=N
                 d['semantic_state']['current_workflow_node']['node_id'] if targets[vid] else None) for vid,d in states.items()}
         else:
             controls, rollout = agent.act_controls(states, env.frame_index, deterministic=deterministic)
+            rollout['initial_request_count']=initial_request_count
             rolls.append(rollout)
         _, value, done, info = env.step_controls(controls)
         assert abs(value-sum(info['events'][0]['frame_cost_receipt']['reward_components'].values())) < 1e-10
@@ -46,8 +48,9 @@ def episode(env, agent=None, *, deterministic=False, event_file=None, identity=N
             if hasattr(agent,'credit_mode'):
                 rollout['request_rewards'] = receipt['request_rewards']
                 mechanisms['migration_opportunities'] += agent.last_diagnostics['migration_opportunities']
+            scheduled=getattr(agent,'checkpoint_contract','').startswith('scheduled_')
             rollout['cost_targets'] = torch.tensor([[
-                by_vehicle[vid]['cache_request']['link_slots_consumed']/10,
+                (sum(ceil(env.model_cache.objects[key].transfer_size_bytes/env.model_cache.transfer_bytes_per_frame) for key in by_vehicle[vid]['cache_request'].get('admitted_object_ids',[])) if scheduled else by_vehicle[vid]['cache_request']['link_slots_consumed'])/10,
                 by_vehicle[vid]['state_transfer_link_frames']/10] for vid in rollout['vehicle_ids']], dtype=torch.float32)
         for e in info['events']:
             control = e['control']
@@ -90,14 +93,17 @@ def main():
     p.add_argument('--productive_controls',action='store_true')
     p.add_argument('--coordinated_controls',action='store_true')
     p.add_argument('--partial_preparation',action='store_true')
+    p.add_argument('--scheduled_controls',action='store_true')
     a = p.parse_args()
     if a.episodes < 4 or a.episodes % 4 or a.episodes % a.eval_every:
         raise ValueError('budget must be a positive multiple of update=4 and eval_every')
+    if a.scheduled_controls:a.partial_preparation=a.coordinated_controls=True
     if a.partial_preparation and not a.coordinated_controls:
         raise ValueError('--partial_preparation requires --coordinated_controls')
     if a.coordinated_controls:
         a.productive_controls=True
     allowed = {'sa_ghmappo','mappo','cache_offload_drl','sa_no_surrogate','sa_no_prediction','sa_no_coordination','sa_team_credit','sa_ungated_prediction'}
+    if a.scheduled_controls:allowed.update({'ppo','dqn','dag_offload_drl','dt_handoff_drl','sa_constant_update'})
     if not a.coordinated_controls and set(a.agents)&{'sa_no_coordination','sa_team_credit','sa_ungated_prediction'}:
         raise ValueError('coordinated ablations require --coordinated_controls')
     if not set(a.agents) <= allowed:
@@ -121,12 +127,13 @@ def main():
         options['service_load_sharing'] = True
     if a.coordinated_controls:
         options['coordination_intent_enabled'] = True
+    if a.scheduled_controls:options['link_reservation_enabled']=True
     run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ_development')
     output = a.output_root/run_id; output.mkdir(parents=True,exist_ok=False)
     metadata = dict(run_id=run_id,status='running',command=sys.argv,
         git_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         git_dirty=bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),
-        protocol='joint_parameterized_ppo_coordinated_partial_v3' if a.partial_preparation else ('joint_parameterized_ppo_coordinated_v1' if a.coordinated_controls else ('joint_parameterized_ppo_productive_v2' if a.productive_controls else 'joint_parameterized_ppo_development_v1')),output_aware_cache=a.partial_preparation,partial_preparation=a.partial_preparation,coordinated_controls=a.coordinated_controls,productive_controls=a.productive_controls,action_contract='joint_parameterized_control_v3',
+        scheduled_controls=a.scheduled_controls,protocol='joint_parameterized_scheduled_v1' if a.scheduled_controls else 'joint_parameterized_ppo_coordinated_partial_v3' if a.partial_preparation else ('joint_parameterized_ppo_coordinated_v1' if a.coordinated_controls else ('joint_parameterized_ppo_productive_v2' if a.productive_controls else 'joint_parameterized_ppo_development_v1')),output_aware_cache=a.partial_preparation,partial_preparation=a.partial_preparation,coordinated_controls=a.coordinated_controls,productive_controls=a.productive_controls,action_contract='joint_parameterized_control_v3',
         observation_contract='joint_request_observation_v3',development_only=True,paper_claim_ready=False,
         holdout_status='sealed_not_evaluated',source_manifest_sha256=_hash_file(a.source_manifest),
         raw_data_sha256=source['raw_data_sha256'],splits={k:source['splits'][k] for k in ('train','dev')},
@@ -143,9 +150,15 @@ def main():
             credit='half_local_ledger_half_team_per_initial_request',coordination='rotating_request_order_charged_intent_reservations',
             queue_prior='negative_reserved_service_plus_state_model_cost_over_remaining_horizon_per_rsu',
             migration_gate='partial_prefix_and_model_only_net_proxy_v2' if a.partial_preparation else 'forecast_execution_coverage_loss_positive_net_reward_proxy')
+    if a.scheduled_controls:
+        from src.agents.registry import ALGO_REGISTRY
+        supported={'sa_ghmappo','mappo','ppo','dqn','cache_offload_drl','dag_offload_drl','dt_handoff_drl'}
+        metadata['baseline_contract_inventory']={name:dict(scheduled_supported=name in supported,legacy_action_contract=spec['action_contract'],reason='parameterized implementation included' if name in supported else 'legacy action/checkpoint contract; not silently substituted') for name,spec in ALGO_REGISTRY.items()}
+        metadata['training'].update(actor_objective='conditional_head_ppo_action_conditioned_policy_average_baseline',credit='half_local_half_team_mc_with_action_conditioned_baselines',link_calendar='eight_frame_public_io_model_state_intents_current_environment_grants',feature_scale='declared_service_frames_log1p_over_log121',stability='linear_lr_3e-4_to_3e-5_and_kl_limit_0.02; sa_constant_update_disables_both',entropy='per_head_divided_by_log_legal_candidate_count',train_probe_indices=[0,5,10,15],prediction_horizon=8,dqn='three_stage_bellman_replay4096_batch128_32_steps_per4episodes_target_sync2updates_epsilon0.3_to0.05; no_PPO_loss')
+        metadata['limitations'].append('action-conditioned policy-average baseline is learned from on-policy returns, not an exact causal Q oracle; 3-frame future link reservations are estimates; existing model transfers nonpreemptive')
     manifest = output/'manifest.json'
     manifest.write_text(json.dumps(metadata,indent=2)+'\n')
-    bundle = fit_predictor(splits['train'])
+    bundle = fit_predictor(splits['train'],**(dict(horizon=8) if a.scheduled_controls else {}))
     torch.save(bundle,output/'predictor.pt')
     metadata['predictor'] = {k:v for k,v in bundle.items() if k!='state_dict'}
     metadata['predictor']['sha256'] = _hash_file(output/'predictor.pt')
@@ -171,7 +184,8 @@ def main():
                     surrogate_enabled=name!='sa_no_surrogate',prediction_enabled=name!='sa_no_prediction',productive_controls=a.productive_controls,
                     **(dict(coordinated_controls=True,coordination_enabled=name!='sa_no_coordination',
                             credit_mode='team' if name=='sa_team_credit' else 'request_team_blend',partial_preparation_enabled=a.partial_preparation,output_aware_cache=a.partial_preparation,
-                            migration_gate_enabled=name!='sa_ungated_prediction') if a.coordinated_controls else {}))
+                            migration_gate_enabled=name!='sa_ungated_prediction',
+                            **(dict(scheduled_controls=True,stability_enabled=name!='sa_constant_update',training_budget=a.episodes) if a.scheduled_controls else {})) if a.coordinated_controls else {}))
                 initial_hash = hashlib.sha256(b''.join(v.detach().numpy().tobytes() for v in agent.state_dict().values())).hexdigest()
                 rollout_buffer = []
                 for ep in range(1,a.episodes+1):
@@ -196,6 +210,18 @@ def main():
                             row,_ = episode(make_env(w),evaluated,deterministic=True,
                                 event_file=events if ep==a.episodes else None,identity=identity)
                             record={**identity,**row}; dev.write(json.dumps(record)+'\n'); results.append(record)
+                        if a.scheduled_controls:
+                            with (output/'train_probe.jsonl').open('a') as probe:
+                                for i in (0,5,10,15):
+                                    w=splits['train'][i];row,_=episode(make_env(w),evaluated,deterministic=True)
+                                    probe.write(json.dumps(dict(agent=name,seed=seed,episode=ep,frame_offset=w['frame_offset'],reward=row['reward'],completed_requests=row['completed_requests']))+'\n')
+                            env=make_env(splits['dev'][0]);graphs=[]
+                            for decision in env.decision_states().values():
+                                data,*_=evaluated._coordinated_features(decision,0,{})
+                                graphs.append(torch.as_tensor(data['graph'])[torch.as_tensor(data['graph_mask'])])
+                            with torch.no_grad():fraction=float((evaluated.graph_encoder(torch.cat(graphs)).abs()>.99).float().mean())
+                            with (output/'representation_diagnostics.jsonl').open('a') as representation:
+                                representation.write(json.dumps(dict(agent=name,seed=seed,episode=ep,first_dev_initial_graph_tanh_saturation=fraction))+'\n')
                         torch.set_rng_state(rng); dev.flush(); events.flush()
                         final = [r for r in results if r['agent']==name and r['seed']==seed and r['episode']==ep]
                         print(json.dumps(dict(agent=name,seed=seed,episode=ep,reward=np.mean([r['reward'] for r in final]),
