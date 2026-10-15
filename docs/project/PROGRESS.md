@@ -2161,3 +2161,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 ## 2026-10-15 协同/机会触发/信用实现阶段
 
 已增加同轮意图预约与费用账本、候选DAG节点表示、覆盖失效/时限/净收益迁移条件及prefix信用；原GRU保留，338项相关测试通过。七配置各128×3seed计划冻结，实际主结果待回收，formal/holdout不执行；见 `joint_coordinated_control_contract_20261015.md`。
+
+2026-10-15：严格阶段SA/MAPPO最终组已回收、其他配置继续。覆盖影子审查显示门控对partial copy过严，独立修复已增加ETA前部分推进、cache/state分开估值与inflight-aware选站，343项回归通过；另按128×3seed重训主三组，见 `joint_partial_preparation_contract_20261015.md`。结果待回收。

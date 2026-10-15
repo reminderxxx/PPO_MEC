@@ -1745,3 +1745,7 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 ## 协同控制同预算开发验证（2026-10-15）
 
 使用项目解释器运行 `scripts/train_joint_parameterized_control.py --source_manifest artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/20261014T074430Z_development/manifest.json --coordinated_controls --agents sa_ghmappo mappo cache_offload_drl sa_no_prediction sa_no_coordination sa_team_credit sa_ungated_prediction --episodes 128 --eval_every 32 --seeds 7 --output_root artifacts/joint_coordinated_control/seed7`，seed17/27使用各自目录。主结果固定最终128，GRU训练预算不变，新增意图费按收据核验；formal/holdout不运行。
+
+## 部分准备独立修复阶段
+
+同协同入口增加 `--partial_preparation --agents sa_ghmappo mappo sa_no_prediction`，各seed仍128episode/每32评估，输出 `artifacts/joint_coordinated_partial_control/seed<seed>/`。需要同时有 `--coordinated_controls`；旧flag默认false，不覆盖旧产物。协议见 `joint_partial_preparation_contract_20261015.md`。

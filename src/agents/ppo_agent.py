@@ -396,14 +396,15 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
     """Request-autoregressive control with charged intent reservations and prefix credit."""
     checkpoint_contract = 'coordinated_parameterized_ppo_v1'
 
-    def __init__(self, *, credit_mode='request_team_blend', migration_gate_enabled=True, coordination_enabled=True, **kwargs):
+    def __init__(self, *, credit_mode='request_team_blend', migration_gate_enabled=True, coordination_enabled=True, partial_preparation_enabled=False, **kwargs):
         kwargs.pop('productive_controls',None)
         super().__init__(productive_controls=True, **kwargs)
         if credit_mode not in ('request_team_blend','team'):
             raise ValueError('unknown coordinated credit mode')
         self.credit_mode, self.migration_gate_enabled = credit_mode, bool(migration_gate_enabled)
         self.coordination_enabled = bool(coordination_enabled)
-        self.options.update(credit_mode=credit_mode,migration_gate_enabled=migration_gate_enabled,coordination_enabled=coordination_enabled)
+        self.partial_preparation_enabled = bool(partial_preparation_enabled)
+        self.options.update(credit_mode=credit_mode,migration_gate_enabled=migration_gate_enabled,coordination_enabled=coordination_enabled,partial_preparation_enabled=partial_preparation_enabled)
         width = 20+16+32+32+16
         self.heads = nn.ModuleList([nn.Sequential(nn.Linear(width,64),nn.Tanh(),nn.Linear(64,1)) for _ in range(3)])
         self.surrogates = nn.ModuleList([nn.Sequential(nn.Linear(width,32),nn.Tanh(),nn.Linear(32,3)) for _ in range(3)])
@@ -425,7 +426,7 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
         ids = sorted(r['rsu_id'] for r in state['rsus']); rsus={r['rsu_id']:r for r in state['rsus']}
         index={n['node_id']:i for i,n in enumerate(nodes)}
         order={n:i for i,n in enumerate(state['workflow']['execution_order'])}
-        opportunities = migration_opportunities(state,prediction_enabled=self.prediction_enabled)
+        opportunities = migration_opportunities(state,prediction_enabled=self.prediction_enabled,allow_partial=self.partial_preparation_enabled)
         # A forecast affects control only when it yields a physical, positive-net preparation opportunity.
         if self.migration_gate_enabled and not opportunities:
             data['own'][11:13] = 0.
@@ -445,9 +446,22 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
                 if rid in ids and state['execution_location'] and rid!=state['execution_location']:
                     copied=state['state_copies_by_rsu'].get(rid,{}).get('payload_bytes',0)
                     relocation=max(1.,(state['execution_state_payload_bytes']-copied)/state['control_cost_parameters']['state_bytes_per_frame'])
+                    if self.partial_preparation_enabled:
+                        rate=state['control_cost_parameters']['state_bytes_per_frame']
+                        transfer=state['state_transfers_by_rsu'].get(rid)
+                        ready=state['state_copies_by_rsu'].get(rid,{}).get('version')==state['execution_state_version']
+                        if ready:relocation=0.
+                        elif transfer is not None:
+                            relocation=max(transfer['remaining_frames'],np.ceil(transfer['remaining_bytes']/rate))
+                            if transfer['version']!=state['execution_state_version']:
+                                relocation+=max(state['control_cost_parameters']['minimum_state_frames'],np.ceil(max(1,state['execution_state_payload_bytes']-transfer['payload_bytes'])/rate))
+                        else:relocation=max(state['control_cost_parameters']['minimum_state_frames'],np.ceil(max(1,state['execution_state_payload_bytes']-copied)/rate))
+                net=opportunity.get('net_reward_proxy',0)
+                if self.partial_preparation_enabled and j==1:net=opportunity.get('cache_net_reward_proxy',0) if nid==node_id else 0.
+                if self.partial_preparation_enabled and j==2:net=opportunity.get('state_net_reward_proxy',0)
                 extra[k]=[r.get('service_work_units',0)/120,queue.get(rid,0)/120,counts.get(rid,0)/8,
-                          relocation/120,opportunity.get('net_reward_proxy',0),opportunity.get('eta_frames',0)/3,
-                          opportunity.get('prepare_frames',0)/3,(order[nid]-order[node_id])/32,
+                          relocation/120,net,opportunity.get('eta_frames',0)/3,
+                          opportunity.get('prepare_budget_frames',opportunity.get('prepare_frames',0))/3,(order[nid]-order[node_id])/32,
                           len(n.get('predecessors',[]))/8,sum(a==nid for a,b in state['workflow']['edges'])/8,
                           own_work/120,n['output_size']/32]
                 node_indices.append(index[nid] if rid is not None else -1)
@@ -540,7 +554,7 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
             reservations[vid]=(target,work)
             opportunity_count+=int(data['opportunity_count'])
             from src.envs.core.joint_control_planning import migration_opportunities
-            diagnostics[vid]=dict(migration_candidates=migration_opportunities(decisions[vid]['semantic_state'],prediction_enabled=self.prediction_enabled),
+            diagnostics[vid]=dict(migration_candidates=migration_opportunities(decisions[vid]['semantic_state'],prediction_enabled=self.prediction_enabled,allow_partial=self.partial_preparation_enabled),
                 reserved_service_frames={rid:float(data['f0'][i,21]*120) for i,rid in enumerate(candidates[0]) if rid and rid!='vehicle'})
             rolls.append(dict(data=batch,actions=a,logs=logs.sum(1),head_logs=logs,values=value,prefix_values=prefix,active_heads=active))
         cache_count=max(r['data']['m1'].shape[1] for r in rolls)

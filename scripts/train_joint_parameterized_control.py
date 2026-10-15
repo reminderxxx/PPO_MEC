@@ -89,9 +89,12 @@ def main():
     p.add_argument('--threads',type=int,default=1)
     p.add_argument('--productive_controls',action='store_true')
     p.add_argument('--coordinated_controls',action='store_true')
+    p.add_argument('--partial_preparation',action='store_true')
     a = p.parse_args()
     if a.episodes < 4 or a.episodes % 4 or a.episodes % a.eval_every:
         raise ValueError('budget must be a positive multiple of update=4 and eval_every')
+    if a.partial_preparation and not a.coordinated_controls:
+        raise ValueError('--partial_preparation requires --coordinated_controls')
     if a.coordinated_controls:
         a.productive_controls=True
     allowed = {'sa_ghmappo','mappo','cache_offload_drl','sa_no_surrogate','sa_no_prediction','sa_no_coordination','sa_team_credit','sa_ungated_prediction'}
@@ -123,7 +126,7 @@ def main():
     metadata = dict(run_id=run_id,status='running',command=sys.argv,
         git_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         git_dirty=bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),
-        protocol='joint_parameterized_ppo_coordinated_v1' if a.coordinated_controls else ('joint_parameterized_ppo_productive_v2' if a.productive_controls else 'joint_parameterized_ppo_development_v1'),coordinated_controls=a.coordinated_controls,productive_controls=a.productive_controls,action_contract='joint_parameterized_control_v3',
+        protocol='joint_parameterized_ppo_coordinated_partial_v2' if a.partial_preparation else ('joint_parameterized_ppo_coordinated_v1' if a.coordinated_controls else ('joint_parameterized_ppo_productive_v2' if a.productive_controls else 'joint_parameterized_ppo_development_v1')),partial_preparation=a.partial_preparation,coordinated_controls=a.coordinated_controls,productive_controls=a.productive_controls,action_contract='joint_parameterized_control_v3',
         observation_contract='joint_request_observation_v3',development_only=True,paper_claim_ready=False,
         holdout_status='sealed_not_evaluated',source_manifest_sha256=_hash_file(a.source_manifest),
         raw_data_sha256=source['raw_data_sha256'],splits={k:source['splits'][k] for k in ('train','dev')},
@@ -139,7 +142,7 @@ def main():
         metadata['training'].update(target_commitment='8_frame_intent_then_hold_inflight_node_until_coverage_loss',actor_objective='conditional_head_clipped_ppo_prefix_baselines_v1',
             credit='half_local_ledger_half_team_per_initial_request',coordination='rotating_request_order_charged_intent_reservations',
             queue_prior='negative_reserved_service_plus_state_model_cost_over_remaining_horizon_per_rsu',
-            migration_gate='forecast_execution_coverage_loss_positive_net_reward_proxy')
+            migration_gate='partial_prefix_and_model_only_net_proxy_v2' if a.partial_preparation else 'forecast_execution_coverage_loss_positive_net_reward_proxy')
     manifest = output/'manifest.json'
     manifest.write_text(json.dumps(metadata,indent=2)+'\n')
     bundle = fit_predictor(splits['train'])
@@ -167,7 +170,7 @@ def main():
                 agent = build_agent(algorithm,control_contract='joint_parameterized_control_v3',seed=seed,
                     surrogate_enabled=name!='sa_no_surrogate',prediction_enabled=name!='sa_no_prediction',productive_controls=a.productive_controls,
                     **(dict(coordinated_controls=True,coordination_enabled=name!='sa_no_coordination',
-                            credit_mode='team' if name=='sa_team_credit' else 'request_team_blend',
+                            credit_mode='team' if name=='sa_team_credit' else 'request_team_blend',partial_preparation_enabled=a.partial_preparation,
                             migration_gate_enabled=name!='sa_ungated_prediction') if a.coordinated_controls else {}))
                 initial_hash = hashlib.sha256(b''.join(v.detach().numpy().tobytes() for v in agent.state_dict().values())).hexdigest()
                 rollout_buffer = []

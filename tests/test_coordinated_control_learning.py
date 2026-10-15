@@ -121,3 +121,49 @@ def test_inflight_certified_prefix_can_finish_and_late_episode_is_noop():
     assert migration_opportunities(s)['b']['prepare_feasible']
     s['episode_frames_remaining']=2
     assert not migration_opportunities(s)
+
+
+def test_partial_copy_can_have_value_without_finishing_before_handoff():
+    s=forecast_state();s['execution_state_payload_bytes']=6425
+    assert not migration_opportunities(s)
+    candidates=migration_opportunities(s,allow_partial=True)
+    assert candidates
+    assert all(v['prepare_frames']>v['eta_frames'] and v['prepare_budget_frames']<=v['eta_frames']
+               and v['state_net_reward_proxy']>0 and v['prepare_feasible'] for v in candidates.values())
+
+
+def test_model_only_prefetch_is_separate_from_state_preparation():
+    s=forecast_state();s['execution_state_payload_bytes']=32
+    for row in s['rsus']:
+        row['ready_base_model_ids']=[];row['cached_adapter_ids']=[]
+    candidates=migration_opportunities(s,allow_partial=True)
+    assert candidates and all(v['cache_net_reward_proxy']>0 and not v['prepare_feasible'] for v in candidates.values())
+
+
+def test_partial_gate_rejects_costly_or_too_late_preparation_and_current_copy_noop():
+    s=forecast_state();s['execution_state_payload_bytes']=6425
+    for row in s['rsus']:row['service_request_count']=100
+    assert not migration_opportunities(s,allow_partial=True)
+    s=forecast_state();s['execution_state_payload_bytes']=6425;s['episode_frames_remaining']=4
+    assert not migration_opportunities(s,allow_partial=True)
+    s=forecast_state();s['state_copies_by_rsu']={rid:dict(version=4,payload_bytes=3072) for rid in ('b','c','d')}
+    assert not migration_opportunities(s,allow_partial=True)
+
+
+def test_partial_option_checkpoint_and_probability_contract(tmp_path):
+    env=four_site_env();env.coordination_intent_enabled=True;p=agent(partial_preparation_enabled=True)
+    _,rolls=episode(env,p);p.update(rolls,epochs=1)
+    path=tmp_path/'partial.pt';p.save_checkpoint(path);restored=type(p).from_checkpoint(path)
+    assert restored.partial_preparation_enabled
+    d=rolls[0]['data'];a=rolls[0]['actions']
+    assert torch.allclose(p.distributions(d,actions=a)[1],restored.distributions(d,actions=a)[1],atol=1e-6)
+
+
+def test_partial_arrival_selection_accounts_for_already_transferred_prefix():
+    env=four_site_env();decision=deepcopy(env.decision_states()['v0'])
+    s=decision['semantic_state'];s.update(execution_location='a',execution_state_version=4,execution_state_payload_bytes=6425)
+    s['state_transfers_by_rsu']={'b':dict(version=4,payload_bytes=6425,remaining_frames=2,remaining_bytes=1500)}
+    p=agent(partial_preparation_enabled=True)
+    data,_,_,_,_=p._coordinated_features(decision,3,{})
+    assert data['f0'][2,23]<data['f0'][3,23]
+    assert data['prior0'][2]>data['prior0'][3]

@@ -572,3 +572,5 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 参数化学习现另有 `--productive_controls`：所有方法共同增加站点 identity、有延迟的服务目标负载共享和冷缓存条件供给 mask；旧 checkpoint 路径保持默认关闭。独立审查及修复合同见 `docs/project/joint_parameterized_representation_review_20261014.md`、`docs/project/joint_parameterized_productive_contract_20261014.md`。
 
 2026-10-15 新实现阶段：`--coordinated_controls` 增加收费的同轮预约工作量、DAG候选表示、机会/净收益迁移条件与prefix信用分配；保留GRU，不按最近关联站变化盲目prepare。事前预算与边界见 [协同控制合同](docs/project/joint_coordinated_control_contract_20261015.md)。
+
+严格门控的独立审查发现部分预复制被排除，新增 `--partial_preparation` 分支，按ETA内可推进量及到站残余/增量成本判断，模型单独预取与state收益分开。三配置同预算再训练见 `docs/project/joint_partial_preparation_contract_20261015.md`，旧七配置保留。

@@ -400,3 +400,5 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 - `src/envs/core/joint_control_planning.py`：声明服务量、因果覆盖机会/净收益代理、预算平衡请求账本。
 - `tests/test_coordinated_control_learning.py`：预约/迁移条件/prefix信用/概率/checkpoint验证。
 - `artifacts/joint_coordinated_control/seed<seed>/`：新一轮同预算产物，保留旧两轮。
+
+- `artifacts/joint_coordinated_partial_control/seed<seed>/`：三个主比较配置的部分预复制阶段，独立于严格版本七配置目录。

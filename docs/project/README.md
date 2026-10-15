@@ -234,3 +234,6 @@
 - `joint_parameterized_results_review_20261015.md`：两轮3840 episode的奖励/完成、消融、费用收据、checkpoint重放与下一阶段问题；结果不支持SA主机制优势。
 
 - `joint_coordinated_control_contract_20261015.md`：保留预测的协同选站、机会净收益迁移、prefix信用与七配置同预算方案。
+
+- `joint_coordinated_gate_review_20261015.md`：严格完成条件排除9个离站请求帧的独立审查。
+- `joint_partial_preparation_contract_20261015.md`：部分预复制/cache-only与三配置同预算再训练。
