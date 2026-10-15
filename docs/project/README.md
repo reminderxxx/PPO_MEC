@@ -250,4 +250,6 @@
 
 - joint_scheduled_control_contract_20261015.md：8帧预测/链路预约、动作信用及尺度修复，恢复七算法和去预测主比较、后期稳定性对照的事前合同。
 
-- joint_scheduled_prediction_support_review_20261015.md：8帧预约执行、固定权重预测局部收益/负例、图尺度原始witness；完整八算法排序待回收。
+- joint_scheduled_prediction_support_review_20261015.md：8帧预约执行、固定权重预测局部收益/负例、图尺度原始witness；完整排序见joint_scheduled_control_results_review_20261015.md。
+
+- joint_scheduled_control_results_review_20261015.md：八主配置同预算最终排序、DQN信用勘误、120 checkpoint/30模型重放、跨seed回退与cache费用/交付边界。

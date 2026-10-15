@@ -1650,3 +1650,11 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 2026-10-15：joint_coordinated_control/seed{7,17,27}/20261015T015625Z_development，source84028c1，七配置128×3seed；审计artifacts/joint_coordinated_audit_20261015/joint_coordinated_control_audit.json，84checkpoint/21final重放通过，paper E0_UNAVAILABLE。完整结果见joint_coordinated_results_review_20261015.md。
 
 2026-10-15：joint_coordinated_partial_control_v2/seed{7,17,27}/20261015T030133Z_development，source e96f6ac，三配置128×3seed全部完成；36checkpoint、71308事件、11000帧收据、9final首dev重放通过。审计artifacts/joint_coordinated_audit_20261015/joint_coordinated_partial_control_v2_audit.json。奖励SA57.660698>no-pred57.521120>MAPPO57.375365，但SA完成6.708333较低，无paper晋级。旧joint_coordinated_partial_control三run以run_abort.json留存516episode；四次smoke48episode不入主表。本次有效训练3840，含中止/smoke总4404。
+
+## 2026-10-15 scheduled 八主配置完整回收
+
+- 根目录：artifacts/joint_scheduled_control；main/baselines/stability三part source aa8676a，dqn_credit source455bc1d；12个精确run_id及主/辅助身份见joint_scheduled_control_results_review_20261015.md和审计JSON。
+- comparison_plan SHA256=483c23f8ee88d7bb459e0dcbd75936157a27ef9aaec345898dd6a99a5fc40131；append-only amendment SHA256=a2df3eba16c8bdb665a5363826b2699245458bac990782cfa7a1af7644eb4695。
+- 原件审计：artifacts/joint_coordinated_audit_20261015/joint_scheduled_control_audit.json；120checkpoint/tensor互异、268517事件/38056收据、30final首dev事件重放一致。training_diagnostics同根，固定预算3840加smoke84=3924；不含历史轮次。
+- 最终SA57.981931/6.958333，MAPPO57.732622/7.041667，no-pred58.226779/7.25；其他PPO/DQN/cache/DAG/DT均已共同合同回收。legacy DQN52.953722仅诊断，corrected DQN53.964010为主结果。
+- 支持：预测固定权重+.0834215/多2请求、7/7准备槽、首窗图饱和0；去重离站仅1事件。非formal/holdout，canonical不更新，paper E0_UNAVAILABLE。

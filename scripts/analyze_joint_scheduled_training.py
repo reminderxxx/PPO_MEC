@@ -56,6 +56,23 @@ def main():
             per_seed={str(seed):dict(first20_stochastic_reward=avg(r['reward'] for r in training if r['seed']==seed and r['episode']<=20),last20_stochastic_reward=avg(r['reward'] for r in training if r['seed']==seed and r['episode']>108)) for seed in plan['seeds']}
             summary[name]=dict(curves=curves,update_statistics=stats,stochastic_training_by_seed=per_seed,
                 final_minus32_dev_reward=curves['128']['dev_reward']-curves['32']['dev_reward'],final_minus32_train_probe_reward=curves['128']['train_probe_reward']-curves['32']['train_probe_reward'])
+            previous={(r['seed'],r['frame_offset']):r for r in data['dev'] if r['episode']==96}
+            final={(r['seed'],r['frame_offset']):r for r in data['dev'] if r['episode']==128}
+            assert previous.keys()==final.keys() and len(final)==24
+            late=[]
+            for key in sorted(final):
+                before=previous[key];after=final[key]
+                delta={field:after[field]-before[field] for field in ('reward','completed_requests','completed_nodes','service_target_change_count','model_transfer_link_frames','state_transfer_link_frames')}
+                delta.update({field:after['status_counts'].get(field,0)-before['status_counts'].get(field,0) for field in ('compute_queue','output_link_queue')})
+                late.append(dict(seed=key[0],frame_offset=key[1],delta=delta))
+            summary[name]['final_minus96_paired_dev']=late
+            summary[name]['training_mechanism_bands']={}
+            for band_label,predicate in [('first32',lambda r:r['episode']<=32),('last32',lambda r:r['episode']>96)]:
+                band=[r for r in training if predicate(r)]
+                summary[name]['training_mechanism_bands'][band_label]=dict(
+                    episodes=len(band),
+                    means={field:avg(r[field] for r in band) for field in ('reward','completed_requests','service_target_change_count','model_transfer_link_frames','state_transfer_link_frames')},
+                    mechanisms={field:avg(r['mechanisms'][field] for r in band) for field in ('prepare_commands','future_cache_commands','cache_commands')})
     paired=[]
     for seed in plan['seeds']:
         a,ac=checkpoints[('sa_ghmappo',seed,128)];b,bc=checkpoints[('sa_constant_update',seed,128)]

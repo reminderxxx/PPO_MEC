@@ -2181,3 +2181,11 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 2026-10-15：独立审查发现DQN请求结束漏team tail，与共享credit定义不符；旧baseline原结果保留为legacy-terminal诊断，另以同128×3seed修复DQN，其他方法不重训不改动。原comparison_plan保留并追加amendment；363项回归通过。
 
 2026-10-15 scheduled support：固定full最终128权重预测开关24单元1胜1负22平，奖励+.0834215、完成+.0833333；最终7次prepare均推进7168B/7槽，初始70节点图饱和三seed均0。外生离站实际只有1个，八主比较仍待回收。见joint_scheduled_prediction_support_review_20261015.md。
+
+## 2026-10-15 scheduled 最终回收（覆盖上文“待回收”状态）
+
+- 12个run均complete：八主配置3072episode、constant-update384、legacy DQN诊断384，共3840；工程smoke84单列，总3924。source aa8676a/455bc1d，原计划及append-only信用勘误保留。
+- 120 checkpoint/tensor互异、268517事件/38056费用收据核验通过；30个最终模型首dev完整事件重放一致。固定贪心train/dev、逐窗96→128及训练首末机制诊断exit0。
+- 奖励排序：no-pred58.226779 > SA57.981931 > MAPPO57.732622 > PPO57.661388 > DT57.583436 > DAG57.210631 > cache56.762605 > corrected DQN53.964010。SA完成6.958333/8，低于MAPPO7.041667、DT7.0、no-pred7.25；双指标目标未达。
+- SA train probe32→128 +.432827，而dev−.270637；seed27持续回退主导差异。稳定更新较恒定更新奖励+.911063，但KL早停0次、仍高熵，不可声称收敛或唯一因果解释。预测固定权重局部收益保留，去预测独立训练更优，不能混为同一证据。
+- 完整独立审查：joint_scheduled_control_results_review_20261015.md。formal/holdout封存、canonical不更新、论文E0_UNAVAILABLE；下一实现阶段先围绕尾部交付/信用和训练覆盖负例建witness，不在本审查内调参。

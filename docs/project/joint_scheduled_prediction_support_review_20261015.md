@@ -26,3 +26,5 @@
 预测局部收益和预约执行已有证据，但仍有负净收益和极少迁移事件。八算法最终性能、完成率、稳定更新及后期回退须等完整回收；不在本审查轮改算法、加预算或选择窗口。formal/holdout继续封存，不更新canonical。无新文献检索，不作novelty结论。
 
 原始支持：`artifacts/joint_coordinated_audit_20261015/frozen_prediction_probe_joint_scheduled_control_main.json`、`joint_scheduled_control_main_prediction_effects.json`、`joint_scheduled_control_main_opportunities.json`、`joint_scheduled_control_main_feature_scale.json`；对应只读probe/effects/opportunities/feature_scale脚本已可执行。
+
+2026-10-15完整回收追加：八主配置及两项独立support均完成，120checkpoint/30final首dev事件重放通过；完整版奖励高于六个baseline但未同时超过去预测和MAPPO的完成率，完整数值、回退与claim边界见`joint_scheduled_control_results_review_20261015.md`。本文件原事前/阶段描述保留历史时间含义。

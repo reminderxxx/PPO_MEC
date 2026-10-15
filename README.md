@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+2026-10-15 最新开发回收：目的站时隙预约、动作信用与图尺度修复后，八配置各128×3seed完成。SA奖励57.981931，高于MAPPO57.732622及其余五基线；去预测版58.226779更高，SA完成6.958333/8亦低于MAPPO7.041667和去预测7.25，双指标目标未达。120 checkpoint/30 final首窗事件重放通过；[完整结果与后期回退审查](docs/project/joint_scheduled_control_results_review_20261015.md)。以下较早参数化/五动作记录保留其历史合同，不混入本轮排名。
+
 2026-10-15：参数化学习、GRU 和 SA surrogate 已接入并完成两轮同预算开发训练（共3,840 episode）。修复轮 SA 奖励27.333、完成0.833/8，低于 MAPPO 的32.537、1.625/8，尚无主机制优势或收敛证据；[完整回收审查](docs/project/joint_parameterized_results_review_20261015.md)。
 
 联合控制 v3 的工程入口为 `scripts/verify_joint_target_control.py`：在原始 train/dev 窗口上验证明确的执行站、当前/未来 DAG base/adapter admission、依赖安全显式驱逐、状态预复制与计算优先级。输入上传、结果回传、模型和状态共用 RSU 数据链路槽，节点在结果送达后计完成。新合同 `joint_parameterized_control_v3` 已接固定规则和 opt-in 学习策略，旧五动作学习策略会被拒绝；v3 算法/checkpoint 适配现通过独立开发训练入口实现。源数据和窗口按 manifest/hash 重建，输出含逐帧费用收据；详见 [`RUNBOOK`](docs/project/RUNBOOK.md)。

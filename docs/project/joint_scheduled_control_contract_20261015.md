@@ -39,3 +39,5 @@
 ## 独立DQN终止信用勘误（首次主比较回收前）
 
 先有joint_dqn_terminal_credit_review_20261015.md独立审查（2772599），再修复。DQN退出后的团队尾回报原未计入，故旧版本与共同credit目标不一致。新入口terminal_team_tail=true，仅终止transition补入观测MC团队尾标签，非终止仍为Bellman TD；旧checkpoint默认false保留。环境/共同PPO/预测/原始reward及episode生产函数不变，原初始化tensor逐位相同。三个seed各128重训，新增384episode，计划实际训练3456+384=3840。原DQN保留legacy-terminal诊断，不据结果选择新旧。原comparison_plan不改写，append-only amendment明确替换与双source共享代码hash；主比较只纳入修正版本。
+
+2026-10-15完整回收追加：八主配置及两项独立support均完成，120checkpoint/30final首dev事件重放通过；完整版奖励高于六个baseline但未同时超过去预测和MAPPO的完成率，完整数值、回退与claim边界见`joint_scheduled_control_results_review_20261015.md`。本文件原事前/阶段描述保留历史时间含义。

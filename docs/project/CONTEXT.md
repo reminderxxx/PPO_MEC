@@ -9,6 +9,10 @@
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
+## 2026-10-15 开发合同补充
+
+参数化八车开发入口可显式启用`--scheduled_controls`，包括执行站、typed-cache准备与状态控制、因果8帧GRU、当前数据槽owner/kind裁决及估计未来预约。SA/MAPPO/PPO/DQN/cache/DAG/DT共同消费新合同，旧五动作checkpoint不能混用。DQN新入口显式补齐terminal team tail，旧checkpoint默认保留原语义。该分支为开发研究合同，不替代下列正式Protocol，不打开formal/holdout或晋级canonical；最新效果/限制见`joint_scheduled_control_results_review_20261015.md`。
+
 ## 项目状态
 
 - 当前唯一 live typed model-cache execution contract 为 Protocol 2.9.0；active index 位于

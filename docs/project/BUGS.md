@@ -5,6 +5,15 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-15：scheduled 最终缺口（最新状态）
+
+- 当前槽owner/kind抢占保护、8帧声明预约、graph/candidate服务尺度及surrogate重复扣费已实现并核验；7次prepare全部实际推进，初始图witness饱和0。未来calendar仍是估计，正net proxy仍有−0.01负例。
+- 完整版奖励高于六个baseline，但去预测58.226779高于full57.981931；full完成6.958333落后MAPPO/DT/no-pred。**算法双指标领先/收敛仍OPEN**，不是工程通过即可晋级。
+- 后期回退集中seed27：full dev32→128奖励57.334734→56.343598，其他seed改善或轻微下降；train贪心probe总体改善。队列/末端交付与泛化、罕见预测机会/高熵信用需独立witness，未确定唯一原因。KL保护未触发，不可把LR对照改善归因KL。
+- DQN terminal team tail漏项已独立修复，corrected主结果与legacy诊断分列。corrected仍从64到128退化，train probe也退化；未据旧低分选用版本，不宣称DQN不适用于此问题。
+- model-cache优越性仍UNVERIFIED：full相对cache基线交付较好但传输更多，且相对MAPPO并非所有缓存指标占优；缺显式学习驱逐/多base及外部强baseline。真实成本/并行DAG/到达过程/共享控制面竞争等长期限制继续。
+- 证据：joint_scheduled_control_results_review_20261015.md，120checkpoint/268517事件/38056收据/30final重放通过。下文为较早阶段记录；formal/holdout和paper claim仍封存/未验证。
+
 ## 2026-10-15：v3 学习接口闭环，协同与迁移学习仍是 blocker
 
 - 另有表示缺口：`service_work_units`已共享但actor尚未消费；DAG池化未向cache候选提供对应节点表示，同尺寸未来节点可能混叠。需另立实现任务，不在本轮只读审查中修复。

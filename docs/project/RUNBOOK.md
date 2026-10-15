@@ -1767,3 +1767,7 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 2026-10-15：python scripts/verify_joint_scheduled_consumers.py核验完成的工程smoke中registry→checkpoint→首dev完整事件（11/11通过）；python scripts/analyze_joint_scheduled_training.py joint_scheduled_control在全部完成后汇总固定greedy train/dev、KL/entropy/图激活和稳定更新配对；python scripts/audit_joint_coordinated_control.py joint_scheduled_control按根comparison_plan.json核验三part各seed，恢复fresh初始化hash并要求actor/Q head实际变化，不能仅靠buffer计数变化通过。
 
 2026-10-15：DQN终止信用修复以comparison_amendment_1.json追加source/alias/replacement_groups和共享模块Git hash，dqn_credit/seedN为同预算替换；旧baselines的DQN以dqn_legacy_terminal_credit单列。audit/训练诊断合并时核验两source共享环境/预测/共同PPO及episode源hash，其他方法仍用原冻结source。
+
+## 2026-10-15 scheduled 完整回收的只读复核
+
+使用项目解释器运行`python scripts/audit_joint_coordinated_control.py joint_scheduled_control`与`python scripts/analyze_joint_scheduled_training.py joint_scheduled_control`。前者验证12个完整run、不可变plan/追加amendment、双source共享代码、120checkpoint、原始费用/预约及30final首dev重放；后者同时输出固定train/dev、训练首末32段机制统计、逐seed/window的96→128差值和stability初始化配对。输出位于artifacts/joint_coordinated_audit_20261015，不更新权重、不选择checkpoint、不打开formal/holdout。原始command.log在各part/seed根；八主比较与legacy/constant辅助结果必须分列。完整结果见joint_scheduled_control_results_review_20261015.md。
