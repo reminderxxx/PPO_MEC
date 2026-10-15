@@ -5,7 +5,7 @@
 
 # PPO_MEC
 
-2026-10-15 delivery v2独立修复：离站前可完成则不准备，已交付prefix不重新计恢复收益，checkpoint版本v2拒绝v1；新固定预算root为`artifacts/joint_delivery_control_v2/`。[v2合同](docs/project/joint_delivery_control_v2_contract_20261015.md)，尚无完整性能结论。
+2026-10-16 delivery v2完整回收：3840回合、120checkpoint及主/移动/旧强cache审计完成。SA48.544345/4.875超过去预测48.433218/4.75，但低于cache奖励48.612738和MAPPO完成4.958333；主预测开关48平、模型成本偏高、后期回退仍在。固定最终结果、负例、验证与下一步见[完整审查](docs/project/joint_delivery_v2_results_review_20261016.md)。formal/holdout封存，非论文主表。
 
 2026-10-15 delivery v1已因离站前完成的估值边界错误停止（已记录316回合、另有未完成交互），不进入完整比较；[独立审查](docs/project/joint_delivery_completion_guard_review_20261015.md)。下文实现/计划记录保留历史阶段。
 

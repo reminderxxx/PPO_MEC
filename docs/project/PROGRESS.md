@@ -5,6 +5,15 @@
 
 ﻿# Progress
 
+## 2026-10-16：delivery v2完整回收，缓存优势和稳定性目标未达
+
+- 源9b9c0d7、八主两辅助各128×seeds7/17/27，共3840回合；主120checkpoint/389044事件/55741收据/60重放，移动240policy+24off/182332事件/30重放，旧cache48/48重放均通过。另独立重建原始主表/曲线/预算/SHA及seed27两次零更新回退诊断通过。
+- 固定最终主结果：SA48.544345/4.875，cache48.612738/4.875，no-pred48.433218/4.750，MAPPO48.181045/4.958333；八主配置中DAG48.645926/4.9375奖励最高。旧强cache48.750552/4.708333仍保留；无奖励与完成率双领先。
+- full主dev机会/prepare均0，48同权重预测开关全平；训练仍411候选/194prepare。移动full60.028204/7.958333低于cache/no-pred/MAPPO；24同权重预测奖励+0.071534但请求0，10胜4负10平。不能把独立no-pred差归因主评估准备收益。
+- 已知资源保护raw核验通过；full模型帧44.8125比cache32.833333多36.48%，未来cache命令近两倍，model-cache优势未兑现。去surrogate48.660759/4.916667高于full；固定entropy更差。64→128 seed17/27回退，seed7恢复；seed27/dev3120有界复现首次选站翻转、67→65节点，非预测prepare。不能称已收敛。
+- 详见[joint_delivery_v2_results_review_20261016.md](joint_delivery_v2_results_review_20261016.md)。本次只读审查/文档收尾，无新增训练或算法变更；正式论文E0_UNAVAILABLE/Unverifiable，formal/holdout封存，canonical不变。新修复按报告独立任务实施，不在审查轮调参。
+
+
 ## 2026-10-15：参数化学习两轮完成，未观察到 SA 优势
 
 - 三方法接入相同控制合同；训练窗口 GRU、DAG/surrogate、服务负载共享及公共冷站供给条件已落地。初轮 a7a06a0 与修复轮 b6a0dbe 各5配置×3seed×128，共3,840 episode；120 checkpoint核验、30次独立首dev窗逐事件重放一致，259,500条原始事件及34,296份收据通过审查。

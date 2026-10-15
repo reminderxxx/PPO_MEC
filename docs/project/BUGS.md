@@ -5,7 +5,16 @@
 
 ﻿# Bugs And Risks
 
-## 2026-10-15：scheduled 最终缺口（最新状态）
+## 2026-10-16：delivery v2剩余风险（当前开发轮）
+
+- **OPEN：双指标领先 / model-cache / 收敛**。SA48.544345/4.875低于cache奖励48.612738、低于MAPPO完成4.958333；去surrogate更好。full模型链路44.8125 vs cache32.833333，未来预取26.083333 vs13.0625；可用空槽不等于值得预取。
+- **预测兑现不充分**：full主dev48单元prepare/机会0、固定权重开关全平；训练194prepare，移动99prepare但同权重仅+0.071534奖励、0请求，仍4负单元。保留预测，不作“有预测必胜”结论；需要校准净收益/时域与机会覆盖。
+- **后期回退仍OPEN**：64→128 seed17/27下降、seed7恢复。seed27最大损失窗首次选站从b变d、67→65节点已独立复现，两次均无prepare。高熵约.94、低KL及下降的critic/surrogate loss不证明收敛，也不支持只归咎探索熵塌缩。
+- **保护范围有限**：本轮389044主+182332移动raw事件的已知必要槽/连续model span/可选LRU当前依赖检查通过；主full准备为0，非空证据来自移动99prepare。未来新需求、延迟cache/队列估计仍不能保证无外部性。团队目标单位已对齐，逐动作边际交付信用仍未识别。
+- 正式证据仍E0_UNAVAILABLE；只读结论见[joint_delivery_v2_results_review_20261016.md](joint_delivery_v2_results_review_20261016.md)。以下scheduled/tail缺口为历史阶段，不覆盖最新结论。
+
+
+## 2026-10-15：scheduled 最终缺口（历史阶段）
 
 - 当前槽owner/kind抢占保护、8帧声明预约、graph/candidate服务尺度及surrogate重复扣费已实现并核验；7次prepare全部实际推进，初始图witness饱和0。未来calendar仍是估计，正net proxy仍有−0.01负例。
 - 完整版奖励高于六个baseline，但去预测58.226779高于full57.981931；full完成6.958333落后MAPPO/DT/no-pred。**算法双指标领先/收敛仍OPEN**，不是工程通过即可晋级。

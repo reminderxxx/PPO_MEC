@@ -9,6 +9,10 @@
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
+## 2026-10-16 delivery开发合同补充
+
+独立入口`scripts/train_joint_delivery_control.py`采用`delivery_parameterized_{ppo,dqn}_v2`、两阶段执行站/资源预约、团队节点交付MC及独立surrogate裁剪；仍为开发合同，不能与历史checkpoint混用或替代正式Protocol。最新已回收结果和边界见`joint_delivery_v2_results_review_20261016.md`。
+
 ## 2026-10-15 开发合同补充
 
 参数化八车开发入口可显式启用`--scheduled_controls`，包括执行站、typed-cache准备与状态控制、因果8帧GRU、当前数据槽owner/kind裁决及估计未来预约。SA/MAPPO/PPO/DQN/cache/DAG/DT共同消费新合同，旧五动作checkpoint不能混用。DQN新入口显式补齐terminal team tail，旧checkpoint默认保留原语义。该分支为开发研究合同，不替代下列正式Protocol，不打开formal/holdout或晋级canonical；最新效果/限制见`joint_scheduled_control_results_review_20261015.md`。

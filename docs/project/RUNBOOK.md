@@ -1787,3 +1787,15 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 推荐统一运行`python scripts/launch_joint_delivery_comparison.py`：要求clean source、root不存在，先冻结主协议及复用mobile分层，再启动十组、回收两项审计。`evaluate_joint_delivery_support.py`仅评价同组最终模型；launcher未完成时先查看progress和子进程，不能重复启动已有root。
 
 2026-10-15 路径晋级仅指实现入口：统一launcher默认root改为artifacts/joint_delivery_control_v2（独立协议副本/十组/主补充审计/旧强cache重放）。joint_delivery_control为cad6509的停止历史，禁止resume/覆盖。--delivery消费者当前为checkpoint v2；v1重放必须使用历史commit，不静默兼容。
+
+## delivery v2已完成实验的收尾（2026-10-16）
+
+当前`artifacts/joint_delivery_control_v2/launcher_result.json`为complete，主/移动/旧cache审计均exit0；不重跑已有root的launcher，不resume旧v1，不把审查当新增训练。原始命令与日志保存在各group及root。
+
+本地产物自带独立重建脚本，仅读源JSONL/manifest/checkpoint SHA，不修改算法、原产物或训练预算：
+
+```bash
+python artifacts/joint_delivery_control_v2/post_training_review/summarize_results.py
+```
+
+输出`post_training_review/analysis.json`，核对3840回合、120checkpoint、480最终单元、1920曲线单元和480固定train-probe。seed27最大64→128退化窗的两次零更新重放见`post_training_review/replay_late_case.py`及`late_case.json`；事后诊断不选择最终模型。完整报告`joint_delivery_v2_results_review_20261016.md`。自动完成提醒已暂停，不再轮询。新算法/更大训练量应另立冻结合同，formal/holdout仍封存。

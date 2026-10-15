@@ -416,4 +416,6 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 
 2026-10-15：`artifacts/joint_delivery_control/`为团队节点开发比较独立root（protocol字节复用、十group、comparison_plan、audit/prediction_probe）；`joint_delivery_preflight*`与`joint_delivery_witness`为工程/只读证据，非主结果。
 
-2026-10-15：joint_delivery_control为停止v1历史；当前待冻结实现产物为artifacts/joint_delivery_control_v2，v2工程为joint_delivery_v2_preflight*。不移动/删除v1产物或拼接预算。
+2026-10-15：joint_delivery_control为停止v1历史；本轮已完成的开发产物为artifacts/joint_delivery_control_v2，v2工程为joint_delivery_v2_preflight*。不移动/删除v1产物或拼接预算。
+
+2026-10-16：delivery v2收尾原件为该root下audit.json、mobility_support/audit.json、legacy_cache_reference/audit.json与launcher_result.json；post_training_review/保留独立数值重建和两次零更新诊断（本地产物不入Git）。完整结论见joint_delivery_v2_results_review_20261016.md，非canonical更新。
