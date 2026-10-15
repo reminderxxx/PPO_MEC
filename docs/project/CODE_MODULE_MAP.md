@@ -808,3 +808,5 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 2026-10-15：scripts/audit_joint_feature_scale.py只读最终full首dev初始已知DAG图尺度/encoder激活，不拟合归一化、不调用策略更新。
 
 2026-10-15：joint_link_reservation.py负责公共需求calendar、保守net与actual control claims；MultiRequestTargetControlEnv opt-in裁决owner/kind当前grant；ScheduledControlPPO在ppo_agent.py提供共同条件分布、动作Q baseline、尺度、稳定更新；各算法根文件提供明确Scheduled类，dqn_agent.py独立Bellman/replay/target loss。registry的scheduled_controls分支直接导入，不修改legacy注册身份。audit/probe消费scheduled options并支持分part计划和嵌套目录。
+
+2026-10-15：verify_joint_scheduled_consumers.py独立验证新registry消费及初始tensor身份；analyze_joint_scheduled_training.py只读固定train probe/dev曲线和优化/传输诊断，并核对稳定/恒定更新除stability_enabled外options与初始tensor相同。均不更新策略或挑选checkpoint。

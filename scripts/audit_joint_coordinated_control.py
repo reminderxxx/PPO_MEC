@@ -76,6 +76,13 @@ def main():
    saved=torch.load(directory/c['path'],weights_only=False)
    actual=hashlib.sha256(b''.join(v.numpy().tobytes() for v in saved['state_dict'].values())).hexdigest()
    assert actual==c['trained_tensor_sha256'];checkpoint_hashes.append(c['sha256']);tensor_hashes.append(actual)
+   if s.get('scheduled_controls'):
+    fresh=build_agent(saved['options']['method'],control_contract=s['action_contract'],scheduled_controls=True,**{k:v for k,v in saved['options'].items() if k!='method'})
+    initial=fresh.state_dict()
+    reconstructed=hashlib.sha256(b''.join(v.numpy().tobytes() for v in initial.values())).hexdigest()
+    assert reconstructed==c['initial_tensor_sha256']
+    assert any(not torch.equal(v,saved['state_dict'][k]) for k,v in initial.items() if k.startswith('heads.')), 'actor/Q head must learn, buffer counter changes are insufficient'
+    if saved['options']['method']=='dqn':assert saved['training_resume_supported'] is False and 0.05<=saved['epsilon']<=0.3
   final={identity(r):r for r in dev if r['episode'] in (0,budget)}
   events=defaultdict(list)
   with (directory/'events.jsonl').open() as f:

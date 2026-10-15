@@ -225,3 +225,10 @@ baseline 闭环额外写出：
 # Classical cache additions (2026-08-18)
 
 `reactive_lru`、`reactive_fifo`、`reactive_lfu`、`reactive_aging_lfu`、`reactive_random` 为 live、checkpoint-free、explicit-only classical baselines。五者 observation/action 与 reactive admission 相同，仅 `required_eviction_policy` 不同；不自动加入历史 final-submission suite。
+
+
+## 2026-10-15 参数化 scheduled 开发池（独立于旧五动作live合同）
+
+`--scheduled_controls`已接SA/MAPPO/PPO/DQN/cache_offload_drl/dag_offload_drl/dt_handoff_drl；另有SA-no-prediction与constant-update消融。PPO为local critic、MAPPO为central critic；DQN为真正replay+target Bellman三stage实现。三个方向型DRL仍是first-party PPO扩展（typed-cache context / DAG scalar context / raw-DT context），不是外部论文完整复现或三种off-policy算法。不能因为简称DRL就把它们当成独立学习家族。
+
+QMIX、MAT、IPPO、DQN变体等旧五动作实现保留，但当前未适配显式参数化候选/新checkpoint合同；新manifest逐项记录支持/排除原因，不能直接拼旧实验奖励。TD3/SAC/MADDPG仍遵守未稳定合同不入live registry的规则。本轮新结果是开发比较，不晋级paper-grade/canonical。
