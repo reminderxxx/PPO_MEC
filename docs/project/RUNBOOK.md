@@ -1757,3 +1757,5 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 2026-10-15：`scripts/audit_joint_prediction_opportunities.py <experiment>`在最终full原始事件上做真实/预测3帧覆盖机会影子清点，只读、真实未来不传入控制器；不把候选帧视为独立事件或净收益证明。
 
 2026-10-15：`scripts/audit_joint_prediction_effects.py <experiment>`分解固定权重预测开关的24单元原始费用、完成帧及prepare事件；不是单动作因果归因，不训练、不选模型。probe允许其他比较方法仍训练，但要求full最终128全部8dev已写入、计划Git/seed匹配、checkpoint不变。
+
+2026-10-15：python scripts/audit_joint_feature_scale.py <experiment>保存只读初始图表示witness；不能当成整个rollout分布或排序因果检验。
