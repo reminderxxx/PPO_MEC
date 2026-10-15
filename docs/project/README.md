@@ -256,3 +256,6 @@
 
 - joint_tail_regression_review_20261015.md：seed27组件/逐头冻结干预，定位priority surrogate及尾部目标不一致。
 - joint_tail_control_contract_20261015.md：独立tail实现、train-only cohort/双panel、八主两support固定预算及生产消费端。
+
+- joint_tail_capacity_review_20261015.md：tight7/8必要容量上界不可全完成，区分过载与预测失效。
+- joint_tail_mobility_support_contract_20261015.md：固定原布局/多站可选高移动的零训练探索支持协议，保留冻结主结果。

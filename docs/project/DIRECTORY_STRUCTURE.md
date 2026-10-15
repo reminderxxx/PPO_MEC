@@ -410,3 +410,6 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 - `scripts/prepare_joint_tail_control.py`、`train_joint_tail_control.py`、`audit_joint_tail_control.py`：tail公共场景生产/学习/只读消费。
 - `src/envs/core/joint_training_scenarios.py`：仅train原时间内外生几何cohort、共享tight场景；不依赖agent。
 - `artifacts/joint_tail_control/protocol/`及`<agent>/<run_id>/`：新scenario_id合同，旧scheduled产物保留。
+
+- `scripts/audit_joint_tail_capacity.py`：与算法分数无关的资源必要容量上界。
+- `scripts/joint_tail_mobility_support.py`、root/mobility_support_plan.json与artifacts/joint_tail_control/mobility_support/：独立零训练高移动支持集；evaluation.json不混为训练manifest。

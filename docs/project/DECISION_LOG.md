@@ -1274,3 +1274,5 @@ claim map 必须报告 `UNAVAILABLE`。
 2026-10-15：scheduled合同同时更新producer/consumer并保留旧默认；公共预测/预约固定8帧以覆盖前置约7帧传输诊断，所有方法共享相同GRU/预算；不将外部论文复现标签附于first-party方向PPO。主表固定最终128，不选峰；stable与constant-update同预算，区分交互公平与DQN replay优化步数。
 
 2026-10-15：3453fe6独立干预定位priority surrogate重排后，另立tail合同：不修改物理reward，共同gamma=1对齐有限评估、critic统一per-request单位，surrogate保留但不干预noop priority/执行头。train-only几何cohort增强覆盖，dev保留base和tight各50%预声明panel；所有baseline共享，禁止按算法分数挑场景。见joint_tail_control_contract_20261015.md。
+
+2026-10-15：a1b6048容量审查后追加零训练support，原覆盖1.2、全程≥2站可达、几何离站排序，固定一套条件后评价所有八主/两辅助最终模型。新条件晚于主训练启动，显式exploratory；不替换已冻结过载主表，不用算法分数选条件，失败Unavailable。

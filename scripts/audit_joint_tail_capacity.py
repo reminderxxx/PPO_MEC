@@ -10,7 +10,9 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 
 
 def main():
-    root=ROOT/'artifacts/joint_tail_control';p=root/'protocol/manifest.json'
+    root=ROOT/'artifacts/joint_tail_control'
+    p=Path(sys.argv[1]).resolve() if len(sys.argv)>1 else root/'protocol/manifest.json'
+    destination=Path(sys.argv[2]) if len(sys.argv)>2 else root/'capacity_diagnostic.json'
     m=json.loads(p.read_text());data=torch.load(p.parent/'protocol.pt',weights_only=False)
     options=m['environment_options'];unit=options['workflow_profile_unit_bytes']
     assert options.get('vehicle_adapter_policy','declared_only')=='declared_only' and not options.get('vehicle_adapter_ids')
@@ -52,11 +54,11 @@ def main():
             worst_violations=sorted(violations,key=lambda v:-v['deficit'])[:3],
             max_reachable_sites=max(bin(v).count('1') for values in masks for v in values)))
     report=dict(reviewed_at=datetime.now(timezone.utc).isoformat(),source_commit=m['git_commit'],
-        artifact_run_id='joint_tail_control/protocol',literature_cutoff='2026-10-15',target_venue='IEEE TMC',policy_version='tmc_review_policy_v3_20260621',
+        artifact_run_id=str(p.parent.relative_to(ROOT)),literature_cutoff='2026-10-15',target_venue='IEEE TMC',policy_version='tmc_review_policy_v3_20260621',
         evidence='necessary optimistic capacity bounds only, no algorithm scores/selection/training',
         demands=demands,rows=rows,
         limits='A violation proves all eight cannot finish under these bounds; no violation does not prove a feasible schedule. Model/state fees and transfers ignored; same trace panels are correlated.')
-    (root/'capacity_diagnostic.json').write_text(json.dumps(report,indent=2)+'\n')
+    destination.write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(dict(demands=demands,ruled_out={panel:sum(r['full_completion_ruled_out'] for r in rows if r['panel']==panel) for panel in ('base','tight')},rows=rows),indent=2))
 
 

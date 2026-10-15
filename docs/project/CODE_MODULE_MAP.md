@@ -814,3 +814,5 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 ## 2026-10-15 tail独立合同
 
 `joint_training_scenarios.py`只接受轨迹/RSU，不读取agent或回报；prepare脚本连接NGSIM loader并冻结公共场景/predictor。`joint_learned_prediction.py`新增按原区间分组fit/validation的opt-in，旧默认不变。各算法文件Tail类通过registry显式flag选择；共同PPO hook维持旧scheduled数学表达，Tail子类限定surrogate准备范围并统一critic单位，DQN保留独立replay/Bellman。训练/审计脚本共同消费scenario_id和panel，旧frame_offset消费者不混用。
+
+2026-10-15：joint_tail_mobility_support.py仅在预定义原dev区间按外生几何筛cohort，共享原GRU并加载已冻结最终模型；producer/consumer/hash与actor源1667分开绑定，不修改训练器。audit_joint_tail_capacity.py给必要上界，不能将无违例写成可行性证明。
