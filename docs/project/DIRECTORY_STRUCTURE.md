@@ -429,3 +429,5 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 - `artifacts/joint_stream_workloads/<timestamp>_engineering/`：manifest、protocol.pt、results/events/receipts及audit.json；不进入Git、不替代既有delivery结果。
 
 2026-10-16 FIFO修正：当前完整工程root为`artifacts/joint_stream_workloads_v2/`，workload/protocol v2；v1 `joint_stream_workloads/`停止129单元，仅历史诊断，不能resume/拼接。三规则和216预算不变，raw auditor另验证发布清单的FIFO启动顺序。
+
+2026-10-16 准入保护v3：当前完整工程root为`artifacts/joint_stream_workloads_v3/`，workload/protocol v3；v2完整216原件保留为资源保护审计失败证据，不拼接/排名。stream本地准入hook以实际LRU和当帧声明依赖拒绝危险可选动作；旧v3默认物理/费用/事件不变。

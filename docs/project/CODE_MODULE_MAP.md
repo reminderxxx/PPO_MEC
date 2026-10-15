@@ -828,3 +828,5 @@ Delivery v2保留predeparture交付prefix、对已完成请求禁准备，模型
 ## 2026-10-16 stream分支
 
 `joint_stream_workloads`构造固定工作负载/catalog → `multi_request_stream_env`复用v3物理引擎并管理请求生命周期 → `joint_stream_rules`只读已发布观测控制 → `run_joint_stream_workloads`持久化完整producer → `audit_joint_stream_workloads`独立账本/容量/对象生命周期及重放consumer。旧v3只提供四个默认行为不变的hook及空帧receipt；registry与src/agents未改，不隐式适配旧checkpoint。
+
+2026-10-16 准入保护v3：当前完整工程root为`artifacts/joint_stream_workloads_v3/`，workload/protocol v3；v2完整216原件保留为资源保护审计失败证据，不拼接/排名。stream本地准入hook以实际LRU和当帧声明依赖拒绝危险可选动作；旧v3默认物理/费用/事件不变。

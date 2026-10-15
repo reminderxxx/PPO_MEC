@@ -16,7 +16,7 @@ from src.envs.core.joint_learned_prediction import LearnedMobilityPredictor
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--source_protocol',type=Path,default=ROOT/'artifacts/joint_delivery_control_v2/protocol/manifest.json');p.add_argument('--output_root',type=Path,default=ROOT/'artifacts/joint_stream_workloads_v2');p.add_argument('--smoke',action='store_true');a=p.parse_args();torch.set_num_threads(1)
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--source_protocol',type=Path,default=ROOT/'artifacts/joint_delivery_control_v2/protocol/manifest.json');p.add_argument('--output_root',type=Path,default=ROOT/'artifacts/joint_stream_workloads_v3');p.add_argument('--smoke',action='store_true');a=p.parse_args();torch.set_num_threads(1)
     dirty=bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip())
     if dirty and not a.smoke:raise ValueError('full engineering run requires clean source')
     protocol=json.loads(a.source_protocol.read_text());source_path=Path(protocol['source_manifest']);source=json.loads(source_path.read_text())
@@ -49,7 +49,7 @@ def main():
         cases.append(dict(case_id=f'c{i:03d}',session=index,size=size,arrival_mode=mode,families=families,capacity=capacity,arrivals=arrivals,catalog=catalog,options=cfg,
             bounds=capacity_lower_bounds(arrivals,480,4,cfg)))
     metadata=dict(status='running',source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),git_dirty=dirty,smoke=a.smoke,command=sys.argv,
-        protocol='joint_stream_workload_engineering_v2',source_protocol=str(a.source_protocol.resolve()),source_protocol_sha256=_hash_file(a.source_protocol),raw_data_sha256=source['raw_data_sha256'],predictor_sha256=protocol['predictor_sha256'],
+        protocol='joint_stream_workload_engineering_v3',source_protocol=str(a.source_protocol.resolve()),source_protocol_sha256=_hash_file(a.source_protocol),raw_data_sha256=source['raw_data_sha256'],predictor_sha256=protocol['predictor_sha256'],
         data_selection='first two nonoverlapping four-window blocks from original train intervals; eight continuous covered vehicles ranked by geometry only; first4 Alibaba jobs/bin in fixed256job prefix',
         source_workflows=[w.to_dict() for w in pool],planned_cells=len(cases)*len(rules),rules=rules,training_episodes=0,paper_claim_ready=False,formal_holdout='sealed_not_evaluated',
         controls='common sticky reachable-balanced placement, causal GRU/shared state and mandatory resource protection; only model-prefetch rule differs; no state-preparation experiment',

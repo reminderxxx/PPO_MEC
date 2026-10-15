@@ -28,7 +28,7 @@ class StreamingRequestControl(JointRequestControl):
 
 class MultiRequestStreamEnv(MultiRequestTargetControlEnv):
     action_contract = 'joint_stream_control_v1'
-    stream_contract = 'joint_fifo_workload_stream_v2'
+    stream_contract = 'joint_fifo_workload_stream_v3'
 
     def __init__(self, *, frames, arrivals, catalog, **kwargs):
         self.arrivals = sorted(deepcopy(list(arrivals)), key=lambda a: (a.frame, a.vehicle_id))
@@ -151,7 +151,37 @@ class MultiRequestStreamEnv(MultiRequestTargetControlEnv):
                 raise ValueError('cache request identity requires a node')
             if vid not in self._active or c.request_id != self._active[vid].request_id:
                 raise ValueError('stale or unknown request control')
-        return super()._validate_controls(controls, decisions)
+        evictions = super()._validate_controls(controls, decisions)
+        required = self._declared_current_models(decisions, controls)
+        if any(set(victims) & required.get(rid,set()) for rid,victims in evictions.items()):
+            raise ValueError('explicit eviction conflicts with a current declared model dependency')
+        return evictions
+
+    def _declared_current_models(self, decisions, controls):
+        required = defaultdict(set)
+        for v,d in decisions.items():
+            state=d['semantic_state'];rid=controls[v].execution_target
+            if rid in self.model_cache.capacity_bytes and not state['output_pending']:
+                n=state['current_workflow_node']
+                required[rid].update((f"base:{n['required_base_model']}",f"adapter:{n['required_adapter']}"))
+        return required
+
+    def _admit_cache(self, vid, control, node, available_slots, decisions, controls):
+        optional=((control.cache_request_id or control.request_id)!=control.request_id or
+                  control.cache_node_id!=self.workflows[vid].current_node_id or vid in self.output_pending)
+        if optional:
+            rid=control.cache_target
+            closure={f'base:{node.required_base_model}'}
+            if control.cache_kind!='base_model':closure.add(f'adapter:{node.required_adapter}')
+            missing=closure-set(self.model_cache.resident[rid])-set(self.model_cache.pending[rid])
+            needed=sum(self.model_cache.objects[k].resident_size_bytes for k in missing)
+            victims=self.model_cache._eviction_plan(rid,needed,closure)
+            required=self._declared_current_models(decisions,controls).get(rid,set())
+            blocked=set(victims or []) & required
+            if blocked:
+                return dict(status='blocked_current_model_dependency',link_slots_consumed=0,
+                    admitted_object_ids=[],evicted_object_ids=[],blocked_object_ids=sorted(blocked))
+        return super()._admit_cache(vid,control,node,available_slots,decisions,controls)
 
     def _request_credit_ledger(self, events, components):
         exposed = [a.request_id for a in self._active.values()] + [a.request_id for q in self._queues.values() for a in q]
@@ -194,4 +224,5 @@ class MultiRequestStreamEnv(MultiRequestTargetControlEnv):
             'observation_contract':self.observation_contract,'arrival_contract':'exogenous_frame_release_per_vehicle_fifo',
             'same_frame_fifo_tie':'published_schedule_list_order',
             'cache_lifetime':'persistent_within_session_cold_on_reset_no_cross_split',
+            'admission_safety':'local_live_cache_and_current_declared_intents_no_future_oracle',
             'future_visibility':'unreleased_requests_hidden','catalog':[asdict(o) for o in self.catalog_objects]}

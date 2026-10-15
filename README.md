@@ -5,7 +5,7 @@
 
 # PPO_MEC
 
-2026-10-16 持续工作负载工程：新增外生FIFO请求、跨请求typed-cache保留/执行状态隔离、已发布queued模型预取和异构双base；独立合同拒绝旧裸v3控制。408回归与旧11模型重放通过，修正同帧FIFO后以v2独立root运行冻结216单元无训练工程矩阵，再决定新学习适配；不是SA性能结论。[合同](docs/project/joint_stream_workload_contract_20261016.md)。
+2026-10-16 持续工作负载工程：新增外生FIFO请求、跨请求typed-cache保留/执行状态隔离、已发布queued模型预取和异构双base；独立合同拒绝旧裸v3控制。408回归与旧11模型重放通过，修正同帧FIFO及延迟视图准入保护后以v3独立root运行冻结216单元无训练工程矩阵，再决定新学习适配；不是SA性能结论。[合同](docs/project/joint_stream_workload_contract_20261016.md)。
 
 2026-10-16 delivery v2完整回收：3840回合、120checkpoint及主/移动/旧强cache审计完成。SA48.544345/4.875超过去预测48.433218/4.75，但低于cache奖励48.612738和MAPPO完成4.958333；主预测开关48平、模型成本偏高、后期回退仍在。固定最终结果、负例、验证与下一步见[完整审查](docs/project/joint_delivery_v2_results_review_20261016.md)。formal/holdout封存，非论文主表。
 

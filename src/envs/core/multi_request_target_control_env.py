@@ -234,6 +234,13 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         if not self.link_reservation_enabled:record.pop('link_reservations')
         return record
 
+    def _admit_cache(self, vid, control, node, available_slots, decisions, controls):
+        if control.cache_kind == "base_model":
+            return self.model_cache.request_base_model(control.cache_target, node.required_base_model,
+                available_link_slots=available_slots)
+        return self.model_cache.request_adapter(control.cache_target, node.required_adapter,
+            node.required_base_model, available_link_slots=available_slots)
+
     def _control_episode_done(self) -> bool:
         return self.frame_index >= len(self.frames) or all(w.is_completed for w in self.workflows.values())
 
@@ -297,12 +304,8 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
             if control.cache_node_id is not None:
                 cache_node = self._cache_node_for_control(vid, control)
                 with self._link_scope(vid,"model",link_left):
-                    if control.cache_kind == "base_model":
-                        cache = self.model_cache.request_base_model(control.cache_target,
-                            cache_node.required_base_model, available_link_slots=link_left[control.cache_target])
-                    else:
-                        cache = self.model_cache.request_adapter(control.cache_target, cache_node.required_adapter,
-                            cache_node.required_base_model, available_link_slots=link_left[control.cache_target])
+                    cache = self._admit_cache(vid, control, cache_node,
+                        link_left[control.cache_target], decisions, controls)
                     link_left[control.cache_target] -= cache["link_slots_consumed"]
             transfers = []
             if control.prepare_target is not None:

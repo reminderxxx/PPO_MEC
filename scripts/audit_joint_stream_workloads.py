@@ -18,7 +18,7 @@ def canonical(event):return (json.dumps(event,sort_keys=True,separators=(',',':'
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('root',type=Path);a=p.parse_args();home=a.root.resolve();torch.set_num_threads(1)
     m=json.loads((home/'manifest.json').read_text());assert m['status']=='complete'
-    assert m['protocol']=='joint_stream_workload_engineering_v2'
+    assert m['protocol']=='joint_stream_workload_engineering_v3'
     if not m['smoke']:assert not m['git_dirty']
     for file,sha in m['output_sha256'].items():assert _hash_file(home/file)==sha
     for file,sha in m['source_fingerprints'].items():assert _hash_file(ROOT/file)==sha, file
