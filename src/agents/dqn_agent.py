@@ -530,7 +530,7 @@ class ScheduledDQNAgent(ScheduledControlPPO):
             with torch.no_grad():
                 *_,_,targets=self._evaluate(data,actions=actions,deterministic=True,return_details=True,target=True)
                 *_,_,future=self._evaluate(nxt,deterministic=True,return_details=True,target=True)
-                expected=torch.stack((targets[:,1],targets[:,2],torch.tensor([x[3] for x in sample])+.99*torch.tensor([not x[4] for x in sample])*future[:,0]),1)
+                expected=torch.stack((targets[:,1],targets[:,2],torch.tensor([x[3] for x in sample])+getattr(self,'return_gamma',.99)*torch.tensor([not x[4] for x in sample])*future[:,0]),1)
             loss=torch.nn.functional.smooth_l1_loss(q,expected)
             self.optimizer.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(self.heads.parameters(),.5);self.optimizer.step();losses.append(float(loss.detach()))
         self.completed_updates+=1
@@ -547,3 +547,10 @@ class ScheduledDQNAgent(ScheduledControlPPO):
     @classmethod
     def from_checkpoint(cls,path):
         obj=super().from_checkpoint(path);obj.epsilon=torch.load(path,weights_only=False)['epsilon'];return obj
+
+
+from src.agents.ppo_agent import TailControlPPO
+
+
+class TailDQNAgent(ScheduledDQNAgent,TailControlPPO):
+    checkpoint_contract='tail_parameterized_dqn_v1'

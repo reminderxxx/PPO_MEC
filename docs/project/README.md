@@ -253,3 +253,6 @@
 - joint_scheduled_prediction_support_review_20261015.md：8帧预约执行、固定权重预测局部收益/负例、图尺度原始witness；完整排序见joint_scheduled_control_results_review_20261015.md。
 
 - joint_scheduled_control_results_review_20261015.md：八主配置同预算最终排序、DQN信用勘误、120 checkpoint/30模型重放、跨seed回退与cache费用/交付边界。
+
+- joint_tail_regression_review_20261015.md：seed27组件/逐头冻结干预，定位priority surrogate及尾部目标不一致。
+- joint_tail_control_contract_20261015.md：独立tail实现、train-only cohort/双panel、八主两support固定预算及生产消费端。

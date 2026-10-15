@@ -696,11 +696,7 @@ class ScheduledControlPPO(CoordinatedControlPPO):
                 raw=self.surrogates[j](valid.detach());est=torch.cat((raw[:,:1],torch.nn.functional.softplus(raw[:,1:])),1);predictions[mask]=est
                 # Return targets already include physical costs. Centering cancels common return drift;
                 # subtracting the cost estimate again would double-charge an action.
-                center=(predictions[...,0]*mask).sum(1)/mask.sum(1).clamp(min=1)
-                relative=predictions[...,0]-center[:,None]
-                if j:relative=predictions[...,0]-predictions[:,0:1,0]
-                reliability=1/(1+10*self.surrogate_mse.sqrt())
-                logits=logits+.3*reliability*relative.detach().tanh()
+                logits=logits+self._surrogate_logit_adjustment(j,predictions,mask,data)
             if j==0:logits=logits+data['prior0']
             dist=self._choice_distribution(logits,mask,deterministic)
             action=actions[:,j] if actions is not None else (dist.logits.argmax(-1) if deterministic else dist.sample())
@@ -718,6 +714,13 @@ class ScheduledControlPPO(CoordinatedControlPPO):
 
     def _choice_distribution(self,logits,mask,deterministic):
         return Categorical(logits=logits.masked_fill(~mask,-1e9))
+
+    def _surrogate_logit_adjustment(self,j,predictions,mask,data):
+        center=(predictions[...,0]*mask).sum(1)/mask.sum(1).clamp(min=1)
+        relative=predictions[...,0]-center[:,None]
+        if j:relative=predictions[...,0]-predictions[:,0:1,0]
+        reliability=1/(1+10*self.surrogate_mse.sqrt())
+        return .3*reliability*relative.detach().tanh()
 
     @torch.no_grad()
     def act_controls(self,decisions,frame,*,deterministic=False):
@@ -783,3 +786,63 @@ class ScheduledControlPPO(CoordinatedControlPPO):
         self.completed_updates+=1
         means=np.mean(losses,0) if losses else [0.,0.,0.]
         return dict(policy_loss=float(means[0]),value_loss=float(means[1]),surrogate_loss=float(means[2]),samples=len(actions),gradient_steps=len(losses),learning_rate=lr,approx_kl=float(np.mean(kls)) if kls else 0.,clip_fraction=float(np.mean(clips)) if clips else 0.,normalized_entropy=float(np.mean(entropies)) if entropies else 0.,q_mse=float(np.mean(qerrors)) if qerrors else 0.,kl_early_stop=int(stopped))
+
+
+class TailControlPPO(ScheduledControlPPO):
+    """Finite-horizon delivery credit and preparation-scoped surrogate assistance."""
+    checkpoint_contract='tail_parameterized_ppo_v1'
+
+    def __init__(self, *, return_gamma=1., **kwargs):
+        super().__init__(**kwargs)
+        if not 0<return_gamma<=1:raise ValueError('return_gamma must be in (0,1]')
+        self.return_gamma=float(return_gamma);self.options['return_gamma']=self.return_gamma
+
+    def _surrogate_logit_adjustment(self,j,predictions,mask,data):
+        if j==0:return torch.zeros_like(predictions[...,0])
+        values=predictions[...,0]
+        if j==2:
+            # Four priorities belong to each preparation target. Auxiliary return
+            # can value preparing a target, but cannot reorder that target's queue.
+            grouped=values.reshape(len(values),5,4)
+            weights=mask.reshape(len(values),5,4).float()
+            means=(grouped*weights).sum(-1)/weights.sum(-1).clamp(min=1)
+            values=means.repeat_interleave(4,dim=1)
+        relative=values-values[:,0:1]
+        f=data[f'f{j}']
+        eligible=mask & (f[...,0]>0) & (f[...,24]>0) & mask[:,0:1]
+        reliability=1/(1+10*self.surrogate_mse.sqrt())
+        return .3*reliability*relative.detach().tanh()*eligible
+
+    def _coordinated_features(self,decision,frame,reservations):
+        data,candidates,vid,node,work=super()._coordinated_features(decision,frame,reservations)
+        s=decision['semantic_state'];rates=s['control_cost_parameters']
+        pending=s['output_pending'];current=s['current_workflow_node']
+        # The current input has already been paid while computing or returning output.
+        current_compute=max(0.,s['current_node_work_units_required']-s['current_node_work_units_progress'])/rates['rsu_work_units_per_frame']
+        current_input=np.ceil(max(1,current['input_size']*rates['profile_unit_bytes'])/rates['input_bytes_per_frame'])
+        current_output=np.ceil(max(1,current['output_size']*rates['profile_unit_bytes'])/rates['output_bytes_per_frame'])
+        correction=current_input if s['execution_location'] in s['input_received_targets'] else 0.
+        if pending:correction=current_input+current_compute+current_output-np.ceil(pending['remaining_bytes']/rates['output_bytes_per_frame'])
+        remaining=max(0.,work-correction)
+        data['own'][2]=(len(s['workflow']['nodes'])-len(s['workflow']['completed_node_ids']))/max(1,len(s['workflow']['nodes']))
+        # Forecast belongs to preparation. Execution/priority use observed progress,
+        # load and deadline; DT's dedicated raw forecast context remains available.
+        data['own'][11:13]=0
+        data['critic'][:20]=data['own']
+        data['f0'][:,10:12]=0;data['f0'][:,24:27]=0
+        horizon=max(1,s['episode_frames_remaining'])
+        for k,f in enumerate(data['f0']):
+            queue=np.expm1(max(0.,f[21])*np.log1p(120))
+            relocation=f[23]*120
+            f[30]=np.clip((horizon-remaining-queue-relocation)/horizon,-1,1)
+        return data,candidates,vid,node,work
+
+    def update(self,rollouts,*,epochs=4):
+        # Global value and request/action values now share reward units per initial
+        # request, avoiding a larger team regression dominating global grad clipping.
+        original=[r['returns'] for r in rollouts]
+        try:
+            for r in rollouts:r['returns']=r['returns']/r['initial_request_count']
+            return super().update(rollouts,epochs=epochs)
+        finally:
+            for r,value in zip(rollouts,original):r['returns']=value

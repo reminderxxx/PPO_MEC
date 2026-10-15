@@ -1771,3 +1771,7 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 ## 2026-10-15 scheduled 完整回收的只读复核
 
 使用项目解释器运行`python scripts/audit_joint_coordinated_control.py joint_scheduled_control`与`python scripts/analyze_joint_scheduled_training.py joint_scheduled_control`。前者验证12个完整run、不可变plan/追加amendment、双source共享代码、120checkpoint、原始费用/预约及30final首dev重放；后者同时输出固定train/dev、训练首末32段机制统计、逐seed/window的96→128差值和stability初始化配对。输出位于artifacts/joint_coordinated_audit_20261015，不更新权重、不选择checkpoint、不打开formal/holdout。原始command.log在各part/seed根；八主比较与legacy/constant辅助结果必须分列。完整结果见joint_scheduled_control_results_review_20261015.md。
+
+## 2026-10-15 tail独立开发入口
+
+先运行项目解释器`python scripts/prepare_joint_tail_control.py --source_manifest <原开发manifest> --output_root artifacts/joint_tail_control/protocol`冻结40train/16dev场景和30epoch公共GRU。再运行`python scripts/train_joint_tail_control.py --protocol artifacts/joint_tail_control/protocol/manifest.json --agent <配置> --seeds 7 17 27 --episodes 128 --eval_every 32 --output_root artifacts/joint_tail_control/<配置>`。八主及两support计划开跑前保存根comparison_plan.json。全部完成后`python scripts/audit_joint_tail_control.py artifacts/joint_tail_control`只读核验、两panel重放及固定权重预测开关。保留全部panel/seed，不按结果选择。

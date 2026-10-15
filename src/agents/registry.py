@@ -252,9 +252,24 @@ def build_agent(agent_name: str, **kwargs: Any) -> BaseAgent:
         from src.agents.mappo_agent import ParameterizedMAPPOAgent
         from src.agents.cache_offload_agent import ParameterizedCacheOffloadAgent
         from src.agents.sa_ghmappo_agent import ParameterizedSAGHMAPPOAgent
-        scheduled=kwargs.pop("scheduled_controls",False)
+        tail=kwargs.pop('tail_controls',False)
+        scheduled=kwargs.pop("scheduled_controls",False) or tail
         if scheduled:
             kwargs.pop('coordinated_controls',None)
+            if tail:
+                from src.agents.ppo_agent import TailControlPPO
+                from src.agents.sa_ghmappo_agent import TailSAGHMAPPOAgent
+                from src.agents.mappo_agent import TailMAPPOAgent
+                from src.agents.cache_offload_agent import TailCacheOffloadAgent
+                from src.agents.dag_offload_agent import TailDAGOffloadAgent
+                from src.agents.dt_handoff_agent import TailDTHandoffAgent
+                from src.agents.dqn_agent import TailDQNAgent
+                mapping={'sa_ghmappo':TailSAGHMAPPOAgent,'mappo':TailMAPPOAgent,
+                         'cache_offload_drl':TailCacheOffloadAgent,'dag_offload_drl':TailDAGOffloadAgent,
+                         'dt_handoff_drl':TailDTHandoffAgent,'dqn':TailDQNAgent}
+                if agent_name=='ppo':return TailControlPPO(method='ppo',**kwargs)
+                if agent_name not in mapping:raise ValueError('agent has no tail parameterized implementation')
+                return mapping[agent_name](**kwargs)
             from src.agents.ppo_agent import ScheduledControlPPO
             from src.agents.mappo_agent import ScheduledMAPPOAgent
             from src.agents.sa_ghmappo_agent import ScheduledSAGHMAPPOAgent

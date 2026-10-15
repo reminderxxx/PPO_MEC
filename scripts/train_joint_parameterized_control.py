@@ -48,7 +48,7 @@ def episode(env, agent=None, *, deterministic=False, event_file=None, identity=N
             if hasattr(agent,'credit_mode'):
                 rollout['request_rewards'] = receipt['request_rewards']
                 mechanisms['migration_opportunities'] += agent.last_diagnostics['migration_opportunities']
-            scheduled=getattr(agent,'checkpoint_contract','').startswith('scheduled_')
+            scheduled=getattr(agent,'checkpoint_contract','').startswith(('scheduled_','tail_'))
             rollout['cost_targets'] = torch.tensor([[
                 (sum(ceil(env.model_cache.objects[key].transfer_size_bytes/env.model_cache.transfer_bytes_per_frame) for key in by_vehicle[vid]['cache_request'].get('admitted_object_ids',[])) if scheduled else by_vehicle[vid]['cache_request']['link_slots_consumed'])/10,
                 by_vehicle[vid]['state_transfer_link_frames']/10] for vid in rollout['vehicle_ids']], dtype=torch.float32)
@@ -69,11 +69,12 @@ def episode(env, agent=None, *, deterministic=False, event_file=None, identity=N
     # Every request receives the full team tail, including after its own completion.
     target = 0.; local_returns={}
     for rollout, value in reversed(list(zip(rolls, rewards))):
-        target = value/10 + .99*target
+        gamma=getattr(agent,'return_gamma',.99)
+        target = value/10 + gamma*target
         rollout['returns'] = torch.full_like(rollout['values'], target)
         if 'request_rewards' in rollout:
             for vid in set(local_returns)|set(rollout['request_rewards']):
-                local_returns[vid] = rollout['request_rewards'].get(vid,0.)/10+.99*local_returns.get(vid,0.)
+                local_returns[vid] = rollout['request_rewards'].get(vid,0.)/10+gamma*local_returns.get(vid,0.)
             local=torch.tensor([local_returns[vid] for vid in rollout['vehicle_ids']],dtype=torch.float32)
             rollout['request_returns']=local
             rollout['team_credit_targets']=torch.full_like(local,target/initial_request_count)

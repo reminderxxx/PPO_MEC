@@ -2191,3 +2191,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 完整独立审查：joint_scheduled_control_results_review_20261015.md。formal/holdout封存、canonical不更新、论文E0_UNAVAILABLE；下一实现阶段先围绕尾部交付/信用和训练覆盖负例建witness，不在本审查内调参。
 
 2026-10-15独立尾部定位：seed27固定权重仅关闭surrogate事件头干预，奖励56.343598→57.837427、请求6→7.125；关闭其他头无改善。priority被观测return残差重排已形成干预证据；gamma.99与有限时域评估也不一致。见joint_tail_regression_review_20261015.md；先审查、后独立实现，不追认新算法优势。
+
+2026-10-15独立tail实现：375相关测试通过；train原区间新增mobile_tight cohort的几何离站151（base29），无失覆盖车帧，GRU按原区间分组fit/validation。SA/DQN各4episode真实入口完成，完整同预算比较尚未启动；见joint_tail_control_contract_20261015.md。

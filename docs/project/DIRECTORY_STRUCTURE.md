@@ -406,3 +406,7 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 2026-10-15：artifacts/joint_coordinated_partial_control_v2保存生命周期修正后三组同预算开发比较；joint_coordinated_partial_control保留已中止试跑及run_abort.json。
 
 2026-10-15：artifacts/joint_scheduled_control/{main,baselines,stability}/seedN/run_id/保存scheduled同预算开发比较；根comparison_plan.json事前冻结各组/seed/预算/source，旧轮原样保留。joint_scheduled_smoke与joint_scheduled_final_smoke为dirty-tree入口验证，不入效果主表。
+
+- `scripts/prepare_joint_tail_control.py`、`train_joint_tail_control.py`、`audit_joint_tail_control.py`：tail公共场景生产/学习/只读消费。
+- `src/envs/core/joint_training_scenarios.py`：仅train原时间内外生几何cohort、共享tight场景；不依赖agent。
+- `artifacts/joint_tail_control/protocol/`及`<agent>/<run_id>/`：新scenario_id合同，旧scheduled产物保留。

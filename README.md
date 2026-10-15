@@ -582,3 +582,5 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 2026-10-15：生命周期v3三组同预算训练及原始账本重放已完整回收；SA奖励均值第一但完成率仍落后，详见[独立最终结果](docs/project/joint_partial_control_results_review_20261015.md)，不作论文晋级。
 
 2026-10-15：新增`--scheduled_controls`独立实现，恢复七算法与去预测的相同参数化动作比较，8帧公共预约/动作信用/图尺度和后期回退对照见[冻结合同](docs/project/joint_scheduled_control_contract_20261015.md)。效果待同预算回收。
+
+2026-10-15独立尾部实现：新增train-only mobility cohort、base/tight双开发panel与tail参数化checkpoint，GRU保留，surrogate不再重排noop priority，gamma=1对齐有限评估。入口`prepare_joint_tail_control.py`/`train_joint_tail_control.py`与[合同](docs/project/joint_tail_control_contract_20261015.md)；新结果待同预算回收。

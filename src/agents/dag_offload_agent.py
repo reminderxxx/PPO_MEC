@@ -288,3 +288,12 @@ class ScheduledDAGOffloadAgent(ScheduledControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method',None)
         super().__init__(method='dag_offload_drl',**kwargs)
+
+
+from src.agents.ppo_agent import TailControlPPO
+
+
+class TailDAGOffloadAgent(TailControlPPO):
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='dag_offload_drl',**kwargs)

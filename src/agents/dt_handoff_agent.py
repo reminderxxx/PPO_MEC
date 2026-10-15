@@ -287,3 +287,12 @@ class ScheduledDTHandoffAgent(ScheduledControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method',None)
         super().__init__(method='dt_handoff_drl',**kwargs)
+
+
+from src.agents.ppo_agent import TailControlPPO
+
+
+class TailDTHandoffAgent(TailControlPPO):
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='dt_handoff_drl',**kwargs)
