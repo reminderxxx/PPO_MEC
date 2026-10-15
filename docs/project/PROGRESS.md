@@ -2165,3 +2165,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 2026-10-15：严格阶段SA/MAPPO最终组已回收、其他配置继续。覆盖影子审查显示门控对partial copy过严，独立修复已增加ETA前部分推进、cache/state分开估值与inflight-aware选站，343项回归通过；另按128×3seed重训主三组，见 `joint_partial_preparation_contract_20261015.md`。结果待回收。
 
 2026-10-15：独立输出生命周期witness发现只交付结果仍强制模型加载；旧partial试跑中止保留，新v3共同修复output-only mask及在途模型成本，三组重新同预算训练。见 joint_output_lifecycle_review_20261015.md 与 joint_partial_preparation_contract_20261015.md。
+
+2026-10-15：严格门控七配置2688episode完整回收；84checkpoint/145441事件/21945收据审计通过，21最终模型首dev完整事件重放一致。SA58.2183445/7.125，MAPPO58.070594/6.95833，no-pred58.232348/6.95833，尚未同时超越两者；预测固定权重开关24单元事件相等。partial生命周期v3三组继续，见joint_coordinated_results_review_20261015.md。

@@ -1646,3 +1646,5 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 七个用户修改文件 SHA-256 未变且未纳入任何提交。Protocol 2.9、Readiness v21、科学配置及旧 invalid-run
 限制均未改变。v16 仍未创建、未消耗、未执行；这是启动授权暂缓，不是运行失败。main 测试使用受控数据
 准备，public preflight 不等于完整正式评估；无正式训练、formal performance、holdout、G14D/G15 或论文结论。
+
+2026-10-15：joint_coordinated_control/seed{7,17,27}/20261015T015625Z_development，source84028c1，七配置128×3seed；审计artifacts/joint_coordinated_audit_20261015/joint_coordinated_control_audit.json，84checkpoint/21final重放通过，paper E0_UNAVAILABLE。完整结果见joint_coordinated_results_review_20261015.md。

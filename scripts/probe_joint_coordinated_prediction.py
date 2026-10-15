@@ -24,7 +24,9 @@ def main():
  splits,workflows,rsus=_load_protocol(arguments(source['command'][1:]));rows=[]
  with (destination/f'frozen_prediction_off_events{suffix}.jsonl').open('w') as events:
   for seed in (7,17,27):
-   manifest=next((ROOT/f'artifacts/{experiment}/seed{seed}').glob('*/manifest.json'))
+   paths=list((ROOT/f'artifacts/{experiment}/seed{seed}').glob('*/manifest.json'))
+   assert len(paths)==1, 'exactly one prespecified run per seed required'
+   manifest=paths[0]
    m=json.loads(manifest.read_text());directory=manifest.parent
    assert m['status']=='complete' and not (directory/'run_abort.json').exists()
    path=directory/f'sa_ghmappo_seed{seed}_ep128.pt';saved=torch.load(path,weights_only=False)

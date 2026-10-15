@@ -239,3 +239,5 @@
 - `joint_partial_preparation_contract_20261015.md`：部分预复制/cache-only与三配置同预算再训练。
 
 - joint_output_lifecycle_review_20261015.md：输出阶段冷模型约束的独立缺陷审查；修复及新同预算比较见joint_partial_preparation_contract_20261015.md。
+
+- joint_coordinated_results_review_20261015.md：七配置同预算完整回收、原始账本及checkpoint重放审计，预测收益尚未证明。

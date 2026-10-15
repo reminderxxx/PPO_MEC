@@ -19,7 +19,9 @@ def identity(r):return r['agent'],r['seed'],r['episode'],r['frame_offset']
 def main():
  torch.set_num_threads(1)
  experiment = sys.argv[1] if len(sys.argv)>1 else 'joint_coordinated_control'
- manifests=[next((ROOT/f'artifacts/{experiment}/seed{s}').glob('*/manifest.json')) for s in (7,17,27)]
+ candidates=[list((ROOT/f'artifacts/{experiment}/seed{s}').glob('*/manifest.json')) for s in (7,17,27)]
+ assert all(len(paths)==1 for paths in candidates), 'exactly one prespecified run per seed required'
+ manifests=[paths[0] for paths in candidates]
  sources=[json.loads(p.read_text()) for p in manifests]
  assert not any((p.parent/'run_abort.json').exists() for p in manifests), 'aborted pilot is not a complete comparison'
  assert all(s['status']=='complete' and not s['git_dirty'] and s.get('coordinated_controls') for s in sources)
@@ -136,6 +138,7 @@ def main():
       completion_losses=sum(v<0 for v in completion),window_mean_differences=by_window)
  # Independently reload every final model and replay first dev window (all request events checked).
  source=json.loads((ROOT/'artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/20261014T074430Z_development/manifest.json').read_text())
+ assert _hash_file(ROOT/'artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/20261014T074430Z_development/manifest.json')==sources[0]['source_manifest_sha256']
  splits,workflows,rsus=_load_protocol(arguments(source['command'][1:]))
  for split in ('train','dev'):
   public=[{k:v for k,v in w.items() if k!='frames'} for w in splits[split]]
