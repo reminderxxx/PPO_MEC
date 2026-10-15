@@ -565,3 +565,51 @@ class DeliveryDQNAgent(ScheduledDQNAgent,DeliveryControlPPO):
     def _transition_reward(self,rollout,index,vid,terminal):
         count=rollout['initial_request_count']
         return float(rollout['returns'][index])/count if terminal else sum(rollout['request_rewards'].values())/(10*count)
+
+
+from src.agents.ppo_agent import StreamControlPPO
+
+
+class StreamDQNAgent(ScheduledDQNAgent, StreamControlPPO):
+    """Autoregressive Q learning across idle frames and request identity changes."""
+    checkpoint_contract = 'stream_parameterized_dqn_v1'
+
+    @staticmethod
+    def _replay_data(data,index):
+        out={k:v[index:index+1].detach().clone() for k,v in data.items()}
+        missing=StreamControlPPO.max_cache_candidates-out['m1'].shape[1]
+        if missing<0:raise ValueError('released cache candidate bound exceeded')
+        for name in ('f1','m1','node1'):
+            pad=(0,0,0,missing) if name=='f1' else (0,missing)
+            out[name]=torch.nn.functional.pad(out[name],pad,value=-1 if name=='node1' else 0)
+        return out
+
+    def update(self,rollouts,*,epochs=4):
+        # MC differences are OBSERVED interval rewards. Reconnect a vehicle's
+        # next decision through idle gaps and new requests, within this session.
+        following={}
+        for r in reversed(rollouts):
+            if r['episode_end']:following={}
+            for i,vid in enumerate(r['vehicle_ids']):
+                data=self._replay_data(r['data'],i)
+                next_item=following.get(vid)
+                total=float(r['returns'][i])/r['initial_request_count']
+                nxt,next_return=next_item if next_item else (data,0.)
+                self.replay.append((data,r['actions'][i:i+1].clone(),nxt,total-next_return,next_item is None))
+                following[vid]=(data,total)
+        losses=[]
+        for _ in range(8*epochs):
+            if len(self.replay)<128:break
+            sample=random.sample(self.replay,128)
+            data={k:torch.cat([x[0][k] for x in sample]) for k in sample[0][0]};actions=torch.cat([x[1] for x in sample]);nxt={k:torch.cat([x[2][k] for x in sample]) for k in sample[0][2]}
+            *_,q,_=self._evaluate(data,actions=actions,return_details=True)
+            with torch.no_grad():
+                *_,_,targets=self._evaluate(data,actions=actions,deterministic=True,return_details=True,target=True)
+                *_,_,future=self._evaluate(nxt,deterministic=True,return_details=True,target=True)
+                expected=torch.stack((targets[:,1],targets[:,2],torch.tensor([x[3] for x in sample])+torch.tensor([not x[4] for x in sample])*future[:,0]),1)
+            loss=torch.nn.functional.smooth_l1_loss(q,expected)
+            self.optimizer.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(self.heads.parameters(),.5);self.optimizer.step();losses.append(float(loss.detach()))
+        self.completed_updates+=1
+        if int(self.completed_updates)%2==0:self.target_heads.load_state_dict(self.heads.state_dict())
+        self.epsilon=max(.05,.3-.25*min(1.,float(self.completed_updates)*4/self.training_budget))
+        return dict(value_loss=float(np.mean(losses)) if losses else 0.,samples=sum(len(r['actions']) for r in rollouts),gradient_steps=len(losses),replay_size=len(self.replay),epsilon=self.epsilon)

@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- [joint_stream_learning_contract_20261016.md](joint_stream_learning_contract_20261016.md)：持续请求八配置共同学习合同、固定训练/开发划分、预算与自动回收；配套学习前审、predictor partition审查、首次软件消费端失败审查同日保留。
+
 - [joint_stream_workload_results_review_20261016.md](joint_stream_workload_results_review_20261016.md)：v3完整216单元零训练工程结果、配对负例、对象驻留使用与学习合同缺口。
 - `joint_stream_workload_review_20261016.md` / `joint_stream_workload_contract_20261016.md`：工作负载空缺前审、独立持续请求/多模型合同和216单元零训练工程验证计划。
 

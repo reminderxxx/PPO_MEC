@@ -496,3 +496,12 @@ class DeliverySAGHMAPPOAgent(DeliveryControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method',None)
         super().__init__(method='sa_ghmappo',**kwargs)
+
+
+from src.agents.ppo_agent import StreamControlPPO
+
+
+class StreamSAGHMAPPOAgent(StreamControlPPO):
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='sa_ghmappo',**kwargs)

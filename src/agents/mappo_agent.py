@@ -214,3 +214,12 @@ class DeliveryMAPPOAgent(DeliveryControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method',None)
         super().__init__(method='mappo',**kwargs)
+
+
+from src.agents.ppo_agent import StreamControlPPO
+
+
+class StreamMAPPOAgent(StreamControlPPO):
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='mappo',**kwargs)

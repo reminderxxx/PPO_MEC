@@ -247,6 +247,20 @@ def build_agent(agent_name: str, **kwargs: Any) -> BaseAgent:
     """Build an agent by registry name."""
     contract = kwargs.pop("control_contract", None)
     if contract is not None:
+        if contract == 'joint_stream_control_v1':
+            from src.agents.ppo_agent import StreamControlPPO
+            from src.agents.mappo_agent import StreamMAPPOAgent
+            from src.agents.sa_ghmappo_agent import StreamSAGHMAPPOAgent
+            from src.agents.cache_offload_agent import StreamCacheOffloadAgent
+            from src.agents.dag_offload_agent import StreamDAGOffloadAgent
+            from src.agents.dt_handoff_agent import StreamDTHandoffAgent
+            from src.agents.dqn_agent import StreamDQNAgent
+            mapping = {'mappo':StreamMAPPOAgent,'sa_ghmappo':StreamSAGHMAPPOAgent,
+                       'cache_offload_drl':StreamCacheOffloadAgent,'dag_offload_drl':StreamDAGOffloadAgent,
+                       'dt_handoff_drl':StreamDTHandoffAgent,'dqn':StreamDQNAgent}
+            if agent_name == 'ppo':return StreamControlPPO(method='ppo',**kwargs)
+            if agent_name not in mapping:raise ValueError('agent has no stream learning implementation')
+            return mapping[agent_name](**kwargs)
         if contract != "joint_parameterized_control_v3":
             raise ValueError("unknown control contract")
         from src.agents.mappo_agent import ParameterizedMAPPOAgent

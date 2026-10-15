@@ -1820,3 +1820,17 @@ python scripts/audit_joint_stream_workloads.py <full_timestamp_directory>
 
 
 2026-10-16 v3完整回收：接受root为`artifacts/joint_stream_workloads_v3/20261015T172250Z_engineering`（216单元审计通过）。只读查看`audit.json`、`workload_analysis.json`和`report_validation.json`；固定结果报告为`joint_stream_workload_results_review_20261016.md`。无活动训练/实验需恢复，不重启v1/v2；旧stream执行命令是复现入口，不是待执行任务。后处理本地脚本`python artifacts/analyze_joint_stream_v3.py`读取成功launcher并核验原train帧、分层配对和对象生命周期，不改源码/模型。该脚本和raw产物仅在本地产物目录，Git记录源码和报告；需要异机复核时按manifest保留完整产物。
+
+
+## 持续请求共同学习（2026-10-16，新合同）
+
+先读`joint_stream_learning_contract_20261016.md`。旧裸v3 checkpoint不能加载。使用项目venv，`launch`会顺序准备新train-only预测器/冻结日程、运行全部八配置并独立审计/自动生成结果报告。首次smoke失败原件不覆盖；每个新root必须不存在。
+
+```bash
+python scripts/launch_joint_stream_learning.py --smoke --output_root artifacts/joint_stream_learning_smoke_v3
+python scripts/launch_joint_stream_learning.py --output_root artifacts/joint_stream_learning/<new_run_id>
+```
+
+科学运行要求clean Git，所有方法各seeds7/17/27×64会话，最大737280训练帧；32只在12固定probe看曲线，64完整48条件固定最终。新增一次seed101/30epoch GRU拟合，仅新train前两会话、第三内部验证；记录真实原时间偏移和SHA，不复用覆盖新dev的旧bundle。最终原始events/receipts在各方法子目录，根`results.jsonl`合并全部final汇总；`audit.json`/`results_review.md`为独立消费输出，`launcher_result.json=complete`才是整个流水线完成。
+
+当前运行指针`artifacts/joint_stream_learning/continuation.json`，每20分钟只读其指向的progress/result及必要日志末尾，不盯奖励/轮次。正常运行静默；完成自动回收分析，独立审查后再落实下一有界实施任务。失败保留原件，不自动重跑或续训；不要重复执行已启动科学launch。

@@ -1017,3 +1017,203 @@ class DeliveryControlPPO(TailControlPPO):
     def from_checkpoint(cls,path):
         obj=super().from_checkpoint(path);saved=torch.load(path,weights_only=False)
         obj.surrogate_optimizer.load_state_dict(saved['surrogate_optimizer']);return obj
+
+
+class StreamControlPPO(DeliveryControlPPO):
+    """Released-request graph controls; session team returns, no arrival oracle.
+
+    Feature widths match the delivery network, but field meanings and graph size
+    are new and checkpoint-incompatible. Identity is used for binding only.
+    """
+    action_contract = 'joint_stream_control_v1'
+    checkpoint_contract = 'stream_parameterized_ppo_v1'
+    max_released_nodes = 64
+    max_cache_candidates = 513
+
+    def reset_controller(self):
+        super().reset_controller()
+        self.request_memory = {}
+
+    def _coordinated_features(self, decision, frame, reservations):
+        from math import ceil
+        from src.envs.core.joint_link_reservation import service_scale
+        from src.envs.core.joint_delivery_planning import fresh_model_span, node_delivery_times
+        from src.envs.core.joint_stream_rules import protects_current_models
+        if decision.get('action_contract') != self.action_contract:
+            raise ValueError('stream learner requires request-bound stream contract')
+        s = decision['semantic_state']; vid = s['primary_vehicle_id']; rid = s['request_id']
+        current = s['current_workflow_node']; done = set(s['workflow']['completed_node_ids'])
+        graphs = [(rid, s['workflow']), *[(q['request_id'], q['workflow']) for q in s['queued_workflows']]]
+        nodes = [(request, n) for request, w in graphs for n in w['nodes']]
+        if len(nodes) > self.max_released_nodes or len(s['rsus']) != 4:
+            raise ValueError('stream learning supports <=64 released nodes and four RSUs')
+        lookup = {n['node_id']: (request, n) for request, n in nodes}
+        if len(lookup) != len(nodes):raise ValueError('released node identities must be unique')
+        index = {n['node_id']: i for i, (_, n) in enumerate(nodes)}
+        rows = {r['rsu_id']: r for r in s['rsus']}; ids = sorted(rows)
+        rates = s['control_cost_parameters']; catalog = rates['model_catalog']; horizon = s['episode_frames_remaining']
+        model_byte_scale=max(o['resident_size_bytes']+sum(catalog[k]['resident_size_bytes'] for k in o['dependency_ids']) for o in catalog.values())
+        scale = lambda x: service_scale(x, 480)
+        work = sum(ceil(max(1., n['input_size']*rates['profile_unit_bytes']/rates['workload_bytes_per_unit'])/rates['rsu_work_units_per_frame']) for request,n in nodes if request != rid or n['node_id'] not in done)
+        queued_work = sum(ceil(max(1., n['input_size']*rates['profile_unit_bytes']/rates['workload_bytes_per_unit'])/rates['rsu_work_units_per_frame']) for request,n in nodes if request != rid)
+        pred = s['predictions'] if self.prediction_enabled else {}
+        future = pred.get('predicted_next_rsu_by_vehicle', {}).get(vid)
+        confidence = pred.get('prediction_confidence_by_vehicle', {}).get(vid, 0.)
+        calendar = getattr(self, '_calendar', {r:[None]*self.planning_horizon for r in ids})
+        opportunities = self._reserved_opportunities(s, calendar)
+        self._feature_opportunities = opportunities
+        # Public intent demand includes already released FIFO queues, never unseen jobs.
+        from collections import Counter
+        demands = {r:set() for r in ids};frequencies={r:Counter() for r in ids}
+        delivery_offsets={};elapsed=0.
+        for request,w in graphs:
+            for nid in w['execution_order']:
+                if request==rid and nid in done:continue
+                n=lookup[nid][1];delivery_offsets[nid]=elapsed
+                elapsed+=ceil(n['input_size']*rates['profile_unit_bytes']/rates['input_bytes_per_frame'])+ceil(max(1.,n['input_size']*rates['profile_unit_bytes']/rates['workload_bytes_per_unit'])/rates['rsu_work_units_per_frame'])+ceil(n['output_size']*rates['profile_unit_bytes']/rates['output_bytes_per_frame'])
+        for owner,d in getattr(self, '_delivery_decisions', {}).items():
+            target = getattr(self, '_team_targets', {}).get(owner)
+            if target not in demands:continue
+            st = d['semantic_state']; ws = [st['workflow'], *[q['workflow'] for q in st['queued_workflows']]]
+            for w in ws:
+                for n in w['nodes']:
+                    if n['node_id'] not in w['completed_node_ids']:
+                        frequencies[target][f"adapter:{n['required_adapter']}"]+=1
+                        demands[target].add(f"adapter:{n['required_adapter']}")
+                        demands[target].add(f"base:{n['required_base_model']}")
+        own = np.array([frame/480, len(done)/max(1,len(s['workflow']['nodes'])),
+            (len(nodes)-len(done))/64, s['current_node_work_units_progress']/max(1.,s['current_node_work_units_required']),
+            scale(s['current_node_work_units_required']/rates['rsu_work_units_per_frame']),
+            scale(s['execution_state_payload_bytes']/rates['state_bytes_per_frame']),s['execution_state_version']/480,
+            s['current_node_parents_ready'],s['vehicle_adapter_ready'],bool(s['output_pending']),
+            len(s['input_received_targets'])/4,confidence if opportunities else 0.,
+            pred.get('dwell_time',{}).get(vid,0)/self.planning_horizon if opportunities else 0.,
+            s['shared_state'].get('available',False),(s['shared_state'].get('age_frames') or 0)/8,
+            len(s['reachable_execution_rsu_ids'])/4,len(graphs)-1,len(graphs)/2,
+            min(1.,work/max(1,horizon)),scale(queued_work)],np.float32)
+        graph = np.zeros((64,4),np.float32); adjacency = np.zeros((64,64),np.float32)
+        for i,(request,n) in enumerate(nodes):
+            graph[i] = [scale(n['input_size']*rates['profile_unit_bytes']/rates['workload_bytes_per_unit']/rates['rsu_work_units_per_frame']),
+                scale(n['output_size']*rates['profile_unit_bytes']/rates['output_bytes_per_frame']),
+                request == rid and n['node_id'] in done,n['node_id']==current['node_id']]
+        for _,w in graphs:
+            for a,b in w['edges']:adjacency[index[b],index[a]]=1
+        adjacency /= np.maximum(1,adjacency.sum(1,keepdims=True))
+        queue = {r:sum(w for v,(target,w) in reservations.items() if v!=vid and target==r) for r in ids}
+        def feature(site=None,n=None,kind='adapter',priority=0):
+            n = n or current; r = rows.get(site,{}); request = lookup[n['node_id']][0]
+            cap = max(1,r.get('capacity_bytes') or model_byte_scale); base = catalog[f"base:{n['required_base_model']}"]; adapter = catalog[f"adapter:{n['required_adapter']}"]
+            closure = {f"base:{n['required_base_model']}",f"adapter:{n['required_adapter']}"}
+            demand = demands.get(site,set()) | closure
+            working_bytes = sum(catalog[k]['resident_size_bytes'] for k in demand)
+            alternate = dict(s,control_cost_parameters=dict(rates,base_size_bytes=base['transfer_size_bytes'],adapter_size_bytes=adapter['transfer_size_bytes']))
+            span = fresh_model_span(alternate,r,n,kind) if site in rows else 0
+            relocation = 0.
+            if site in rows and s['execution_state_version'] and site!=s['execution_location']:
+                relocation=max(0,s['execution_state_payload_bytes']-s['state_copies_by_rsu'].get(site,{}).get('payload_bytes',0))/rates['state_bytes_per_frame']
+            op=opportunities.get(site,{}) if n['node_id']==current['node_id'] else {}
+            # Risk is a feature, not a label claimed to be causal net reward.
+            risk=max(0.,working_bytes/cap-1) if site in rows else 0.
+            return [float(site in rows),float(site in s['reachable_execution_rsu_ids']),float(site==s['execution_location']),float(site==s['associations'][vid]),
+                float(n['required_adapter'] in r.get('cached_adapter_ids',[])),float(n['required_adapter'] in r.get('loading_adapter_ids',[])),
+                float(n['required_base_model'] in r.get('ready_base_model_ids',[])),r.get('occupied_bytes',0)/cap,
+                r.get('service_request_count',0)/8,float(site in s['input_received_targets']),
+                float(site==future)*confidence,float(pred.get('future_load',{}).get(site,0))/8,
+                float(n['node_id']==current['node_id']),scale(n['input_size']*rates['profile_unit_bytes']/rates['input_bytes_per_frame']),float(kind=='base_model'),priority/3,
+                *[float(site==r) for r in ids],base['resident_size_bytes']/cap if site in rows else 0.,adapter['resident_size_bytes']/cap if site in rows else 0.,
+                scale(queue.get(site,0)),scale(relocation),np.tanh(op.get('net_reward_proxy',0.)),
+                min(1.,frequencies.get(site,{}).get(f"adapter:{n['required_adapter']}",0)/8),min(4.,risk),scale(delivery_offsets.get(n['node_id'],0.)),
+                (len(nodes)-len(done))/64,scale(span),np.clip((horizon-work-queue.get(site,0)-relocation)/max(1,horizon),-1,1),
+                scale(n['output_size']*rates['profile_unit_bytes']/rates['output_bytes_per_frame'])]
+        targets=[None,*ids,'vehicle']; cache=[(None,None,'adapter')]; event=[(r,p) for r in [None,*ids] for p in range(4)]
+        f0=[feature(r) for r in targets]; mask=[r in decision['control_space']['execution_targets'] or (r=='vehicle' and decision['control_space']['vehicle_execution_available']) for r in targets]
+        if any(mask[1:]):mask[0]=False
+        old=self.target_memory.get(vid)
+        if old and old[0]==current['node_id'] and old[1] in s['reachable_execution_rsu_ids'] and (s['current_node_work_units_progress']>0 or s['output_pending'] or frame-old[2]<8):mask=[r==old[1] for r in targets]
+        f1=[feature()]; m1=[True]; ni1=[-1]
+        for request,n in nodes:
+            for site in ids:
+                row=rows[site]
+                for kind in ('base_model','adapter'):
+                    cache.append((site,n['node_id'],kind));ni1.append(index[n['node_id']])
+                    ready=n['required_base_model'] in row.get('ready_base_model_ids',[]) if kind=='base_model' else n['required_adapter'] in row.get('cached_adapter_ids',[]) or n['required_adapter'] in row.get('loading_adapter_ids',[])
+                    reactive=request==rid and n['node_id']==current['node_id'] and getattr(self,'_team_targets',{}).get(vid)==site and not s['output_pending']
+                    grant=calendar[site][0]
+                    valid=not ready and (request!=rid or n['node_id'] not in done) and (reactive or frame%4==0)
+                    valid &= grant is None or (reactive and grant==(vid,'model'))
+                    base=catalog[f"base:{n['required_base_model']}"];adapter=catalog[f"adapter:{n['required_adapter']}"]
+                    alt=dict(s,control_cost_parameters=dict(rates,base_size_bytes=base['transfer_size_bytes'],adapter_size_bytes=adapter['transfer_size_bytes']))
+                    span=fresh_model_span(alt,row,n,kind)
+                    valid &= not span or (span<=len(calendar[site]) and all(x is None or (reactive and x==(vid,'model')) for x in calendar[site][:span]))
+                    if not reactive:valid &= protects_current_models(alt,row,n,getattr(self,'_delivery_decisions',{}),getattr(self,'_team_targets',{}),catalog)
+                    m1.append(valid)
+                    f1.append(feature(site,n,kind) if valid else [0.]*32)
+        m2=[r is None or opportunities.get(r,{}).get('prepare_feasible',False) for r,p in event]
+        critic=list(own)
+        c=decision['centralized_critic_state']
+        for row in sorted(c['rsus'],key=lambda r:r['rsu_id']):
+            critic += [row.get('occupied_bytes',0)/max(1,row.get('capacity_bytes',1)),row.get('associated_vehicle_count',0)/8,
+                len(row.get('loading_adapter_ids',[]))/16,sum(w['execution_location']==row['rsu_id'] for w in c['joint_workflows'].values())/8]
+        if self.method=='ppo':critic[20:]=[0.]*16
+        data=dict(own=own,critic=np.asarray(critic,np.float32),graph=graph,adjacency=adjacency,graph_mask=np.arange(64)<len(nodes),
+            prior0=np.asarray([-(queue.get(r,0)+np.expm1(float(f0[i][23])*np.log1p(480)))/(max(4,horizon)/4) if r in rows else 0. for i,r in enumerate(targets)],np.float32),
+            domain=np.asarray([len(nodes)/64,sum(len(w['edges']) for _,w in graphs)/128,scale(work),len(done)/max(1,len(nodes))],np.float32),opportunity_count=np.asarray(len(opportunities),np.int64))
+        for j,(features,masks,indices) in enumerate([(f0,mask,[index[current['node_id']]]*6),(f1,m1,ni1),([feature(r,priority=p) for r,p in event],m2,[index[current['node_id']]]*20)]):
+            data[f'f{j}']=np.asarray(features,np.float32);data[f'm{j}']=np.asarray(masks,bool);data[f'node{j}']=np.asarray(indices,np.int64)
+        return data,(targets,cache,event),vid,current['node_id'],work
+
+    @torch.no_grad()
+    def act_controls(self,decisions,frame,*,deterministic=False):
+        from copy import deepcopy
+        from dataclasses import replace
+        from src.envs.core.multi_request_stream_env import StreamingRequestControl
+        from src.envs.core.joint_delivery_planning import reactive_link_calendar,book_delivery_control
+        from src.envs.core.joint_link_reservation import control_link_claims
+        if not decisions:
+            self.last_diagnostics=dict(migration_opportunities=0,by_vehicle={});return {},None
+        for vid,d in decisions.items():
+            rid=d['semantic_state']['request_id']
+            if self.request_memory.get(vid)!=rid:self.target_memory.pop(vid,None);self.commitments.pop(vid,None)
+            self.request_memory[vid]=rid
+        self._delivery_decisions=decisions
+        targets={v:self.target_memory[v][1] if v in self.target_memory else d['semantic_state']['execution_location'] or d['semantic_state']['associations'][v] for v,d in decisions.items()}
+        self._team_targets=targets;self._calendar=reactive_link_calendar(decisions,targets,self.planning_horizon)
+        ids=sorted(decisions);shift=frame%len(ids);ids=ids[shift:]+ids[:shift]
+        reservations={};first={};chosen={}
+        for vid in ids:
+            data,candidates,_,node,work=self._coordinated_features(decisions[vid],frame,reservations)
+            batch={k:torch.as_tensor(v).unsqueeze(0) for k,v in data.items()}
+            actions,*_=self._evaluate(batch,deterministic=deterministic,execution_only=True)
+            chosen[vid]=actions[:,0];targets[vid]=candidates[0][int(actions[0,0])];first[vid]=data
+            reservations[vid]=(targets[vid],work)
+        self._calendar=reactive_link_calendar(decisions,targets,self.planning_horizon)
+        controls={};rolls=[];diagnostics={};opportunities=0
+        for vid in ids:
+            fresh,candidates,_,node,work=self._coordinated_features(decisions[vid],frame,reservations)
+            data=dict(first[vid])
+            for key in ('f1','m1','node1','f2','m2','node2','opportunity_count'):data[key]=fresh[key]
+            batch={k:torch.as_tensor(v).unsqueeze(0) for k,v in data.items()}
+            a,logs,entropy,value,surrogate,prefix,enabled,baseline,q,_=self._evaluate(batch,deterministic=deterministic,execution_actions=chosen[vid],return_details=True)
+            cache,nid,kind=candidates[1][int(a[0,1])];prepare,priority=candidates[2][int(a[0,2])]
+            state=decisions[vid]['semantic_state'];known=[(state['request_id'],state['workflow']),*[(z['request_id'],z['workflow']) for z in state['queued_workflows']]]
+            cache_request=next((request for request,w in known if any(n['node_id']==nid for n in w['nodes'])),None)
+            control=StreamingRequestControl(targets[vid],cache,nid,kind,prepare,priority=priority,request_id=state['request_id'],cache_request_id=cache_request)
+            # Booking consumes the selected object's heterogeneous size, including queued DAG nodes.
+            planning=deepcopy(state);planning['workflow']['nodes']=[n for _,w in known for n in w['nodes']]
+            if nid is not None:
+                n=next(n for n in planning['workflow']['nodes'] if n['node_id']==nid);cat=state['control_cost_parameters']['model_catalog']
+                planning['control_cost_parameters'].update(base_size_bytes=cat[f"base:{n['required_base_model']}"]['transfer_size_bytes'],adapter_size_bytes=cat[f"adapter:{n['required_adapter']}"]['transfer_size_bytes'])
+            claims=control_link_claims(planning,control,self._calendar);controls[vid]=replace(control,link_reservations=claims)
+            from src.envs.core.joint_delivery_planning import fresh_model_span
+            span=fresh_model_span(planning,next(r for r in state['rsus'] if r['rsu_id']==cache),n,kind) if cache is not None else 0
+            diagnostics[vid]=dict(migration_candidates=deepcopy(self._feature_opportunities),link_calendar=deepcopy(self._calendar),two_pass_execution_targets=dict(targets),request_id=state['request_id'],cache_admission_span=span)
+            book_delivery_control(self._calendar,vid,claims,planning,control)
+            old=self.target_memory.get(vid);since=old[2] if old and old[:2]==(node,targets[vid]) else frame
+            self.target_memory[vid]=(node,targets[vid],since);opportunities+=len(self._feature_opportunities)
+            rolls.append(dict(data=batch,actions=a,logs=logs.sum(1),head_logs=logs,values=value,prefix_values=prefix,active_heads=enabled,counterfactual_baselines=baseline))
+        self._pad_cache(rolls,max(r['data']['m1'].shape[1] for r in rolls))
+        result={k:torch.cat([r[k] for r in rolls]) for k in rolls[0] if k!='data'}
+        result['data']={k:torch.cat([r['data'][k] for r in rolls]) for k in rolls[0]['data']};result['vehicle_ids']=ids
+        result['request_ids']=[decisions[v]['semantic_state']['request_id'] for v in ids]
+        self.last_diagnostics=dict(migration_opportunities=opportunities,by_vehicle=diagnostics)
+        return controls,result

@@ -5,6 +5,13 @@
 
 # Artifact Records
 
+## 2026-10-16 joint stream learning software qualification
+
+- 接受软件root `artifacts/joint_stream_learning_smoke_v4`（dirty source qualification，非科学结果）；同父v1/v2/v3全部原件保留，v1八配置训练完成但auditor `cases[0]`类型错误，v2/v3/v4均有限全链通过，不据奖励换参数。
+- 最终软件全链`artifacts/joint_stream_learning_smoke_v4`：八配置各seed7×4session×最多32frame，8个最终软件cell、2048事件/256收据/8checkpoint/8最终模型逐事件重放通过；不是性能结论。
+- 四轮共128个32帧上限软件训练session；426局部/旧合同回归通过，日志`artifacts/joint_stream_learning/accepted_final_tests.log`。源码脚本及checkpoint/action合同见`joint_stream_learning_contract_20261016.md`。
+- 主科学预算8配置×3seed×64=1536会话、最大737280训练帧，尚未把软件结果当主结果；主run以`artifacts/joint_stream_learning/continuation.json`指向的新clean root为准，完成后须audit与launcher均成功再回收分析。
+
 ## 2026-10-16 joint stream v3 fixed engineering matrix
 
 - Root `artifacts/joint_stream_workloads_v3/20261015T172250Z_engineering`；源码 `868b0e9fc3db994c7d9aaea4331368c83d71121f`；216单元/416940事件/71757收据/6完整重放通过，全部结果保留。原train两段互斥480帧会话，72匹配scenario，各三规则；非72独立时间窗口。

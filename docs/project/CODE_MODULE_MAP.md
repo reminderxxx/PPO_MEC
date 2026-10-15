@@ -830,3 +830,8 @@ Delivery v2保留predeparture交付prefix、对已完成请求禁准备，模型
 `joint_stream_workloads`构造固定工作负载/catalog → `multi_request_stream_env`复用v3物理引擎并管理请求生命周期 → `joint_stream_rules`只读已发布观测控制 → `run_joint_stream_workloads`持久化完整producer → `audit_joint_stream_workloads`独立账本/容量/对象生命周期及重放consumer。旧v3只提供四个默认行为不变的hook及空帧receipt；registry与src/agents未改，不隐式适配旧checkpoint。
 
 2026-10-16 准入保护v3：当前完整工程root为`artifacts/joint_stream_workloads_v3/`，workload/protocol v3；v2完整216原件保留为资源保护审计失败证据，不拼接/排名。stream本地准入hook以实际LRU和当帧声明依赖拒绝危险可选动作；旧v3默认物理/费用/事件不变。
+
+
+### 2026-10-16 持续请求学习消费者
+
+`registry`显式新stream合同→各算法直接Stream类→`ppo_agent.StreamControlPPO`（共享已发布图/候选/两阶段控制与PPO团队MC）；`dqn_agent.StreamDQNAgent`独立跨空闲Q/replay/target更新。`prepare_joint_stream_learning`仅新train重拟合固定GRU并冻结provenance→`train_joint_stream_control`逐物理帧费用与团队tail→`audit_joint_stream_learning`独立账本/重载/重放/结果consumer；`launch_joint_stream_learning`管理有限顺序作业。旧default/v3路径不变，旧checkpoint仍按原合同载入，不能自动升级stream。

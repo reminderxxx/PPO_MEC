@@ -5,6 +5,14 @@
 
 ﻿# Progress
 
+## 2026-10-16 持续请求共同学习适配与冻结训练
+
+最终软件全链`artifacts/joint_stream_learning_smoke_v4`：八配置各seed7×4session×最多32frame，8个最终软件cell、2048事件/256收据/8checkpoint/8最终模型逐事件重放通过；不是性能结论。 426回归通过；当前阶段先完成clean源码提交，再启动一次冻结科学流水线，进展指针见continuation。
+
+2026-10-16 持续请求共同学习适配：七算法及SA去预测版现消费request-bound新合同，已发布queue图/异构模型费用、请求记忆切换与含空闲期的团队tail已接入；DQN跨空闲/请求连接。GRU按新train分区重新固定拟合，旧checkpoint拒绝。八配置×3seed×64会话（上限737280训练帧）合同已冻结，正式运行/结果以`artifacts/joint_stream_learning/continuation.json`指针为准；未回收前不报告算法优势。
+
+新合同[joint_stream_learning_contract_20261016.md](joint_stream_learning_contract_20261016.md)，前审及预测划分/首次smoke失败均独立保留。训练每20分钟仅查状态，完成后自动回收审计分析；旧阶段结果不拼接，formal/holdout封存。
+
 ## 2026-10-16 持续工作负载工程完整回收
 
 2026-10-16 持续工作负载工程已完成：外生FIFO请求、跨请求typed-cache、已发布队列预取和异构多base已接入；v3冻结216单元、416940事件/71757收据/6次完整重放通过，411项回归及旧11模型兼容重放通过。gain规则预取对象使用1012/1079（93.79%），相对reactive配对奖励+1.222289、完整请求差0；长任务完成数−0.083333且c070负例保留。新增RL训练0，SA/MAPPO新合同尚待适配，不能称算法优势。

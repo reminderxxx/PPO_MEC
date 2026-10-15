@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+2026-10-16 持续请求共同学习适配：七算法及SA去预测版现消费request-bound新合同，已发布queue图/异构模型费用、请求记忆切换与含空闲期的团队tail已接入；DQN跨空闲/请求连接。GRU按新train分区重新固定拟合，旧checkpoint拒绝。八配置×3seed×64会话（上限737280训练帧）合同已冻结，正式运行/结果以`artifacts/joint_stream_learning/continuation.json`指针为准；未回收前不报告算法优势。 [共同学习合同](docs/project/joint_stream_learning_contract_20261016.md)。
+
 2026-10-16 持续工作负载工程已完成：外生FIFO请求、跨请求typed-cache、已发布队列预取和异构多base已接入；v3冻结216单元、416940事件/71757收据/6次完整重放通过，411项回归及旧11模型兼容重放通过。gain规则预取对象使用1012/1079（93.79%），相对reactive配对奖励+1.222289、完整请求差0；长任务完成数−0.083333且c070负例保留。新增RL训练0，SA/MAPPO新合同尚待适配，不能称算法优势。 [完整结果](docs/project/joint_stream_workload_results_review_20261016.md)。
 
 2026-10-16 delivery v2完整回收：3840回合、120checkpoint及主/移动/旧强cache审计完成。SA48.544345/4.875超过去预测48.433218/4.75，但低于cache奖励48.612738和MAPPO完成4.958333；主预测开关48平、模型成本偏高、后期回退仍在。固定最终结果、负例、验证与下一步见[完整审查](docs/project/joint_delivery_v2_results_review_20261016.md)。formal/holdout封存，非论文主表。

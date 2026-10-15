@@ -431,3 +431,12 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 2026-10-16 FIFO修正：当前完整工程root为`artifacts/joint_stream_workloads_v2/`，workload/protocol v2；v1 `joint_stream_workloads/`停止129单元，仅历史诊断，不能resume/拼接。三规则和216预算不变，raw auditor另验证发布清单的FIFO启动顺序。
 
 2026-10-16 准入保护v3：当前完整工程root为`artifacts/joint_stream_workloads_v3/`，workload/protocol v3；v2完整216原件保留为资源保护审计失败证据，不拼接/排名。stream本地准入hook以实际LRU和当帧声明依赖拒绝危险可选动作；旧v3默认物理/费用/事件不变。
+
+
+### 2026-10-16 持续请求共同学习
+
+- `scripts/prepare_joint_stream_learning.py`：五原train会话划分、train-only GRU和固定日程。
+- `scripts/train_joint_stream_control.py`：全部物理帧费用、请求绑定控制及团队tail生产。
+- `scripts/audit_joint_stream_learning.py`：逐事件/费用/FIFO/依赖、checkpoint参数和24次最终模型重放消费，自动结果与曲线报告。
+- `scripts/launch_joint_stream_learning.py`：一次有限八配置顺序后台流水线。
+- `artifacts/joint_stream_learning/<run_id>/`：protocol、八方法子目录原件、合并results、audit与结果报告；`continuation.json`为父目录当前运行指针。不进Git。
