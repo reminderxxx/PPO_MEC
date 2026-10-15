@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `joint_stream_workload_review_20261016.md` / `joint_stream_workload_contract_20261016.md`：工作负载空缺前审、独立持续请求/多模型合同和216单元零训练工程验证计划。
+
 - [joint_delivery_v2_results_review_20261016.md](joint_delivery_v2_results_review_20261016.md)：十组3840回合固定最终结果、120checkpoint/主补充重放、预测开关/缓存成本、后期选站回退和剩余任务；双指标目标未达。
 
 - `joint_target_control_engineering_20261014.md`：显式目标站、未来模型对象、状态/结果转发与共享数据链路的工程实现、参考来源与验收边界。

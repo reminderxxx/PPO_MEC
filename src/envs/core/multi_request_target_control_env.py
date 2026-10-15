@@ -122,16 +122,20 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
             else:
                 if control.cache_target not in rsus:
                     raise ValueError("unknown cache target")
-                if control.cache_node_id is not None and control.cache_node_id not in {
-                    node.node_id for node in self.workflows[vid].nodes
-                }:
-                    raise ValueError("cache node must belong to the known DAG")
+                if control.cache_node_id is not None:
+                    self._cache_node_for_control(vid, control)
                 evictions[control.cache_target].extend(control.evict_object_ids)
         # Validate the joint ordered list before mutation, including two requests
         # trying to evict the same object or a base with a remaining dependent.
         for target, victims in evictions.items():
             self.model_cache.validate_eviction(target, victims)
         return evictions
+
+    def _cache_node_for_control(self, vid, control):
+        node = next((n for n in self.workflows[vid].nodes if n.node_id == control.cache_node_id), None)
+        if node is None:
+            raise ValueError("cache node must belong to the known DAG")
+        return node
 
     def _input(self, vid: str, node: Any, target: str, link_left: dict[str, int]) -> dict:
         key = (vid, node.node_id, target)
@@ -230,8 +234,18 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         if not self.link_reservation_enabled:record.pop('link_reservations')
         return record
 
+    def _control_episode_done(self) -> bool:
+        return self.frame_index >= len(self.frames) or all(w.is_completed for w in self.workflows.values())
+
+    def _request_credit_ledger(self, events, components):
+        from src.envs.core.joint_control_planning import request_reward_ledger
+        return request_reward_ledger(events, components) if events else {}
+
+    def _waiting_request_count(self) -> int:
+        return sum(not w.is_completed for w in self.workflows.values())
+
     def step_controls(self, controls: dict[str, JointRequestControl]) -> tuple[dict, float, bool, dict]:
-        if self.frame_index >= len(self.frames) or all(w.is_completed for w in self.workflows.values()):
+        if self._control_episode_done():
             raise RuntimeError("episode ended")
         decisions = self.decision_states()
         evictions = self._validate_controls(controls, decisions)
@@ -259,7 +273,7 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         eviction_receipts = {target: self.model_cache.evict_objects(target, victims)
                              for target, victims in evictions.items() if victims}
         ids = sorted(decisions)
-        shift = self.frame_index % len(ids)
+        shift = self.frame_index % len(ids) if ids else 0
         tie_order = ids[shift:] + ids[:shift]
         order = sorted(tie_order, key=lambda vid: -controls[vid].priority)
         self._link_grants={}
@@ -281,7 +295,7 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
             version_before = self.state_version[vid]
             cache = {"status": "none", "link_slots_consumed": 0, "evicted_object_ids": []}
             if control.cache_node_id is not None:
-                cache_node = next(n for n in self.workflows[vid].nodes if n.node_id == control.cache_node_id)
+                cache_node = self._cache_node_for_control(vid, control)
                 with self._link_scope(vid,"model",link_left):
                     if control.cache_kind == "base_model":
                         cache = self.model_cache.request_base_model(control.cache_target,
@@ -378,7 +392,7 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         self.events.extend(events)
         self.previous_associations = {vid: decisions[vid]["semantic_state"]["associations"][vid] for vid in decisions}
         self.frame_index += 1
-        done = self.frame_index >= len(self.frames) or all(w.is_completed for w in self.workflows.values())
+        done = self._control_episode_done()
         model_frames = sum(occupied.values()) + sum(e["cache_request"]["link_slots_consumed"] for e in events)
         sharing = self._frame_shared_state_bytes
         sharing += intent_bytes
@@ -387,7 +401,7 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         self.sharing_bytes_charged += sharing
         components = {
             "completed_nodes": float(completed_now),
-            "unfinished_wait": -0.01 * sum(not w.is_completed for w in self.workflows.values()),
+            "unfinished_wait": -0.01 * self._waiting_request_count(),
             "vehicle_compute": -0.02 * sum(e["status"].startswith("vehicle_") for e in events),
             "model_transfer": -0.01 * model_frames,
             "state_transfer": -0.01 * sum(e["state_transfer_link_frames"] for e in events),
@@ -398,11 +412,10 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         totals = {field: sum(e[field] for e in events) for field in (
             "input_transfer_bytes", "input_transfer_link_frames", "output_transfer_bytes", "output_transfer_link_frames")}
         self.io_totals.update(totals)
-        from src.envs.core.joint_control_planning import request_reward_ledger
-        credit = request_reward_ledger(events,components)
-        events[0]["frame_cost_receipt"] = {
+        credit = self._request_credit_ledger(events, components)
+        receipt = {
             **({"request_rewards": credit, "control_intent_transmitted_bytes": intent_bytes} if self.coordination_intent_enabled else {}),
-            "contract_version": "joint_frame_cost_receipt_v3", "frame_index": events[0]["frame_index"],
+            "contract_version": "joint_frame_cost_receipt_v3", "frame_index": self.frame_index - 1,
             "link_usage_by_rsu": link_usage,
             "explicit_evictions_by_rsu": eviction_receipts,
             "reward_components": components, "cache_events": cache_events,
@@ -411,10 +424,12 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
             "state_transfer_bytes": sum(e["state_transfer_bytes"] for e in events),
             "state_transfer_link_frames": sum(e["state_transfer_link_frames"] for e in events), **totals,
         }
+        if events:
+            events[0]["frame_cost_receipt"] = receipt
         observation = self.observe() if not done else {"frame_index": self.frame_index}
         return observation, sum(components.values()), done, {
             "events": events, "completed_nodes": completed_now, "reward_components": components,
-            "cache_events": cache_events,
+            "cache_events": cache_events, "frame_cost_receipt": receipt,
         }
 
     def summary(self) -> dict[str, Any]:

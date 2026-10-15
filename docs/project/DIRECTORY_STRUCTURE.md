@@ -419,3 +419,11 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 2026-10-15：joint_delivery_control为停止v1历史；本轮已完成的开发产物为artifacts/joint_delivery_control_v2，v2工程为joint_delivery_v2_preflight*。不移动/删除v1产物或拼接预算。
 
 2026-10-16：delivery v2收尾原件为该root下audit.json、mobility_support/audit.json、legacy_cache_reference/audit.json与launcher_result.json；post_training_review/保留独立数值重建和两次零更新诊断（本地产物不入Git）。完整结论见joint_delivery_v2_results_review_20261016.md，非canonical更新。
+
+## 2026-10-16 持续工作负载工程
+
+- `src/envs/core/multi_request_stream_env.py`：外生FIFO请求、执行状态隔离、跨请求缓存与新控制身份合同。
+- `src/envs/core/joint_stream_workloads.py`：原DAG分层、两族异构catalog、固定到达计划和必要容量下界。
+- `src/envs/core/joint_stream_rules.py`：三种无训练工程规则与异构LRU/净收益保护。
+- `scripts/run_joint_stream_workloads.py` / `scripts/audit_joint_stream_workloads.py`：score-blind216单元生产与独立raw消费/6次重放。
+- `artifacts/joint_stream_workloads/<timestamp>_engineering/`：manifest、protocol.pt、results/events/receipts及audit.json；不进入Git、不替代既有delivery结果。

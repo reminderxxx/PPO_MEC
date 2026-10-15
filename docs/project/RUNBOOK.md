@@ -1799,3 +1799,17 @@ python artifacts/joint_delivery_control_v2/post_training_review/summarize_result
 ```
 
 输出`post_training_review/analysis.json`，核对3840回合、120checkpoint、480最终单元、1920曲线单元和480固定train-probe。seed27最大64→128退化窗的两次零更新重放见`post_training_review/replay_late_case.py`及`late_case.json`；事后诊断不选择最终模型。完整报告`joint_delivery_v2_results_review_20261016.md`。自动完成提醒已暂停，不再轮询。新算法/更大训练量应另立冻结合同，formal/holdout仍封存。
+
+## 持续工作负载工程（2026-10-16）
+
+先读`joint_stream_workload_review_20261016.md`及`joint_stream_workload_contract_20261016.md`。解释器使用项目venv，真实文件只检查/读取，不下载。
+
+```bash
+python -m pytest tests/test_multi_request_stream_env.py -q
+python scripts/run_joint_stream_workloads.py --smoke --output_root artifacts/joint_stream_preflight
+python scripts/audit_joint_stream_workloads.py <smoke_timestamp_directory>
+python scripts/run_joint_stream_workloads.py
+python scripts/audit_joint_stream_workloads.py <full_timestamp_directory>
+```
+
+完整运行要求clean source，固定72scenario×3规则=216单元、训练0；不重复跑已有目录、不打开formal/holdout。所有原件包括空闲帧费用保留，audit通过后再分析各负载/容量层，不能跨不同请求数简单用总奖励排名。旧learning checkpoint不消费新stream合同，后续必须独立适配并重新冻结公平训练预算。

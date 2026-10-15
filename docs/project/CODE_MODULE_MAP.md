@@ -824,3 +824,7 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 `audit_joint_delivery_cache_reference.py`只读重放上一轮强缓存模型，核对全部48单元原始事件；不重训、不替换新同合同缓存基线。
 
 Delivery v2保留predeparture交付prefix、对已完成请求禁准备，模型miss响应与proactive cache周期分开；producer/checkpoint版本v2和独立root joint_delivery_control_v2成对消费，v1按cad6509历史重放。
+
+## 2026-10-16 stream分支
+
+`joint_stream_workloads`构造固定工作负载/catalog → `multi_request_stream_env`复用v3物理引擎并管理请求生命周期 → `joint_stream_rules`只读已发布观测控制 → `run_joint_stream_workloads`持久化完整producer → `audit_joint_stream_workloads`独立账本/容量/对象生命周期及重放consumer。旧v3只提供四个默认行为不变的hook及空帧receipt；registry与src/agents未改，不隐式适配旧checkpoint。
