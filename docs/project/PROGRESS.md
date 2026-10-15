@@ -2195,3 +2195,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 2026-10-15独立tail实现：375相关测试通过；train原区间新增mobile_tight cohort的几何离站151（base29），无失覆盖车帧，GRU按原区间分组fit/validation。SA/DQN各4episode真实入口完成，完整同预算比较尚未启动；见joint_tail_control_contract_20261015.md。
 
 2026-10-15 tail已冻结运行：source1667da3，十个group启动均clean；八主3072+两support768=3840训练episode，各128×seed7/17/27，base/tight各50%、固定最终128。公共GRU30epoch按16/4原时间分组，hash b78be998d13fff145d5c1f249cad5f33af7206a153d6d5259c9d532e16d44ceb。新schema preflight2checkpoint/26924事件/3627收据/4重放通过；完整结果待回收，不晋级paper。
+
+2026-10-15独立容量审查：tight7/8窗口即使忽略模型/状态也排除全8完成（总217计算/193 IO槽）；仅覆盖检查不足。base/tight冻结主结果继续保留，不改权重。追加原布局、高移动且全程≥2站可达的探索support，先冻结条件再对所有最终模型评价，0新增训练；见joint_tail_capacity_review_20261015.md。
