@@ -28,7 +28,8 @@ def main():
    assert len(paths)==1, 'exactly one prespecified run per seed required'
    manifest=paths[0]
    m=json.loads(manifest.read_text());directory=manifest.parent
-   assert m['status']=='complete' and not (directory/'run_abort.json').exists()
+   assert m['status'] in ('running','complete') and not (directory/'run_abort.json').exists()
+   assert m['git_commit'].startswith(plan['source_commit']) and plan['seeds']==[7,17,27]
    path=directory/f'sa_ghmappo_seed{seed}_ep128.pt';saved=torch.load(path,weights_only=False)
    checkpoint_hash=_hash_file(path)
    cls=type(build_agent('sa_ghmappo',control_contract=m['action_contract'],coordinated_controls=True,**{k:v for k,v in saved['options'].items() if k!='method'}))
@@ -36,6 +37,7 @@ def main():
    trained_hash=hashlib.sha256(b''.join(v.numpy().tobytes() for v in agent.state_dict().values())).hexdigest()
    provider=LearnedMobilityPredictor(torch.load(directory/'predictor.pt',weights_only=False))
    original={r['frame_offset']:r for r in (json.loads(s) for s in (directory/'dev.jsonl').read_text().splitlines()) if r['agent']=='sa_ghmappo' and r['episode']==128}
+   assert set(original)=={w['frame_offset'] for w in splits['dev']}, 'all fixed-final full dev rows must exist'
    for window in splits['dev']:
     env=MultiRequestTargetControlEnv(frames=window['frames'],vehicle_workflows=dict(zip(window['vehicle_ids'],workflows)),
       rsu_states=rsus,costs=ReplayCosts(**m['costs']['replay_costs']),prediction_provider=provider,**m['environment_options'])

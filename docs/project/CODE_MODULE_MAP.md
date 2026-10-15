@@ -802,3 +802,5 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 2026-10-15：`scripts/audit_joint_coordinated_control.py <experiment>`只读核验完整manifest、原始费用/请求ledger、模型hash与全部最终checkpoint首dev窗口事件重放；`scripts/probe_joint_coordinated_prediction.py <experiment>`执行预声明的固定权重预测开关（零训练）。中止试跑被拒绝。
 
 2026-10-15：`scripts/audit_joint_prediction_opportunities.py <experiment>`在最终full原始事件上做真实/预测3帧覆盖机会影子清点，只读、真实未来不传入控制器；不把候选帧视为独立事件或净收益证明。
+
+2026-10-15：`scripts/audit_joint_prediction_effects.py <experiment>`分解固定权重预测开关的24单元原始费用、完成帧及prepare事件；不是单动作因果归因，不训练、不选模型。probe允许其他比较方法仍训练，但要求full最终128全部8dev已写入、计划Git/seed匹配、checkpoint不变。

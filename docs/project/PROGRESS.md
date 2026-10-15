@@ -2167,3 +2167,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 2026-10-15：独立输出生命周期witness发现只交付结果仍强制模型加载；旧partial试跑中止保留，新v3共同修复output-only mask及在途模型成本，三组重新同预算训练。见 joint_output_lifecycle_review_20261015.md 与 joint_partial_preparation_contract_20261015.md。
 
 2026-10-15：严格门控七配置2688episode完整回收；84checkpoint/145441事件/21945收据审计通过，21最终模型首dev完整事件重放一致。SA58.2183445/7.125，MAPPO58.070594/6.95833，no-pred58.232348/6.95833，尚未同时超越两者；预测固定权重开关24单元事件相等。partial生命周期v3三组继续，见joint_coordinated_results_review_20261015.md。
+
+2026-10-15：partial生命周期v3固定full权重预测开关support已回收（零训练）：24单元1胜1负22平，奖励+0.0295703、完成+0.0416667；有部分预复制实际推进，但多次被链路队列挡住，保留−0.01反例。完整三组仍训练，不能提前晋级；见joint_partial_prediction_support_review_20261015.md。
