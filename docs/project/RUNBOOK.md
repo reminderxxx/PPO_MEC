@@ -1777,3 +1777,5 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 先运行项目解释器`python scripts/prepare_joint_tail_control.py --source_manifest <原开发manifest> --output_root artifacts/joint_tail_control/protocol`冻结40train/16dev场景和30epoch公共GRU。再运行`python scripts/train_joint_tail_control.py --protocol artifacts/joint_tail_control/protocol/manifest.json --agent <配置> --seeds 7 17 27 --episodes 128 --eval_every 32 --output_root artifacts/joint_tail_control/<配置>`。八主及两support计划开跑前保存根comparison_plan.json。全部完成后`python scripts/audit_joint_tail_control.py artifacts/joint_tail_control`只读核验、两panel重放及固定权重预测开关。保留全部panel/seed，不按结果选择。
 
 2026-10-15：独立高移动support使用`python scripts/joint_tail_mobility_support.py prepare --root artifacts/joint_tail_control`先冻结规则/数据，再以`evaluate --agent <name>`评价每个完整最终模型group；十组结束后`collect`核验原始费用与30次首窗重放。`python scripts/audit_joint_tail_capacity.py <protocol_manifest> <output_json>`检查必要容量上界。support条件不足即Unavailable；root原主表及权重不变，不增加训练。
+
+2026-10-15 tail完整回收：`artifacts/joint_tail_control/audit.json`是已完成的十组开发主审计；`mobility_support/audit.json`是晚定义零训练探索审计，不能替代主表。预算/版本/全结果/失败例与paper边界见`joint_tail_control_results_review_20261015.md`，不再引用其运行中状态。

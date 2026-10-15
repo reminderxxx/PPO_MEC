@@ -35,3 +35,5 @@ PPO与DQN交互预算相同，优化步数按各自定义公开。三个方向DR
 375相关pytest通过；首批真实数据preflight完成，旧scheduled消费者和新schema两panel重放另行核验后启动clean-source正式开发比较。真实成本、多base/学习驱逐、并发DAG/到达、控制面数据槽竞争、formal/holdout等仍未覆盖。不能将本轮工程合同写成论文算法优势。
 
 实现验收追加：375测试通过，旧scheduled的11个checkpoint首窗完整事件仍一致；新SA/DQN两份4episode入口的2checkpoint、base/tight共4次独立事件重放及原始费用核验通过。审计首次输出相对路径解析报错已修复，原失败日志保留，完整重跑exit0；未改原始模型/事件。
+
+完成状态（2026-10-15）：预声明十组3840训练全部完成，120checkpoint/409883事件/55258收据/60重放通过；最终主表及负例见joint_tail_control_results_review_20261015.md。主结果权重未改，双指标最高/收敛目标未达。另有容量独立审查后的零训练移动探索support，明确不替换本合同主表。

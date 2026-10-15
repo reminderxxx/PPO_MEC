@@ -864,3 +864,12 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 2026-10-15 tail已冻结运行：source1667da3，十个group启动均clean；八主3072+两support768=3840训练episode，各128×seed7/17/27，base/tight各50%、固定最终128。公共GRU30epoch按16/4原时间分组，hash b78be998d13fff145d5c1f249cad5f33af7206a153d6d5259c9d532e16d44ceb。新schema preflight2checkpoint/26924事件/3627收据/4重放通过；完整结果待回收，不晋级paper。
 
 2026-10-15独立容量审查：tight7/8窗口即使忽略模型/状态也排除全8完成（总217计算/193 IO槽）；仅覆盖检查不足。base/tight冻结主结果继续保留，不改权重。追加原布局、高移动且全程≥2站可达的探索support，先冻结条件再对所有最终模型评价，0新增训练；见joint_tail_capacity_review_20261015.md。
+
+## 2026-10-15 tail完成后仍open的机制问题
+
+- 旧seed27 surrogate priority错误已有独立干预证据并在tail限制干预；新seed27尾段改善，seed7/17仍回退，不能宣称回退已全修。末段entropy.941/KL8.92e−7、无KL早停；额外训练是否改善待固定预算曲线。
+- 正prepare proxy漏别车新冷模型/IO准入的机会成本：固定full17/dev_2760_tight实际抢占adapter槽、少2节点、奖励−1.931024，预测离站只差1帧。低传输总量不代表低时序损失。
+- state gate整图finish与节点交付reward错位；fixture剩13帧、节点预计14→12却reserved无候选。是公式反例，真实漏机会和解除后净收益未验证。
+- 混合半local半team/N目标仍可能惩罚有益资源让步（N8自身/他者9:1），未证明团队边际信用已闭环。no-surrogate/discounted辅助高于full，额外模块收益未兑现。
+- Tight7/8场景乐观容量已不可全8完成；新mobile_base分层仅exploratory，不能替换冻结primary、当新独立时间窗口或追认胜出。SA仍未同时赢cache/MAPPO/no-pred，cache成本低需完成约束验证，不能宣称cache普遍优势。
+- baseline共享GRU/门控/队列先验，当前MAPPO为增强对照、方向DRL多共用PPO；仍需另立普通MAPPO/外部忠实强基线，不削弱现有对照。本轮正式证据paper E0_UNAVAILABLE，完整原件见joint_tail_control_results_review_20261015.md。

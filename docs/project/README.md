@@ -259,3 +259,5 @@
 
 - joint_tail_capacity_review_20261015.md：tight7/8必要容量上界不可全完成，区分过载与预测失效。
 - joint_tail_mobility_support_contract_20261015.md：固定原布局/多站可选高移动的零训练探索支持协议，保留冻结主结果。
+
+- joint_tail_control_results_review_20261015.md：十组完整回收、120checkpoint/60主重放、零训练移动分层/30重放、预测挤占冷模型负例和剩余目标/信用缺口。

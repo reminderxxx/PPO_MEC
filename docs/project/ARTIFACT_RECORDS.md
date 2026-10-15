@@ -1658,3 +1658,13 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - 原件审计：artifacts/joint_coordinated_audit_20261015/joint_scheduled_control_audit.json；120checkpoint/tensor互异、268517事件/38056收据、30final首dev事件重放一致。training_diagnostics同根，固定预算3840加smoke84=3924；不含历史轮次。
 - 最终SA57.981931/6.958333，MAPPO57.732622/7.041667，no-pred58.226779/7.25；其他PPO/DQN/cache/DAG/DT均已共同合同回收。legacy DQN52.953722仅诊断，corrected DQN53.964010为主结果。
 - 支持：预测固定权重+.0834215/多2请求、7/7准备槽、首窗图饱和0；去重离站仅1事件。非formal/holdout，canonical不更新，paper E0_UNAVAILABLE。
+
+## 2026-10-15 joint-tail delivery / coverage development
+
+- 根：`artifacts/joint_tail_control/`；十组均`<agent>/20261015T074001Z_development`，生产commit1667da3a39b7ae2f724504fdd63697cbda1c1890。comparison_plan于07:40UTC冻结，公共prepared manifest c0199b81...、GRU b78be998...；raw数据未改。
+- 八主3072+两辅助768训练episode，合计3840；真实SA/DQN preflight8另列。每组128×7/17/27，40train场景、16dev场景含原8时间base/tight各50%；所有最终128、未选峰。两panel不构成独立原时间。
+- `audit.json`：120checkpoint、409883事件、55258费用收据、60次base/tight最终重放；`prediction_probe/20261015T095658Z/events.jsonl`保存48次同权重预测关闭。全通过，完整SHA/原始负例/源绑定见joint_tail_control_results_review_20261015.md。
+- 排名cache48.750552/4.708333，SA48.375857/4.0625，no-pred48.603467/4.229167、MAPPO48.132056/4.375；双指标目标未达。fixed full预测−.020602397奖励/+.041666667完成；seed17负例保存prediction_negative_case.json，准备阻断别车adapter准入、少2节点。
+- `capacity_diagnostic.json`：tight7/8必要上界排除全8完成；`objective_gap_witness.json`为节点/整图门控公式反例，不是真实轨迹因果性能证明。
+- `mobility_support_plan.json`晚定义探索条件，`mobility_support/`保留原宽覆盖、全程≥2站/高移动cohort；原8dev时间不改、不替换主表。公共GRU/全部30最终模型不更新；240policy+24off、198774事件/30重放通过，`audit.json`明确0训练。
+- mobile full59.388970/8、no-pred59.192464/7.791667、MAPPO59.464020/8、cache59.715258/8；同权重预测+.022625488/0（3胜3负18平）。探索条件支持局部作用，不是全基线最高/普遍优势。formal/holdout均未打开，canonical未改，paper E0_UNAVAILABLE/Unverifiable。

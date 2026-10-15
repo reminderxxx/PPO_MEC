@@ -5,7 +5,9 @@
 
 # PPO_MEC
 
-2026-10-15 最新开发回收：目的站时隙预约、动作信用与图尺度修复后，八配置各128×3seed完成。SA奖励57.981931，高于MAPPO57.732622及其余五基线；去预测版58.226779更高，SA完成6.958333/8亦低于MAPPO7.041667和去预测7.25，双指标目标未达。120 checkpoint/30 final首窗事件重放通过；[完整结果与后期回退审查](docs/project/joint_scheduled_control_results_review_20261015.md)。以下较早参数化/五动作记录保留其历史合同，不混入本轮排名。
+2026-10-15 最新tail开发轮已完整回收：八主配置及两辅助各128×3seed，共3840训练episode。固定base/tight各50%下，cache48.750552/4.708333最高，SA48.375857/4.0625，去预测48.603467/4.229167、MAPPO48.132056/4.375；双指标目标未达。120checkpoint/409883事件/60次最终模型重放通过。seed27末段改善，seed7/17仍回退；预测负例定位为准备挤占别车adapter准入。原布局高移动探索support中SA59.388970/8超过去预测59.192464/7.791667，但仍低于cache奖励59.715258；不替换主表、不晋级paper。[完整结果与剩余信用/门控问题](docs/project/joint_tail_control_results_review_20261015.md)。
+
+2026-10-15 前轮scheduled开发回收：目的站时隙预约、动作信用与图尺度修复后，八配置各128×3seed完成。SA奖励57.981931，高于MAPPO57.732622及其余五基线；去预测版58.226779更高，SA完成6.958333/8亦低于MAPPO7.041667和去预测7.25，双指标目标未达。120 checkpoint/30 final首窗事件重放通过；[完整结果与后期回退审查](docs/project/joint_scheduled_control_results_review_20261015.md)。以下较早参数化/五动作记录保留其历史合同，不混入本轮排名。
 
 2026-10-15：参数化学习、GRU 和 SA surrogate 已接入并完成两轮同预算开发训练（共3,840 episode）。修复轮 SA 奖励27.333、完成0.833/8，低于 MAPPO 的32.537、1.625/8，尚无主机制优势或收敛证据；[完整回收审查](docs/project/joint_parameterized_results_review_20261015.md)。
 

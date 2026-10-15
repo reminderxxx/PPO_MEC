@@ -2197,3 +2197,13 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 2026-10-15 tail已冻结运行：source1667da3，十个group启动均clean；八主3072+两support768=3840训练episode，各128×seed7/17/27，base/tight各50%、固定最终128。公共GRU30epoch按16/4原时间分组，hash b78be998d13fff145d5c1f249cad5f33af7206a153d6d5259c9d532e16d44ceb。新schema preflight2checkpoint/26924事件/3627收据/4重放通过；完整结果待回收，不晋级paper。
 
 2026-10-15独立容量审查：tight7/8窗口即使忽略模型/状态也排除全8完成（总217计算/193 IO槽）；仅覆盖检查不足。base/tight冻结主结果继续保留，不改权重。追加原布局、高移动且全程≥2站可达的探索support，先冻结条件再对所有最终模型评价，0新增训练；见joint_tail_capacity_review_20261015.md。
+
+## 2026-10-15 tail最终回收（覆盖上文“待回收/运行”状态）
+
+- source1667da3、十group启动clean、公共predictor b78be998...；八主3072+两辅助768=3840训练全部complete。工程8单列，本轮真实RL合计3848。固定最终128/base:tight=50:50，无峰值或seed筛选。
+- 120checkpoint、409883事件、55258收据通过；30个最终模型×两panel首窗60次完整重放一致。全48预测开关同权重零训练，奖励−.020602397、完成+.041666667（1胜1负46平）。
+- 主奖励：cache48.750552、no-pred48.603467、DT48.458615、PPO48.442091、SA48.375857、MAPPO48.132056、DAG48.126992、DQN44.643283；SA完成4.0625，低于cache4.708333/MAPPO4.375/no-pred4.229167。no-surrogate48.697197/4.25、discounted48.557613/4.458333辅助亦高于full。
+- 新seed27 96→12848.630548/4.1875→48.785089/4.3125，旧尾段回退未复现；seed7/17仍回退，平均64→128下降，无收敛证据。高熵/小KL与降低V/Q损失不能证明贪心稳定。
+- 独立容量审查tight7/8必要上界不支持全8完成。全部原结果保留；晚定义mobile_base探索support（≥2站全程可达/几何排序）0新增训练：240policy+24off、198774事件/30重放通过。full59.388970/8 > no-pred59.192464/7.791667，仍低于cache59.715258/8；同权重预测+.022625488、完成0（3胜3负18平），不替代主结果。
+- 真实负例：seed17/dev_2760_tight，预测离站基本正确，状态准备占用冷adapter准入槽，peachtree:137少送2节点，奖励−1.931024。准备net漏团队机会成本；state gate还用整图finish估值，与节点奖励错位，有界fixture反例通过；实际漏机会范围待反事实验证。混合local/team信用仍非纯团队边际信用。
+- 相关375+2测试、旧11重放、新preflight4重放、最终90次重放与审计均通过。详见joint_tail_control_results_review_20261015.md；formal/holdout封存、canonical不更新、paper E0_UNAVAILABLE/Unverifiable，不作优势或cache普遍友好结论。

@@ -29,6 +29,10 @@ def main():
     manifests=[json.loads(p.read_text()) for p in paths]
     if plan:
         assert sorted(m['agent'] for m in manifests)==sorted(plan['primary_agents']+plan['support_agents'])
+    off_events=None
+    if not a.smoke:
+        probe_home=root/'prediction_probe'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+        probe_home.mkdir(parents=True,exist_ok=False);off_events=probe_home/'events.jsonl'
     dev=[];training=[];probes=[];reproductions=[];predict=[];checkpoints=events_count=receipts_count=0;initial={}
     for path,m in zip(paths,manifests):
         assert m['status']=='complete'
@@ -116,10 +120,14 @@ def main():
                 reproductions.append(dict(agent=m['agent'],seed=c['seed'],scenario_id=w['scenario_id'],events_equal=True))
             if m['agent']=='sa_ghmappo' and not a.smoke:
                 before=tensor_hash(agent);agent.prediction_enabled=False
-                for w in data['scenarios']['dev']:
-                    off,_=episode(make_env(w,data,protocol),agent,deterministic=True)
-                    on=final[(c['seed'],w['scenario_id'])]
-                    predict.append(dict(seed=c['seed'],scenario_id=w['scenario_id'],panel=w['panel'],reward_on=on['reward'],reward_off=off['reward'],delta_reward=on['reward']-off['reward'],delta_completed=on['completed_requests']-off['completed_requests']))
+                with off_events.open('a') as stream:
+                    for w in data['scenarios']['dev']:
+                        off,_=episode(make_env(w,data,protocol),agent,deterministic=True,event_file=stream,
+                            identity=dict(agent='sa_ghmappo_prediction_off',seed=c['seed'],episode=m['episodes'],scenario_id=w['scenario_id'],panel=w['panel'],frame_offset=w['frame_offset']))
+                        on=final[(c['seed'],w['scenario_id'])]
+                        predict.append(dict(seed=c['seed'],scenario_id=w['scenario_id'],panel=w['panel'],reward_on=on['reward'],reward_off=off['reward'],delta_reward=on['reward']-off['reward'],delta_completed=on['completed_requests']-off['completed_requests'],
+                            model_frames_on=on['model_transfer_link_frames'],model_frames_off=off['model_transfer_link_frames'],state_frames_on=on['state_transfer_link_frames'],state_frames_off=off['state_transfer_link_frames'],
+                            nodes_on=on['completed_nodes'],nodes_off=off['completed_nodes'],prepare_on=on['mechanisms']['prepare_commands'],prepare_off=off['mechanisms']['prepare_commands']))
                 assert tensor_hash(agent)==before and _hash_file(cp)==c['sha256']
         for row in rows:
             row['cache_evictions']=sum(c['eviction_count'] for c in row['model_cache'].values())
@@ -127,6 +135,7 @@ def main():
         dev+=rows;training+=tr;probes+=pr
         print(json.dumps(dict(agent=m['agent'],raw_audited=True,checkpoints_checked=checkpoints,reproductions=len(reproductions))),flush=True)
     if plan:
+        assert len(predict)==48
         for seed in plan['seeds']:
             assert initial[('sa_ghmappo',seed)]==initial[('sa_no_prediction',seed)]==initial[('sa_discounted',seed)]==initial[('sa_no_surrogate',seed)]
         assert len({m['prepared_manifest_sha256'] for m in manifests})==1
@@ -146,8 +155,12 @@ def main():
             updates=[r['losses'] for r in training if r['agent']==name and ep-m['eval_every']<r['episode']<=ep and r['losses']]
             curves[name][str(ep)]=dict(reward=avg(r['reward'] for r in values),completed=avg(r['completed_requests'] for r in values),
                 probe_reward=avg(r['reward'] for r in probe),probe_completed=avg(r['completed_requests'] for r in probe),
+                compute_queue_frames=avg(r['status_counts'].get('compute_queue',0) for r in values),
+                output_queue_frames=avg(r['status_counts'].get('output_link_queue',0) for r in values),
+                by_panel={panel:dict(reward=avg(r['reward'] for r in values if r['panel']==panel),completed=avg(r['completed_requests'] for r in values if r['panel']==panel)) for panel in ('base','tight')},
                 by_seed={str(seed):dict(reward=avg(r['reward'] for r in values if r['seed']==seed),completed=avg(r['completed_requests'] for r in values if r['seed']==seed)) for seed in m['seeds']},
-                updates={key:avg(u[key] for u in updates if key in u) for key in ('gradient_steps','approx_kl','kl_early_stop','normalized_entropy','q_mse') if any(key in u for u in updates)})
+                by_seed_panel={f'{seed}_{panel}':dict(reward=avg(r['reward'] for r in values if r['seed']==seed and r['panel']==panel),completed=avg(r['completed_requests'] for r in values if r['seed']==seed and r['panel']==panel)) for seed in m['seeds'] for panel in ('base','tight')},
+                updates={key:avg(u[key] for u in updates if key in u) for key in ('gradient_steps','learning_rate','value_loss','surrogate_loss','approx_kl','kl_early_stop','normalized_entropy','q_mse','epsilon') if any(key in u for u in updates)})
     if plan:
         full={(r['seed'],r['scenario_id']):r for r in dev if r['agent']=='sa_ghmappo' and r['episode']==plan['episodes']}
         for name in summary:
@@ -163,6 +176,8 @@ def main():
         artifact_run_id=[str(p.parent.relative_to(ROOT)) for p in paths],evidence_level='development raw/replayed; paper E0_UNAVAILABLE',
         counts=dict(checkpoints=checkpoints,events=events_count,receipts=receipts_count,reproductions=len(reproductions)),
         summary=summary,curves=curves,paired=paired,prediction_probe=predict,reproductions=reproductions,
+        prediction_off_events=str(off_events.relative_to(ROOT)) if off_events else None,
+        prediction_off_events_sha256=_hash_file(off_events) if off_events else None,
         statistical_scope='descriptive; base/tight and cohorts share raw intervals; no significance/independent-cluster claim',paper_claim_ready=False)
     (destination/'audit.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(dict(output=str(destination/'audit.json'),counts=report['counts'],summary=summary,paired=paired),indent=2))

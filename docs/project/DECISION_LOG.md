@@ -1276,3 +1276,5 @@ claim map 必须报告 `UNAVAILABLE`。
 2026-10-15：3453fe6独立干预定位priority surrogate重排后，另立tail合同：不修改物理reward，共同gamma=1对齐有限评估、critic统一per-request单位，surrogate保留但不干预noop priority/执行头。train-only几何cohort增强覆盖，dev保留base和tight各50%预声明panel；所有baseline共享，禁止按算法分数挑场景。见joint_tail_control_contract_20261015.md。
 
 2026-10-15：a1b6048容量审查后追加零训练support，原覆盖1.2、全程≥2站可达、几何离站排序，固定一套条件后评价所有八主/两辅助最终模型。新条件晚于主训练启动，显式exploratory；不替换已冻结过载主表，不用算法分数选条件，失败Unavailable。
+
+2026-10-15 tail审查结束：全部固定预算结果保留、primary50:50不变，mobile_base仅晚定义探索。旧priority修复不等于团队net/credit已闭环；真实准备挤占冷adapter导致少2节点，state gate整图/节点目标错位有bounded witness。另立下一实现合同修团队机会成本/节点交付目标后再定预算，不能在本审查中调参或替换baseline。新旧MAPPO身份明确：保留当前公共预测/缓存增强强对照，普通MAPPO与外部忠实baseline另定义，不能用弱版本追认优势。

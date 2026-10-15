@@ -59,7 +59,7 @@ def main():
         demands=demands,rows=rows,
         limits='A violation proves all eight cannot finish under these bounds; no violation does not prove a feasible schedule. Model/state fees and transfers ignored; same trace panels are correlated.')
     destination.write_text(json.dumps(report,indent=2)+'\n')
-    print(json.dumps(dict(demands=demands,ruled_out={panel:sum(r['full_completion_ruled_out'] for r in rows if r['panel']==panel) for panel in ('base','tight')},rows=rows),indent=2))
+    print(json.dumps(dict(demands=demands,ruled_out={panel:sum(r['full_completion_ruled_out'] for r in rows if r['panel']==panel) for panel in sorted({r['panel'] for r in rows})},rows=rows),indent=2))
 
 
 if __name__=='__main__':main()
