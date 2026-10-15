@@ -845,3 +845,5 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 2026-10-15 scheduled：旧prefix控制的链路被偷占、图尺度与surrogate重复扣费用已新增独立合同修复；未来槽仍为估计，动作Q仍为学习的counterfactual baseline而非因果oracle。后期回退通过固定greedy train probe/梯度KL日志/constant-update对照核验，尚无新效果结论。
 
 2026-10-15：Scheduled DQN terminal信用缺team tail，已独立审查/修复；terminal_team_tail默认false兼容旧checkpoint，scheduled新入口DQN明确true。原轮旧DQN不作为同信用主baseline，修正版同预算单独回收；不据原旧DQN低分证明主方法优势。
+
+2026-10-15：当前slot grant让最终7次prepare全部推进，但保留−0.0100166净收益反例；3seed/8dev仅1外生离站事件，不能宣称预测普遍占优。覆盖影子输出键与请求key重名已修正为experiment_key，保留错名旧输出并按正确路径重跑一致；未改学习器。

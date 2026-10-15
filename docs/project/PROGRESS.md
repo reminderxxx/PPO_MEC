@@ -2179,3 +2179,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 2026-10-15 scheduled已冻结：source aa8676a，八主配置3072episode加constant-update support384episode，共3456按计划运行；九个group-seed源均clean、同一8帧predictor hash12f8d9193e...。362相关测试、干净真实链SA/DQN各4episode以及11个工程checkpoint首dev完整事件registry重放通过。未选择checkpoint、未打开formal/holdout。
 
 2026-10-15：独立审查发现DQN请求结束漏team tail，与共享credit定义不符；旧baseline原结果保留为legacy-terminal诊断，另以同128×3seed修复DQN，其他方法不重训不改动。原comparison_plan保留并追加amendment；363项回归通过。
+
+2026-10-15 scheduled support：固定full最终128权重预测开关24单元1胜1负22平，奖励+.0834215、完成+.0833333；最终7次prepare均推进7168B/7槽，初始70节点图饱和三seed均0。外生离站实际只有1个，八主比较仍待回收。见joint_scheduled_prediction_support_review_20261015.md。

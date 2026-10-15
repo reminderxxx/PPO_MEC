@@ -249,3 +249,5 @@
 - joint_partial_control_results_review_20261015.md：生命周期v3三组同预算最终结果、全部原始账本/9模型重放、预测局部贡献和剩余缺口。
 
 - joint_scheduled_control_contract_20261015.md：8帧预测/链路预约、动作信用及尺度修复，恢复七算法和去预测主比较、后期稳定性对照的事前合同。
+
+- joint_scheduled_prediction_support_review_20261015.md：8帧预约执行、固定权重预测局部收益/负例、图尺度原始witness；完整八算法排序待回收。

@@ -12,7 +12,7 @@ from src.envs.core.multi_request_replay_env import ReplayCosts
 def main():
  torch.set_num_threads(1)
  experiment=sys.argv[1] if len(sys.argv)>1 else 'joint_coordinated_control'
- key=experiment.replace('/','_')
+ experiment_key=experiment.replace('/','_')
  source=json.loads((ROOT/'artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/20261014T074430Z_development/manifest.json').read_text())
  splits,workflows,rsus=_load_protocol(arguments(source['command'][1:]));sites={r.rsu_id:r for r in rsus}
  path=next((ROOT/f'artifacts/{experiment}/seed7').glob('*/manifest.json'));m=json.loads(path.read_text())
@@ -59,6 +59,6 @@ def main():
     payloads[key]=e['state_payload_bytes']
  report=dict(experiment=experiment,scope='read-only actual/forecast coverage inventory at fitted horizon; actual future never enters policy; not net-benefit evidence',actual_candidate_request_frames=len(true_cases),actual_cases=true_cases,candidate_request_frames=len(cases),
        larger_full_copy_than_eta=sum(c['full_state_frames']>c['eta'] for c in cases),cases=cases)
- out=ROOT/f'artifacts/joint_coordinated_audit_20261015/{key}_opportunities.json';out.write_text(json.dumps(report,indent=2)+'\n')
+ out=ROOT/f'artifacts/joint_coordinated_audit_20261015/{experiment_key}_opportunities.json';out.write_text(json.dumps(report,indent=2)+'\n')
  print(json.dumps({k:v for k,v in report.items() if k not in ('cases','actual_cases')},indent=2))
 if __name__=='__main__':main()

@@ -45,6 +45,8 @@ def main():
  if not plan:assert all(source['agents']==sources[0]['agents'] for source in sources)
  all_agents=[name for names in plan['groups'].values() for name in names] if plan else sources[0]['agents']
  if amendment:
+  changed_src=subprocess.check_output(['git','diff','--name-only',plan['source_commit'],amendment['source_commit'],'--','src/'],cwd=ROOT,text=True).splitlines()
+  assert changed_src==['src/agents/dqn_agent.py'], 'only DQN source may differ in the replacement'
   all_agents += list(amendment['aliases'].values())
   for filename,expected in amendment['shared_source_files'].items():
    for commit in (plan['source_commit'],amendment['source_commit']):
@@ -63,7 +65,7 @@ def main():
   for b in all_windows[i+1:]:
    if a['source_segment_id']==b['source_segment_id']:
     assert a['time_end']<b['time_start'] or b['time_end']<a['time_start']
- rows=[];checkpoint_hashes=[];tensor_hashes=[];audit_counts=Counter(); traces={}
+ rows=[];checkpoint_hashes=[];tensor_hashes=[];audit_counts=Counter(); traces={};dqn_initial={}
  for path,s in zip(manifests,sources):
   directory=path.parent; seed=s['seeds'][0];budget=s['training']['episodes']
   assert s['holdout_status']=='sealed_not_evaluated' and not s['paper_claim_ready']
@@ -101,7 +103,10 @@ def main():
     reconstructed=hashlib.sha256(b''.join(v.numpy().tobytes() for v in initial.values())).hexdigest()
     assert reconstructed==c['initial_tensor_sha256']
     assert any(not torch.equal(v,saved['state_dict'][k]) for k,v in initial.items() if k.startswith('heads.')), 'actor/Q head must learn, buffer counter changes are insufficient'
-    if saved['options']['method']=='dqn':assert saved['training_resume_supported'] is False and 0.05<=saved['epsilon']<=0.3
+    if saved['options']['method']=='dqn':
+     assert saved['training_resume_supported'] is False and 0.05<=saved['epsilon']<=0.3
+     dqn_initial.setdefault((name_for(path,c['agent']),seed),set()).add(c['initial_tensor_sha256'])
+     if amendment:assert bool(saved['options'].get('terminal_team_tail',False))==(name_for(path,c['agent'])=='dqn')
   final={identity(r):r for r in dev if r['episode'] in (0,budget)}
   events=defaultdict(list)
   with (directory/'events.jsonl').open() as f:
@@ -164,6 +169,8 @@ def main():
    traces[key]=hashlib.sha256(json.dumps(group,sort_keys=True).encode()).hexdigest()
    audit_counts['events']+=len(group);audit_counts['receipts']+=len(receipts)
   rows += [{**r,'agent':name_for(path,r['agent'])} for r in dev]
+ if amendment:
+  for seed in plan['seeds']:assert dqn_initial[('dqn',seed)]==dqn_initial[('dqn_legacy_terminal_credit',seed)] and len(dqn_initial[('dqn',seed)])==1
  assert len(set(checkpoint_hashes))==len(checkpoint_hashes)
  # Equal tensors are allowed for a zero-opportunity prediction ablation; record rather than invent distinct models.
  unique_tensor_count=len(set(tensor_hashes))
