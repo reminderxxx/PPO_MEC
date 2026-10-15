@@ -2213,3 +2213,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 2026-10-15 delivery验收完成：393相关测试、16项随机/确定性概率检查及旧11重放通过；新preflight2checkpoint/27025事件/3757收据/4次base/tight完整事件与逐帧策略概率核验通过。两轮工程16 RL episode单列。未知远站状态guard和DQN审计模式错误已修复、失败日志保留；下一步clean source冻结3840完整训练，仍无性能优势声明。
 
 2026-10-15 delivery开跑前最终验收：394相关测试、当前新consumer的2checkpoint/27025事件/3757收据/4次两panel事件和策略概率重放通过；新增独立raw依赖检查确认可选预取没有驱逐同帧他者当前模型。十组预算及额外零训练旧强缓存重放在开跑前冻结，source待clean commit记录。
+
+2026-10-15 delivery v1停止：源cad6509新planner把离站前第4帧已能完成的末节点推迟到eta6，错误给+.04准备收益。独立公式witness确认后停止，已记录316训练、至多10未完成另列；计划/原件保留，不进固定128比较。见joint_delivery_completion_guard_review_20261015.md；先独立审查后另立v2实现，非按奖励筛选。

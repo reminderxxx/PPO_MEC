@@ -875,3 +875,5 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - baseline共享GRU/门控/队列先验，当前MAPPO为增强对照、方向DRL多共用PPO；仍需另立普通MAPPO/外部忠实强基线，不削弱现有对照。本轮正式证据paper E0_UNAVAILABLE，完整原件见joint_tail_control_results_review_20261015.md。
 
 2026-10-15 delivery实现：已知reactive冷准入/IO挤占、模型非抢占span和可选LRU驱逐当前需求新增同合同guard；节点proxy与团队MC信用对齐，surrogate不再改logit且辅助梯度隔离。保护基于共享观测/声明catalog，未知未来需求及延迟共享仍有风险；额外模块收益、所有seed后期回退尚未由新完整实验验证。
+
+2026-10-15 delivery v1边界缺陷：新geometry路径遗漏source可在离站前完成的排除，eta+max把已交付prefix重新收恢复延迟；有界末节点4<eta6却proxy+.04。316回合后停止保留，不把不完整trial作算法效果；v2须保留predeparture prefix并版本化重训。
