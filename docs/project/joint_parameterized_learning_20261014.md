@@ -1,6 +1,6 @@
 # v3 参数化学习合同与开发对比
 
-日期：2026-10-14。状态：IMPLEMENTED_VALIDATION_IN_PROGRESS。本文件先冻结实现与预算，再执行开发对比。
+日期：2026-10-14。状态：COMPLETED_NEGATIVE_DEV_RESULT。本文件先冻结实现与预算，再执行开发对比。
 
 ## 任务与版本边界
 
@@ -37,3 +37,7 @@
 ## 验证
 
 新增合同单测覆盖三算法 update、精确 joint-logprob 重算、checkpoint/optimizer 恢复、actor 不读 critic 真值、非法 mask 拒绝、未来轨迹不影响当前预测、跨窗口预测样本边界。已有环境、缓存、legacy registry/checkpoint 回归共同执行。实际训练前另做 4 episode smoke，只确认生产/消费端可运行，不用于性能结论。
+
+## 2026-10-15 回收
+
+本阶段及其后独立productive修复阶段均已完成，原始结果/审查见 `joint_parameterized_results_review_20261015.md`。主机制无优势，327项相关回归通过，论文证据仍E0_UNAVAILABLE。

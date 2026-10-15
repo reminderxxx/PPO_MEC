@@ -5,6 +5,13 @@
 
 # Artifact Records
 
+## 2026-10-15 parameterized v3 learning and productive repair
+
+- 初轮：`artifacts/joint_parameterized_learning/seed{7,17,27}/20261014T105504Z_development`，commit a7a06a0；productive：`artifacts/joint_parameterized_learning_productive/seed{7,17}/20261014T111122Z_development`、`seed27/20261014T111123Z_development`，commit b6a0dbe；六manifest全部complete/clean，保留两轮所有负值。
+- 每轮5配置×3seed×128，20train/8dev、每32存档、固定最终128；共120checkpoint。两轮各60hash审查及15次独立最终模型首窗重放，收据/IO/完成/时间区间一致。审查输出 `artifacts/joint_parameterized_learning_audit_20261014/{audit,audit_productive}.json`。
+- productive SA27.333/0.833，MAPPO32.537/1.625，cache28.483/1.083；无主机制优势、无稳定收敛。后验相同cache周期规则57.308/6.250仅作集中调度效率诊断。论文E0_UNAVAILABLE，formal/holdout不运行；详见 `joint_parameterized_results_review_20261015.md`。
+
+
 ## 2026-10-14 eight-vehicle v2 cold-cache-mask development diagnostic
 
 - Run `20261014T064956Z_development`，路径 `artifacts/eight_vehicle_joint_v2_cold_mask_20261014/20261014T064956Z_development/`，执行 commit `6865720fdaea1debac337e212651274a35339483`，`git_dirty=false`；新合同 `semantic_discrete_5_per_request_v2_cold_cache_mask`，formal/holdout 未运行。

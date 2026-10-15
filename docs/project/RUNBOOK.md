@@ -1737,3 +1737,7 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 在八车研究 worktree 使用项目 `.venv/bin/python scripts/train_joint_parameterized_control.py --source_manifest artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/20261014T074430Z_development/manifest.json --episodes 128 --eval_every 32 --seeds 7 17 27`。默认五配置含两项 SA 消融。输出 `artifacts/joint_parameterized_learning/<run_id>/`；只读取训练/开发窗口，最终 checkpoint 固定，不打开 formal/holdout。完整合同见 `joint_parameterized_learning_20261014.md`。
 
 同预算再训练可加 `--productive_controls --output_root artifacts/joint_parameterized_learning_productive/seed7 --seeds 7`，另外 seed17/27 使用各自 output_root。必须保留初轮结果，不跨控制约束直接比较算法优势。该模式所有算法都获得 service_load_sharing 和公共条件 mask。
+
+## 2026-10-15 固定开发产物审查
+
+使用项目解释器运行 `scripts/audit_joint_parameterized_control.py`（初轮）和 `scripts/audit_joint_parameterized_control.py joint_parameterized_learning_productive`（修复轮），需要上述本地manifest、checkpoint及源数据。它只读模型/原始事件，重建train/dev时间对齐，独立重放首dev窗口，输出 `artifacts/joint_parameterized_learning_audit_20261014/` 下对应JSON；不选择checkpoint、不训练、不执行formal/holdout。开发回收见 `joint_parameterized_results_review_20261015.md`。

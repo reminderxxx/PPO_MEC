@@ -1,7 +1,7 @@
 # 联合控制 v3 设计草案：让主机制成为可执行决策
 
 - 日期：2026-10-14
-- 状态：`PARTIAL_ENGINEERING_IMPLEMENTATION`；候选执行站、明确模型对象/驱逐、版本状态与输入/输出账本已有 `multi_request_target_control_env.py` 和规则验证入口；学习算法、checkpoint 适配与预测器训练仍未完成，未取得论文算法优势
+- 状态：`PARTIAL_ENGINEERING_IMPLEMENTATION`；候选执行站、明确模型对象/驱逐、版本状态与输入/输出账本已有 `multi_request_target_control_env.py` 和规则验证入口；2026-10-15 已完成学习/checkpoint 与训练窗口 GRU 接入和两轮开发对比，主机制未取得奖励/完成率优势，完整 surrogate/learned eviction 与成本校准仍未闭环；见 `joint_parameterized_results_review_20261015.md`
 - 适用范围：NGSIM 轨迹 × Alibaba DAG 的内部仿真；物理成本仍待实测标定
 - 原始诊断：`artifacts/joint_mechanism_opportunity_20261014/` 与 `artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/`
 

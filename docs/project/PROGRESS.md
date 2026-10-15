@@ -5,6 +5,13 @@
 
 ﻿# Progress
 
+## 2026-10-15：参数化学习两轮完成，未观察到 SA 优势
+
+- 三方法接入相同控制合同；训练窗口 GRU、DAG/surrogate、服务负载共享及公共冷站供给条件已落地。初轮 a7a06a0 与修复轮 b6a0dbe 各5配置×3seed×128，共3,840 episode；120 checkpoint核验、30次独立首dev窗逐事件重放一致，259,500条原始事件及34,296份收据通过审查。
+- 修复轮固定最终128：SA 27.333 / 0.833请求，MAPPO 32.537 / 1.625，缓存PPO 28.483 / 1.083；SA无预测34.537 / 2.083。SA无稳定收敛，多窗口挤单站；平均513.333 prepare命令、100.375状态链路帧，prepared_on_arrival=0。GRU训练内验证RMSE下降不等于调度收益。
+- 327项目标回归通过。独立审查不改算法；后续应另立协同选站/credit与净收益迁移触发任务。formal/holdout未执行，论文E0_UNAVAILABLE；见 `joint_parameterized_results_review_20261015.md`。
+
+
 ## 2026-10-14：显式候选站与模型/状态工程合同已落地
 
 - 在原八车实验的干净分支上实现 `MultiRequestTargetControlEnv` / `JointRequestControl`：覆盖内执行站、已知 DAG base/adapter admission、依赖安全显式驱逐、状态 prepare、计算优先级和输入/结果传输；输出送达后才计节点完成，待返回结果可经付费版本状态转发到新站。316 项目标回归、语法与 diff 检查通过；交付细节见 `joint_target_control_engineering_20261014.md`。

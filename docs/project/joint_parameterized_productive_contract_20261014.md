@@ -1,6 +1,6 @@
 # 参数化学习 productive v2 实现任务
 
-日期：2026-10-14。任务来自独立 `joint_parameterized_representation_review_20261014.md`，不是在其审查轮修改结果。状态：IMPLEMENTED_VALIDATION_IN_PROGRESS。
+日期：2026-10-14。任务来自独立 `joint_parameterized_representation_review_20261014.md`，不是在其审查轮修改结果。状态：COMPLETED_DEV_AUDITED。
 
 ## 共同修复
 
@@ -18,3 +18,7 @@
 ## 验证
 
 针对三方法检查 identity 不混叠、冷站 cache target=current selected target、非周期 noop、条件 mask 零概率拒绝、相同 stored rollout logprob、update 与 opt-in checkpoint；检查服务负载在远端按一帧延迟到达和共享字节计费；相关回归327 passed。4 episode 真实链 smoke 与正式开发预算分别记录，不混作性能证据。
+
+## 2026-10-15 回收
+
+三seed/五配置/128 episode均complete，固定最终checkpoint结果及独立审查见 `joint_parameterized_results_review_20261015.md`。SA未胜出，禁止将公共可行性修复和GRU精度改善包装为论文优势。

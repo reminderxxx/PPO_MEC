@@ -1258,3 +1258,7 @@ claim map 必须报告 `UNAVAILABLE`。
 采用单独 v3 checkpoint 合同重新实现 SA 主机制；不强行移植旧五动作权重。所有比较方法具有相同目标、cache、prepare、priority 与控制周期，SA 只增加 DAG message/surrogate，额外模型容量如实记录。预测用训练窗口 GRU，surrogate 用训练 rollout 实际 return/cost，不用未来真值部署。自动 typed LRU 仍共用，learned eviction 与 causal transition surrogate 尚缺。预算与固定最终 checkpoint 预先冻结于 `joint_parameterized_learning_20261014.md`。
 
 2026-10-14 独立表示审查发现同状态站点缺 identity，另立 productive v2 修复任务。使用公共 identity/服务负载/冷站供给条件，不将公共 mask 包装成 SA 的独有改进；同预算重新训练并保留原轮。旧 checkpoint 默认 productive_controls=false 精确兼容，详见 `joint_parameterized_productive_contract_20261014.md`。
+
+## 2026-10-15 负结果与审查边界
+
+两轮开发回收后保留固定最终128及全部失败，不选dev峰值替换、不修改费用制造收益。SA未胜出，独立审查另列协同选站/credit、迁移触发与surrogate任务；本审查阶段不自动修复或继续筛选实验。公共冷站mask、预测精度或低模型传输不能单独作为SA优势。见 `joint_parameterized_results_review_20261015.md`。
