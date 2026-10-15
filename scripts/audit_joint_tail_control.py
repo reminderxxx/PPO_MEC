@@ -71,22 +71,33 @@ def main():
         assert grouped.keys()==final.keys()
         for key,es in grouped.items():
             row=final[key];reward=0.
+            receipts=[]
             for e in es:
                 w=windows[key[1]];assert e['time_index']==w['frames'][e['frame_index']]['time_index']
                 if 'frame_cost_receipt' in e:
                     receipt=e['frame_cost_receipt'];components=receipt['reward_components'];reward+=sum(components.values())
+                    receipts.append(receipt)
                     assert abs(sum(receipt['request_rewards'].values())-sum(components.values()))<1e-8
                     assert all(0<=used<=1 for used in receipt['link_usage_by_rsu'].values());receipts_count+=1
                 vid=e['vehicle_id'];grants=e['link_reservation_grants']
                 for transfer in e['state_transfers']:
                     if transfer['link_frames'] and transfer['target'] in grants:
                         assert grants[transfer['target']]['vehicle_id']==vid and grants[transfer['target']]['kind']=='state'
+                for target,kind,used in [(e['control']['cache_target'],'model',e['cache_request']['link_slots_consumed']),
+                                        (e['target_rsu_id'],'input',e['input_transfer_link_frames']),
+                                        (e['output_source_rsu_id'],'output',e['output_transfer_link_frames'])]:
+                    if used and target in grants:
+                        assert grants[target]['vehicle_id']==vid and grants[target]['kind']==kind
             assert abs(reward-row['reward'])<1e-8
             assert sum(r['completed'] for r in row['per_request'])==row['completed_requests']
             assert sum(r['completed_nodes'] for r in row['per_request'])==row['completed_nodes']
             assert all(c['occupied_bytes']<=c['capacity_bytes'] for c in row['model_cache'].values())
             assert sum(e['output_transfer_link_frames'] for e in es)==row['output_transfer_link_frames']
             assert sum(e['state_transfer_link_frames'] for e in es)==row['state_transfer_link_frames']
+            assert sum(e['input_transfer_link_frames'] for e in es)==row['input_transfer_link_frames']
+            assert sum(r['model_transfer_link_frames'] for r in receipts)==row['model_transfer_link_frames']
+            assert sum(r['shared_state_transmitted_bytes'] for r in receipts)==row['shared_state_transmitted_bytes']
+            assert sum(e['status'] in ('node_completed','vehicle_fallback_completed') for e in es)==row['completed_nodes']
             events_count+=len(es)
         for c in m['checkpoints']:
             cp=path.parent/c['path'];assert _hash_file(cp)==c['sha256'];saved=torch.load(cp,weights_only=False)
@@ -110,6 +121,9 @@ def main():
                     on=final[(c['seed'],w['scenario_id'])]
                     predict.append(dict(seed=c['seed'],scenario_id=w['scenario_id'],panel=w['panel'],reward_on=on['reward'],reward_off=off['reward'],delta_reward=on['reward']-off['reward'],delta_completed=on['completed_requests']-off['completed_requests']))
                 assert tensor_hash(agent)==before and _hash_file(cp)==c['sha256']
+        for row in rows:
+            row['cache_evictions']=sum(c['eviction_count'] for c in row['model_cache'].values())
+            row['cache_transferred_bytes']=sum(c['transferred_bytes'] for c in row['model_cache'].values())
         dev+=rows;training+=tr;probes+=pr
         print(json.dumps(dict(agent=m['agent'],raw_audited=True,checkpoints_checked=checkpoints,reproductions=len(reproductions))),flush=True)
     if plan:
@@ -119,7 +133,8 @@ def main():
     summary={};curves={};paired={}
     for m in manifests:
         name=m['agent'];rs=[r for r in dev if r['agent']==name and r['episode']==m['episodes']]
-        metrics=['reward','completed_requests','completed_nodes','model_transfer_link_frames','state_transfer_link_frames','service_target_change_count']
+        metrics=['reward','completed_requests','completed_nodes','model_transfer_link_frames','state_transfer_link_frames','service_target_change_count',
+                 'input_transfer_link_frames','output_transfer_link_frames','shared_state_transmitted_bytes','cache_evictions','cache_transferred_bytes']
         summary[name]={k:avg(r[k] for r in rs) for k in metrics}
         summary[name]['by_panel']={panel:{k:avg(r[k] for r in rs if r['panel']==panel) for k in metrics} for panel in ('base','tight')}
         summary[name]['reward_by_seed']=[avg(r['reward'] for r in rs if r['seed']==seed) for seed in m['seeds']]
@@ -144,6 +159,7 @@ def main():
     destination.mkdir(exist_ok=True)
     report=dict(reviewed_at=datetime.now(timezone.utc).isoformat(),literature_cutoff='2026-10-15',target_venue='IEEE TMC',
         policy_version='tmc_review_policy_v3_20260621',source_commit=manifests[0]['git_commit'],
+        audit_source_sha256=_hash_file(Path(__file__)),
         artifact_run_id=[str(p.parent.relative_to(ROOT)) for p in paths],evidence_level='development raw/replayed; paper E0_UNAVAILABLE',
         counts=dict(checkpoints=checkpoints,events=events_count,receipts=receipts_count,reproductions=len(reproductions)),
         summary=summary,curves=curves,paired=paired,prediction_probe=predict,reproductions=reproductions,
