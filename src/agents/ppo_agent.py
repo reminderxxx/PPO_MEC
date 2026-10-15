@@ -390,3 +390,199 @@ class ParameterizedControlPPO(nn.Module):
             raise ValueError('incompatible v3 checkpoint')
         obj = cls(**saved['options']); obj.load_state_dict(saved['state_dict']); obj.optimizer.load_state_dict(saved['optimizer'])
         return obj
+
+
+class CoordinatedControlPPO(ParameterizedControlPPO):
+    """Request-autoregressive control with charged intent reservations and prefix credit."""
+    checkpoint_contract = 'coordinated_parameterized_ppo_v1'
+
+    def __init__(self, *, credit_mode='request_team_blend', migration_gate_enabled=True, coordination_enabled=True, **kwargs):
+        kwargs.pop('productive_controls',None)
+        super().__init__(productive_controls=True, **kwargs)
+        if credit_mode not in ('request_team_blend','team'):
+            raise ValueError('unknown coordinated credit mode')
+        self.credit_mode, self.migration_gate_enabled = credit_mode, bool(migration_gate_enabled)
+        self.coordination_enabled = bool(coordination_enabled)
+        self.options.update(credit_mode=credit_mode,migration_gate_enabled=migration_gate_enabled,coordination_enabled=coordination_enabled)
+        width = 20+16+32+32+16
+        self.heads = nn.ModuleList([nn.Sequential(nn.Linear(width,64),nn.Tanh(),nn.Linear(64,1)) for _ in range(3)])
+        self.surrogates = nn.ModuleList([nn.Sequential(nn.Linear(width,32),nn.Tanh(),nn.Linear(32,3)) for _ in range(3)])
+        self.prefix_values = nn.ModuleList([nn.Sequential(nn.Linear(36+32,64),nn.Tanh(),nn.Linear(64,1)) for _ in range(3)])
+        self.cache_encoder = nn.Sequential(nn.Linear(32,16),nn.Tanh())
+        self.optimizer = torch.optim.Adam(self.parameters(),lr=self.options['learning_rate'])
+        self.reset_controller()
+
+    def reset_controller(self):
+        super().reset_controller()
+        self.target_memory = {}
+        self.last_diagnostics = {}
+
+    def _coordinated_features(self, decision, frame, reservations):
+        from src.envs.core.joint_control_planning import migration_opportunities, workflow_service_frames
+        # Common base features are built without the legacy whole-node commitment mask.
+        data,candidates,vid,node_id = super()._features(decision,frame)
+        state = decision['semantic_state']; nodes = state['workflow']['nodes']
+        ids = sorted(r['rsu_id'] for r in state['rsus']); rsus={r['rsu_id']:r for r in state['rsus']}
+        index={n['node_id']:i for i,n in enumerate(nodes)}
+        order={n:i for i,n in enumerate(state['workflow']['execution_order'])}
+        opportunities = migration_opportunities(state,prediction_enabled=self.prediction_enabled)
+        # A forecast affects control only when it yields a physical, positive-net preparation opportunity.
+        if self.migration_gate_enabled and not opportunities:
+            data['own'][11:13] = 0.
+            data['critic'][11:13] = 0.
+            for j in range(3):data[f'f{j}'][:,10:12]=0.
+        own_work = workflow_service_frames(state)
+        queue = {rid:sum(work for owner,(target,work) in reservations.items() if owner!=vid and target==rid) for rid in ids}
+        counts={rid:sum(owner!=vid and target==rid for owner,(target,_) in reservations.items()) for rid in ids}
+        plans=[[(target,node_id) for target in candidates[0]],
+               [(target,nid or node_id) for target,nid,kind in candidates[1]],
+               [(target,node_id) for target,priority in candidates[2]]]
+        for j in range(3):
+            extra=np.zeros((len(plans[j]),12),np.float32); node_indices=[]
+            for k,(rid,nid) in enumerate(plans[j]):
+                r=rsus.get(rid,{}); n=nodes[index[nid]]; opportunity=opportunities.get(rid,{})
+                relocation = 0.
+                if rid in ids and state['execution_location'] and rid!=state['execution_location']:
+                    copied=state['state_copies_by_rsu'].get(rid,{}).get('payload_bytes',0)
+                    relocation=max(1.,(state['execution_state_payload_bytes']-copied)/state['control_cost_parameters']['state_bytes_per_frame'])
+                extra[k]=[r.get('service_work_units',0)/120,queue.get(rid,0)/120,counts.get(rid,0)/8,
+                          relocation/120,opportunity.get('net_reward_proxy',0),opportunity.get('eta_frames',0)/3,
+                          opportunity.get('prepare_frames',0)/3,(order[nid]-order[node_id])/32,
+                          len(n.get('predecessors',[]))/8,sum(a==nid for a,b in state['workflow']['edges'])/8,
+                          own_work/120,n['output_size']/32]
+                node_indices.append(index[nid] if rid is not None else -1)
+            data[f'f{j}']=np.concatenate((data[f'f{j}'],extra),1)
+            data[f'node{j}']=np.asarray(node_indices,np.int64)
+        data['prior0']=np.zeros(6,np.float32)
+        horizon=max(4.,state['episode_frames_remaining'])
+        for k,rid in enumerate(candidates[0]):
+            if rid in ids:
+                # Declared service-frame cost, shared equally by every method. No hidden action override.
+                rates=state['control_cost_parameters']
+                model_delay=(np.ceil(rates['base_size_bytes']/rates['model_bytes_per_frame'])*(1-data['f0'][k,6])+
+                             np.ceil(rates['adapter_size_bytes']/rates['model_bytes_per_frame'])*(1-data['f0'][k,4]))
+                data['prior0'][k]=-(queue[rid]+120*data['f0'][k,23]+model_delay)/(horizon/4)
+        old=self.target_memory.get(vid)
+        if old and old[0]==node_id and old[1] in state['reachable_execution_rsu_ids']:
+            location=state['execution_location']
+            # In-flight work/output stays in place; break only for coverage loss.
+            if state['current_node_work_units_progress']>0 or state['output_pending'] or frame-old[2]<8:
+                data['m0'][:]=False;data['m0'][candidates[0].index(old[1])]=True
+        if self.migration_gate_enabled:
+            for k,(rid,priority) in enumerate(candidates[2]):
+                data['m2'][k] &= rid is None or opportunities.get(rid,{}).get('prepare_feasible',False)
+        data['opportunity_count']=np.asarray(len(opportunities),np.int64)
+        return data,candidates,vid,node_id,own_work
+
+    def _evaluate(self,data,*,actions=None,deterministic=False):
+        own=data['own'];batch=len(own)
+        latent=self.graph_encoder(data['graph'])
+        latent=self.graph_message(torch.cat((latent,torch.bmm(data['adjacency'],latent)),-1))
+        if self.method=='sa_ghmappo':
+            weight=data['graph_mask'].float().unsqueeze(-1)
+            context=(latent*weight).sum(1)/weight.sum(1).clamp(min=1)
+        elif self.method=='cache_offload_drl':context=self.cache_encoder(data['f0'][:,1:5]).mean(1)
+        else:context=own.new_zeros(batch,16)
+        condition=own.new_zeros(batch,32);chosen=[];logs=[];entropies=[];surrogate=[];values=[];active=[]
+        for j in range(3):
+            f=data[f'f{j}'];mask=data[f'm{j}'];n=f.shape[1]
+            if j==1:
+                match=(f[...,16:20]==condition[:,None,16:20]).all(-1)&(f[...,12]==1)&(f[...,14]==0)
+                eligible=match&mask
+                cold=(condition[:,0]==1)&~((condition[:,4]==1)&(condition[:,6]==1))&(condition[:,5]==0)
+                mask=torch.where((cold&eligible.any(1))[:,None],eligible,mask)
+            node_indices=data[f'node{j}']; graph=latent.gather(1,node_indices.clamp(min=0)[...,None].expand(-1,-1,16))
+            graph=graph*(node_indices>=0)[...,None] if self.method=='sa_ghmappo' else torch.zeros_like(graph)
+            x=torch.cat((own[:,None].expand(-1,n,-1),context[:,None].expand(-1,n,-1),f,
+                         condition[:,None].expand(-1,n,-1),graph),-1)
+            # Evaluate only legal rows: avoids scoring hundreds of masked cache options on noop frames.
+            logits=own.new_full((batch,n),-1e9); predictions=own.new_zeros(batch,n,3)
+            valid=x[mask]; logits[mask]=self.heads[j](valid).squeeze(-1)
+            if self.surrogate_enabled:
+                raw=self.surrogates[j](valid.detach())
+                estimates=torch.cat((raw[:,:1],torch.nn.functional.softplus(raw[:,1:])),1)
+                predictions[mask]=estimates
+                logits[mask]=logits[mask]+.3*(estimates[:,0]-estimates[:,1]-estimates[:,2]).detach().tanh()
+            if j==0:logits=logits+data['prior0']
+            dist=Categorical(logits=logits)
+            action=actions[:,j] if actions is not None else (dist.logits.argmax(-1) if deterministic else dist.sample())
+            if not bool(mask.gather(1,action[:,None]).all()):raise ValueError('action outside stored coordinated behavior mask')
+            chosen.append(action);logs.append(dist.log_prob(action));entropies.append(dist.entropy())
+            values.append(self.prefix_values[j](torch.cat((data['critic'],condition.detach()),-1)).squeeze(-1))
+            surrogate.append(predictions[torch.arange(batch),action]);active.append(mask.sum(1)>1)
+            condition=f[torch.arange(batch),action]
+        return (torch.stack(chosen,1),torch.stack(logs,1),torch.stack(entropies,1),
+                self.critic(data['critic']).squeeze(-1),torch.stack(surrogate,1),torch.stack(values,1),torch.stack(active,1))
+
+    def distributions(self,data,*,actions=None,deterministic=False):
+        a,log,entropy,value,surrogate,_,_=self._evaluate(data,actions=actions,deterministic=deterministic)
+        return a,log.sum(1),entropy.sum(1),value,surrogate
+
+    @torch.no_grad()
+    def act_controls(self,decisions,frame,*,deterministic=False):
+        from src.envs.core.multi_request_target_control_env import JointRequestControl
+        from src.envs.core.joint_control_planning import workflow_service_frames
+        ids=sorted(decisions);shift=frame%len(ids);ids=ids[shift:]+ids[:shift]
+        reservations={vid:(old[1],workflow_service_frames(decisions[vid]['semantic_state']))
+                      for vid,old in self.target_memory.items() if vid in decisions and
+                      old[1] in decisions[vid]['semantic_state']['reachable_execution_rsu_ids']}
+        controls={};rolls=[];opportunity_count=0;diagnostics={}
+        for vid in ids:
+            data,candidates,_,node,work=self._coordinated_features(decisions[vid],frame,reservations if self.coordination_enabled else {})
+            batch={k:torch.as_tensor(v).unsqueeze(0) for k,v in data.items()}
+            a,logs,entropy,value,surrogate,prefix,active=self._evaluate(batch,deterministic=deterministic)
+            target=candidates[0][int(a[0,0])];cache_target,cache_node,kind=candidates[1][int(a[0,1])]
+            prepare,priority=candidates[2][int(a[0,2])]
+            controls[vid]=JointRequestControl(target,cache_target,cache_node,kind,prepare,priority=priority)
+            old=self.target_memory.get(vid)
+            since=old[2] if old and old[0]==node and old[1]==target else frame
+            self.target_memory[vid]=(node,target,since)
+            reservations[vid]=(target,work)
+            opportunity_count+=int(data['opportunity_count'])
+            from src.envs.core.joint_control_planning import migration_opportunities
+            diagnostics[vid]=dict(migration_candidates=migration_opportunities(decisions[vid]['semantic_state'],prediction_enabled=self.prediction_enabled),
+                reserved_service_frames={rid:float(data['f0'][i,21]*120) for i,rid in enumerate(candidates[0]) if rid and rid!='vehicle'})
+            rolls.append(dict(data=batch,actions=a,logs=logs.sum(1),head_logs=logs,values=value,prefix_values=prefix,active_heads=active))
+        cache_count=max(r['data']['m1'].shape[1] for r in rolls)
+        self._pad_cache(rolls,cache_count)
+        keys=rolls[0]
+        result={k:({name:torch.cat([r[k][name] for r in rolls]) for name in rolls[0][k]} if k=='data' else torch.cat([r[k] for r in rolls])) for k in keys}
+        result['vehicle_ids']=ids
+        self.last_diagnostics=dict(migration_opportunities=opportunity_count,request_order=ids,by_vehicle=diagnostics)
+        return controls,result
+
+    @staticmethod
+    def _pad_cache(rollouts,count):
+        for r in rollouts:
+            missing=count-r['data']['m1'].shape[1]
+            r['data']['f1']=torch.nn.functional.pad(r['data']['f1'],(0,0,0,missing))
+            r['data']['m1']=torch.nn.functional.pad(r['data']['m1'],(0,missing))
+            r['data']['node1']=torch.nn.functional.pad(r['data']['node1'],(0,missing),value=-1)
+
+    def update(self,rollouts,*,epochs=4):
+        self._pad_cache(rollouts,max(r['data']['m1'].shape[1] for r in rollouts))
+        data={k:torch.cat([r['data'][k] for r in rollouts]) for k in rollouts[0]['data']}
+        actions=torch.cat([r['actions'] for r in rollouts]);old=torch.cat([r['head_logs'] for r in rollouts])
+        team=torch.cat([r['returns'] for r in rollouts]);targets=torch.cat([r['credit_targets'] for r in rollouts])
+        if self.credit_mode=='team':targets=torch.cat([r['team_credit_targets'] for r in rollouts])
+        values=torch.cat([r['prefix_values'] for r in rollouts]);active=torch.cat([r['active_heads'] for r in rollouts])
+        advantages=targets[:,None]-values
+        for j in range(3):
+            sample=advantages[active[:,j],j]
+            if len(sample)>1:advantages[:,j]=(advantages[:,j]-sample.mean())/sample.std().clamp(min=1e-6)
+        costs=torch.cat([r['cost_targets'] for r in rollouts]);losses=[]
+        for _ in range(epochs):
+            for index in torch.randperm(len(actions)).split(512):
+                batch={k:v[index] for k,v in data.items()}
+                _,logs,entropy,value,surrogate,prefix,enabled=self._evaluate(batch,actions=actions[index])
+                ratio=(logs-old[index]).exp()
+                objective=torch.minimum(ratio*advantages[index],ratio.clamp(.8,1.2)*advantages[index])
+                weight=enabled.float();denominator=weight.sum().clamp(min=1)
+                policy=-(objective*weight).sum()/denominator
+                vf=(prefix-targets[index,None]).square().mean()+ (value-team[index]).square().mean()
+                aux=(surrogate-torch.cat((targets[index,None],costs[index]),-1)[:,None]).square().mean() if self.surrogate_enabled else vf*0
+                loss=policy+.5*vf-.01*(entropy*weight).sum()/denominator+.2*aux
+                self.optimizer.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(self.parameters(),.5);self.optimizer.step()
+                losses.append([float(policy.detach()),float(vf.detach()),float(aux.detach())])
+        means=np.mean(losses,0)
+        return dict(policy_loss=float(means[0]),value_loss=float(means[1]),surrogate_loss=float(means[2]),samples=len(actions))

@@ -27,6 +27,7 @@ def episode(env, agent=None, *, deterministic=False, event_file=None, identity=N
     if agent is not None:
         agent.reset_controller()
     assignments, reward, rolls, rewards, mechanisms = {}, 0., [], [], Counter()
+    initial_request_count=len(env.decision_states())
     while True:
         states = env.decision_states()
         if agent is None:
@@ -41,11 +42,18 @@ def episode(env, agent=None, *, deterministic=False, event_file=None, identity=N
         reward += value; rewards.append(value)
         if agent is not None:
             by_vehicle = {e['vehicle_id']: e for e in info['events']}
+            receipt=info['events'][0]['frame_cost_receipt']
+            if hasattr(agent,'credit_mode'):
+                rollout['request_rewards'] = receipt['request_rewards']
+                mechanisms['migration_opportunities'] += agent.last_diagnostics['migration_opportunities']
             rollout['cost_targets'] = torch.tensor([[
                 by_vehicle[vid]['cache_request']['link_slots_consumed']/10,
                 by_vehicle[vid]['state_transfer_link_frames']/10] for vid in rollout['vehicle_ids']], dtype=torch.float32)
         for e in info['events']:
             control = e['control']
+            if agent is not None and hasattr(agent,'credit_mode'):
+                e['control_planning']=agent.last_diagnostics['by_vehicle'][e['vehicle_id']]
+                mechanisms['net_positive_prepare_commands'] += int(control['prepare_target'] in e['control_planning']['migration_candidates'])
             mechanisms['cache_commands'] += int(control['cache_target'] is not None)
             mechanisms['future_cache_commands'] += int(control['cache_node_id'] is not None and control['cache_node_id'] != e['node_id'])
             mechanisms['base_only_commands'] += int(control['cache_target'] is not None and control['cache_kind']=='base_model')
@@ -56,10 +64,17 @@ def episode(env, agent=None, *, deterministic=False, event_file=None, identity=N
         if done:
             break
     # Every request receives the full team tail, including after its own completion.
-    target = 0.
+    target = 0.; local_returns={}
     for rollout, value in reversed(list(zip(rolls, rewards))):
         target = value/10 + .99*target
         rollout['returns'] = torch.full_like(rollout['values'], target)
+        if 'request_rewards' in rollout:
+            for vid in set(local_returns)|set(rollout['request_rewards']):
+                local_returns[vid] = rollout['request_rewards'].get(vid,0.)/10+.99*local_returns.get(vid,0.)
+            local=torch.tensor([local_returns[vid] for vid in rollout['vehicle_ids']],dtype=torch.float32)
+            rollout['request_returns']=local
+            rollout['team_credit_targets']=torch.full_like(local,target/initial_request_count)
+            rollout['credit_targets']=.5*local+.5*target/initial_request_count
     return dict(reward=reward, **env.summary(), mechanisms=dict(mechanisms)), rolls
 
 
@@ -73,10 +88,15 @@ def main():
     p.add_argument('--output_root',type=Path,default=ROOT/'artifacts/joint_parameterized_learning')
     p.add_argument('--threads',type=int,default=1)
     p.add_argument('--productive_controls',action='store_true')
+    p.add_argument('--coordinated_controls',action='store_true')
     a = p.parse_args()
     if a.episodes < 4 or a.episodes % 4 or a.episodes % a.eval_every:
         raise ValueError('budget must be a positive multiple of update=4 and eval_every')
-    allowed = {'sa_ghmappo','mappo','cache_offload_drl','sa_no_surrogate','sa_no_prediction'}
+    if a.coordinated_controls:
+        a.productive_controls=True
+    allowed = {'sa_ghmappo','mappo','cache_offload_drl','sa_no_surrogate','sa_no_prediction','sa_no_coordination','sa_team_credit','sa_ungated_prediction'}
+    if not a.coordinated_controls and set(a.agents)&{'sa_no_coordination','sa_team_credit','sa_ungated_prediction'}:
+        raise ValueError('coordinated ablations require --coordinated_controls')
     if not set(a.agents) <= allowed:
         raise ValueError('unsupported comparison agent')
     torch.set_num_threads(a.threads)
@@ -96,12 +116,14 @@ def main():
     options['model_cache_config'] = source['costs']['model_cache']
     if a.productive_controls:
         options['service_load_sharing'] = True
+    if a.coordinated_controls:
+        options['coordination_intent_enabled'] = True
     run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ_development')
     output = a.output_root/run_id; output.mkdir(parents=True,exist_ok=False)
     metadata = dict(run_id=run_id,status='running',command=sys.argv,
         git_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         git_dirty=bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),
-        protocol='joint_parameterized_ppo_productive_v2' if a.productive_controls else 'joint_parameterized_ppo_development_v1',productive_controls=a.productive_controls,action_contract='joint_parameterized_control_v3',
+        protocol='joint_parameterized_ppo_coordinated_v1' if a.coordinated_controls else ('joint_parameterized_ppo_productive_v2' if a.productive_controls else 'joint_parameterized_ppo_development_v1'),coordinated_controls=a.coordinated_controls,productive_controls=a.productive_controls,action_contract='joint_parameterized_control_v3',
         observation_contract='joint_request_observation_v3',development_only=True,paper_claim_ready=False,
         holdout_status='sealed_not_evaluated',source_manifest_sha256=_hash_file(a.source_manifest),
         raw_data_sha256=source['raw_data_sha256'],splits={k:source['splits'][k] for k in ('train','dev')},
@@ -113,6 +135,11 @@ def main():
         limitations=['internal synthetic-cost simulation','first-party cache PPO, not external paper reproduction',
             'typed LRU fallback, no learned explicit eviction','surrogate predicts observational team return and per-command cache/state costs, not a causal counterfactual model',
             'serial DAG and single initial request batch','shared control bytes charged outside data link slots'])
+    if a.coordinated_controls:
+        metadata['training'].update(target_commitment='8_frame_intent_then_hold_inflight_node_until_coverage_loss',actor_objective='conditional_head_clipped_ppo_prefix_baselines_v1',
+            credit='half_local_ledger_half_team_per_initial_request',coordination='rotating_request_order_charged_intent_reservations',
+            queue_prior='negative_reserved_service_plus_state_model_cost_over_remaining_horizon_per_rsu',
+            migration_gate='forecast_execution_coverage_loss_positive_net_reward_proxy')
     manifest = output/'manifest.json'
     manifest.write_text(json.dumps(metadata,indent=2)+'\n')
     bundle = fit_predictor(splits['train'])
@@ -138,7 +165,10 @@ def main():
             for seed in a.seeds:
                 random.seed(seed); np.random.seed(seed)
                 agent = build_agent(algorithm,control_contract='joint_parameterized_control_v3',seed=seed,
-                    surrogate_enabled=name!='sa_no_surrogate',prediction_enabled=name!='sa_no_prediction',productive_controls=a.productive_controls)
+                    surrogate_enabled=name!='sa_no_surrogate',prediction_enabled=name!='sa_no_prediction',productive_controls=a.productive_controls,
+                    **(dict(coordinated_controls=True,coordination_enabled=name!='sa_no_coordination',
+                            credit_mode='team' if name=='sa_team_credit' else 'request_team_blend',
+                            migration_gate_enabled=name!='sa_ungated_prediction') if a.coordinated_controls else {}))
                 initial_hash = hashlib.sha256(b''.join(v.detach().numpy().tobytes() for v in agent.state_dict().values())).hexdigest()
                 rollout_buffer = []
                 for ep in range(1,a.episodes+1):

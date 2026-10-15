@@ -176,3 +176,13 @@ class ParameterizedMAPPOAgent(ParameterizedControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method', None)
         super().__init__(method='mappo', **kwargs)
+
+
+from src.agents.ppo_agent import CoordinatedControlPPO
+
+
+class CoordinatedMAPPOAgent(CoordinatedControlPPO):
+    """Opt-in coordinated v3 controller with the common observation/action contract."""
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='mappo',**kwargs)

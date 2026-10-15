@@ -1741,3 +1741,7 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 ## 2026-10-15 固定开发产物审查
 
 使用项目解释器运行 `scripts/audit_joint_parameterized_control.py`（初轮）和 `scripts/audit_joint_parameterized_control.py joint_parameterized_learning_productive`（修复轮），需要上述本地manifest、checkpoint及源数据。它只读模型/原始事件，重建train/dev时间对齐，独立重放首dev窗口，输出 `artifacts/joint_parameterized_learning_audit_20261014/` 下对应JSON；不选择checkpoint、不训练、不执行formal/holdout。开发回收见 `joint_parameterized_results_review_20261015.md`。
+
+## 协同控制同预算开发验证（2026-10-15）
+
+使用项目解释器运行 `scripts/train_joint_parameterized_control.py --source_manifest artifacts/eight_vehicle_joint_v2_mechanism_budget96_20261014/20261014T074430Z_development/manifest.json --coordinated_controls --agents sa_ghmappo mappo cache_offload_drl sa_no_prediction sa_no_coordination sa_team_credit sa_ungated_prediction --episodes 128 --eval_every 32 --seeds 7 --output_root artifacts/joint_coordinated_control/seed7`，seed17/27使用各自目录。主结果固定最终128，GRU训练预算不变，新增意图费按收据核验；formal/holdout不运行。

@@ -28,12 +28,13 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
     action_contract = "joint_parameterized_control_v3"
 
     def __init__(self, *, input_bytes_per_link_frame: int = 1024,
-                 output_bytes_per_link_frame: int = 1024, **kwargs: Any) -> None:
+                 output_bytes_per_link_frame: int = 1024, coordination_intent_enabled: bool = False, **kwargs: Any) -> None:
         if any(not isfinite(value) or value < 1 or int(value) != value for value in
                (input_bytes_per_link_frame, output_bytes_per_link_frame)):
             raise ValueError("input/output rates must be positive integer bytes")
         if "environment_revision" in kwargs or "strict_cold_cache_mask" in kwargs:
             raise ValueError("target control uses its own v3 contract")
+        self.coordination_intent_enabled = bool(coordination_intent_enabled)
         self.input_bytes_per_link_frame = int(input_bytes_per_link_frame)
         self.output_bytes_per_link_frame = int(output_bytes_per_link_frame)
         super().__init__(environment_revision="v2", **kwargs)
@@ -47,6 +48,7 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         self.output_pending: dict[str, dict[str, Any]] = {}
         self.previous_service_targets: dict[str, str | None] = {}
         self.io_totals: Counter = Counter()
+        self.control_intent_bytes = 0
         return observation
 
     def step_actions(self, actions: dict[str, int]):
@@ -63,6 +65,13 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
                          input_received_targets=sorted(target for owner, node, target in self.input_received
                                                        if owner == vid and node == self.workflows[vid].current_node_id),
                          output_pending=dict(self.output_pending.get(vid, {})))
+            state['episode_frames_remaining']=len(self.frames)-self.frame_index
+            state['control_cost_parameters'] = dict(rsu_work_units_per_frame=self.rsu_work_units_per_frame,
+                profile_unit_bytes=self.workflow_profile_unit_bytes,workload_bytes_per_unit=self.workload_bytes_per_unit,
+                state_bytes_per_frame=self.state_bytes_per_link_frame,minimum_state_frames=self.costs.handoff_state_frames,
+                input_bytes_per_frame=self.input_bytes_per_link_frame,output_bytes_per_frame=self.output_bytes_per_link_frame,
+                model_bytes_per_frame=self.model_cache_config.get('transfer_bytes_per_frame',1024),
+                base_size_bytes=self.model_cache_config.get('base_size_bytes',2048),adapter_size_bytes=self.model_cache_config.get('adapter_size_bytes',512))
             info.pop("action_mask", None)
             info["action_contract"] = self.action_contract
             info["control_space"] = {
@@ -200,6 +209,14 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
             raise RuntimeError("episode ended")
         decisions = self.decision_states()
         evictions = self._validate_controls(controls, decisions)
+        intent_bytes = 0
+        if self.coordination_intent_enabled:
+            import json
+            from src.envs.core.joint_control_planning import workflow_service_frames
+            intents = [{'vehicle_id':vid,'execution_target':control.execution_target,
+                        'service_frames':workflow_service_frames(decisions[vid]['semantic_state'])}
+                       for vid,control in controls.items()]
+            intent_bytes = len(json.dumps({'frame':self.frame_index,'intents':intents},sort_keys=True,separators=(',',':')).encode())
         occupied = self.model_cache.begin_frame()
         link_left = {r.rsu_id: self.costs.link_slots_per_rsu - occupied[r.rsu_id] for r in self.rsus}
         compute_left = {r.rsu_id: self.costs.compute_slots_per_rsu for r in self.rsus}
@@ -313,6 +330,8 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         done = self.frame_index >= len(self.frames) or all(w.is_completed for w in self.workflows.values())
         model_frames = sum(occupied.values()) + sum(e["cache_request"]["link_slots_consumed"] for e in events)
         sharing = self._frame_shared_state_bytes
+        sharing += intent_bytes
+        self.control_intent_bytes += intent_bytes
         self.model_link_frames_charged += model_frames
         self.sharing_bytes_charged += sharing
         components = {
@@ -328,7 +347,10 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         totals = {field: sum(e[field] for e in events) for field in (
             "input_transfer_bytes", "input_transfer_link_frames", "output_transfer_bytes", "output_transfer_link_frames")}
         self.io_totals.update(totals)
+        from src.envs.core.joint_control_planning import request_reward_ledger
+        credit = request_reward_ledger(events,components)
         events[0]["frame_cost_receipt"] = {
+            **({"request_rewards": credit, "control_intent_transmitted_bytes": intent_bytes} if self.coordination_intent_enabled else {}),
             "contract_version": "joint_frame_cost_receipt_v3", "frame_index": events[0]["frame_index"],
             "link_usage_by_rsu": link_usage,
             "explicit_evictions_by_rsu": eviction_receipts,
@@ -349,6 +371,7 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
         summary.update(environment_revision="v3", observation_contract=self.observation_contract,
                        action_contract=self.action_contract, **self.io_totals)
         summary["pending_output_count"] = len(self.output_pending)
+        summary["control_intent_transmitted_bytes"] = self.control_intent_bytes
         summary["service_target_change_count"] = sum(e["service_target_changed"] for e in self.events)
         summary["base_model_fetch_count"] = sum(e["cache_action_status"] == "base_model_fetch" for e in self.events)
         summary["explicit_eviction_count"] = sum(len(e["explicit_evicted_object_ids"]) for e in self.events)
@@ -359,6 +382,7 @@ class MultiRequestTargetControlEnv(MultiRequestJointControlEnv):
                 "input_bytes_per_link_frame": self.input_bytes_per_link_frame,
                 "output_bytes_per_link_frame": self.output_bytes_per_link_frame,
                 "completion_contract": "node_counts_only_after_output_delivery",
+                "coordination_intent_enabled":self.coordination_intent_enabled,
                 "communication_contract": "input_output_model_state_share_destination_rsu_link_slots",
                 "control_channel": "shared_state_json_fee_only_no_data_link_reservation",
                 "execution_contract": "currently_covered_rsu_or_declared_vehicle_or_wait",

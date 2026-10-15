@@ -252,6 +252,16 @@ def build_agent(agent_name: str, **kwargs: Any) -> BaseAgent:
         from src.agents.mappo_agent import ParameterizedMAPPOAgent
         from src.agents.cache_offload_agent import ParameterizedCacheOffloadAgent
         from src.agents.sa_ghmappo_agent import ParameterizedSAGHMAPPOAgent
+        coordinated = kwargs.pop("coordinated_controls", False)
+        if coordinated:
+            from src.agents.mappo_agent import CoordinatedMAPPOAgent
+            from src.agents.cache_offload_agent import CoordinatedCacheOffloadAgent
+            from src.agents.sa_ghmappo_agent import CoordinatedSAGHMAPPOAgent
+            mapping = {"mappo": CoordinatedMAPPOAgent,"cache_offload_drl": CoordinatedCacheOffloadAgent,
+                       "sa_ghmappo": CoordinatedSAGHMAPPOAgent}
+            if agent_name not in mapping:
+                raise ValueError("agent has no coordinated implementation")
+            return mapping[agent_name](**kwargs)
         parameterized = {"mappo": ParameterizedMAPPOAgent,
                          "cache_offload_drl": ParameterizedCacheOffloadAgent,
                          "sa_ghmappo": ParameterizedSAGHMAPPOAgent}

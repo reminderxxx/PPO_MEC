@@ -73,6 +73,7 @@ class LearnedMobilityPredictor(CausalMobilityPredictor):
         self.model = ResidualMobilityGRU(self.horizon)
         self.model.load_state_dict(bundle['state_dict']); self.model.eval()
         self.scale, self.history_size_gru = bundle['scale'], bundle['history']
+        self.position_margin = 3*bundle.get('validation_rmse_position',0.)
         self.history = {}
 
     def reset(self):
@@ -113,6 +114,8 @@ class LearnedMobilityPredictor(CausalMobilityPredictor):
             predicted_handoff_target_rsu_id_by_vehicle=next_rsu.copy(),
             predicted_handoff_vehicle_ids=[v for v, rid in next_rsu.items() if rid], dwell_time=dwell,
             future_load={r.rsu_id: float(counts[r.rsu_id]) for r in rsus},
-            prediction_source='causal_residual_gru_v1')
+            prediction_source='causal_residual_gru_v1',
+            predicted_positions_by_vehicle={v.vehicle_id:[[v.position_x+float(d[0]),v.position_y+float(d[1])] for d in forecast] for v,forecast in zip(vehicles,forecasts)},
+            position_uncertainty_margin=self.position_margin)
         self.last_result = deepcopy(result)
         return result

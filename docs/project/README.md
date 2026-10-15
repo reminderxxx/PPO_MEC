@@ -232,3 +232,5 @@
 ## 2026-10-15 参数化学习回收
 
 - `joint_parameterized_results_review_20261015.md`：两轮3840 episode的奖励/完成、消融、费用收据、checkpoint重放与下一阶段问题；结果不支持SA主机制优势。
+
+- `joint_coordinated_control_contract_20261015.md`：保留预测的协同选站、机会净收益迁移、prefix信用与七配置同预算方案。

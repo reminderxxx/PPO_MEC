@@ -317,3 +317,13 @@ class ParameterizedCacheOffloadAgent(ParameterizedControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method', None)
         super().__init__(method='cache_offload_drl', **kwargs)
+
+
+from src.agents.ppo_agent import CoordinatedControlPPO
+
+
+class CoordinatedCacheOffloadAgent(CoordinatedControlPPO):
+    """Opt-in coordinated v3 controller with the common observation/action contract."""
+    def __init__(self, **kwargs):
+        kwargs.pop('method',None)
+        super().__init__(method='cache_offload_drl',**kwargs)

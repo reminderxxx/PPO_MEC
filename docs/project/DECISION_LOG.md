@@ -1262,3 +1262,7 @@ claim map 必须报告 `UNAVAILABLE`。
 ## 2026-10-15 负结果与审查边界
 
 两轮开发回收后保留固定最终128及全部失败，不选dev峰值替换、不修改费用制造收益。SA未胜出，独立审查另列协同选站/credit、迁移触发与surrogate任务；本审查阶段不自动修复或继续筛选实验。公共冷站mask、预测精度或低模型传输不能单独作为SA优势。见 `joint_parameterized_results_review_20261015.md`。
+
+## 2026-10-15 协同控制独立实现
+
+用户明确授权在前轮负结果审查后修复协同/迁移/credit。采用收费的请求顺序预约、所有方法共同load prior、覆盖失效与净收益条件、预算平衡请求/团队混合目标及prefix baseline；保留预测、不调奖励、保留旧checkpoint。独立七配置同128/三seed预算见 `joint_coordinated_control_contract_20261015.md`，尚未证明性能优势。

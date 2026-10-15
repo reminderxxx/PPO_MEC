@@ -792,3 +792,5 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 参数化 productive opt-in 在 PPO 公共概率层实施 conditional cache mask，不在环境执行后替换 action；共享负载的生产由 joint 环境负责，延迟/字节费消费仍经 SharedStateChannel，三算法共享相同观察与约束。
 
 `audit_joint_parameterized_control.py` 独立消费固定manifest/checkpoint、训练/开发/事件JSONL，核验费用完成与源帧时间，不更新policy或训练缓冲；加载器沿用相应opt-in checkpoint合同。
+
+协同opt-in由各算法文件中的Coordinated类直接继承 `ppo_agent.py` 公共实现；`joint_control_planning.py` 只用当前声明/预测计算服务量与机会代理。环境在动作前序列化意图并在收据记费，训练器消费请求账本生成prefix-credit目标，GRU额外输出预测位置，旧默认路径不增加意图费。
