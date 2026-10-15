@@ -1749,3 +1749,7 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 ## 部分准备独立修复阶段
 
 同协同入口增加 `--partial_preparation --agents sa_ghmappo mappo sa_no_prediction`，各seed仍128episode/每32评估，输出 `artifacts/joint_coordinated_partial_control/seed<seed>/`。需要同时有 `--coordinated_controls`；旧flag默认false，不覆盖旧产物。协议见 `joint_partial_preparation_contract_20261015.md`。
+
+2026-10-15：--coordinated_controls --partial_preparation 现选择partial v3（output_aware_cache=true）；新完整比较根目录artifacts/joint_coordinated_partial_control_v2，旧partial_control下run_abort.json标识中止工程试跑。
+
+2026-10-15：`scripts/audit_joint_coordinated_control.py <experiment>`只读核验完整manifest、原始费用/请求ledger、模型hash与全部最终checkpoint首dev窗口事件重放；`scripts/probe_joint_coordinated_prediction.py <experiment>`执行预声明的固定权重预测开关（零训练）。中止试跑被拒绝。

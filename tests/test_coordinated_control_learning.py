@@ -167,3 +167,39 @@ def test_partial_arrival_selection_accounts_for_already_transferred_prefix():
     data,_,_,_,_=p._coordinated_features(decision,3,{})
     assert data['f0'][2,23]<data['f0'][3,23]
     assert data['prior0'][2]>data['prior0'][3]
+
+
+def test_output_only_delivery_accepts_cold_model_noop_without_link_theft():
+    from src.envs.core.multi_request_target_control_env import JointRequestControl
+    env=four_site_env()
+    env.output_pending['v0']=dict(node_id='n0',rsu_id='a',remaining_bytes=2)
+    env.execution_location['v0']='a';env.state_version['v0']=1
+    env.work_progress['v0']=2;env.state_payload_bytes['v0']=2
+    decision=env.decision_states()['v0']
+    data,_,_,_,_=agent()._coordinated_features(decision,0,{})
+    batch={k:torch.as_tensor(v).unsqueeze(0) for k,v in data.items()}
+    actions=torch.tensor([[1,0,0]])
+    with pytest.raises(ValueError):agent().distributions(batch,actions=actions)
+    policy=agent(output_aware_cache=True)
+    policy.distributions(batch,actions=actions)
+    env.step_controls({'v0':JointRequestControl('a'),'v1':JointRequestControl(None)})
+    assert env.workflows['v0'].current_node_id!='n0'
+    assert not env.model_cache.is_ready('a',decision['semantic_state']['current_workflow_node']['required_adapter'],decision['semantic_state']['current_workflow_node']['required_base_model'])
+
+
+def test_remaining_model_cost_counts_observed_inflight_prefix_and_output_phase():
+    from src.envs.core.joint_control_planning import remaining_model_frames
+    state=forecast_state();row=deepcopy(state['rsus'][1]);node=state['current_workflow_node']
+    row['ready_base_model_ids']=[];row['cached_adapter_ids']=[]
+    state['control_cost_parameters'].update(base_size_bytes=2048,adapter_size_bytes=512,model_bytes_per_frame=1024)
+    assert remaining_model_frames(state,row)==3
+    row['loading_remaining_bytes']={f"base:{node['required_base_model']}":1,f"adapter:{node['required_adapter']}":1}
+    assert remaining_model_frames(state,row)==2
+    state['output_pending']=dict(remaining_bytes=2)
+    assert remaining_model_frames(state,row)==0
+
+
+def test_output_lifecycle_option_roundtrip(tmp_path):
+    policy=agent(output_aware_cache=True,partial_preparation_enabled=True)
+    policy.save_checkpoint(tmp_path/'lifecycle.pt')
+    assert type(policy).from_checkpoint(tmp_path/'lifecycle.pt').output_aware_cache

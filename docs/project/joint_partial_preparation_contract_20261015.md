@@ -22,3 +22,12 @@
 ## 验证
 
 343项相关回归通过；包含全量传输不及ETA但有部分复制价值、模型单独预取、负收益/期限拒绝、已有copy不重复准备、inflight进度进入选站费用、概率/更新/checkpoint，以及旧默认合同。生产链smoke与干净commit下的128episode主运行分开记录。
+
+
+## 2026-10-15 生命周期修订 v3（独立审查后实现）
+
+独立审查 `joint_output_lifecycle_review_20261015.md` 已先提交。58796cc试跑中止并保留各run_abort.json与所有旧产物，不能拼入新主比较。新增output_aware_cache checkpoint选项默认false以重放旧模型；新partial入口统一为true，protocol为joint_parameterized_ppo_coordinated_partial_v3。已计算结果交付不再强制加载模型；模型机会与选站费用使用观测到的在途剩余字节。所有三组共同修复，不改奖励、资源、网络和128×3seed预算。
+
+新输出：`artifacts/joint_coordinated_partial_control_v2/seed<seed>/<run_id>/`。旧partial试跑额外训练成本单列，不作为正式预算或最佳checkpoint候选。训练开始前冻结主比较为最终128；不选择中间最好结果。
+
+生命周期v3验证：346项相关回归通过，py_compile/diff检查通过，真实冻结数据入口4episode×3配置smoke完整结束（joint_lifecycle_smoke_20261015/20261015T025720Z_development）；旧partial中止共516episode（seed7/17/27分别174/170/172），单列为缺陷定位成本。

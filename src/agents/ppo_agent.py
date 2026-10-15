@@ -396,7 +396,7 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
     """Request-autoregressive control with charged intent reservations and prefix credit."""
     checkpoint_contract = 'coordinated_parameterized_ppo_v1'
 
-    def __init__(self, *, credit_mode='request_team_blend', migration_gate_enabled=True, coordination_enabled=True, partial_preparation_enabled=False, **kwargs):
+    def __init__(self, *, credit_mode='request_team_blend', migration_gate_enabled=True, coordination_enabled=True, partial_preparation_enabled=False, output_aware_cache=False, **kwargs):
         kwargs.pop('productive_controls',None)
         super().__init__(productive_controls=True, **kwargs)
         if credit_mode not in ('request_team_blend','team'):
@@ -404,7 +404,8 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
         self.credit_mode, self.migration_gate_enabled = credit_mode, bool(migration_gate_enabled)
         self.coordination_enabled = bool(coordination_enabled)
         self.partial_preparation_enabled = bool(partial_preparation_enabled)
-        self.options.update(credit_mode=credit_mode,migration_gate_enabled=migration_gate_enabled,coordination_enabled=coordination_enabled,partial_preparation_enabled=partial_preparation_enabled)
+        self.output_aware_cache = bool(output_aware_cache)
+        self.options.update(credit_mode=credit_mode,migration_gate_enabled=migration_gate_enabled,coordination_enabled=coordination_enabled,partial_preparation_enabled=partial_preparation_enabled,output_aware_cache=output_aware_cache)
         width = 20+16+32+32+16
         self.heads = nn.ModuleList([nn.Sequential(nn.Linear(width,64),nn.Tanh(),nn.Linear(64,1)) for _ in range(3)])
         self.surrogates = nn.ModuleList([nn.Sequential(nn.Linear(width,32),nn.Tanh(),nn.Linear(32,3)) for _ in range(3)])
@@ -426,7 +427,7 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
         ids = sorted(r['rsu_id'] for r in state['rsus']); rsus={r['rsu_id']:r for r in state['rsus']}
         index={n['node_id']:i for i,n in enumerate(nodes)}
         order={n:i for i,n in enumerate(state['workflow']['execution_order'])}
-        opportunities = migration_opportunities(state,prediction_enabled=self.prediction_enabled,allow_partial=self.partial_preparation_enabled)
+        opportunities = migration_opportunities(state,prediction_enabled=self.prediction_enabled,allow_partial=self.partial_preparation_enabled,model_progress_aware=self.output_aware_cache)
         # A forecast affects control only when it yields a physical, positive-net preparation opportunity.
         if self.migration_gate_enabled and not opportunities:
             data['own'][11:13] = 0.
@@ -475,6 +476,9 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
                 rates=state['control_cost_parameters']
                 model_delay=(np.ceil(rates['base_size_bytes']/rates['model_bytes_per_frame'])*(1-data['f0'][k,6])+
                              np.ceil(rates['adapter_size_bytes']/rates['model_bytes_per_frame'])*(1-data['f0'][k,4]))
+                if self.output_aware_cache:
+                    from src.envs.core.joint_control_planning import remaining_model_frames
+                    model_delay=remaining_model_frames(state,rsus[rid])
                 data['prior0'][k]=-(queue[rid]+120*data['f0'][k,23]+model_delay)/(horizon/4)
         old=self.target_memory.get(vid)
         if old and old[0]==node_id and old[1] in state['reachable_execution_rsu_ids']:
@@ -504,6 +508,7 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
                 match=(f[...,16:20]==condition[:,None,16:20]).all(-1)&(f[...,12]==1)&(f[...,14]==0)
                 eligible=match&mask
                 cold=(condition[:,0]==1)&~((condition[:,4]==1)&(condition[:,6]==1))&(condition[:,5]==0)
+                if self.output_aware_cache:cold=cold&~own[:,9].bool()
                 mask=torch.where((cold&eligible.any(1))[:,None],eligible,mask)
             node_indices=data[f'node{j}']; graph=latent.gather(1,node_indices.clamp(min=0)[...,None].expand(-1,-1,16))
             graph=graph*(node_indices>=0)[...,None] if self.method=='sa_ghmappo' else torch.zeros_like(graph)
@@ -554,7 +559,7 @@ class CoordinatedControlPPO(ParameterizedControlPPO):
             reservations[vid]=(target,work)
             opportunity_count+=int(data['opportunity_count'])
             from src.envs.core.joint_control_planning import migration_opportunities
-            diagnostics[vid]=dict(migration_candidates=migration_opportunities(decisions[vid]['semantic_state'],prediction_enabled=self.prediction_enabled,allow_partial=self.partial_preparation_enabled),
+            diagnostics[vid]=dict(migration_candidates=migration_opportunities(decisions[vid]['semantic_state'],prediction_enabled=self.prediction_enabled,allow_partial=self.partial_preparation_enabled,model_progress_aware=self.output_aware_cache),
                 reserved_service_frames={rid:float(data['f0'][i,21]*120) for i,rid in enumerate(candidates[0]) if rid and rid!='vehicle'})
             rolls.append(dict(data=batch,actions=a,logs=logs.sum(1),head_logs=logs,values=value,prefix_values=prefix,active_heads=active))
         cache_count=max(r['data']['m1'].shape[1] for r in rolls)

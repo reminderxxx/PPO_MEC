@@ -17,7 +17,7 @@ def workflow_service_frames(state):
     return total
 
 
-def migration_opportunities(state, *, prediction_enabled=True, allow_partial=False):
+def migration_opportunities(state, *, prediction_enabled=True, allow_partial=False, model_progress_aware=False):
     """Estimate saved critical-path delay minus extra transfer/contention cost.
 
     Only a predicted loss of *execution-site coverage* is an opportunity.
@@ -25,7 +25,7 @@ def migration_opportunities(state, *, prediction_enabled=True, allow_partial=Fal
     use declared synthetic rates and observed prefix versions, never true futures.
     """
     if allow_partial:
-        return partial_migration_opportunities(state,prediction_enabled=prediction_enabled)
+        return partial_migration_opportunities(state,prediction_enabled=prediction_enabled,model_progress_aware=model_progress_aware)
     if not prediction_enabled or not state.get('execution_location'):
         return {}
     vid = state['primary_vehicle_id']; p = state['predictions']
@@ -102,7 +102,7 @@ def request_reward_ledger(events, components):
     return ledger
 
 
-def partial_migration_opportunities(state, *, prediction_enabled=True):
+def partial_migration_opportunities(state, *, prediction_enabled=True, model_progress_aware=False):
     """Value useful prefixes and model-only prefetch, with residual recovery.
 
     A positive proxy is a deployment candidate, not a guarantee of realized gain.
@@ -144,6 +144,7 @@ def partial_migration_opportunities(state, *, prediction_enabled=True):
         if not pending:
             if node['required_base_model'] not in row.get('ready_base_model_ids',[]):model+=ceil(rates['base_size_bytes']/rates['model_bytes_per_frame'])
             if node['required_adapter'] not in row.get('cached_adapter_ids',[]):model+=ceil(rates['adapter_size_bytes']/rates['model_bytes_per_frame'])
+        if model_progress_aware:model=remaining_model_frames(state,row)
         if copy.get('version')==state['execution_state_version']:full=0
         model_budget=min(model,eta);prefix_budget=min(full,max(0,eta-model_budget))
         after_state=max(0,full-prefix_budget)+residual if prefix_budget else reactive_state
@@ -174,3 +175,16 @@ def partial_migration_opportunities(state, *, prediction_enabled=True):
                 prepare_feasible=prefix_budget>0 and state_net>0,model_prefetch_frames=model_budget,
                 partial_copy=full>prefix_budget,residual_recovery_frames=residual,arrival_delay_frames=after,combined_net_reward_proxy=combined)
     return result
+
+
+def remaining_model_frames(state, row):
+    """Observed remaining destination-link model work; output delivery needs no model."""
+    if state['output_pending']:return 0
+    rates=state['control_cost_parameters'];node=state['current_workflow_node']
+    pending=row.get('loading_remaining_bytes',{});total=0
+    for kind,identifier,ready,size in (
+        ('base',node['required_base_model'],row.get('ready_base_model_ids',[]),rates['base_size_bytes']),
+        ('adapter',node['required_adapter'],row.get('cached_adapter_ids',[]),rates['adapter_size_bytes'])):
+        if identifier not in ready:
+            total+=ceil(pending.get(f'{kind}:{identifier}',size)/rates['model_bytes_per_frame'])
+    return total

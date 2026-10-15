@@ -402,3 +402,5 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 - `artifacts/joint_coordinated_control/seed<seed>/`：新一轮同预算产物，保留旧两轮。
 
 - `artifacts/joint_coordinated_partial_control/seed<seed>/`：三个主比较配置的部分预复制阶段，独立于严格版本七配置目录。
+
+2026-10-15：artifacts/joint_coordinated_partial_control_v2保存生命周期修正后三组同预算开发比较；joint_coordinated_partial_control保留已中止试跑及run_abort.json。

@@ -831,3 +831,5 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 新共同prior和账本修复已实现，效果待同预算验证。意图总线仍为零延迟控制面代理，净收益为声明成本启发式而非校准因果估值；rolling confidence不是概率校准，低迁移机会可能使full/no-prediction一致。surrogate仍非完整状态转移模型，learned victim与真实成本校准未补齐。
 
 2026-10-15：严格完整复制门控漏掉部分前缀机会，独立partial分支已实现，default false兼容旧模型。3帧horizon和估计增长/队列/净收益仍有限，真实收益必须由独立动作/费用重放和同预算对比核验，不能把候选数视作收益。
+
+2026-10-15：output-only冷站交付被学习控制器强制模型加载，已在独立审查后通过默认关闭的output_aware_cache合同修复；旧checkpoint保留原行为。新partial轮使用修正，论文效果待完整审计。

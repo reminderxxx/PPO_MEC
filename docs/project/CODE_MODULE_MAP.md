@@ -796,3 +796,7 @@ DQN 只启用后者。集中真实状态由 decision info 单独传入，只供 
 协同opt-in由各算法文件中的Coordinated类直接继承 `ppo_agent.py` 公共实现；`joint_control_planning.py` 只用当前声明/预测计算服务量与机会代理。环境在动作前序列化意图并在收据记费，训练器消费请求账本生成prefix-credit目标，GRU额外输出预测位置，旧默认路径不增加意图费。
 
 `joint_control_planning.partial_migration_opportunities` 分离cache-only与state边际净收益，并保留ETA内未完成的prefix推进；`CoordinatedControlPPO` opt-in消费该估计及自身在途传输状态，旧默认分支不变。
+
+2026-10-15：joint_control_planning.remaining_model_frames统一output-only零模型需求与观测在途模型剩余费用，CoordinatedControlPPO的output_aware_cache选项同步mask/费用/机会生产与checkpoint消费。
+
+2026-10-15：`scripts/audit_joint_coordinated_control.py <experiment>`只读核验完整manifest、原始费用/请求ledger、模型hash与全部最终checkpoint首dev窗口事件重放；`scripts/probe_joint_coordinated_prediction.py <experiment>`执行预声明的固定权重预测开关（零训练）。中止试跑被拒绝。

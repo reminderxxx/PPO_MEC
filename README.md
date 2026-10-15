@@ -574,3 +574,5 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 2026-10-15 新实现阶段：`--coordinated_controls` 增加收费的同轮预约工作量、DAG候选表示、机会/净收益迁移条件与prefix信用分配；保留GRU，不按最近关联站变化盲目prepare。事前预算与边界见 [协同控制合同](docs/project/joint_coordinated_control_contract_20261015.md)。
 
 严格门控的独立审查发现部分预复制被排除，新增 `--partial_preparation` 分支，按ETA内可推进量及到站残余/增量成本判断，模型单独预取与state收益分开。三配置同预算再训练见 `docs/project/joint_partial_preparation_contract_20261015.md`，旧七配置保留。
+
+2026-10-15：partial控制入口升级为生命周期v3，完整重训根目录`artifacts/joint_coordinated_partial_control_v2/`；旧试跑留存，详见[修复合同](docs/project/joint_partial_preparation_contract_20261015.md)。
