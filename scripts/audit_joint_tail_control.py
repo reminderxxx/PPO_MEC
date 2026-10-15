@@ -41,7 +41,7 @@ def main():
         assert m['status']=='complete'
         if plan:assert not m['git_dirty'] and m['git_commit']==plan['source_commit'] and m['episodes']==plan['episodes'] and m['seeds']==plan['seeds']
         if a.delivery:
-            assert m['credit']=='team_mc_per_initial_request_including_terminal_tail' and m['return_gamma']==1.
+            assert m['protocol']=='joint_team_node_delivery_v2' and m['credit']=='team_mc_per_initial_request_including_terminal_tail' and m['return_gamma']==1.
             assert m['entropy_anneal']==(m['agent']!='sa_fixed_entropy')
         prepared=Path(m['prepared_protocol']);assert _hash_file(prepared)==m['prepared_manifest_sha256']
         protocol=json.loads(prepared.read_text())
@@ -98,7 +98,9 @@ def main():
                     assert abs(sum(receipt['request_rewards'].values())-sum(components.values()))<1e-8
                     assert all(0<=used<=1 for used in receipt['link_usage_by_rsu'].values());receipts_count+=1
                 vid=e['vehicle_id'];grants=e['link_reservation_grants']
-                if a.delivery:audit_optional_cache_evictions(e,by_frame[e['frame_index']],work_by_vehicle)
+                if a.delivery:
+                    audit_optional_cache_evictions(e,by_frame[e['frame_index']],work_by_vehicle)
+                    for op in e['control_planning']['migration_candidates'].values():assert op['source_delivery_times'][-1]>op['eta_frames']
                 if a.delivery and e['control']['prepare_target'] is not None:
                     assert e['control_planning']['link_calendar'][e['control']['prepare_target']][0] is None
                 if a.delivery and e['control']['cache_target'] is not None:
@@ -192,7 +194,7 @@ def main():
             other={(r['seed'],r['scenario_id']):r for r in dev if r['agent']==name and r['episode']==plan['episodes']}
             ds=[full[k]['reward']-other[k]['reward'] for k in full]
             paired[name]=dict(reward=avg(ds),completed=avg(full[k]['completed_requests']-other[k]['completed_requests'] for k in full),wins=sum(d>1e-9 for d in ds),losses=sum(d< -1e-9 for d in ds))
-    destination=(root if not a.smoke else ROOT/('artifacts/joint_delivery_preflight_audit' if a.delivery else 'artifacts/joint_tail_preflight_audit'))
+    destination=(root if not a.smoke else ROOT/('artifacts/joint_delivery_v2_preflight_audit' if a.delivery else 'artifacts/joint_tail_preflight_audit'))
     destination.mkdir(exist_ok=True)
     report=dict(reviewed_at=datetime.now(timezone.utc).isoformat(),literature_cutoff='2026-10-15',target_venue='IEEE TMC',
         policy_version='tmc_review_policy_v3_20260621',source_commit=manifests[0]['git_commit'],

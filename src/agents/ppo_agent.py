@@ -871,7 +871,7 @@ class TailControlPPO(ScheduledControlPPO):
 
 class DeliveryControlPPO(TailControlPPO):
     """Team node delivery with two-pass reactive protection and cache-residual DAG context."""
-    checkpoint_contract='delivery_parameterized_ppo_v1'
+    checkpoint_contract='delivery_parameterized_ppo_v2'
 
     def __init__(self, *, entropy_anneal=True, **kwargs):
         kwargs['credit_mode']='team'
@@ -918,6 +918,12 @@ class DeliveryControlPPO(TailControlPPO):
         nodes={n['node_id']:n for n in state['workflow']['nodes']};calendar=getattr(self,'_calendar',{})
         for k,(rid,nid,kind) in enumerate(candidates[1]):
             if nid is not None and nid!=node:data['f1'][k,24:27]=0
+            if rid in calendar and nid==node and getattr(self,'_team_targets',{}).get(vid)==rid and not state['output_pending']:
+                row=rows[rid];n=nodes[nid];grant=calendar[rid][0]
+                ready=(n['required_base_model'] in row.get('ready_base_model_ids',[]) if kind=='base_model' else
+                       n['required_adapter'] in row.get('cached_adapter_ids',[]) or n['required_adapter'] in row.get('loading_adapter_ids',[]))
+                # Reactive misses run immediately; only proactive cache runs on the 4-frame clock.
+                data['m1'][k]=not ready and (grant is None or grant==(vid,'model'))
             if rid is None or rid not in calendar or not data['m1'][k]:continue
             span=fresh_model_span(state,rows[rid],nodes[nid],kind)
             # Async model transfer cannot yield the next frame: protect every

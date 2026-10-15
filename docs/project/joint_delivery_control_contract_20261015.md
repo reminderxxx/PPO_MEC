@@ -1,5 +1,7 @@
 # 团队节点交付与预测准备资源保护：独立实现合同
 
+**历史v1：cad6509试跑已在316个已记录回合后因估值边界缺陷停止；当前CLI/工厂已转v2，不resume本root。独立审查及后续合同见joint_delivery_completion_guard_review_20261015.md、joint_delivery_control_v2_contract_20261015.md。**
+
 日期：2026-10-15。依据独立审查`joint_tail_control_results_review_20261015.md`（532dca6）；本阶段为用户明确授权的修复/开发实验，审查结论不被追认为性能改进。formal/holdout封存，canonical不变。
 
 ## 已定位问题

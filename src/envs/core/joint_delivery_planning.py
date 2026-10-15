@@ -23,10 +23,11 @@ def node_delivery_times(state, target):
     return times
 
 
-def node_delivery_utility(times, delay, horizon):
+def node_delivery_utility(times, delay, horizon, preserved_prefix=0):
     # Node rewards and unfinished-request waiting match the declared physical objective.
-    deliveries=sum(t+delay<=horizon for t in times)
-    finish=(times[-1]+delay) if times else 0.
+    adjusted=[t if i<preserved_prefix else t+delay for i,t in enumerate(times)]
+    deliveries=sum(t<=horizon for t in adjusted)
+    finish=adjusted[-1] if adjusted else 0.
     return deliveries-.01*min(horizon,max(0.,finish))
 
 
@@ -105,8 +106,20 @@ def delivery_migration_opportunities(state, calendar, *, decisions=None, targets
     if not exits:return {}
     eta=exits[0];horizon=state['episode_frames_remaining'];rates=state['control_cost_parameters']
     if eta>=horizon:return {}
-    n=state['current_workflow_node'];growth=eta
-    if state['current_node_service_steps_remaining']<=eta:growth+=n['output_size']*rates['profile_unit_bytes']
+    def current_queue(rid):
+        return sum(ceil(max(0,d['semantic_state']['current_node_work_units_required']-d['semantic_state']['current_node_work_units_progress'])/rates['rsu_work_units_per_frame'])
+                   for owner,d in (decisions or {}).items() if owner!=vid and (targets or {}).get(owner)==rid)
+    source_initial=remaining_model_frames(state,source)+current_queue(source['rsu_id'])
+    source_times=[source_initial+t for t in node_delivery_times(state,source['rsu_id'])]
+    if not source_times or source_times[-1]<=eta:return {}
+    prefix_count=sum(t<=eta for t in source_times)
+    done=set(state['workflow']['completed_node_ids']);lookup={n['node_id']:n for n in state['workflow']['nodes']}
+    remaining_nodes=[lookup[nid] for nid in state['workflow']['execution_order'] if nid not in done]
+    planning_node=remaining_nodes[prefix_count]
+    growth=eta
+    for i,n in enumerate(remaining_nodes):
+        output=ceil(max(1,n['output_size']*rates['profile_unit_bytes'])/rates['output_bytes_per_frame'])
+        if source_times[i]-output<=eta and not (i==0 and state['output_pending']):growth+=n['output_size']*rates['profile_unit_bytes']
     result={}
     for rid,row in rows.items():
         if rid==source['rsu_id'] or not covers(points[eta-1],row,-margin):continue
@@ -119,20 +132,26 @@ def delivery_migration_opportunities(state, calendar, *, decisions=None, targets
         residual=max(rates['minimum_state_frames'],ceil(growth/rate))
         if transfer is not None:residual=max(residual,ceil(max(1,state['execution_state_payload_bytes']-transfer['payload_bytes']+growth)/rate))
         reactive=max(rates['minimum_state_frames'],ceil((missing+growth)/rate)) if transfer is None else full+residual
-        model=remaining_model_frames(state,row);mb=min(model,len(slots));prefix=min(full,len(slots))
+        alternate=dict(state,current_workflow_node=planning_node,
+                       output_pending=state['output_pending'] if prefix_count==0 else {})
+        model=remaining_model_frames(alternate,row)
+        # Do not promise prefetch benefit for an adapter already used before departure.
+        # Future DAG admissions remain available to the learned cache head; their
+        # forecast current-node proxy stays zero until that node is actually current.
+        mb=min(model,len(slots)) if prefix_count==0 else 0
+        prefix=min(full,len(slots))
         before=model+reactive;cache_after=before-mb
         state_after=model+max(0,full-prefix)+residual if prefix else before
-        # Observed competing current-node work, not whole-DAG reservations (which
-        # would erase all useful prefixes in a long workflow).
-        queue=0.
-        for other,d in (decisions or {}).items():
-            if other!=vid and (targets or {}).get(other)==rid:
-                o=d['semantic_state'];queue+=ceil(max(0,o['current_node_work_units_required']-o['current_node_work_units_progress'])/rates['rsu_work_units_per_frame'])
-        times=[eta+max(0.,t-eta)+queue for t in node_delivery_times(state,rid)]
-        base=node_delivery_utility(times,before,horizon)
+        queue=current_queue(rid)
+        dest_times=node_delivery_times(state,rid)
+        source_prefix=source_times[prefix_count-1] if prefix_count else source_initial
+        dest_prefix=dest_times[prefix_count-1] if prefix_count else 0.
+        progress=max(0.,eta-source_prefix)
+        times=[source_times[i] if i<prefix_count else eta+max(0.,t-dest_prefix-progress)+queue for i,t in enumerate(dest_times)]
+        base=node_delivery_utility(times,before,horizon,prefix_count)
         def benefit(after,budget):
             extra=max(0.,budget+after-before)
-            return confidence*(node_delivery_utility(times,after,horizon)-base)-.01*extra-(1-confidence)*.01*budget
+            return confidence*(node_delivery_utility(times,after,horizon,prefix_count)-base)-.01*extra-(1-confidence)*.01*budget
         cache_net=benefit(cache_after,mb) if mb else 0.
         state_net=benefit(state_after,prefix) if prefix else 0.
         if max(cache_net,state_net)<=0:continue
@@ -141,8 +160,9 @@ def delivery_migration_opportunities(state, calendar, *, decisions=None, targets
             net_reward_proxy=max(cache_net,state_net),state_net_reward_proxy=state_net,cache_net_reward_proxy=cache_net,
             combined_net_reward_proxy=max(cache_net,state_net),confidence=confidence,prepare_feasible=prefix>0 and state_net>0,
             model_prefetch_frames=mb,reserved_free_slots=slots,blocked_reactive_slots=min(eta,len(calendar[rid]))-len(slots),
-            team_opportunity_cost=0.,team_node_gain_state=sum(t+state_after<=horizon for t in times)-sum(t+before<=horizon for t in times),
-            team_node_gain_cache=sum(t+cache_after<=horizon for t in times)-sum(t+before<=horizon for t in times),
+            team_opportunity_cost=0.,team_node_gain_state=sum((t if i<prefix_count else t+state_after)<=horizon for i,t in enumerate(times))-sum((t if i<prefix_count else t+before)<=horizon for i,t in enumerate(times)),
+            team_node_gain_cache=sum((t if i<prefix_count else t+cache_after)<=horizon for i,t in enumerate(times))-sum((t if i<prefix_count else t+before)<=horizon for i,t in enumerate(times)),
+            source_delivery_times=source_times,predeparture_delivered_nodes=prefix_count,planning_node_id=planning_node['node_id'],
             destination_compute_queue_frames=queue,proxy_scope='observed protected reactive demands; unknown future demand not an oracle')
     return result
 

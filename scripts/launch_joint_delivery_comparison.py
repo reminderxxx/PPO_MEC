@@ -7,7 +7,7 @@ from scripts.launch_eight_vehicle_joint_experiment import _hash_file
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output_root',type=Path,default=ROOT/'artifacts/joint_delivery_control');a=p.parse_args();os.chdir(ROOT);root=a.output_root.resolve()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output_root',type=Path,default=ROOT/'artifacts/joint_delivery_control_v2');a=p.parse_args();os.chdir(ROOT);root=a.output_root.resolve()
     assert not subprocess.check_output(['git','status','--porcelain'],text=True).strip(),'requires clean source'
     source=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip();root.mkdir(parents=True,exist_ok=False)
     py=sys.executable
@@ -19,7 +19,7 @@ def main():
     primary=['sa_ghmappo','mappo','sa_no_prediction','ppo','dqn','cache_offload_drl','dag_offload_drl','dt_handoff_drl'];supports=['sa_no_surrogate','sa_fixed_entropy'];names=primary+supports
     files=list((ROOT/'src').rglob('*.py'))+[ROOT/f'scripts/{name}.py' for name in ['train_joint_delivery_control','train_joint_tail_control','train_joint_parameterized_control']]
     fingerprints={str(f.relative_to(ROOT)):_hash_file(f) for f in files}
-    plan=dict(created_at=datetime.now(timezone.utc).isoformat(),source_commit=source,prepared_source_commit=m['git_commit'],prepared_manifest_sha256=_hash_file(prepared),
+    plan=dict(control_version='delivery_v2',created_at=datetime.now(timezone.utc).isoformat(),source_commit=source,prepared_source_commit=m['git_commit'],prepared_manifest_sha256=_hash_file(prepared),
         predictor_sha256=m['predictor_sha256'],primary_agents=primary,support_agents=supports,episodes=128,seeds=[7,17,27],eval_every=32,
         primary_panels=dict(base=.5,tight=.5),primary_checkpoint='fixed_final128_no_peak_selection',main_training_episodes=3072,support_training_episodes=768,total_training_episodes=3840,
         prediction_probe='all48_final_full_same_weights_on_minus_off',secondary='all30final models on frozen existing8 mobile_base scenes; full24forecastoff; zero training',

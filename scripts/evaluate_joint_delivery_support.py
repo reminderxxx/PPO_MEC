@@ -39,6 +39,7 @@ def collect(root):
             audit_optional_cache_evictions(e,grouped[(e['seed'],e['scenario_id'],e['mode'],e['frame_index'])],workflows)
         for line in (root/'mobility_support'/name/'events.jsonl').open():
             e=json.loads(line);c=e['control'];d=e['control_planning'];vid=e['vehicle_id']
+            for op in d['migration_candidates'].values():assert op['source_delivery_times'][-1]>op['eta_frames']
             if c['prepare_target'] is not None:assert d['link_calendar'][c['prepare_target']][0] is None
             if c['cache_target'] is not None:
                 span=d['cache_admission_span'];cal=d['link_calendar'][c['cache_target']]

@@ -560,7 +560,7 @@ from src.agents.ppo_agent import DeliveryControlPPO
 
 
 class DeliveryDQNAgent(ScheduledDQNAgent,DeliveryControlPPO):
-    checkpoint_contract='delivery_parameterized_dqn_v1'
+    checkpoint_contract='delivery_parameterized_dqn_v2'
 
     def _transition_reward(self,rollout,index,vid,terminal):
         count=rollout['initial_request_count']

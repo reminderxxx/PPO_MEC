@@ -263,3 +263,6 @@
 - joint_tail_control_results_review_20261015.md：十组完整回收、120checkpoint/60主重放、零训练移动分层/30重放、预测挤占冷模型负例和剩余目标/信用缺口。
 
 - joint_delivery_control_contract_20261015.md：预测准备资源保护、团队节点信用、缓存残差与固定完整基线预算的新实现合同。
+
+- joint_delivery_completion_guard_review_20261015.md：离站前结束却准备的有界错误、v1停止和成本记录。
+- joint_delivery_control_v2_contract_20261015.md：保留predeparture交付、合同v2拒绝v1与从头同预算的独立修复。

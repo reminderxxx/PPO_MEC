@@ -43,7 +43,7 @@ def main():
     for filename,key in [('protocol.pt','protocol_sha256'),('predictor.pt','predictor_sha256')]:assert _hash_file(home/filename)==protocol[key]
     data=torch.load(home/'protocol.pt',weights_only=False);data['predictor']=torch.load(home/'predictor.pt',weights_only=False)
     run_id=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ_development');output=a.output_root/run_id;output.mkdir(parents=True,exist_ok=False)
-    metadata=dict(run_id=run_id,status='running',command=sys.argv,protocol='joint_team_node_delivery_v1',
+    metadata=dict(run_id=run_id,status='running',command=sys.argv,protocol='joint_team_node_delivery_v2',
         git_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
         git_dirty=bool(subprocess.check_output(['git','status','--porcelain'],text=True).strip()),
         action_contract='joint_parameterized_control_v3',agent=a.agent,seeds=a.seeds,episodes=a.episodes,eval_every=a.eval_every,

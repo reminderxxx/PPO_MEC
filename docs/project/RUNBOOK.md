@@ -1785,3 +1785,5 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 `python scripts/prepare_joint_delivery_control.py --output_root artifacts/joint_delivery_control/protocol`按hash复制冻结tail协议与GRU（不重拟合），再用`python scripts/train_joint_delivery_control.py --protocol artifacts/joint_delivery_control/protocol/manifest.json --agent <name> --seeds 7 17 27 --episodes 128 --eval_every 32 --output_root artifacts/joint_delivery_control/<name>`逐组启动。先保存根comparison_plan，完成后`python scripts/audit_joint_tail_control.py artifacts/joint_delivery_control --delivery`。旧默认auditor/旧checkpoint不混用。预算和保护边界见`joint_delivery_control_contract_20261015.md`。
 
 推荐统一运行`python scripts/launch_joint_delivery_comparison.py`：要求clean source、root不存在，先冻结主协议及复用mobile分层，再启动十组、回收两项审计。`evaluate_joint_delivery_support.py`仅评价同组最终模型；launcher未完成时先查看progress和子进程，不能重复启动已有root。
+
+2026-10-15 路径晋级仅指实现入口：统一launcher默认root改为artifacts/joint_delivery_control_v2（独立协议副本/十组/主补充审计/旧强cache重放）。joint_delivery_control为cad6509的停止历史，禁止resume/覆盖。--delivery消费者当前为checkpoint v2；v1重放必须使用历史commit，不静默兼容。

@@ -877,3 +877,5 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 2026-10-15 delivery实现：已知reactive冷准入/IO挤占、模型非抢占span和可选LRU驱逐当前需求新增同合同guard；节点proxy与团队MC信用对齐，surrogate不再改logit且辅助梯度隔离。保护基于共享观测/声明catalog，未知未来需求及延迟共享仍有风险；额外模块收益、所有seed后期回退尚未由新完整实验验证。
 
 2026-10-15 delivery v1边界缺陷：新geometry路径遗漏source可在离站前完成的排除，eta+max把已交付prefix重新收恢复延迟；有界末节点4<eta6却proxy+.04。316回合后停止保留，不把不完整trial作算法效果；v2须保留predeparture prefix并版本化重训。
+
+2026-10-15 v2已修source可离站前完成的准备误估，保留已交付prefix效用并禁止v1模型混读；有拥塞时的预测机会仍保留，20项局部验证通过。新训练效果/真实估计误差仍open，不以公式修复声称性能改善。

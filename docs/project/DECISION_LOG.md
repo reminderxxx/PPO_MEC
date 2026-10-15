@@ -1280,3 +1280,5 @@ claim map 必须报告 `UNAVAILABLE`。
 2026-10-15 tail审查结束：全部固定预算结果保留、primary50:50不变，mobile_base仅晚定义探索。旧priority修复不等于团队net/credit已闭环；真实准备挤占冷adapter导致少2节点，state gate整图/节点目标错位有bounded witness。另立下一实现合同修团队机会成本/节点交付目标后再定预算，不能在本审查中调参或替换baseline。新旧MAPPO身份明确：保留当前公共预测/缓存增强强对照，普通MAPPO与外部忠实baseline另定义，不能用弱版本追认优势。
 
 2026-10-15：532dca6独立审查后，用户授权delivery实现。吸收缓存基线context，以零初始化有界GNN残差增强；先冻结全部执行站再保护新的冷模型/接续IO与连续span，可选预取不驱逐已知当前需求。纯团队节点MC取代9:1混合效用；surrogate保留作控制变量，不再给logit观测回报bonus，辅助梯度独立裁剪。协议/GRU/费用/预算不变；本轮3840episode包括八主＋去surrogate/固定entropy两辅助，最终128，不按dev回滚。机制设计不承诺胜出，formal/holdout封存。
+
+2026-10-15：不为已结束请求的未来恢复计收益。v1在有界逻辑错误确认后停止，316记录/最多10未完成保留；ea81c0e独立审查后另立v2合同/新root/新checkpoint，从头同预算，不resume或按v1得分筛seed。

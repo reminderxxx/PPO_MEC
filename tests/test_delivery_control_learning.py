@@ -148,3 +148,39 @@ def test_raw_audit_rejects_optional_eviction_of_a_team_current_dependency():
     with pytest.raises(AssertionError,match='current team model'):audit_optional_cache_evictions(event,[event,peer],workflows)
     event['cache_request']['evicted_object_ids']=['adapter:unused']
     audit_optional_cache_evictions(event,[event,peer],workflows)
+
+
+def test_request_finishing_before_departure_never_prepares():
+    s=forecast_state();node=s['workflow']['nodes'][-1]
+    s['workflow'].update(completed_node_ids=['n0','n1'],current_node_id=node['node_id']);s['current_workflow_node']=node
+    s['predictions']['predicted_positions_by_vehicle']['v0']=[[1,0],[2,0],[3,0],[4,0],[5,0],[6,0]]
+    s['control_cost_parameters'].update(base_size_bytes=2048,adapter_size_bytes=512,model_bytes_per_frame=1024);s['execution_state_payload_bytes']=6425
+    from src.envs.core.joint_delivery_planning import node_delivery_times
+    assert node_delivery_times(s,'a')==[4.]
+    assert not delivery_migration_opportunities(s,{r['rsu_id']:[None]*8 for r in s['rsus']})
+    other=deepcopy(s);other['primary_vehicle_id']='v1';other['current_node_work_units_required']=20
+    decisions={'v0':{'semantic_state':s},'v1':{'semantic_state':other}}
+    assert delivery_migration_opportunities(s,{r['rsu_id']:[None]*8 for r in s['rsus']},decisions=decisions,targets={'v0':'a','v1':'a'})
+
+
+def test_departure_delay_never_recharges_nodes_already_delivered():
+    # The first node arrives before departure and must keep its reward and time.
+    assert node_delivery_utility([4.,10.,20.],5.,12.,1)==pytest.approx(1-.12)
+    assert node_delivery_utility([4.,10.,20.],1.,12.,1)==pytest.approx(2-.12)
+    # Once the entire request finishes, an irrelevant future migration delay has zero value.
+    assert node_delivery_utility([4.],7.,50.,1)==node_delivery_utility([4.],2.,50.,1)
+
+
+def test_v2_checkpoint_refuses_v1_contract(tmp_path):
+    p=policy();path=tmp_path/'v1.pt';p.save_checkpoint(path);saved=torch.load(path,weights_only=False)
+    saved['contract']='delivery_parameterized_ppo_v1';torch.save(saved,path)
+    with pytest.raises(ValueError,match='incompatible'):type(p).from_checkpoint(path)
+
+
+def test_reserved_reactive_miss_can_load_off_the_proactive_cache_clock():
+    e=env();p=policy();states=e.decision_states();p._delivery_decisions=states;p._team_targets={'v0':'b','v1':'a'}
+    p._calendar=reactive_link_calendar(states,p._team_targets,8)
+    data,candidates,_,node,_=p._coordinated_features(states['v0'],1,{})
+    k=candidates[1].index(('b',node,'adapter'))
+    assert p._calendar['b'][0]==('v0','model') and data['m1'][k]
+    assert not any(data['m1'][j] for j,(rid,nid,kind) in enumerate(candidates[1]) if nid is not None and nid!=node)

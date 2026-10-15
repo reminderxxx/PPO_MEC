@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+2026-10-15 delivery v2独立修复：离站前可完成则不准备，已交付prefix不重新计恢复收益，checkpoint版本v2拒绝v1；新固定预算root为`artifacts/joint_delivery_control_v2/`。[v2合同](docs/project/joint_delivery_control_v2_contract_20261015.md)，尚无完整性能结论。
+
 2026-10-15 delivery v1已因离站前完成的估值边界错误停止（已记录316回合、另有未完成交互），不进入完整比较；[独立审查](docs/project/joint_delivery_completion_guard_review_20261015.md)。下文实现/计划记录保留历史阶段。
 
 2026-10-15 独立delivery修复阶段：两阶段选站/当前冷模型预约、连续model span、已知当前模型LRU保护、节点交付净收益和纯团队信用已接入opt-in合同；SA采用缓存特征＋零初始化DAG残差，surrogate改作控制变量并独立裁剪。完整同预算结果待回收，前轮负结果保留。[合同](docs/project/joint_delivery_control_contract_20261015.md)。
