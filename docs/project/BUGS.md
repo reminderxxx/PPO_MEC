@@ -1,3 +1,7 @@
+## 2026-10-17：Stream v1 baseline重复与可选cache保护盲点（OPEN BLOCKER）
+
+Stream DT丢失预测domain、与DAG全轨迹及权重重复；可选准入/auditor漏remote-current，扩展检查11违规。seed课程缺覆盖、SA反应加载与预取驻留失配、late回退仍开放。 详见[joint_stream_results_review_20261017.md](joint_stream_results_review_20261017.md)。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

@@ -1,3 +1,7 @@
+## 2026-10-17：持续请求八组已回收，先独立审查后修复
+
+1536会话、647788帧、1152最终单元、48checkpoint/24重放；SA205.920336超过cache201.559963，但低于DAG207.295583。DT与DAG六checkpoint及全轨迹重复；扩展保护检查11违规。未晋级，formal/holdout封存。 详见[joint_stream_results_review_20261017.md](joint_stream_results_review_20261017.md)。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。
