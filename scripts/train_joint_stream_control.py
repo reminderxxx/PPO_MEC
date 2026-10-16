@@ -23,7 +23,7 @@ def actor_hash(agent):
 
 def make_agent(name,seed,budget):
     method='sa_ghmappo' if name=='sa_no_prediction' else name
-    return build_agent(method,control_contract='joint_stream_control_v1',seed=seed,training_budget=budget,
+    return build_agent(method,control_contract='joint_stream_control_v2',seed=seed,training_budget=budget,
                        prediction_enabled=name!='sa_no_prediction',return_gamma=1.)
 
 
@@ -70,6 +70,8 @@ def main():
     p.add_argument('--output_root',type=Path,required=True);p.add_argument('--agent',choices=NAMES,required=True)
     a=p.parse_args();torch.set_num_threads(1)
     manifest=json.loads(a.protocol.read_text());home=a.protocol.parent
+    if manifest.get('protocol')!='joint_stream_learning_v2' or manifest.get('action_contract')!='joint_stream_control_v2':
+        raise ValueError('stream v2 training requires its independently frozen v2 protocol')
     for name,sha in manifest['assets'].items():assert _hash_file(home/name)==sha
     for name,sha in manifest['source_fingerprints'].items():assert _hash_file(ROOT/name)==sha,name
     dirty=bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip())

@@ -1,3 +1,7 @@
+## 2026-10-17 Stream v2
+
+`joint_stream_refinement.py`只消费公开已发布DAG、延迟RSU状态、因果预测与声明意图，提供使用时间/恢复帧/可选cache净交付代理和均衡日程；`StreamControlPPO`共同消费，DT独立context在`dt_handoff_agent.py`；环境执行当前依赖保护，auditor独立消费原始事件、value metadata和checkpoint，拒绝DT/DAG tensor alias。代理不是reward或未来标签，surrogate观察团队MC监督不变。
+
 # Code Module Map
 
 ## 显式候选站工程合同（2026-10-14）

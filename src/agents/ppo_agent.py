@@ -1025,8 +1025,8 @@ class StreamControlPPO(DeliveryControlPPO):
     Feature widths match the delivery network, but field meanings and graph size
     are new and checkpoint-incompatible. Identity is used for binding only.
     """
-    action_contract = 'joint_stream_control_v1'
-    checkpoint_contract = 'stream_parameterized_ppo_v1'
+    action_contract = 'joint_stream_control_v2'
+    checkpoint_contract = 'stream_parameterized_ppo_v2'
     max_released_nodes = 64
     max_cache_candidates = 513
 
@@ -1039,6 +1039,7 @@ class StreamControlPPO(DeliveryControlPPO):
         from src.envs.core.joint_link_reservation import service_scale
         from src.envs.core.joint_delivery_planning import fresh_model_span, node_delivery_times
         from src.envs.core.joint_stream_rules import protects_current_models
+        from src.envs.core.joint_stream_refinement import state_restore_frames, optional_cache_value
         if decision.get('action_contract') != self.action_contract:
             raise ValueError('stream learner requires request-bound stream contract')
         s = decision['semantic_state']; vid = s['primary_vehicle_id']; rid = s['request_id']
@@ -1062,6 +1063,7 @@ class StreamControlPPO(DeliveryControlPPO):
         calendar = getattr(self, '_calendar', {r:[None]*self.planning_horizon for r in ids})
         opportunities = self._reserved_opportunities(s, calendar)
         self._feature_opportunities = opportunities
+        self._cache_values = {}
         # Public intent demand includes already released FIFO queues, never unseen jobs.
         from collections import Counter
         demands = {r:set() for r in ids};frequencies={r:Counter() for r in ids}
@@ -1110,7 +1112,7 @@ class StreamControlPPO(DeliveryControlPPO):
             span = fresh_model_span(alternate,r,n,kind) if site in rows else 0
             relocation = 0.
             if site in rows and s['execution_state_version'] and site!=s['execution_location']:
-                relocation=max(0,s['execution_state_payload_bytes']-s['state_copies_by_rsu'].get(site,{}).get('payload_bytes',0))/rates['state_bytes_per_frame']
+                relocation=state_restore_frames(s,site)
             op=opportunities.get(site,{}) if n['node_id']==current['node_id'] else {}
             # Risk is a feature, not a label claimed to be causal net reward.
             risk=max(0.,working_bytes/cap-1) if site in rows else 0.
@@ -1145,7 +1147,19 @@ class StreamControlPPO(DeliveryControlPPO):
                     alt=dict(s,control_cost_parameters=dict(rates,base_size_bytes=base['transfer_size_bytes'],adapter_size_bytes=adapter['transfer_size_bytes']))
                     span=fresh_model_span(alt,row,n,kind)
                     valid &= not span or (span<=len(calendar[site]) and all(x is None or (reactive and x==(vid,'model')) for x in calendar[site][:span]))
-                    if not reactive:valid &= protects_current_models(alt,row,n,getattr(self,'_delivery_decisions',{}),getattr(self,'_team_targets',{}),catalog)
+                    value = None
+                    if not reactive:
+                        valid &= protects_current_models(alt,row,n,getattr(self,'_delivery_decisions',{}),getattr(self,'_team_targets',{}),catalog)
+                        # A completed current node awaiting output is not future model demand.
+                        valid &= not (request==rid and n['node_id']==current['node_id'] and bool(s['output_pending']))
+                        if valid:
+                            demand=demands.get(site,set()) | {f"base:{n['required_base_model']}",f"adapter:{n['required_adapter']}"}
+                            value=optional_cache_value(s,row,n,span,getattr(self,'_team_targets',{}).get(vid),
+                                sum(catalog[k]['resident_size_bytes'] for k in demand),
+                                prediction_enabled=self.prediction_enabled,horizon=self.planning_horizon,
+                                use_after_override=opportunities[site].get('eta_frames') if request==rid and n['node_id']==current['node_id'] and site in opportunities and opportunities[site].get('cache_net_reward_proxy',0)>0 else None)
+                            valid &= value['eligible']
+                    if value is not None:self._cache_values[site,n['node_id'],kind]=value
                     m1.append(valid)
                     f1.append(feature(site,n,kind) if valid else [0.]*32)
         m2=[r is None or opportunities.get(r,{}).get('prepare_feasible',False) for r,p in event]
@@ -1158,6 +1172,22 @@ class StreamControlPPO(DeliveryControlPPO):
         data=dict(own=own,critic=np.asarray(critic,np.float32),graph=graph,adjacency=adjacency,graph_mask=np.arange(64)<len(nodes),
             prior0=np.asarray([-(queue.get(r,0)+np.expm1(float(f0[i][23])*np.log1p(480)))/(max(4,horizon)/4) if r in rows else 0. for i,r in enumerate(targets)],np.float32),
             domain=np.asarray([len(nodes)/64,sum(len(w['edges']) for _,w in graphs)/128,scale(work),len(done)/max(1,len(nodes))],np.float32),opportunity_count=np.asarray(len(opportunities),np.int64))
+        # Public physical cost prior shared by SA and every comparator.  Cold
+        # model closures and current family conflicts used to be omitted here.
+        for i,site in enumerate(targets):
+            if site not in rows:continue
+            row=rows[site];base=catalog[f"base:{current['required_base_model']}"];adapter=catalog[f"adapter:{current['required_adapter']}"]
+            alt=dict(s,control_cost_parameters=dict(rates,base_size_bytes=base['transfer_size_bytes'],adapter_size_bytes=adapter['transfer_size_bytes']))
+            loading=row.get('loading_remaining_frames',{})
+            cold=fresh_model_span(alt,row,current)+sum(loading.get(k,0) for k in (f"base:{current['required_base_model']}",f"adapter:{current['required_adapter']}"))
+            closure={f"base:{current['required_base_model']}",f"adapter:{current['required_adapter']}"}
+            peer=set()
+            for owner,d in getattr(self,'_delivery_decisions',{}).items():
+                if owner!=vid and getattr(self,'_team_targets',{}).get(owner)==site and not d['semantic_state']['output_pending']:
+                    n=d['semantic_state']['current_workflow_node'];peer.update((f"base:{n['required_base_model']}",f"adapter:{n['required_adapter']}"))
+            overflow=max(0.,sum(catalog[k]['resident_size_bytes'] for k in closure|peer)/max(1,row.get('capacity_bytes') or model_byte_scale)-1)
+            conflict=overflow*sum(ceil(catalog[k]['transfer_size_bytes']/rates['model_bytes_per_frame']) for k in peer-closure)
+            data['prior0'][i]-=(cold+conflict)/max(1.,max(4,horizon)/4)
         for j,(features,masks,indices) in enumerate([(f0,mask,[index[current['node_id']]]*6),(f1,m1,ni1),([feature(r,priority=p) for r,p in event],m2,[index[current['node_id']]]*20)]):
             data[f'f{j}']=np.asarray(features,np.float32);data[f'm{j}']=np.asarray(masks,bool);data[f'node{j}']=np.asarray(indices,np.int64)
         return data,(targets,cache,event),vid,current['node_id'],work
@@ -1206,7 +1236,8 @@ class StreamControlPPO(DeliveryControlPPO):
             claims=control_link_claims(planning,control,self._calendar);controls[vid]=replace(control,link_reservations=claims)
             from src.envs.core.joint_delivery_planning import fresh_model_span
             span=fresh_model_span(planning,next(r for r in state['rsus'] if r['rsu_id']==cache),n,kind) if cache is not None else 0
-            diagnostics[vid]=dict(migration_candidates=deepcopy(self._feature_opportunities),link_calendar=deepcopy(self._calendar),two_pass_execution_targets=dict(targets),request_id=state['request_id'],cache_admission_span=span)
+            diagnostics[vid]=dict(migration_candidates=deepcopy(self._feature_opportunities),link_calendar=deepcopy(self._calendar),two_pass_execution_targets=dict(targets),request_id=state['request_id'],cache_admission_span=span,
+                cache_value=deepcopy(self._cache_values.get((cache,nid,kind))))
             book_delivery_control(self._calendar,vid,claims,planning,control)
             old=self.target_memory.get(vid);since=old[2] if old and old[:2]==(node,targets[vid]) else frame
             self.target_memory[vid]=(node,targets[vid],since);opportunities+=len(self._feature_opportunities)

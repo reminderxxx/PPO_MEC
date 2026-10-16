@@ -168,23 +168,25 @@ def test_batch_and_stream_share_request_order_when_names_sort_backwards():
 
 
 def test_live_admission_rejects_optional_eviction_of_self_or_peer_current_model():
-    def run(peer):
+    def run(peer,remote_current=False):
         ids=['v0','v1'] if peer else ['v0']
         arrivals=[WorkflowArrival(0,v,wf(v,2)) for v in ids]
         for a in arrivals:a.workflow.nodes[1].required_adapter='y'
+        if remote_current:arrivals[-1].workflow.nodes[0].required_adapter='y'
         e=MultiRequestStreamEnv(frames=[{'time_index':f*100,'source_segment_id':'s','vehicles':[VehicleState(v,0,0,0,'base') for v in ids]} for f in range(50)],
             arrivals=arrivals,catalog=[ModelCacheObject('base:base','base_model',4,4,base_model_id='base'),ModelCacheObject('adapter:x','adapter',2,2,('base:base',),adapter_id='x'),ModelCacheObject('adapter:y','adapter',2,2,('base:base',),adapter_id='y')],
-            rsu_states=[RSUState('a',0,0,10)],costs=ReplayCosts(),workload_bytes_per_unit=1,shared_state_enabled=False,
+            rsu_states=[RSUState(r,0,0,10) for r in ('ab' if remote_current else 'a')],costs=ReplayCosts(),workload_bytes_per_unit=1,shared_state_enabled=False,
             model_cache_config={'capacity_bytes':6,'transfer_bytes_per_frame':8})
         e.model_cache.begin_frame();e.model_cache.request_adapter('a','x','base');e.model_cache.advance()
         e.model_cache.begin_frame();e.model_cache.advance();e._sync_cache_view()
         actor='v1' if peer else 'v0'
         cs={v:StreamingRequestControl('a' if v=='v0' else None,request_id=f'{v}/{v}') for v in ids}
         cs[actor]=StreamingRequestControl('a' if not peer else None,'a',f'{actor}_n1',request_id=f'{actor}/{actor}',cache_request_id=f'{actor}/{actor}')
+        if remote_current:cs[actor]=StreamingRequestControl('b','a',f'{actor}_n0',request_id=f'{actor}/{actor}',cache_request_id=f'{actor}/{actor}')
         before=e.model_cache.transferred_bytes['a'];_,_,_,info=e.step_controls(cs);event=next(x for x in info['events'] if x['vehicle_id']==actor)
         assert event['cache_request']['status']=='blocked_current_model_dependency'
         assert event['cache_request']['link_slots_consumed']==0 and e.model_cache.transferred_bytes['a']==before
         assert e.model_cache.is_ready('a','x','base') and not e.model_cache.is_ready('a','y','base')
         with pytest.raises(ValueError,match='current declared'):
             e.step_controls({v:StreamingRequestControl('a',cache_target='a' if v==actor else None,evict_object_ids=('adapter:x',) if v==actor else (),request_id=f'{v}/{v}') for v in ids})
-    run(False);run(True)
+    run(False);run(True);run(True,True)

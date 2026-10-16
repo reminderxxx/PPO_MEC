@@ -1,3 +1,7 @@
+## 持续请求 v2 开发确认（2026-10-17）
+
+八组v1已回收；SA超过cache但低于DAG，DT与DAG原实现重复，独立审查保留11次保护违规。当前`joint_stream_control_v2`修复接口、均衡日程和可选准备/冷站成本；旧checkpoint拒绝。入口与预算见[确认合同](docs/project/joint_stream_refinement_contract_20261017.md)。此开发入口不替代正式Protocol，formal/holdout封存。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

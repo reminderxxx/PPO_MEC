@@ -247,7 +247,7 @@ def build_agent(agent_name: str, **kwargs: Any) -> BaseAgent:
     """Build an agent by registry name."""
     contract = kwargs.pop("control_contract", None)
     if contract is not None:
-        if contract == 'joint_stream_control_v1':
+        if contract == 'joint_stream_control_v2':
             from src.agents.ppo_agent import StreamControlPPO
             from src.agents.mappo_agent import StreamMAPPOAgent
             from src.agents.sa_ghmappo_agent import StreamSAGHMAPPOAgent

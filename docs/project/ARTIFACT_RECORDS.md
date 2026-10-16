@@ -1,3 +1,7 @@
+## 2026-10-17：Stream v2软件验收
+
+`artifacts/joint_stream_learning_refinement_smoke_20261017`：8算法×seed7×4短会话，1024训练帧、8最终、2048事件/256收据、8checkpoint/8重放；audit pass，DAG/DT tensor不同。`artifacts/joint_stream_learning/refinement_tests_20261017.log`为432 passed/13.11s。只验软件，不作性能结论，科学确认尚待清洁提交冻结。
+
 ## 2026-10-17：joint_stream_learning v1完整回收
 
 run=artifacts/joint_stream_learning/20261015T181642Z_development；source=e96d831；8配置×3seed×64；原audit pass，但独立审查发现DT/DAG重复与11当前依赖违规，不是paper-ready。 详见[joint_stream_results_review_20261017.md](joint_stream_results_review_20261017.md)。

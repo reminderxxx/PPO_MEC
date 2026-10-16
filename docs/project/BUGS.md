@@ -1,3 +1,7 @@
+## 2026-10-17：Stream v2修复边界
+
+FIXED/software：remote-current环境及两个auditor谓词；DT预测context alias；每seed后半程无long的课程缺口；恢复minimum slot和冷模型成本漏项；无使用时域/净交付代理的可选预取。432 tests和软件八组audit通过，不证明实际优势。OPEN：seed7family thrash/seed27late退化/PPOseed17及DAG负例是否改善，需唯一有界确认；surrogate仍observational，LRU仍共同自动策略，未获得因果action信用或formal证据。
+
 ## 2026-10-17：Stream v1 baseline重复与可选cache保护盲点（OPEN BLOCKER）
 
 Stream DT丢失预测domain、与DAG全轨迹及权重重复；可选准入/auditor漏remote-current，扩展检查11违规。seed课程缺覆盖、SA反应加载与预取驻留失配、late回退仍开放。 详见[joint_stream_results_review_20261017.md](joint_stream_results_review_20261017.md)。

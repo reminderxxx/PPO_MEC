@@ -314,3 +314,11 @@ class StreamDTHandoffAgent(StreamControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method',None)
         super().__init__(method='dt_handoff_drl',**kwargs)
+
+    def _policy_context(self, data, latent):
+        # Stream v1 accidentally inherited the DAG domain for DT as well.
+        # Preserve common action/observation authority; specialize the context.
+        mobility=torch.stack((data['own'][:,11],data['own'][:,12],
+                              data['f0'][...,10].max(1).values,
+                              data['f0'][...,11].mean(1)),1)
+        return self.domain_encoder(mobility)

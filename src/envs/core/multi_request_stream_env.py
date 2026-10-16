@@ -27,7 +27,7 @@ class StreamingRequestControl(JointRequestControl):
 
 
 class MultiRequestStreamEnv(MultiRequestTargetControlEnv):
-    action_contract = 'joint_stream_control_v1'
+    action_contract = 'joint_stream_control_v2'
     stream_contract = 'joint_fifo_workload_stream_v3'
 
     def __init__(self, *, frames, arrivals, catalog, **kwargs):
@@ -168,7 +168,8 @@ class MultiRequestStreamEnv(MultiRequestTargetControlEnv):
 
     def _admit_cache(self, vid, control, node, available_slots, decisions, controls):
         optional=((control.cache_request_id or control.request_id)!=control.request_id or
-                  control.cache_node_id!=self.workflows[vid].current_node_id or vid in self.output_pending)
+                  control.cache_node_id!=self.workflows[vid].current_node_id or vid in self.output_pending or
+                  control.cache_target!=control.execution_target)
         if optional:
             rid=control.cache_target
             closure={f'base:{node.required_base_model}'}

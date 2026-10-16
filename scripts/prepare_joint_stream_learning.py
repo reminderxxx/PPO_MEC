@@ -10,6 +10,7 @@ from src.envs.core.joint_training_scenarios import mobile_cohort
 from src.envs.core.joint_stream_workloads import SIZE_BINS,request_plan,catalog_from_pool,capacity_lower_bounds
 from scripts.train_joint_stream_control import NAMES
 from src.envs.core.joint_learned_prediction import fit_predictor
+from src.envs.core.joint_stream_refinement import balanced_training_schedule
 
 
 def main():
@@ -54,14 +55,14 @@ def main():
     seeds=[7] if a.smoke else [7,17,27];episodes=4 if a.smoke else 64
     schedule={}
     for j,seed in enumerate(seeds):
-        schedule[str(seed)]=[cases['train'][0]['case_id']]*episodes if a.smoke else [cases['train'][((ep//3+j*8)%24)+(ep%3)*24]['case_id'] for ep in range(episodes)]
+        schedule[str(seed)]=[cases['train'][0]['case_id']]*episodes if a.smoke else balanced_training_schedule(cases['train'], episodes)
     probes=[c['case_id'] for i,c in enumerate(cases['dev']) if i%4==0]
     # Refit solely inside the NEW train partition; old predictor saw newdev times.
     predictor_windows=[dict(s,source_segment_id=s['frames'][0]['source_segment_id'],time_start=s['frames'][0]['time_index'],time_end=s['frames'][-1]['time_index']) for i,s in enumerate(sessions) if s['split']=='train']
     bundle=fit_predictor(predictor_windows,seed=101,epochs=30,horizon=8)
     data=dict(sessions=sessions,cases=cases,predictor=bundle)
     a.output.mkdir(parents=True,exist_ok=False);torch.save(data,a.output/'protocol.pt');torch.save(bundle,a.output/'predictor.pt')
-    manifest=dict(status='frozen',protocol='joint_stream_learning_v1',source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),git_dirty=dirty,smoke=a.smoke,
+    manifest=dict(status='frozen',protocol='joint_stream_learning_v2',action_contract='joint_stream_control_v2',training_schedule_contract='balanced24interleaved_same_all_seeds_64sessions',baseline_context_contract='DAG_public_structure_DT_causal_mobility_distinct_v2',source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),git_dirty=dirty,smoke=a.smoke,
         command=sys.argv,created_at=datetime.now(timezone.utc).isoformat(),source_protocol=str(a.source_protocol.resolve()),source_protocol_sha256=_hash_file(a.source_protocol),raw_data_sha256=source['raw_data_sha256'],parent_predictor_sha256=parent['predictor_sha256'],predictor_sha256=_hash_file(a.output/'predictor.pt'),predictor_fit_contract='newtrain_session0_1_fit_session2_internal_validation_seed101_epochs30_horizon8_no_newdev',predictor_fit_offsets=bundle['fit_offsets'],predictor_validation_offsets=bundle['validation_offsets'],
         assets={name:_hash_file(a.output/name) for name in ['protocol.pt','predictor.pt']},costs=parent['costs'],methods=NAMES,seeds=seeds,episodes=episodes,
         checkpoint_episodes=[4] if a.smoke else [32,64],curve_probe_ids=probes,training_schedule=schedule,

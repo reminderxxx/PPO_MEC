@@ -35,7 +35,7 @@ def main():
                 n=next(n for n in requests[e['request_id']]['workflow']['nodes'] if n['node_id']==e['node_id']);required[e['control']['execution_target']].update((f"base:{n['required_base_model']}",f"adapter:{n['required_adapter']}"))
         for e in es:
             c=e['control'];rid=c['cache_target'];q=e['cache_request'];request=requests[e['request_id']];assert c['request_id']==e['request_id'] and request['frame']<=frame and e['request_id'] not in completed
-            optional=c['cache_node_id'] is not None and (c['cache_request_id']!=e['request_id'] or c['cache_node_id']!=e['node_id'] or e['output_source_rsu_id'] is not None)
+            optional=c['cache_node_id'] is not None and (c['cache_request_id']!=e['request_id'] or c['cache_node_id']!=e['node_id'] or e['output_source_rsu_id'] is not None or c['cache_target']!=c['execution_target'])
             assert not e['explicit_evicted_object_ids']
             if c['cache_node_id'] is not None:
                 cache_req=requests[c['cache_request_id']];assert cache_req['vehicle_id']==e['vehicle_id'] and cache_req['frame']<=frame and cache_req['request_id'] not in completed

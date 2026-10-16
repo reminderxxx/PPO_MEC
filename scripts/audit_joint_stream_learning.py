@@ -14,6 +14,7 @@ from scripts.train_joint_tail_control import tensor_hash
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('root',type=Path);a=p.parse_args();home=a.root.resolve();torch.set_num_threads(1)
     plan=json.loads((home/'protocol/manifest.json').read_text());assert plan['status']=='frozen'
+    assert plan.get('protocol')=='joint_stream_learning_v2' and plan.get('action_contract')=='joint_stream_control_v2'
     for path,sha in plan['assets'].items():assert _hash_file(home/'protocol'/path)==sha
     for path,sha in plan['source_fingerprints'].items():assert _hash_file(ROOT/path)==sha,path
     parent_path=Path(plan['source_protocol']);assert _hash_file(parent_path)==plan['source_protocol_sha256']
@@ -43,6 +44,12 @@ def main():
             checks.append(dict(agent=name,seed=c['seed'],episode=c['episode'],sha256=c['sha256']))
         train+=training;dev+=evaluations;runs.append(output)
     session_keys=[]
+    # Labels are not independent baselines when every learned tensor is equal.
+    metadata={r.name:json.loads((r/'manifest.json').read_text()) for r in runs}
+    dag=metadata.get('dag_offload_drl');dt=metadata.get('dt_handoff_drl')
+    distinct = dag is None or dt is None or any(x['trained_tensor_sha256']!=y['trained_tensor_sha256']
+        for x,y in zip(dag['checkpoints'],dt['checkpoints']))
+    assert distinct, 'DAG/DT baseline tensor alias: not independent comparison'
     old=torch.load(parent_path.parent/'protocol.pt',weights_only=False)
     allowed={(f['source_segment_id'],f['time_index']) for w in old['scenarios']['train'] for f in w['frames']}
     for session in data['sessions']:
@@ -71,7 +78,11 @@ def main():
                 n=next(n for n in requests[e['request_id']]['workflow']['nodes'] if n['node_id']==e['node_id']);required[e['control']['execution_target']].update((f"base:{n['required_base_model']}",f"adapter:{n['required_adapter']}"))
         for e in es:
             c=e['control'];rid=c['cache_target'];q=e['cache_request'];request=requests[e['request_id']];assert c['request_id']==e['request_id'] and request['frame']<=frame and e['request_id'] not in completed
-            optional=c['cache_node_id'] is not None and (c['cache_request_id']!=e['request_id'] or c['cache_node_id']!=e['node_id'] or e['output_source_rsu_id'] is not None)
+            optional=c['cache_node_id'] is not None and (c['cache_request_id']!=e['request_id'] or c['cache_node_id']!=e['node_id'] or e['output_source_rsu_id'] is not None or c['cache_target']!=c['execution_target'])
+            if optional and q.get('admitted_object_ids'):
+                value=e['control_planning']['cache_value']
+                assert value and value['eligible'] and value['net_delivery_proxy']>0
+                assert value['admission_span']<=value['use_after_frames']<=8
             assert not e['explicit_evicted_object_ids']
             if c['cache_node_id'] is not None:
                 cache_req=requests[c['cache_request_id']];assert cache_req['vehicle_id']==e['vehicle_id'] and cache_req['frame']<=frame and cache_req['request_id'] not in completed
@@ -162,6 +173,7 @@ def main():
         evidence_level='internal stream development raw/checkpoint replay; paper E0_UNAVAILABLE / Unverifiable',
         counts=dict(final_cells=len(final),events=count_events,receipts=sum(receipts.values()),checkpoints=len(checks),reproductions=len(replays),training_sessions=len(train),training_frames=sum(r['steps'] for r in train),training_decisions=sum(r['decision_rows'] for r in train)),
         means=means,paired_full_minus_baseline=paired,curve_probe=curves,checkpoints=checks,replays=replays,
+        dag_dt_distinct_tensors=distinct,optional_preparation_contract='bounded_public_use_survival_net_delivery_proxy_v2',
         lifetimes=[dict(case_id=k[0],rule=k[1],**v) for k,v in cells.items()],
         source_sha256=_hash_file(home/'protocol/manifest.json'),output_sha256={'results.jsonl':_hash_file(home/'results.jsonl')},
         limits=['same source workflow pool, long one source DAG','2 originaltrain sessions used as newdev, not independent paper clusters','synthetic costs; not real model execution','final64 fixed, probe curve only; no convergence guarantee'],paper_claim_ready=False)

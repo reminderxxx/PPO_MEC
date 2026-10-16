@@ -572,7 +572,7 @@ from src.agents.ppo_agent import StreamControlPPO
 
 class StreamDQNAgent(ScheduledDQNAgent, StreamControlPPO):
     """Autoregressive Q learning across idle frames and request identity changes."""
-    checkpoint_contract = 'stream_parameterized_dqn_v1'
+    checkpoint_contract = 'stream_parameterized_dqn_v2'
 
     @staticmethod
     def _replay_data(data,index):

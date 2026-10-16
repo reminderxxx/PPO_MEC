@@ -1,3 +1,7 @@
+## 2026-10-17：独立审查后冻结Stream v2最小修复
+
+依据9ae70d5审查，修公共remote-current保护、均衡条件日程、最小恢复/冷模型与family冲突prior、按使用时域/预测驻留/净交付代理的可选准备，并恢复DT独立预测context。所有baseline共用动作/资源规则，保留DAG强对照、预测/共享/surrogate；不改reward、费用、数据或按结果挑峰。v2合同拒绝v1；只执行一次同上限开发确认，不承诺SA第一或收敛。详见joint_stream_refinement_contract_20261017.md。
+
 ﻿# Decision Log
 
 ## 2026-10-14：先实现可控工程链，再适配学习策略

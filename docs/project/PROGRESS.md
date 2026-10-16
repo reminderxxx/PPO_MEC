@@ -1,3 +1,7 @@
+## 2026-10-17：Stream v2软件修复通过，待有界确认
+
+432 tests passed；八算法软件全链32session/1024frame、8最终/8checkpoint逐事件重放audit pass，DT/DAG tensor已分离。公共保护/均衡日程/冷模型恢复成本/按需预取均落地，物理reward和数据不改。仅软件正确性，性能尚待新冻结确认；合同joint_stream_refinement_contract_20261017.md。
+
 ## 2026-10-17：持续请求八组已回收，先独立审查后修复
 
 1536会话、647788帧、1152最终单元、48checkpoint/24重放；SA205.920336超过cache201.559963，但低于DAG207.295583。DT与DAG六checkpoint及全轨迹重复；扩展保护检查11违规。未晋级，formal/holdout封存。 详见[joint_stream_results_review_20261017.md](joint_stream_results_review_20261017.md)。

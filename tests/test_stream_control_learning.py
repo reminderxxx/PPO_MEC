@@ -22,7 +22,7 @@ def env():
 
 def policy(name='sa_ghmappo',**kw):
     torch.set_num_threads(1)
-    return build_agent(name,control_contract='joint_stream_control_v1',return_gamma=1.,**kw)
+    return build_agent(name,control_contract='joint_stream_control_v2',return_gamma=1.,**kw)
 
 
 @pytest.mark.parametrize('name',['sa_ghmappo','mappo','ppo','dqn','cache_offload_drl','dag_offload_drl','dt_handoff_drl'])
@@ -43,7 +43,12 @@ def test_all_stream_algorithms_probabilities_update_checkpoint_replay(name,tmp_p
 
 
 def test_queue_candidate_identity_and_unreleased_graph_hidden():
-    e=env();p=policy();d=e.decision_states()['v'];data,candidates,*_=p._coordinated_features(d,0,{})
+    e=env();p=policy(prediction_enabled=False);d=e.decision_states()['v']
+    # The queued request is now within the bounded preparation horizon.
+    s=d['semantic_state'];s['workflow']['completed_node_ids']=['one_n0','one_n1']
+    s['current_workflow_node']=deepcopy(s['workflow']['nodes'][2])
+    p._team_targets={'v':'a'};p._delivery_decisions={'v':d}
+    data,candidates,*_=p._coordinated_features(d,0,{})
     queued=[k for k,(site,nid,kind) in enumerate(candidates[1]) if nid and nid.startswith('queued')]
     legal_queued=[k for k in queued if data['m1'][k]]
     assert queued and legal_queued and (data['f1'][legal_queued,27]>0).all()
