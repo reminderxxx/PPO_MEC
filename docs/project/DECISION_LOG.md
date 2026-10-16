@@ -1,3 +1,7 @@
+## 2026-10-17：确认训练远端同步网络例外
+
+审查提交9ae70d5已推送；实现08db391的git push两次因github.com:443连接75秒超时失败。科学冻结以清洁本地commit与source/assets SHA为准，允许在新root启动唯一确认轮；不改变算法、数据、预算或评价合同。不得声称remote已同步；结果回收时再同步并在交付说明未解决失败。
+
 ## 2026-10-17：独立审查后冻结Stream v2最小修复
 
 依据9ae70d5审查，修公共remote-current保护、均衡条件日程、最小恢复/冷模型与family冲突prior、按使用时域/预测驻留/净交付代理的可选准备，并恢复DT独立预测context。所有baseline共用动作/资源规则，保留DAG强对照、预测/共享/surrogate；不改reward、费用、数据或按结果挑峰。v2合同拒绝v1；只执行一次同上限开发确认，不承诺SA第一或收敛。详见joint_stream_refinement_contract_20261017.md。

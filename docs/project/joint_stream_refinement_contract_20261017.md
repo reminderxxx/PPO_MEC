@@ -24,7 +24,7 @@
 
 432项共同链路/回归测试通过（13.11s）；日志artifacts/joint_stream_learning/refinement_tests_20261017.log。包含remote-current反例、前后半程全条件、DT预测敏感性、v1拒绝、净收益/驻留/远站ETA准备与masked PPO/跨请求DQN/队列隐藏等。
 
-软件全链artifacts/joint_stream_learning_refinement_smoke_20261017：32短训练会话/1024帧、8最终单元、2048事件、256收据、8checkpoint/8逐事件重放，audit pass，DAG/DT tensor不同。非性能结论。下一步清洁提交并push后在全新root冻结协议、从头运行八组；完成前不再改源码。20分钟heartbeat只查状态，不追逐奖励。
+软件全链artifacts/joint_stream_learning_refinement_smoke_20261017：32短训练会话/1024帧、8最终单元、2048事件、256收据、8checkpoint/8逐事件重放，audit pass，DAG/DT tensor不同。非性能结论。下一步清洁提交后在全新root冻结协议、从头运行八组；完成前不再改源码。Git push必须尝试并报告；本轮远端443连接两次失败，允许清洁本地commit/SHA冻结启动，单独记录待同步，不能声称已推送成功，网络恢复后同步。20分钟heartbeat只查状态，不追逐奖励。
 
 ## 回收与边界
 
