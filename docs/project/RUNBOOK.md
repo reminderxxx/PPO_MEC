@@ -1,3 +1,7 @@
+## 2026-10-18 阶段一已回收
+
+`artifacts/joint_stream_learning/learning_effectiveness_stage1_20261017/result.json`已complete，新增2016评估799137帧、训练0；不要再次启动此run。独立审查、完整72行指标与下一阶段任务见[joint_stream_learning_effectiveness_review_20261018.md](joint_stream_learning_effectiveness_review_20261018.md)。回收helpers/曲线保存在该阶段`recovery/`和`plots/`，审查不新增策略评估。下一阶段仅任务点，状态重建或新训练须另立有界执行合同。
+
 ## 2026-10-17：零训练学习有效性阶段一
 
 合同：`joint_stream_learning_effectiveness_contract_20261017.md`。使用项目Python，先qualify核验24初始化与固定SA/7/32/dev_000逐字段一致，再prepare冻结新输出，最后仅运行一次run；失败保留现场，不自动重启。所有命令从仓库根执行，输出目录须为全新阶段目录。

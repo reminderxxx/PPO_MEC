@@ -1,3 +1,7 @@
+## 2026-10-18 学习有效性阶段一
+
+[joint_stream_learning_effectiveness_review_20261018.md](joint_stream_learning_effectiveness_review_20261018.md)：完整48条件0/32/64、8方法/3seed的学习增益、基线退化、全部72行模型指标、曲线和第二阶段任务点。仅开发证据，不证明收敛；阶段二未执行。
+
 ## 2026-10-17 最新完整回收
 
 - [持续请求v2唯一确认轮独立审查](joint_stream_confirmation_results_review_20261017.md)：8组全部固定最终、费用/对象生命周期与baseline独立性；均值优势及seed17/预取/曲线覆盖负例，1/1已结束，非论文晋级。

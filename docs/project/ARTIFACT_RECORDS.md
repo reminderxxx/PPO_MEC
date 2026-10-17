@@ -1,3 +1,9 @@
+## 2026-10-18：阶段一学习有效性完整结果
+
+- `artifacts/joint_stream_learning/learning_effectiveness_stage1_20261017`：evaluation4823a1a/source35975cb，8×3×3×48=3456格；新增2016评估799137帧，复用1440；新增训练/优化0。正式资格183帧、定稿检查366帧另记，总新增评估/软件检查799686帧。原48checkpoint和1152固定64结果保留。
+- `recovery/independent_review.json`、`ppo_mec_stage1_integrity_review.json`、`ppo_mec_stage1_results_review.json`与helpers；`recovery/stage2_task_points.json`冻结15个诊断见证及退出规则；`plots/`含三点概览、8×3均值/seed范围图、逐seed图及SVG/JSON/脚本；`recovery_manifest.json`保存文件指纹。机器产物ignored，不上传数据/checkpoint。
+- SA奖励205.598218→206.179616→210.399715、完成率87.109375→87.934028→88.888889%、模型115.732639→101.368056→96.937500KiB。seed17持续退化，六组相对初始化奖励退化，DAG近乎平；全部正负配对保留。独立汇总及总账恒等式重建通过，非新评估全逐帧物理重放。详见[完整审查与下一阶段任务](joint_stream_learning_effectiveness_review_20261018.md)。formal/holdout封存、canonical不变，阶段二未执行。
+
 ## 2026-10-17：学习有效性阶段一（结果待完成）
 
 原确认run和固定最终结果保留。独立入口evaluate_joint_stream_learning_effectiveness.py新增2016零训练评估，原1440行校验后复用，共3456个0/32/64比较单元。具体输出/进度指针由artifacts/joint_stream_learning/continuation.json的learning_effectiveness_stage1记录；运行前冻结contract.json及evaluator/source/checkpoint/reuse指纹。无新增训练授权，结果待完整回收后独立审查；不把软件验收当性能结论。

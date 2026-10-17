@@ -1,3 +1,9 @@
+## 2026-10-18：阶段一确认的学习风险
+
+RESOLVED/evidence：新增精确0点和32缺失36条件，完整48面板可比较0/32/64；SA有限均值学习收益成立（+4.801497，完成率+1.779514pp，模型−16.24%），不以小KL或参数变化代替实效。
+
+OPEN：seed17相对初始化−8.624080且32→64−5.461505，long/双family/4096损害集中；SA65/144格下降，单family均值−0.923548。六组baseline/ablation均值下降、DQN144/144下降；SA−cache最终10.154284由SA学习+4.801497和cache退化5.352787共同组成，不能把全部排序差称机制学习收益。公共logprob/mask/回报单位/Q边界/梯度裁剪是待核验问题，不是已证实bug。fresh记录缺完整events/receipts，虽全部汇总reward恒等式重建通过，仍缺逐帧物理复现/模块因果归因及独立时间泛化。见[阶段一审查](joint_stream_learning_effectiveness_review_20261018.md)和冻结的下一阶段任务点；不自动调参/训练。
+
 ## 2026-10-17：学习有效性待固定面板验证
 
 OPEN：SA参数确已更新，但现有12probe只覆盖单family4096，缺0点；不能据loss/KL/参数变化判断有效学习或收敛。新增零训练全48面板0/32/64评估独立补证。actor_hash只含heads、actor_gradient_norm包含非surrogate价值参数；SA stream的surrogate不直接改greedy logits、domain_encoder未使用，不能将这些字段误当机制收益。0点保留公共费用先验/mask/协调/固定GRU。完整收益和seed17机制仍待评估，见[阶段一合同](joint_stream_learning_effectiveness_contract_20261017.md)。
