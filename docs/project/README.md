@@ -1,3 +1,7 @@
+## 2026-10-17 最新完整回收
+
+- [持续请求v2唯一确认轮独立审查](joint_stream_confirmation_results_review_20261017.md)：8组全部固定最终、费用/对象生命周期与baseline独立性；均值优势及seed17/预取/曲线覆盖负例，1/1已结束，非论文晋级。
+
 ## 2026-10-17 新增入口
 
 - [持续请求v1独立回收审查](joint_stream_results_review_20261017.md)

@@ -1,3 +1,5 @@
+2026-10-17 Stream v2唯一确认轮已完整回收：8组×3seed×64，650515实际训练帧，48checkpoint/24固定条件最终重放及独立费用审查通过。SA固定开发均值210.399715/88.8889%，高于cache、DAG和独立DT；DAG模型费用更低，seed17和预取站点/驻留负例保留。仅开发证据，未晋级formal/holdout/canonical；[完整结果及边界](docs/project/joint_stream_confirmation_results_review_20261017.md)。已用完1/1轮，不自动续训。
+
 ## 持续请求 v2 开发确认（2026-10-17）
 
 八组v1已回收；SA超过cache但低于DAG，DT与DAG原实现重复，独立审查保留11次保护违规。当前`joint_stream_control_v2`修复接口、均衡日程和可选准备/冷站成本；旧checkpoint拒绝。入口与预算见[确认合同](docs/project/joint_stream_refinement_contract_20261017.md)。此开发入口不替代正式Protocol，formal/holdout封存。

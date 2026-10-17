@@ -1,3 +1,11 @@
+## 2026-10-17：Stream v2确认后的剩余风险
+
+CONFIRMED/development：DT/DAG六对权重均不同；全3005571事件中remote-current optional驱逐当前依赖违规0、自报optional use/net bounds违规0；旧原件11违规不追认修复。相同训练日程/两半24条件覆盖、123源码及48checkpoint校验通过。
+
+OPEN：seed17反应式模型族驻留/选站抖动（dev046重准入117vs cache46，99.79%准入字节为reactive）及单family状态连续性（dev020零base重准入仍少29节点）。SA optional70.22%对象使用，但36.51%optional字节未用；291/321未用对象的原定节点在别站算，去预测使用率88.40%更高，不能把奖励优势当纯预取因果效果。proxy use_start与actual compute不同、缺完整决策前forecast/net独立重算；未来站点承诺/驻留仍需机制证明。
+
+OPEN/coverage：固定12probe全为单family4096，不能排除双family/8192的late退化；只有两个相邻已复用dev时间会话、long单源、合成物理成本。24重放只覆盖dev_000，非全1152独立重跑。observational surrogate、自动LRU和无信息/候选权限分离消融的边界不变。详见[确认审查](joint_stream_confirmation_results_review_20261017.md)。1/1预算用完，不自动续训。以下v1 OPEN BLOCKER仅约束历史原run，不把其结果追认有效。
+
 ## 2026-10-17：Stream v2修复边界
 
 FIXED/software：remote-current环境及两个auditor谓词；DT预测context alias；每seed后半程无long的课程缺口；恢复minimum slot和冷模型成本漏项；无使用时域/净交付代理的可选预取。432 tests和软件八组audit通过，不证明实际优势。OPEN：seed7family thrash/seed27late退化/PPOseed17及DAG负例是否改善，需唯一有界确认；surrogate仍observational，LRU仍共同自动策略，未获得因果action信用或formal证据。

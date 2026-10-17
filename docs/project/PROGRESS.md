@@ -1,3 +1,11 @@
+## 2026-10-17：Stream v2唯一确认轮完整回收
+
+run `20261016T162100Z_confirmation`（source35975cb）已complete，自动audit pass；1536会话、650515实际帧、1152固定最终、48checkpoint及24固定dev_000最终重放。独立91项文件SHA/463231收据、123源码指纹和全3005571事件保护复核通过；DT/DAG六对权重均不同，旧违规未重现。
+
+SA210.399715/88.8889%/96.93750KiB，cache200.245431/86.0677%/135.27083，DAG205.288553/87.6302%/92.57639，独立DT197.816505/85.0694%/118.99306。SA本轮均值最高，DAG归一化模型费用仍低；seed17弱于cache/MAPPO，反应式family重载和状态抖动仍开放。optional757/1078实际使用，未用321.5KiB；去预测使用率更高、seed27零optional，不能归因纯预测收益。32→64probe仅单family4096，不证明双family稳定/收敛。
+
+[完整独立审查](joint_stream_confirmation_results_review_20261017.md)及`artifacts/joint_stream_learning/confirmation_recovery_20261017/`保留全部负例。已授权1/1轮结束，不追加训练或追排名修改；记录提交同步后暂停提醒。formal/holdout封存、canonical不变、论文E0_UNAVAILABLE/Unverifiable。下文较早“待确认”均为历史阶段。
+
 ## 2026-10-17：Stream v2软件修复通过，待有界确认
 
 432 tests passed；八算法软件全链32session/1024frame、8最终/8checkpoint逐事件重放audit pass，DT/DAG tensor已分离。公共保护/均衡日程/冷模型恢复成本/按需预取均落地，物理reward和数据不改。仅软件正确性，性能尚待新冻结确认；合同joint_stream_refinement_contract_20261017.md。

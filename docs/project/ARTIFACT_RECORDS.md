@@ -1,3 +1,11 @@
+## 2026-10-17：Stream v2唯一有界确认完整结果
+
+- Run：`artifacts/joint_stream_learning/20261016T162100Z_confirmation`；source `35975cb3d73c84ddbabf01f6749bbc2d60c826de`，protocol `joint_stream_learning_v2` / action `joint_stream_control_v2`，clean；8×3×64=1536，实际650515帧/4299535决策，上限737280，固定最终64、未选峰。
+- `launcher_result.json=complete`，`audit.json=pass`，2026-10-17 12:25:41北京时间；1152最终、3005571事件、463231收据、48checkpoint、24固定dev_000最终重放。独立91文件SHA/全费用守恒、123源码与48checkpoint加载通过，6对DAG/DT tensor及actor均不同；全事件宽化保护违规0。未独立重放其余1128条件。
+- SA210.399715/88.8889%/96.93750KiB；cache200.245431/86.0677%/135.27083，DAG205.288553/87.6302%/92.57639，DT197.816505/85.0694%/118.99306；DAG模型每完成请求6.60277KiB低于SA6.81592。seed17、medium及逐case负例全部保留。
+- 独立包：`artifacts/joint_stream_learning/confirmation_recovery_20261017/`，含metrics/independent_review/integrity_review/paired_diagnosis/event_diagnosis/trace_forensics/cache_mechanism_summary、全部对象生命周期和分析脚本、SHA清单。optional SA757/1078用，未用321.5KiB；旧SA同口径1314/4792，旧legacy3248/1144单独保留。准备使用不等于实际因果净交付；forecast/net自报审计边界见报告。
+- [完整独立审查](joint_stream_confirmation_results_review_20261017.md)：本轮开发均值最高，非正式主表/泛化/收敛或TMC-ready；两个相邻dev会话、单family4096 probe、合成费用等风险不变。formal/holdout封存、canonical不变，1/1已结束；本次新增科学训练0。
+
 ## 2026-10-17：Stream v2软件验收
 
 `artifacts/joint_stream_learning_refinement_smoke_20261017`：8算法×seed7×4短会话，1024训练帧、8最终、2048事件/256收据、8checkpoint/8重放；audit pass，DAG/DT tensor不同。`artifacts/joint_stream_learning/refinement_tests_20261017.log`为432 passed/13.11s。只验软件，不作性能结论，科学确认尚待清洁提交冻结。

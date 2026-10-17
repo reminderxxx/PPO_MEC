@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-14
+更新日期：2026-10-17
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -318,3 +318,24 @@
 - 不要声称外部 LoRA/KV-cache 论文已经提供 VEC adapter request trace。
 - 不要声称 PPO_MEC 全面优于 oracle prediction 或所有 heuristic upper-bound；当前项目文档已记录 `oracle_prediction` 和 `popularity_cache_heuristic` 边界。
 - 不要把 `mappo`、`qmix`、`controller_mat` 写成 vehicle-agent / RSU-agent full MARL；当前都是 controller-level baselines。不要把 `dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl` 写成主算法变体；它们是领域专项 learned comparators，不能使用 SA-GHMAPPO 专属机制。
+
+## 2026-10-17 持续请求确认回收：近邻定向刷新
+
+- `literature_cutoff`: `2026-10-17`；公开检索范围为2021–2026的DAG/cache/offloading、移动预测/迁移及edge AI执行，优先出版社/DOI页面。仅定向近邻增补，不代表全面文献审计完成，novelty仍N/S；未向检索服务上传本项目原件。
+- DOI部分直接读取返回403；下表“出版社检索页”指同一出版社页面的搜索返回正文，不把二手引用升格为原文核验。既有2026-06-21质量审计保留历史日期。
+- 新近邻再次说明：DAG表示+PPO、联合service cache与dependency scheduling、mobility-aware VEC AI offloading均已有工作。当前需要兑现的差异是typed模型依赖、真实可恢复workflow prefix、因果准备时机与持续跨站交付的具体耦合；本轮开发均值不证明这些差异的独立创新或因果收益。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| periodic DAG + PPO | [Cost-Optimized Periodic DAG-Structured Task Offloading in Multi-User MEC Systems Using Reinforcement Learning](https://doi.org/10.1145/3762993) | ACM TOIT 26(1), article2, 2026；出版社正式页核验，2026-01-14 | 显式多用户争用，DAG编码、PPO及greedy行为克隆初始化；不是仅静态单任务基线。 | DAG图表示或PPO不构成独有创新；typed base/adapter跨请求驻留、workflow prefix迁移和预测准备需独立消融与实际使用证据。未复现该文。 | Direct neighbor / baseline rationale；B-Supporting，非本项目同名DAG方法的忠实复现证明。 |
+| collaborative service cache + dependent scheduling | [Energy-latency aware mechanism for collaborative service caching and dependent task scheduling: a metaheuristic binarization approach](https://doi.org/10.1016/j.eswa.2026.133504) | Expert Systems with Applications, DOI含2026；出版社预览题名/摘要核验，正式卷期/日期待核 | 联合service缓存与依赖任务排序，计服务迁移/替换费用，Q-learning增强GWO。 | 不能把cache+DAG耦合或计入迁移费用单独当创新；需验证车辆跨站、typed模型闭包与按时使用/状态恢复的额外约束。 | Related Work / novelty risk；B-Supporting，不照搬其模拟提升幅度。 |
+| DNN partition/offload VEC | [DNN Inference Acceleration Based on Adaptive Task Partitioning and Offloading in Embedded VEC](https://doi.org/10.1145/3725734) | ACM TECS 24(4), article54, 2025；出版社核验，2025-06-05 | DAG/chain DNN切分卸载、异构推理时延估计；正文记载Raspberry Pi/Jetson Nano及CARLA/SUMO验证。 | 本项目Alibaba任务图不等于DNN layer DAG，合成成本不能替代设备验证；adapter依赖和跨请求状态复用是待验证差异。 | System grounding / calibration；B-Supporting，设备方案不代表本机已具备。 |
+| mobile cooperative continuity | [UNION: Fault-tolerant Cooperative Computing in Opportunistic Mobile Edge Cloud](https://doi.org/10.1145/3617994) | ACM TOIT 23(4), article59, 2023；出版社核验，2023-11-17 | 间歇连接下数据/计算卸载、执行可靠性与deadline及结果回传；使用真实移动trace。 | 当前prototype未建立故障概率/可靠性保证，不能泛称已解决连续服务；该文将DAG列为未来方向，不等于提供adapter cache机制。 | Related Work / continuity boundary；B-Supporting。 |
+| joint content cache/offload/resource VEC | [Joint Optimization of Task Offloading Content Caching and Resource Allocation in Vehicular Edge Computing](https://doi.org/10.1145/3732782) | ACM TAAS / 2025仅本轮出版社其他论文引用线索；原页不可读，卷期页码待一手核验 | VEC联合内容缓存、卸载与资源配置近邻；具体优化模型/算法全文待核。 | content/input reuse不等于base/adapter依赖与执行状态，但不能忽略已有联合优化；不得据二手摘要声称其缺少某机制。 | Unverified nearest neighbor / 待核。 |
+| predicted preference content caching | [DRL-based Content Caching Strategy With Efficient User Preference Predictions in UAV-assisted VEC](https://doi.org/10.1145/3701234) | ACM TOSN 20(6), 2024；出版社检索页题名/元数据，2024-11-22；全文算法待核 | 预测与VEC内容缓存的相关研究；用户偏好预测与车辆驻留预测需区分。 | 本项目应单独量化预测精度、准备使用及净交付，不能把启用预测等同机制成功；不是内容命中率的直接复用。 | Related Work / prediction boundary；B-Supporting，全文未复现。 |
+| service-chain migration | [面向车载元宇宙智能孪生体全局迁移的可靠服务链选择方案](https://doi.org/10.11999/JEIT250612) | 电子与信息学报出版社题名/DOI线索；年份、卷期、全文机制待核 | VEC迁移与可靠服务链的近邻线索；具体可靠性假设未全文核验。 | 连续DAG与service chain不可直接等同；本项目还需明确状态可恢复、模型依赖和共享资源争用的证据。 | Unverified supporting neighbor / reviewer response。 |
+| UAV joint cache/offload | [无人机辅助动态权重边缘计算卸载策略研究](https://doi.org/10.11999/JEIT260054) | 电子与信息学报出版社摘要核验；DOI含2026，正式年份/卷期待核 | 摘要描述DAG子任务、协同缓存、卸载/资源联合优化及动态权重；CCAH-MVO。 | 非地面车辆RSU迁移；不能仅以cache+DAG联合优化作差异，本项目物理reward未按排名更改。 | Supporting methods / 非核心baseline。 |
+| edge caching optimization | [An Optimal Edge Data Caching Scheme Based on Improved Particle Swarm Optimization](https://doi.org/10.1002/cpe.70849) | Concurrency and Computation: Practice and Experience, 2026；出版社核验首次发表2026-06-30 | 边缘数据缓存的改进PSO；提供依赖调度/缓存文献线索，未将其引用内容视作该文贡献。 | 数据缓存与typed模型闭包/执行前缀不同；不把PSO或缓存命中率直接当本项目同合同baseline。 | Supporting context / reviewer response；非核心。 |
+| mission-critical edge review | [Resource Management for Mission-Critical Applications in Edge Computing: Systematic Review on Recent Research and Open Issues](https://doi.org/10.1145/3762181) | ACM Computing Surveys出版社检索页；正式年份/卷期本轮待核 | mission-critical资源管理综述线索，适于梳理可靠性与deadline证据要求，未全文审查。 | 综述不提供本项目部署成本或算法有效性证明；需限定持续交付与真实deadline差异。 | Context / literature navigation；不作主方法性能依据。 |
+| vehicular AIGC allocation | [Deep Reinforcement Learning based Multi-attribute Auction Model for Resource Allocation in Vehicular AIGC Services](https://doi.org/10.1145/3665348.3665356) | ACM 2024 International Conference on Generative Artificial Intelligence and Information Security；出版社题名页核验，全文细节待核 | VEC AIGC资源配置与auction近邻题名线索。 | 本项目不研究竞价/收益博弈，不能用AIGC标签替代真实AI执行验证；仅作场景背景。 | Discussion context / 非核心。 |
+| hybrid cloud-fog service chains | [SFC-Based IoT Provisioning on a Hybrid Cloud-Fog Computing with a Minimized Latency](https://doi.org/10.1155/2024/3384837) | Journal of Computer Networks and Communications, 2024；出版社题名/检索摘要线索，全文待核 | 混合cloud/fog下service-chain时延配置背景。 | SFC placement不是typed adapter依赖或移动workflow prefix迁移，不能直接作性能对照。 | Discussion context / 非核心。 |
