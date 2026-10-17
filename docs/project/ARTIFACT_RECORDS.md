@@ -1,3 +1,7 @@
+## 2026-10-17：学习有效性阶段一（结果待完成）
+
+原确认run和固定最终结果保留。独立入口evaluate_joint_stream_learning_effectiveness.py新增2016零训练评估，原1440行校验后复用，共3456个0/32/64比较单元。具体输出/进度指针由artifacts/joint_stream_learning/continuation.json的learning_effectiveness_stage1记录；运行前冻结contract.json及evaluator/source/checkpoint/reuse指纹。无新增训练授权，结果待完整回收后独立审查；不把软件验收当性能结论。
+
 ## 2026-10-17：Stream v2唯一有界确认完整结果
 
 - Run：`artifacts/joint_stream_learning/20261016T162100Z_confirmation`；source `35975cb3d73c84ddbabf01f6749bbc2d60c826de`，protocol `joint_stream_learning_v2` / action `joint_stream_control_v2`，clean；8×3×64=1536，实际650515帧/4299535决策，上限737280，固定最终64、未选峰。

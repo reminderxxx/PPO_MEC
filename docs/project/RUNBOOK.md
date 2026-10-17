@@ -1,3 +1,15 @@
+## 2026-10-17：零训练学习有效性阶段一
+
+合同：`joint_stream_learning_effectiveness_contract_20261017.md`。使用项目Python，先qualify核验24初始化与固定SA/7/32/dev_000逐字段一致，再prepare冻结新输出，最后仅运行一次run；失败保留现场，不自动重启。所有命令从仓库根执行，输出目录须为全新阶段目录。
+
+```bash
+python scripts/evaluate_joint_stream_learning_effectiveness.py qualify --source_run artifacts/joint_stream_learning/20261016T162100Z_confirmation --output /tmp/learning_effectiveness_qualification.json
+python scripts/evaluate_joint_stream_learning_effectiveness.py prepare --source_run artifacts/joint_stream_learning/20261016T162100Z_confirmation --output artifacts/joint_stream_learning/learning_effectiveness_stage1_20261017 --qualification /tmp/learning_effectiveness_qualification.json --workers 2
+python scripts/evaluate_joint_stream_learning_effectiveness.py run --output artifacts/joint_stream_learning/learning_effectiveness_stage1_20261017
+```
+
+不要对已存在输出再执行prepare/run。仅完整成功后summarize可只读输入重建汇总；失败标记禁止summarize写complete。新增2016评估最多967680帧，训练/优化0；复用32点12probe与64点完整48，新增0点48及32缺失36。后台检查默认20分钟只读阶段progress/result/failure和必要group末条身份，不读逐回合奖励；完成后独立审查、绘固定48条件三点图并交付下一阶段任务点。新训练需另立授权合同。
+
 ## 持续请求 v2确认入口（2026-10-17）
 
 先读`joint_stream_results_review_20261017.md`及`joint_stream_refinement_contract_20261017.md`。共同入口`python scripts/launch_joint_stream_learning.py --output_root artifacts/joint_stream_learning/<fresh_UTC>_confirmation`，必须清洁提交且使用全新root；push失败时按冻结合同记录网络例外并保留本地commit/SHA，稍后同步；`--smoke`为32帧软件验收。v2拒绝v1 protocol/checkpoint，不用当前源码重跑或改写旧audit；旧归档需其冻结提交。此入口只允许已授权的一轮1536session/737280帧上限确认，不能重复启动。

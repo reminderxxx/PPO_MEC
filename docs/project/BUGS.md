@@ -1,3 +1,7 @@
+## 2026-10-17：学习有效性待固定面板验证
+
+OPEN：SA参数确已更新，但现有12probe只覆盖单family4096，缺0点；不能据loss/KL/参数变化判断有效学习或收敛。新增零训练全48面板0/32/64评估独立补证。actor_hash只含heads、actor_gradient_norm包含非surrogate价值参数；SA stream的surrogate不直接改greedy logits、domain_encoder未使用，不能将这些字段误当机制收益。0点保留公共费用先验/mask/协调/固定GRU。完整收益和seed17机制仍待评估，见[阶段一合同](joint_stream_learning_effectiveness_contract_20261017.md)。
+
 ## 2026-10-17：Stream v2确认后的剩余风险
 
 CONFIRMED/development：DT/DAG六对权重均不同；全3005571事件中remote-current optional驱逐当前依赖违规0、自报optional use/net bounds违规0；旧原件11违规不追认修复。相同训练日程/两半24条件覆盖、123源码及48checkpoint校验通过。

@@ -1,3 +1,5 @@
+2026-10-17 第一阶段零训练学习有效性评估入口已就绪：固定全部48开发条件比较0/32/64，补2016评估、复用1440原始行；不追加训练或挑峰。阶段结束交付下一阶段任务点。见[阶段一合同](docs/project/joint_stream_learning_effectiveness_contract_20261017.md)。
+
 2026-10-17 Stream v2唯一确认轮已完整回收：8组×3seed×64，650515实际训练帧，48checkpoint/24固定条件最终重放及独立费用审查通过。SA固定开发均值210.399715/88.8889%，高于cache、DAG和独立DT；DAG模型费用更低，seed17和预取站点/驻留负例保留。仅开发证据，未晋级formal/holdout/canonical；[完整结果及边界](docs/project/joint_stream_confirmation_results_review_20261017.md)。已用完1/1轮，不自动续训。
 
 ## 持续请求 v2 开发确认（2026-10-17）

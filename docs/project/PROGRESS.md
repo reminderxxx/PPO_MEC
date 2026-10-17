@@ -1,3 +1,7 @@
+## 2026-10-17：阶段一学习有效性验证
+
+用户授权第一阶段执行，范围为独立零训练0/32/64评估。全8方法×3seed×48同面板，新增2016评估session/最多967680评估帧，复用1440原始行。24初始化精确重建已通过；完整学习增益待评估，不能用权重改变、小KL或loss下降代替收益。原确认轮及checkpoint保留、formal/holdout封存。见[阶段合同](joint_stream_learning_effectiveness_contract_20261017.md)，进度以continuation的learning_effectiveness_stage1字段为准；完成后交付下一阶段任务点，不自动新训。
+
 ## 2026-10-17：Stream v2唯一确认轮完整回收
 
 run `20261016T162100Z_confirmation`（source35975cb）已complete，自动audit pass；1536会话、650515实际帧、1152固定最终、48checkpoint及24固定dev_000最终重放。独立91项文件SHA/463231收据、123源码指纹和全3005571事件保护复核通过；DT/DAG六对权重均不同，旧违规未重现。

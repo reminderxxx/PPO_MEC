@@ -1,3 +1,7 @@
+## 2026-10-17 开发学习有效性诊断
+
+`scripts/evaluate_joint_stream_learning_effectiveness.py`：独立零训练qualify/prepare/run/summarize入口；产物在`artifacts/joint_stream_learning/`下新建阶段目录，保留contract、qualification、reused_rows、分组rows/controls/progress/result。原冻结run不覆写，live进度由continuation的learning_effectiveness_stage1指向。
+
 ## 2026-10-17 Stream v2增量
 
 `src/envs/core/joint_stream_refinement.py`提供公共因果规划代理/均衡训练日程；`tests/test_stream_refinement.py`覆盖已定位反例。独立审查与确认合同分别为`joint_stream_results_review_20261017.md`和`joint_stream_refinement_contract_20261017.md`。新运行写`artifacts/joint_stream_learning/<UTC>_confirmation/`，旧`20261015T181642Z_development`永久保留为历史回收，不续写。
