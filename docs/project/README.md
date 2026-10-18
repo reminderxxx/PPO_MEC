@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `manuscript_revision_ledger.md`：CSCWD 2027 论文逐轮要求、来源基线、精准位置和已固定位置；修改论文前必读。
+
 - `mechanism_evidence_closure_results_20261005.md`：共享缓存公平成本、两节点重跑/恢复和 12 场景决策空间结果；
   明确 Pareto 边界、ALPR 负结果和不启动 RL 的结论
 - `mechanism_evidence_closure_plan_20261005.md`：本轮命令、调用、墙钟、12 格与状态成本的事前冻结方案
