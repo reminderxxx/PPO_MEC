@@ -1,3 +1,7 @@
+## 2026-10-18 只读学习诊断工具
+
+`diagnose_joint_stream_learning.py`调用冻结训练脚本已有make_env/stream_episode，仅一次final64参考，不调用update。`joint_stream_same_state_scoring.py`封装forward临时hooks，保存完整decision/候选/上下文/输入及reference prefix；纯评分不依赖环境。`audit_joint_stream_learning_chain.py`只执行合成概率/autograd及纯transition构造前缀/原日志重建；`audit_joint_stream_cached_gradients.py`只读已捕获张量和checkpoint，分组autograd.grad并校验全部状态不变。算法模块不反向依赖这些诊断脚本，registry/算法实现未修改。
+
 ## 2026-10-17 Stream v2
 
 `joint_stream_refinement.py`只消费公开已发布DAG、延迟RSU状态、因果预测与声明意图，提供使用时间/恢复帧/可选cache净交付代理和均衡日程；`StreamControlPPO`共同消费，DT独立context在`dt_handoff_agent.py`；环境执行当前依赖保护，auditor独立消费原始事件、value metadata和checkpoint，拒绝DT/DAG tensor alias。代理不是reward或未来标签，surrogate观察团队MC监督不变。

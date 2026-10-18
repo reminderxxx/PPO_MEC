@@ -1,3 +1,7 @@
+## 2026-10-18 第二阶段诊断入口
+
+`scripts/diagnose_joint_stream_learning.py`：只消费预冻结contract的单次final64参考重建，exclusive run_started拒绝重跑；`scripts/joint_stream_same_state_scoring.py`：捕获/纯tensor条件评分，不拥有环境；`scripts/audit_joint_stream_learning_chain.py`：纯合成与原日志审查；`scripts/audit_joint_stream_cached_gradients.py`：只读缓存autograd，不优化。测试`tests/test_joint_stream_learning_diagnostics.py`。产物`artifacts/joint_stream_learning/learning_diagnosis_stage2_20261018`含contract/result、15组events/receipts/snapshots/rollouts/scores、独立诊断与delivery清单；continuation.learning_diagnosis_stage2指向当前阶段。原run不覆写。
+
 ## 2026-10-17 开发学习有效性诊断
 
 `scripts/evaluate_joint_stream_learning_effectiveness.py`：独立零训练qualify/prepare/run/summarize入口；产物在`artifacts/joint_stream_learning/`下新建阶段目录，保留contract、qualification、reused_rows、分组rows/controls/progress/result。原冻结run不覆写，live进度由continuation的learning_effectiveness_stage1指向。

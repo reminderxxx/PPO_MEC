@@ -1,3 +1,9 @@
+## 2026-10-18：第二阶段共同学习与同状态诊断
+
+- `artifacts/joint_stream_learning/learning_diagnosis_stage2_20261018`：contract SHA cde19bc74093926ef9ed5f3ce4150185972fcaec05046548dd2c0e9e56225109；固定15参考/7032帧，上限7200，新增训练/优化0。123源码、原48checkpoint文件、15 summary/events/receipts全部一致。
+- 15组snapshots/selected rollouts/scoring、2160forward/1080次遍；39组PPO形式cached_gradients，DQN2格跳过；完整score_analysis、P0合成反例/原日志资格重建、54555旧事件物理链/反例、独立审查和交付SHA保留。0/32/64只同状态条件评分，不是新自主性能面板或原训练梯度。
+- DQN最新数据被倒序FIFO淘汰已确认，SA17唯一退化因果尚未确认；原64结果和优势门禁保持。46软件测试通过。[独立报告与第三阶段任务](joint_stream_learning_diagnosis_review_20261018.md)。数据/模型/产物ignored不上传，formal封存、canonical不变。下文阶段一状态为历史。
+
 ## 2026-10-18：阶段一学习有效性完整结果
 
 - `artifacts/joint_stream_learning/learning_effectiveness_stage1_20261017`：evaluation4823a1a/source35975cb，8×3×3×48=3456格；新增2016评估799137帧，复用1440；新增训练/优化0。正式资格183帧、定稿检查366帧另记，总新增评估/软件检查799686帧。原48checkpoint和1152固定64结果保留。

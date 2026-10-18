@@ -1,3 +1,17 @@
+## 2026-10-18 第二阶段诊断已完成
+
+合同[joint_stream_learning_diagnosis_contract_20261018.md](joint_stream_learning_diagnosis_contract_20261018.md)与机器contract在执行前冻结。`learning_diagnosis_stage2_20261018/result.json=complete`，15参考/7032帧、零训练；已完成目录不能再次执行。参考历史命令为`python scripts/diagnose_joint_stream_learning.py --output_root artifacts/joint_stream_learning/learning_diagnosis_stage2_20261018`，exclusive启动锁会拒绝重跑；失败保留，不自动重启。工具不提供解除锁/覆盖选项。
+
+只读复验可使用新输出路径：
+
+```bash
+python scripts/audit_joint_stream_learning_chain.py --output_root <新的审查目录>
+python scripts/audit_joint_stream_cached_gradients.py --stage2_root artifacts/joint_stream_learning/learning_diagnosis_stage2_20261018 --output <新的审查文件.json>
+python -m pytest -p no:cacheprovider tests/test_joint_stream_learning_diagnostics.py -q
+```
+
+46测试、15参考完整summary/event/receipt对账和39组梯度纯度通过；不需再次运行环境。报告/第三阶段任务见[joint_stream_learning_diagnosis_review_20261018.md](joint_stream_learning_diagnosis_review_20261018.md)。下一阶段需独立最小修复与软件合同；任何新训练另有明确公平预算，当前1/1已用完。下文阶段一状态为历史。
+
 ## 2026-10-18 阶段一已回收
 
 `artifacts/joint_stream_learning/learning_effectiveness_stage1_20261017/result.json`已complete，新增2016评估799137帧、训练0；不要再次启动此run。独立审查、完整72行指标与下一阶段任务见[joint_stream_learning_effectiveness_review_20261018.md](joint_stream_learning_effectiveness_review_20261018.md)。回收helpers/曲线保存在该阶段`recovery/`和`plots/`，审查不新增策略评估。下一阶段仅任务点，状态重建或新训练须另立有界执行合同。

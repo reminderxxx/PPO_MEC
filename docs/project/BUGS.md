@@ -1,3 +1,9 @@
+## 2026-10-18：第二阶段确认的DQN覆盖缺陷与归因边界
+
+OPEN/P0 verified：StreamDQN为连接未来逆序构造transition后直接append到maxlen4096 FIFO，溢出时保留较早、淘汰较新。默认4097反例丢最新terminal；原48/48包溢出，353675/550283当前决策在首次随机采样前失去资格，90/192会话全淘汰，三个seed的ep64均0保留。是资格覆盖错误，不等于后期所有reward信息消失或性能退化唯一原因；当前对该baseline的优势不能归因。独立审查先记录，算法未修。
+
+BOUNDED exclusions：八配置合成概率/两遍logprob一致，真实参考64重算通过；MC/10/8单位及DQN不溢出跨idle/request/session边界守恒。原训练行为张量缺失，不能推断全训练概率无误。VALUE/CLIP coupling confirmed：39个真实状态PPO形式诊断价值主导共同裁剪，但正向SA7/27裁得更重；不能单因果解释seed17。CACHE/CREDIT OPEN：早期1080次遍仅8个cache自由选择，不能外推480帧；单family零base重载仍退化、部分双family退化state总费用反降。完整报告[joint_stream_learning_diagnosis_review_20261018.md](joint_stream_learning_diagnosis_review_20261018.md)。原状态后续仍OPEN，未改reward/源码/训练。
+
 ## 2026-10-18：阶段一确认的学习风险
 
 RESOLVED/evidence：新增精确0点和32缺失36条件，完整48面板可比较0/32/64；SA有限均值学习收益成立（+4.801497，完成率+1.779514pp，模型−16.24%），不以小KL或参数变化代替实效。

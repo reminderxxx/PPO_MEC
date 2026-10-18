@@ -1,3 +1,7 @@
+## 2026-10-18 第二阶段已完成
+
+[joint_stream_learning_diagnosis_review_20261018.md](joint_stream_learning_diagnosis_review_20261018.md)：DQN回放顺序一阶缺陷、15格参考全轨迹对账、同状态0/32/64评分、共同裁剪/物理链反例及第三阶段任务。训练/优化0；[执行合同](joint_stream_learning_diagnosis_contract_20261018.md)冻结7200评估帧，上限内完成7032。第三阶段未实施；下文阶段一“阶段二未执行”为历史。
+
 ## 2026-10-18 学习有效性阶段一
 
 [joint_stream_learning_effectiveness_review_20261018.md](joint_stream_learning_effectiveness_review_20261018.md)：完整48条件0/32/64、8方法/3seed的学习增益、基线退化、全部72行模型指标、曲线和第二阶段任务点。仅开发证据，不证明收敛；阶段二未执行。
