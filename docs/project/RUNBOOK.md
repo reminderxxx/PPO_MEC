@@ -1,3 +1,15 @@
+## 2026-10-18 SA候选软件验收与旧源码边界
+
+`StreamSAGHMAPPOAgent`默认separate_policy_value_clip=False，候选通过registry的joint_stream_control_v2加True显式构造；checkpoint候选flag/tag必须配对。旧原训练launcher不自动开启候选。
+
+```bash
+python -m pytest -p no:cacheprovider tests/test_sa_separate_gradient_clip.py -q
+python -m pytest -p no:cacheprovider tests/test_joint_stream_learning_diagnostics.py -q
+python scripts/qualify_sa_separate_gradient_clip.py --stage3_root artifacts/joint_stream_learning/sa_learning_stage3_20261018 --output_root <全新资格目录>
+```
+
+已完成23/46/9状态资格。软件资格硬限128私有Adam，禁止环境/完整update/rollout。`diagnose_sa_midlate.py`只消费事前冻结五案例合同，2400参考帧已完整执行，exclusive锁禁止重跑；不要重新启动已完成目录。当前SA源码已改，旧原123-fingerprint诊断如需重验使用Git35975cb原源码checkout，不将新代码追认历史source。原Git对象/48旧cp兼容由新资格入口独立核验。第四阶段密集曲线合同仅草案，科学训练不自动启动。见[阶段报告](sa_learning_stage3_review_20261018.md)。
+
 ## 2026-10-18 第二阶段诊断已完成
 
 合同[joint_stream_learning_diagnosis_contract_20261018.md](joint_stream_learning_diagnosis_contract_20261018.md)与机器contract在执行前冻结。`learning_diagnosis_stage2_20261018/result.json=complete`，15参考/7032帧、零训练；已完成目录不能再次执行。参考历史命令为`python scripts/diagnose_joint_stream_learning.py --output_root artifacts/joint_stream_learning/learning_diagnosis_stage2_20261018`，exclusive启动锁会拒绝重跑；失败保留，不自动重启。工具不提供解除锁/覆盖选项。

@@ -1,3 +1,7 @@
+## 2026-10-18 SA第三阶段入口
+
+`src/agents/sa_ghmappo_agent.py`直接承载StreamSA opt-in梯度分组，算法不另建package。`scripts/diagnose_sa_midlate.py`为固定五案例/原source一次参考采集；`scripts/qualify_sa_separate_gradient_clip.py`为只消费已有tensor的私有更新资格；`tests/test_sa_separate_gradient_clip.py`覆盖默认与候选/旧checkpoint。输出`artifacts/joint_stream_learning/sa_learning_stage3_20261018`，continuation.sa_learning_stage3指向当前记录；midlate_reference、software_qualification及独立分析均不入Git。
+
 ## 2026-10-18 第二阶段诊断入口
 
 `scripts/diagnose_joint_stream_learning.py`：只消费预冻结contract的单次final64参考重建，exclusive run_started拒绝重跑；`scripts/joint_stream_same_state_scoring.py`：捕获/纯tensor条件评分，不拥有环境；`scripts/audit_joint_stream_learning_chain.py`：纯合成与原日志审查；`scripts/audit_joint_stream_cached_gradients.py`：只读缓存autograd，不优化。测试`tests/test_joint_stream_learning_diagnostics.py`。产物`artifacts/joint_stream_learning/learning_diagnosis_stage2_20261018`含contract/result、15组events/receipts/snapshots/rollouts/scores、独立诊断与delivery清单；continuation.learning_diagnosis_stage2指向当前阶段。原run不覆写。

@@ -1,3 +1,9 @@
+## 2026-10-18：SA第三阶段候选与补证完成
+
+按用户优先级暂缓DQN，保留缺陷披露，实施唯一SA opt-in separate_policy_value_clip=True（policy/value各0.5、原surrogate0.5，同Adam）。默认与父类精确一致，checkpoint flag/tag绑定且旧缺字段False，loss日志numeric。23专项、46诊断回归、48旧checkpoint兼容及9状态软件资格通过；95次私有软件Adam，科学训练0。
+
+源码改动前5参考2400帧、1948calls/974决策逐summary/events/receipts一致；735commitment强制，cache仅5自由、prepare0；37已付state换站全跟随更优prior且old仍valid，age8–11，正负例共有。不能把head2 priority变化称预测改善，或据此直接加锁/压残差。第四阶段建议两SA臂×3seed×64，0/8/…64完整48固定面板，共384train/2592eval；仅草案未启动，不能称收敛。[本阶段交付/第四阶段任务](sa_learning_stage3_review_20261018.md)。
+
 ## 2026-10-18：第二阶段诊断完整回收
 
 15/15固定参考、7032/7200评估帧，2160forward（两遍各1080）；123源码、48checkpoint文件SHA及15格完整summary/events/receipts精确一致。零训练/优化、46软件测试通过；39组纯缓存PPO形式梯度通过，不是原训练梯度。

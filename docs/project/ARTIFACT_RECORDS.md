@@ -1,3 +1,9 @@
+## 2026-10-18：SA第三阶段
+
+- `artifacts/joint_stream_learning/sa_learning_stage3_20261018`：总合同024c8268294a1e7fdc45032ae2116a9e8646d91ce6d204bd1efaea90db7eee6b；中后期执行合同ad21337cc21866c9baa98305012cf3e458995252a93a8d35d6a7477a992852c7。源码修改前5×480=2400评估帧，127固定frame/1948calls/974决策，summary/events/receipts与已审查原件exact。
+- `software_qualification/qualification.json`：123原Git文件、仅SA live变更、48旧cp兼容、3initial/6SA额外恢复、9状态36副本72Adam；专项23tests/23Adam，诊断46tests；合计95软件Adam，科学训练/科学优化0。旧source快照、两个纯读分析helper、37 paid-switch联结、candidate review、测试receipt与delivery/SHA保留。
+- 唯一SA候选独立clip显式opt-in，原最终64保留、未新增性能曲线；[阶段报告](sa_learning_stage3_review_20261018.md)和[下一阶段草案](sa_group_clip_confirmation_draft_20261018.md)。私有数据/checkpoint/artifact ignored不上传，formal封存/canonical不变。
+
 ## 2026-10-18：第二阶段共同学习与同状态诊断
 
 - `artifacts/joint_stream_learning/learning_diagnosis_stage2_20261018`：contract SHA cde19bc74093926ef9ed5f3ce4150185972fcaec05046548dd2c0e9e56225109；固定15参考/7032帧，上限7200，新增训练/优化0。123源码、原48checkpoint文件、15 summary/events/receipts全部一致。

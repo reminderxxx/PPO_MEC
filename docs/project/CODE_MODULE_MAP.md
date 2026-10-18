@@ -1,3 +1,7 @@
+## 2026-10-18 SA独立梯度组
+
+StreamSAGHMAPPOAgent增加显式separate_policy_value_clip开关，False直接父类；True仅重写梯度裁剪、分组numeric日志与checkpoint flag/tag校验。共享PPO核心、其他baseline、环境/预测/状态共享/物理费用不变，仍同一个main Adam和原surrogate Adam。qualify_sa_separate_gradient_clip只读原Git/48cp和3缓存tensor pack，私有副本一步资格不提供科学训练；diagnose_sa_midlate只在原source上做固定参考及同状态评分。算法不反向依赖诊断脚本。
+
 ## 2026-10-18 只读学习诊断工具
 
 `diagnose_joint_stream_learning.py`调用冻结训练脚本已有make_env/stream_episode，仅一次final64参考，不调用update。`joint_stream_same_state_scoring.py`封装forward临时hooks，保存完整decision/候选/上下文/输入及reference prefix；纯评分不依赖环境。`audit_joint_stream_learning_chain.py`只执行合成概率/autograd及纯transition构造前缀/原日志重建；`audit_joint_stream_cached_gradients.py`只读已捕获张量和checkpoint，分组autograd.grad并校验全部状态不变。算法模块不反向依赖这些诊断脚本，registry/算法实现未修改。

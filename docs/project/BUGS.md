@@ -1,3 +1,9 @@
+## 2026-10-18：SA第三阶段实现边界
+
+IMPLEMENTED/CANDIDATE：独立policy/value clip解决软件梯度组耦合，默认不变；尚未证实奖励改善或seed17退化修复，联合梯度上界确实增加，Adam可抵消缩放反例仍保留。23专项+46诊断、9真实缓存状态私有软件更新隔离通过；不是科学训练或原训练梯度复现。
+
+OPEN/prior-continuity：中后期固定事件富集样本974中735commitment强制，37次已付state未compute离站均旧站valid、新prior更优、年龄8–11，正负例共有；全64同节点switch仅2次strictprioroverride且来自正向7/27。须核验承诺到期后的剩余费用/queue排序与实际交付，不能单纯惩罚残差、加sunk cost或承诺延长锁定改善。prepare0、priority-only974，不作预测因果结论。DQN回放缺陷DEFERRED/OPEN，不借其弱结果作SA机制主张。见[本阶段审查](sa_learning_stage3_review_20261018.md)。
+
 ## 2026-10-18：第二阶段确认的DQN覆盖缺陷与归因边界
 
 OPEN/P0 verified：StreamDQN为连接未来逆序构造transition后直接append到maxlen4096 FIFO，溢出时保留较早、淘汰较新。默认4097反例丢最新terminal；原48/48包溢出，353675/550283当前决策在首次随机采样前失去资格，90/192会话全淘汰，三个seed的ep64均0保留。是资格覆盖错误，不等于后期所有reward信息消失或性能退化唯一原因；当前对该baseline的优势不能归因。独立审查先记录，算法未修。

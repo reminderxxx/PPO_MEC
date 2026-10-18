@@ -502,6 +502,72 @@ from src.agents.ppo_agent import StreamControlPPO
 
 
 class StreamSAGHMAPPOAgent(StreamControlPPO):
-    def __init__(self, **kwargs):
+    training_gradient_contract = 'sa_policy_value_clip_v1'
+
+    def __init__(self, *, separate_policy_value_clip=False, **kwargs):
+        if type(separate_policy_value_clip) is not bool:
+            raise ValueError('separate_policy_value_clip must be a bool')
         kwargs.pop('method',None)
         super().__init__(method='sa_ghmappo',**kwargs)
+        self.separate_policy_value_clip = separate_policy_value_clip
+        if separate_policy_value_clip:
+            self.options['separate_policy_value_clip'] = True
+            value_prefixes = ('critic.', 'prefix_values.', 'action_values.')
+            self._separate_value_parameters = [p for n,p in self.named_parameters() if n.startswith(value_prefixes)]
+            self._separate_policy_parameters = [p for n,p in self.named_parameters()
+                                               if not n.startswith(('surrogates.',) + value_prefixes)]
+            policy_ids = {id(p) for p in self._separate_policy_parameters}
+            value_ids = {id(p) for p in self._separate_value_parameters}
+            if policy_ids & value_ids or policy_ids | value_ids != {id(p) for p in self._actor_parameters}:
+                raise RuntimeError('policy/value clipping groups must partition the existing optimizer parameters')
+            self._separate_gradient_stats = []
+
+    def _apply_control_gradients(self, loss):
+        if not self.separate_policy_value_clip:
+            return super()._apply_control_gradients(loss)
+        import torch
+        self.optimizer.zero_grad(); self.surrogate_optimizer.zero_grad(); loss.backward()
+        policy_norm = float(torch.nn.utils.clip_grad_norm_(self._separate_policy_parameters, .5))
+        value_norm = float(torch.nn.utils.clip_grad_norm_(self._separate_value_parameters, .5))
+        surrogate_norm = float(torch.nn.utils.clip_grad_norm_(self.surrogates.parameters(), .5))
+        self.optimizer.step()
+        if self.surrogate_enabled:
+            self.surrogate_optimizer.step()
+        # Keep the existing metric's all-non-surrogate meaning for consumers.
+        self._gradient_stats.append(((policy_norm**2 + value_norm**2)**.5, surrogate_norm))
+        self._separate_gradient_stats.append((policy_norm, value_norm, surrogate_norm,
+            min(1., .5/(policy_norm+1e-6)), min(1., .5/(value_norm+1e-6)),
+            min(1., .5/(surrogate_norm+1e-6))))
+
+    def update(self, rollouts, *, epochs=4):
+        if not self.separate_policy_value_clip:
+            return super().update(rollouts, epochs=epochs)
+        self._separate_gradient_stats = []
+        result = super().update(rollouts, epochs=epochs)
+        names = ('policy_gradient_norm', 'value_gradient_norm', 'separated_surrogate_gradient_norm',
+                 'policy_clip_coefficient', 'value_clip_coefficient', 'surrogate_clip_coefficient')
+        for j, name in enumerate(names):
+            result[name] = (sum(row[j] for row in self._separate_gradient_stats)/len(self._separate_gradient_stats)
+                            if self._separate_gradient_stats else 0.)
+        result['separate_policy_value_clip'] = 1
+        return result
+
+    def save_checkpoint(self, path):
+        super().save_checkpoint(path)
+        if self.separate_policy_value_clip:
+            import torch
+            saved = torch.load(path, map_location='cpu', weights_only=False)
+            saved['training_gradient_contract'] = self.training_gradient_contract
+            torch.save(saved, path)
+
+    @classmethod
+    def from_checkpoint(cls, path):
+        import torch
+        saved = torch.load(path, map_location='cpu', weights_only=False)
+        enabled = saved['options'].get('separate_policy_value_clip', False)
+        if type(enabled) is not bool:
+            raise ValueError('checkpoint separate_policy_value_clip must be a bool')
+        tag = saved.get('training_gradient_contract')
+        if (enabled and tag != cls.training_gradient_contract) or (not enabled and 'training_gradient_contract' in saved):
+            raise ValueError('incompatible SA training gradient contract')
+        return super().from_checkpoint(path)

@@ -1,3 +1,7 @@
+## 2026-10-18：SA第三阶段完成
+
+SA候选仅显式opt-in策略/value独立clip各0.5，同Adam/loss/reward；默认父类路径与旧模型保持。 两组独立0.5改变联合范数上界，是待检验干预，尚无新性能/收敛结果。48旧checkpoint兼容、23+46测试、九状态parent/default exact和value×100 policy隔离通过；仅95次软件Adam，科学训练0。中后期735/974选择由commitment强制，37付state未compute换站均旧站有效且新prior更优，正负例共有。下一阶段密集固定面板两臂合同仅设计，原1/1预算不能续用；整体/seed7/27非回退与formal封存保持。见[阶段报告](sa_learning_stage3_review_20261018.md)。
+
 ## 2026-10-18：第二阶段共同学习诊断完成
 
 固定15见证/7032评估帧，2160forward、1080次遍行；所有参考summary/events/receipts对原64精确一致，参数/优化/新训练0。确认StreamDQN逆序构造直接写FIFO的覆盖缺陷；当前SA–DQN排序不能作机制归因。190个自由execution中62个0→64变更，早期cache仅8自由选择；真实状态PPO形式梯度显示价值主导共同裁剪，但正例裁剪更重，不能证明退化因果。下一阶段任务为最小DQN修复、分组可观测性和中后期状态合同，未实施。见[独立审查](joint_stream_learning_diagnosis_review_20261018.md)。正式证据仍E0，原最终64、预测/共享及seed7/27门禁保留。下文阶段一状态为历史。
