@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">车联网边缘协同结构示例图</title>
+  <desc id="desc">云端协调两个路侧单元，车辆通过 V2I 接入，车辆间通过 V2V 通信，任务与状态在相邻 RSU 间迁移。</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1649c5"/>
+      <stop offset="1" stop-color="#0b2d88"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#102e79"/>
+      <stop offset="1" stop-color="#081d54"/>
+    </linearGradient>
+    <marker id="arrow-white" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M2 2 L10 6 L2 10" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrow-cyan" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M2 2 L10 6 L2 10" fill="none" stroke="#67e8f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#061747" flood-opacity="0.28"/>
+    </filter>
+    <style>
+      text { font-family: 'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',sans-serif; fill: #ffffff; }
+      .title { font-size: 44px; font-weight: 700; letter-spacing: 2px; }
+      .subtitle { font-size: 19px; fill: #dbeafe; }
+      .section { font-size: 25px; font-weight: 700; }
+      .body { font-size: 18px; }
+      .small { font-size: 15px; }
+      .tiny { font-size: 13px; }
+      .muted { fill: #c7d7ff; }
+      .accent { fill: #93f3ff; }
+      .panel { fill: #ffffff; fill-opacity: 0.10; stroke: #ffffff; stroke-opacity: 0.42; stroke-width: 2; }
+      .chip { fill: #ffffff; fill-opacity: 0.13; stroke: #ffffff; stroke-opacity: 0.30; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#background)"/>
+  <path d="M72 128 H1528" stroke="#ffffff" stroke-opacity="0.65" stroke-width="2"/>
+  <text x="80" y="69" class="title">车联网边缘协同结构示例</text>
+  <text x="82" y="106" class="subtitle">车辆 · 路侧单元（RSU）· 边缘计算 · 跨域任务接续</text>
+  <text x="1506" y="91" class="small" text-anchor="end">VEC ARCHITECTURE / EXAMPLE</text>
+
+  <!-- Cloud coordination -->
+  <g filter="url(#shadow)">
+    <rect x="510" y="154" width="580" height="153" rx="26" class="panel"/>
+  </g>
+  <g transform="translate(548 181)" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 68 H100 C115 68 126 57 126 43 C126 29 115 18 101 18 C97 18 93 19 89 21 C82 8 69 1 55 4 C40 6 30 18 28 32 C15 31 5 41 5 52 C5 61 11 68 20 68 Z"/>
+    <path d="M43 45 H84 M63 33 V57" stroke="#93f3ff"/>
+  </g>
+  <text x="713" y="214" class="section">云端 / 全局协调</text>
+  <text x="713" y="250" class="body muted">策略训练 · 长周期编排 · 全局状态汇聚</text>
+  <text x="713" y="279" class="small accent">控制信息 / 模型更新</text>
+
+  <!-- Cloud to edge links -->
+  <path d="M622 307 C570 331 461 333 391 359" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="9 9" marker-end="url(#arrow-white)"/>
+  <path d="M978 307 C1030 331 1139 333 1209 359" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="9 9" marker-end="url(#arrow-white)"/>
+
+  <!-- RSU A -->
+  <g filter="url(#shadow)">
+    <rect x="80" y="370" width="600" height="256" rx="25" class="panel"/>
+  </g>
+  <circle cx="154" cy="433" r="44" fill="#ffffff" fill-opacity="0.14" stroke="#ffffff" stroke-opacity="0.5"/>
+  <g transform="translate(124 398)" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M29 20 L29 65 M12 65 H47 M20 65 L29 20 L38 65"/>
+    <circle cx="29" cy="16" r="4" fill="#93f3ff" stroke="none"/>
+    <path d="M14 17 C14 9 20 3 29 3 C38 3 44 9 44 17 M5 17 C5 4 15 -6 29 -6 C43 -6 53 4 53 17"/>
+  </g>
+  <text x="220" y="422" class="section">RSU A · 边缘节点</text>
+  <text x="220" y="454" class="body muted">区域 A：接入、卸载与任务执行</text>
+  <path d="M108 481 H652" stroke="#ffffff" stroke-opacity="0.34"/>
+  <rect x="110" y="502" width="252" height="89" rx="17" class="chip"/>
+  <text x="132" y="533" class="body" font-weight="700">DAG 工作流</text>
+  <text x="132" y="564" class="small muted">任务 T₁ → T₂ · 本地执行</text>
+  <rect x="386" y="502" width="264" height="89" rx="17" class="chip"/>
+  <text x="408" y="533" class="body" font-weight="700">Adapter 缓存</text>
+  <text x="408" y="564" class="small muted">模型组件复用 · 预取</text>
+
+  <!-- RSU B -->
+  <g filter="url(#shadow)">
+    <rect x="920" y="370" width="600" height="256" rx="25" class="panel"/>
+  </g>
+  <circle cx="994" cy="433" r="44" fill="#ffffff" fill-opacity="0.14" stroke="#ffffff" stroke-opacity="0.5"/>
+  <g transform="translate(964 398)" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M29 20 L29 65 M12 65 H47 M20 65 L29 20 L38 65"/>
+    <circle cx="29" cy="16" r="4" fill="#93f3ff" stroke="none"/>
+    <path d="M14 17 C14 9 20 3 29 3 C38 3 44 9 44 17 M5 17 C5 4 15 -6 29 -6 C43 -6 53 4 53 17"/>
+  </g>
+  <text x="1060" y="422" class="section">RSU B · 边缘节点</text>
+  <text x="1060" y="454" class="body muted">区域 B：接续执行与结果返回</text>
+  <path d="M948 481 H1492" stroke="#ffffff" stroke-opacity="0.34"/>
+  <rect x="950" y="502" width="252" height="89" rx="17" class="chip"/>
+  <text x="972" y="533" class="body" font-weight="700">状态接续</text>
+  <text x="972" y="564" class="small muted">任务 T₃ → T₄ · 继续执行</text>
+  <rect x="1226" y="502" width="264" height="89" rx="17" class="chip"/>
+  <text x="1248" y="533" class="body" font-weight="700">Adapter 缓存</text>
+  <text x="1248" y="564" class="small muted">命中 / 拉取模型组件</text>
+
+  <!-- Handoff -->
+  <path d="M691 474 H909" fill="none" stroke="#67e8f9" stroke-width="3.5" stroke-dasharray="10 7" marker-end="url(#arrow-cyan)"/>
+  <text x="800" y="444" class="body accent" text-anchor="middle" font-weight="700">跨 RSU handoff</text>
+  <text x="800" y="509" class="small muted" text-anchor="middle">DAG 状态 · 缓存信息</text>
+
+  <!-- V2I links -->
+  <path d="M297 704 C309 671 324 650 348 631" fill="none" stroke="#93f3ff" stroke-width="2.5" stroke-dasharray="8 7" marker-end="url(#arrow-cyan)"/>
+  <path d="M1285 704 C1273 671 1258 650 1234 631" fill="none" stroke="#93f3ff" stroke-width="2.5" stroke-dasharray="8 7" marker-end="url(#arrow-cyan)"/>
+  <text x="251" y="669" class="small accent">V2I</text>
+  <text x="1306" y="669" class="small accent">V2I</text>
+
+  <!-- Road and vehicles -->
+  <rect x="0" y="700" width="1600" height="141" fill="url(#road)"/>
+  <path d="M0 711 H1600 M0 829 H1600" stroke="#ffffff" stroke-opacity="0.5" stroke-width="2"/>
+  <path d="M34 772 H154 M240 772 H360 M446 772 H566 M652 772 H772 M858 772 H978 M1064 772 H1184 M1270 772 H1390 M1476 772 H1576" stroke="#ffffff" stroke-opacity="0.42" stroke-width="3" stroke-dasharray="38 18"/>
+
+  <!-- Vehicles -->
+  <g transform="translate(181 727)">
+    <path d="M10 40 H135 L124 19 C121 13 114 9 106 9 H46 C38 9 31 13 27 20 L10 40 Z" fill="#dffbff"/>
+    <rect x="4" y="37" width="139" height="28" rx="9" fill="#93f3ff"/>
+    <path d="M48 15 H102 C109 15 113 18 116 24 L121 35 H33 L39 23 C41 18 44 15 48 15 Z" fill="#2a58a8"/>
+    <circle cx="34" cy="65" r="12" fill="#071e5d" stroke="#ffffff" stroke-width="3"/>
+    <circle cx="113" cy="65" r="12" fill="#071e5d" stroke="#ffffff" stroke-width="3"/>
+  </g>
+  <g transform="translate(721 727)">
+    <path d="M10 40 H135 L124 19 C121 13 114 9 106 9 H46 C38 9 31 13 27 20 L10 40 Z" fill="#ffffff"/>
+    <rect x="4" y="37" width="139" height="28" rx="9" fill="#bed0ff"/>
+    <path d="M48 15 H102 C109 15 113 18 116 24 L121 35 H33 L39 23 C41 18 44 15 48 15 Z" fill="#2a58a8"/>
+    <circle cx="34" cy="65" r="12" fill="#071e5d" stroke="#ffffff" stroke-width="3"/>
+    <circle cx="113" cy="65" r="12" fill="#071e5d" stroke="#ffffff" stroke-width="3"/>
+  </g>
+  <g transform="translate(1251 727)">
+    <path d="M10 40 H135 L124 19 C121 13 114 9 106 9 H46 C38 9 31 13 27 20 L10 40 Z" fill="#dffbff"/>
+    <rect x="4" y="37" width="139" height="28" rx="9" fill="#93f3ff"/>
+    <path d="M48 15 H102 C109 15 113 18 116 24 L121 35 H33 L39 23 C41 18 44 15 48 15 Z" fill="#2a58a8"/>
+    <circle cx="34" cy="65" r="12" fill="#071e5d" stroke="#ffffff" stroke-width="3"/>
+    <circle cx="113" cy="65" r="12" fill="#071e5d" stroke="#ffffff" stroke-width="3"/>
+  </g>
+  <text x="255" y="824" class="small" text-anchor="middle">车辆 A · 发起任务</text>
+  <text x="795" y="824" class="small" text-anchor="middle">移动车辆 · 穿越覆盖区</text>
+  <text x="1325" y="824" class="small" text-anchor="middle">车辆 B · 接收服务</text>
+  <path d="M875 748 H1235" fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#arrow-white)"/>
+  <text x="1055" y="735" class="small" text-anchor="middle">V2V 直连</text>
+
+  <!-- Footer -->
+  <text x="80" y="876" class="tiny muted">示意图：实线表示车辆直连；虚线表示无线接入、控制链路或状态迁移。组件和流程可按具体系统调整。</text>
+  <text x="1519" y="876" class="tiny muted" text-anchor="end">PPO_MEC · 2026</text>
+</svg>
