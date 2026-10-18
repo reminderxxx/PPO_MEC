@@ -1,3 +1,7 @@
+## 2026-10-18：第四阶段配对产物约定
+
+仅新建`artifacts/joint_stream_learning/<UTC>_sa_group_clip_pair/`；continuation.sa_learning_stage4为精确live指针。qualification/含两case及960帧上限，contract.json绑定清洁source/原protocol/assets/完整日程/初始化/门禁副本；arms/sa_legacy_clip与arms/sa_group_clip分别独占输出，training/dev、54checkpoint、真实梯度分组/Adamdelta、RNG隔离及所有评估events/receipts gzip保留；audit/只读消费并分开完整性与效果门禁。授权384train/2592eval不等于已完成，实际执行计数与SHA以机器receipt为准。全部私有产物ignored不提交，旧run不覆写，formal/holdout封存、canonical不变。
+
 ## 2026-10-18：SA第三阶段
 
 - `artifacts/joint_stream_learning/sa_learning_stage3_20261018`：总合同024c8268294a1e7fdc45032ae2116a9e8646d91ce6d204bd1efaea90db7eee6b；中后期执行合同ad21337cc21866c9baa98305012cf3e458995252a93a8d35d6a7477a992852c7。源码修改前5×480=2400评估帧，127固定frame/1948calls/974决策，summary/events/receipts与已审查原件exact。

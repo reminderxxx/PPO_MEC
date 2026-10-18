@@ -1,3 +1,19 @@
+## 2026-10-18 第四阶段一次SA配对执行
+
+用户已授权本轮，完整边界见[第四阶段合同](sa_group_clip_confirmation_contract_20261018.md)。源码/测试/文档先验证并scoped commit，真实尝试push；如果GitHub443不可达，记录待同步及实际错误，仍可用清洁本地commit冻结已授权研究。原run及旧确认1/1保持历史。
+
+```bash
+python scripts/launch_sa_group_clip_pair.py qualification-plan --output_root artifacts/joint_stream_learning/<新UTC>_sa_group_clip_pair --additional_source docs/project/sa_group_clip_confirmation_contract_20261018.md
+python scripts/launch_sa_group_clip_pair.py qualify --output_root artifacts/joint_stream_learning/<新UTC>_sa_group_clip_pair
+python scripts/launch_sa_group_clip_pair.py prepare --output_root artifacts/joint_stream_learning/<新UTC>_sa_group_clip_pair
+python scripts/launch_sa_group_clip_pair.py run --output_root artifacts/joint_stream_learning/<新UTC>_sa_group_clip_pair
+python scripts/launch_sa_group_clip_pair.py status --output_root artifacts/joint_stream_learning/<新UTC>_sa_group_clip_pair
+```
+
+qualification-plan在任何环境前冻结2case/960帧，仅seed7原64/dev000在legacy及同权重候选各1次；qualify失败不重跑。prepare验证6初始化、同日程/GRU/dev48并冻结54checkpoint/384train/2592eval及完整精度门禁。run独占且不可恢复，两个固定arm各1thread，任臂失败停止对臂；两臂完整后自动只读auditor，完整性通过与效果门禁分开，负效果不触发重训。审计结果/audit/status.json与summary.json、父result.json是回收入口，20分钟只看status和必要arm progress，不读逐回合reward。
+
+测试`python -m pytest -p no:cacheprovider tests/test_sa_group_clip_pair.py -q`为纯tensor/模拟子进程，硬限128软件Adam、禁止真实环境；不反复全套执行耗尽软件预算。已经启动的科学root、资格root不能再次执行；不提供覆盖/解锁/自动重试入口。训练运行时源码/contract不再编辑，续接只改ignored continuation及进度。完整回收后更新审查与真实9点/训练图、第五阶段任务点、scoped commit/push并暂停提醒；第五阶段未自动授权。
+
 ## 2026-10-18 SA候选软件验收与旧源码边界
 
 `StreamSAGHMAPPOAgent`默认separate_policy_value_clip=False，候选通过registry的joint_stream_control_v2加True显式构造；checkpoint候选flag/tag必须配对。旧原训练launcher不自动开启候选。

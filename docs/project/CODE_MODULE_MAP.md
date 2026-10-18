@@ -1,3 +1,7 @@
+## 2026-10-18：第四阶段编排与独立消费
+
+launch_sa_group_clip_pair负责冻结与一次两臂协调，调用train_sa_group_clip_pair；后者复用train_joint_stream_control.make_env/stream_episode和registry，不改算法。GradientObserver仅临时包裹原clip/forward/Adam，记录detach范数和真实delta，必须与未包装更新逐字段精确一致且不插入None-grad optimizerstate。audit_sa_group_clip_pair只读protocol/checkpoint/raw/收据/梯度输出完整性与预声明效果，算法不反向依赖审计。生产/消费以同一contract.json绑定，评估独立副本并恢复三类RNG/检查训练状态。
+
 ## 2026-10-18 SA独立梯度组
 
 StreamSAGHMAPPOAgent增加显式separate_policy_value_clip开关，False直接父类；True仅重写梯度裁剪、分组numeric日志与checkpoint flag/tag校验。共享PPO核心、其他baseline、环境/预测/状态共享/物理费用不变，仍同一个main Adam和原surrogate Adam。qualify_sa_separate_gradient_clip只读原Git/48cp和3缓存tensor pack，私有副本一步资格不提供科学训练；diagnose_sa_midlate只在原source上做固定参考及同状态评分。算法不反向依赖诊断脚本。

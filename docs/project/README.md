@@ -1,3 +1,7 @@
+## 2026-10-18 第四阶段入口
+
+[SA配对学习与稳定性合同](sa_group_clip_confirmation_contract_20261018.md)规定用户授权的一次384train/2592eval及2资格case，独立生产/审计和固定64/优势门禁。实际source、进度和启动receipt从continuation.sa_learning_stage4读取；结果后提供完整正负审查与第五阶段任务点。此时不宣称提升或收敛。
+
 ## 2026-10-18 SA第三阶段已完成
 
 [sa_learning_stage3_review_20261018.md](sa_learning_stage3_review_20261018.md)：SA独立裁剪候选、软件兼容/隔离验收、五案例中后期反证与第四阶段任务。[阶段合同](sa_learning_stage3_contract_20261018.md)冻结参考2400帧和软件预算；[下一阶段配对学习/稳定性草案](sa_group_clip_confirmation_draft_20261018.md)尚未执行。没有新增科学训练或收敛结论，DQN修复暂缓。

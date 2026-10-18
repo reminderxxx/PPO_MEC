@@ -1,3 +1,9 @@
+## 2026-10-18：第四阶段SA配对学习流程
+
+用户已授权第四阶段一次SA配对学习：legacy与policy/value分组裁剪候选，共2×3seed×64=384训练会话、最多184320训练帧；0/8/…/64各完整48开发条件，共2592评估/最多1244160帧，另2资格会话/960帧。固定64、原整体及seed7/27非回退门禁和同轮对照门禁保持，不因曲线延训或挑峰。
+
+新入口为qualification/prepare/协调启动、单臂训练及独立只读审计；精确source、机器合同、资格/运行状态由`artifacts/joint_stream_learning/continuation.json`的`sa_learning_stage4`记录。每8会话完整同面板曲线用于有限预算学习及尾部稳定检验；现在没有候选提升或收敛结论。原确认轮1/1保持历史已用完，原checkpoint不覆写，formal/holdout封存、canonical不变，DQN暂缓修复。见[已授权第四阶段合同](docs/project/sa_group_clip_confirmation_contract_20261018.md)。下文“草案未启动”为历史阶段状态。
+
 ## 2026-10-18：第三阶段SA候选已实现并验收
 
 SA候选仅显式opt-in策略/value独立clip各0.5，同Adam/loss/reward；默认父类路径与旧模型保持。 23专项+46诊断回归、9状态软件资格通过；95次私有软件Adam步骤，新增科学训练0。5个中后期原模型参考2400帧全事件/收据一致；37次已付state换站均跟随更优公共prior，不能直接压制learned残差。下一阶段以两臂同预算、0/8/…64完整48条件曲线验证学习与尾部稳定，当前仅草案。原最终64/seed7和27门禁保留，DQN暂缓修复。[本阶段报告与第四阶段任务](docs/project/sa_learning_stage3_review_20261018.md)。

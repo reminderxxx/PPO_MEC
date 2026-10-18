@@ -1,3 +1,11 @@
+## 2026-10-18：第四阶段SA配对入口
+
+- `scripts/launch_sa_group_clip_pair.py`：qualification-plan/qualify/prepare/run/status；一次独占启动、两worker和失败停止。
+- `scripts/train_sa_group_clip_pair.py`：单臂固定64/9快照、全48评估、真实训练梯度观察和RNG隔离。
+- `scripts/audit_sa_group_clip_pair.py`：不创建环境/不优化，读取原始行/54checkpoint/收据/梯度，固定末点与优势/稳定性审计。
+- `tests/test_sa_group_clip_pair.py`：纯tensor与模拟协调资格，无额外真实环境。
+- `artifacts/joint_stream_learning/<UTC>_sa_group_clip_pair/`：qualification、contract、arms、audit、launcher_result；真实路径由continuation.sa_learning_stage4记录，旧目录永不覆写。
+
 ## 2026-10-18 SA第三阶段入口
 
 `src/agents/sa_ghmappo_agent.py`直接承载StreamSA opt-in梯度分组，算法不另建package。`scripts/diagnose_sa_midlate.py`为固定五案例/原source一次参考采集；`scripts/qualify_sa_separate_gradient_clip.py`为只消费已有tensor的私有更新资格；`tests/test_sa_separate_gradient_clip.py`覆盖默认与候选/旧checkpoint。输出`artifacts/joint_stream_learning/sa_learning_stage3_20261018`，continuation.sa_learning_stage3指向当前记录；midlate_reference、software_qualification及独立分析均不入Git。

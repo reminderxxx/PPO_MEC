@@ -1,3 +1,9 @@
+## 2026-10-18：第四阶段流程部署与授权
+
+用户已授权第四阶段一次SA配对学习：legacy与policy/value分组裁剪候选，共2×3seed×64=384训练会话、最多184320训练帧；0/8/…/64各完整48开发条件，共2592评估/最多1244160帧，另2资格会话/960帧。固定64、原整体及seed7/27非回退门禁和同轮对照门禁保持，不因曲线延训或挑峰。 新梯度观察器只记录实际训练backward/Adam，完整评估保存全部事件与逐帧收据，隔离Python/NumPy/Torch RNG和训练状态。启动按软件资格→清洁commit及真实push尝试→两固定资格case→冻结→两臂一次启动执行。实际资格与启动结果不预写为成功，以continuation.sa_learning_stage4及launcher_result为准；性能/稳定性均待完整固定64结果与审计。
+
+[第四阶段完整合同](sa_group_clip_confirmation_contract_20261018.md)。训练结束自动独立审查、固定面板真实9点和原始64会话图、全部配对负例/成本/优势门禁及尾部判据；阶段结束交付第五阶段任务点。formal/holdout封存、canonical不变，无下一轮自动授权。
+
 ## 2026-10-18：SA第三阶段候选与补证完成
 
 按用户优先级暂缓DQN，保留缺陷披露，实施唯一SA opt-in separate_policy_value_clip=True（policy/value各0.5、原surrogate0.5，同Adam）。默认与父类精确一致，checkpoint flag/tag绑定且旧缺字段False，loss日志numeric。23专项、46诊断回归、48旧checkpoint兼容及9状态软件资格通过；95次私有软件Adam，科学训练0。
