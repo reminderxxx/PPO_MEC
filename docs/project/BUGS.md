@@ -1,3 +1,9 @@
+## 2026-10-19：分组裁剪科学候选未通过，保留原版
+
+CLOSED/negative candidate：第四阶段完整配对证实分组裁剪固定64三seed均退化，历史/同轮优势门禁失败，seed17自身0恢复false；两臂尾稳均未全部过。软件完整性通过，不能把负效果称训练故障或重跑理由。opt-in实现保留但不晋级，默认/原模型不变。
+
+OPEN/first-order：少交付节点和更多等待构成主要奖励差；换目标、state队列与同站重准入增加为描述性链，不等于可避免损失。实际post-gradient变大而每步Adam policyΔ平均更小，不能归因“更猛更新”；effective head自由度/物理同效动作与信用、prior/commitment/剩余交付评分仍待同状态证据。visit是选定目标记录段，非物理到站；admission→eviction含下载/预约与右删失，非ready驻留/利用率。正例/反例及DQN暂缓边界继续保留。[审查](sa_group_clip_results_review_20261019.md)、[第五阶段任务](sa_learning_stage5_tasks_20261019.md)；无自动实施/训练授权。
+
 ## 2026-10-18：第四阶段待验证风险
 
 OPEN：SA分组裁剪改变共同范数上界，软件policy/value隔离不证明reward改善或Adam有效步长增加；seed17自身0点恢复与机制描述分开，不能自动称退化已解决。两臂固定64和全体/seed7/27保护门禁、48/56/64每seed稳定性事前冻结，失败保留原模型。密集评估必须不扰动训练RNG/Adam/控制器，legacy32/64须精确重现历史tensor，否则停止两臂独立定位、不重跑。当前固定开发面板已消费、两相邻时间会话、合成费用与DQN缺陷不因本轮而消除。[合同](sa_group_clip_confirmation_contract_20261018.md)。

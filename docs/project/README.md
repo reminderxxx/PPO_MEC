@@ -1,3 +1,7 @@
+## 2026-10-19 第四阶段完整负结果
+
+[SA分组裁剪完整审查](sa_group_clip_results_review_20261019.md)：384训练/2592评估与完整性通过，三seed固定64均退化、保护/尾稳失败，原版保留。[第五阶段任务点](sa_learning_stage5_tasks_20261019.md)仅草案，未实施/未新训。
+
 ## 2026-10-18 第四阶段入口
 
 [SA配对学习与稳定性合同](sa_group_clip_confirmation_contract_20261018.md)规定用户授权的一次384train/2592eval及2资格case，独立生产/审计和固定64/优势门禁。实际source、进度和启动receipt从continuation.sa_learning_stage4读取；结果后提供完整正负审查与第五阶段任务点。此时不宣称提升或收敛。

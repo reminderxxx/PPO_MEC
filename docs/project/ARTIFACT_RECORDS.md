@@ -1,3 +1,12 @@
+## 2026-10-19：SA分组裁剪第四阶段完整开发证据
+
+- run：`artifacts/joint_stream_learning/20261018T082032Z_sa_group_clip_pair`；科学source `8cacb6de54c1cbde1da6f8089d9060810707958a`，合同SHA `79c42776c164bc5e3d14a53e00995c3af5486032fd4bfd2f8c376f95373b9232`。
+- `result.json` complete与`audit/status.json` pass；完整性true、scientific_gate_passed=false、bounded_tail_stability=false；未替换canonical。
+- 384train/162667帧、2592dev/1021120帧；资格2/378与软件88Adam单列。54cp/54RNG、6初始化、123原source/130新source、历史288科学行、2592ledger及rawgrid独立一致。
+- 固定64原版210.399714505/88.888889%/96.9375KiB，分组196.387336433/84.809028%/135.256944444KiB；23胜121负。全部保护失败、seed17恢复false，原版保留。
+- 私有回收 `recovery_20261019/`：independent_check/identity、gradient_forensics、visit_forensics及方法审查、384/2592冻结快照、全分层/正负例、5图PNG/SVG/数值/脚本与validation；真实数据/checkpoint/私有artifact不纳入Git。
+- [长期独立审查](sa_group_clip_results_review_20261019.md)、[第五阶段任务点](sa_learning_stage5_tasks_20261019.md)。正式论文E0/Unverifiable；仅任务交付，未授权第五阶段实现/新训。
+
 ## 2026-10-18：第四阶段配对产物约定
 
 仅新建`artifacts/joint_stream_learning/<UTC>_sa_group_clip_pair/`；continuation.sa_learning_stage4为精确live指针。qualification/含两case及960帧上限，contract.json绑定清洁source/原protocol/assets/完整日程/初始化/门禁副本；arms/sa_legacy_clip与arms/sa_group_clip分别独占输出，training/dev、54checkpoint、真实梯度分组/Adamdelta、RNG隔离及所有评估events/receipts gzip保留；audit/只读消费并分开完整性与效果门禁。授权384train/2592eval不等于已完成，实际执行计数与SHA以机器receipt为准。全部私有产物ignored不提交，旧run不覆写，formal/holdout封存、canonical不变。
