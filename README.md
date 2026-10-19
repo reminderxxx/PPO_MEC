@@ -1,3 +1,7 @@
+## 2026-10-20：第五阶段同状态诊断完整回收
+
+144冻结参考/63944帧与原summary/events/receipts精确一致；零训练/反向/Adam。9271采样记录的priority四编号可按固定reference co-controls缩为1/2/3/4组（1251/7838/161/21），但离线类不能直接作在线mask；172采样付费后离站中163由prior支持，含快速交付正例，未识别唯一退化修复。原版及优势门禁保留。[完整报告与三图](docs/project/sa_same_state_results_review_20261020.md)、[下一5C任务点](docs/project/sa_learning_stage5c_tasks_20261020.md)；5C实现/新训练未授权。
+
 ## 2026-10-20：第五阶段先诊断、零新训练
 
 用户授权先有效动作/信用分配，再做有界同状态核对。5A真实日志独立审查通过：未发现MC重复归一化或FIFO重置错误；类别自由不等于物理有效，原stochastic逐动作信用仍缺。5B新入口仅参考重放与条件评分，144会话/最多69120帧、零反向/Adam/新训练；实际启动和进度由continuation.sa_learning_stage5记录。原版SA和已有优势门禁保留，5C改动/新学习未授权。见[独立诊断](docs/project/sa_effective_credit_review_20261020.md)、[冻结合同](docs/project/sa_effective_credit_contract_20261020.md)。

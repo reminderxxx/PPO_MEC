@@ -1,3 +1,11 @@
+## 2026-10-20：同状态诊断已证结构机会与因果缺口
+
+VERIFIED/alias opportunity：9271固定分位记录的reference prepare四priority编号存在同全队稳定顺序充分类，19590/37084条件编号可收缩；这不是原训练梯度浪费。完整co-controls可能在owner采样后才生成，故在线mask/class logprob/联合ratio因果可用性OPEN。其他prepare60候选未识别，不同桶不证明物理不同。
+
+UNIDENTIFIED/regression cause：172采样paid-before-compute离站163由prior支持，仅9严格残差覆盖（含正例和重复0）。warm-old→cold-new也有实际peer eviction/保护集合交互，不能据mask称旧站必胜；统一锁站/罚sunk cost/禁残差均无依据。greedy事实MC校准不是原stochastic信用，17误差小于7/27的反证保留。原版及门禁不变。[完整独立审查](sa_same_state_results_review_20261020.md)。
+
+RESOLVED/offline consumer：旧资格witness字段与float32公共偏移/subnormal逆log边界已在独立消费端修复，失败派生目录/反例保留；未放宽sourceSHA/exactreference/效果门禁，原科学run无failure/修改/重跑。5C仍仅任务点。
+
 ## 2026-10-20：有效动作与信用诊断边界
 
 VERIFIED/5A：MC/10/8及2976session FIFO/active边界未发现算术/重置错误；forced actor/entropy/KL屏蔽成立，value/Q仍回归forced。prepare_priority类别多选100%与约85%active分母占比不能当物理机会或梯度贡献；单owner四priority同效仅约0.5%训练行，多owner有效率UNVERIFIED。

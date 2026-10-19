@@ -1,3 +1,7 @@
+## 2026-10-20：第五阶段独立信用消费者
+
+`audit_sa_stage5_credit`延迟仅为可信tensor反序列化导入torch，读取完整B合同/结果/输出SHA，独立算categorical数值、reference-only事实MC偏差和保守priority order类。该consumer不依赖agent/env，float32逆log数值界只用于恒等式，不修改科学raw或效果门禁。`plot_sa_stage5_diagnostics`消费已归约表，经ReportLab绘图；算法/冻结参考runner不反向依赖它们。first/second head0和三head重复globalV不作新独立样本。
+
 ## 2026-10-20：第五阶段同状态诊断消费端
 
 `diagnose_sa_stage5_same_state`只消费冻结阶段四protocol/checkpoint/dev/审计ledger与已有CaptureTap/FixedFrameCapture。原make_env/stream_episode只为参考轨迹服务，其他模型对捕获同pass/batch/reference prefix条件评分。passive hooks观察真实Q/surrogate/V/probability，不训练；物理state账是只读因果ledger，非可恢复env。预算先扣、源/轨迹精确对账、RNG/学习状态隔离及独占claim由诊断入口负责；算法/registry/环境不反向依赖诊断，均未修改。

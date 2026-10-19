@@ -1,3 +1,9 @@
+## 2026-10-20：第五阶段完整回收
+
+`artifacts/joint_stream_learning/sa_effective_credit_stage5_20261020/same_state`唯一1/1：144/63944参考、18542capture、9271second、129794score；训练/backward/Adam0。源码27f6228真实push，原算法8cacb6d不变。完整原summary和479190event/63944receipt canonical均exact；18cp/6初始化/864输出SHA与RNG/学习状态通过。
+
+`recovery_20261020/`保存完整性/语义/执行链/信用独立报告、259588head明细、compact/entropy、两个consumer-only失败部分、root107检查（含75图数字）、安装168项/40软件测试和三幅ReportLab SVG/PNG。资格成本16/112独立，未再模型评分/环境重放。正式E0/Unverifiable；原版保留。[完整报告](sa_same_state_results_review_20261020.md)、[5C任务点](sa_learning_stage5c_tasks_20261020.md)。5C实现/新训练未执行，完成交付后暂停原提醒。
+
 ## 2026-10-20：SA第五阶段5A只读诊断
 
 诊断根 `artifacts/joint_stream_learning/sa_effective_credit_stage5_20261020`；`existing_evidence/`保存动作与信用独立JSON/helper，`a_review.json`绑定源SHA及158项根检查。130source、10日志SHA、96update、8572forward、2976原会话边界通过；5A新增环境/评分/梯度/Adam/训练0。正式E0/Unverifiable、原stochastic信用和多owner有效率仍UNVERIFIED。

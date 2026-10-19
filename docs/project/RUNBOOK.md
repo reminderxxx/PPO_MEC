@@ -1,3 +1,11 @@
+## 2026-10-20：第五阶段完成后离线审查
+
+完整结果后可用现有venv运行：`python scripts/audit_sa_stage5_credit.py summarize --root <same_state> --output_root <fresh_derived_root> --trusted_tensor_capsules`。它拒绝partial/failure或旧输出目录，仅反序列化SHA绑定可信tensor并消费保存评分；没有模型forward或环境。`qualification --scores <existing_qualification_scores.jsonl.gz> --output_root <fresh_root>`也仅算已有JSON。
+
+三图用现有bundled Python/ReportLab：`python scripts/plot_sa_stage5_diagnostics.py --compact <audited_compact.json> --execution <execution_forensics.json> --output_root <fresh_plot_root>`；PNG由现有node/sharp渲染，不下载依赖。归约helper、完整命令/原helperSHA与metadata-only转换均保留私有recovery，不上传数据。
+
+必须保留MC/80与成本slot/10单位、同pass/reference prefix、reference-only事实标签、其他prepare未识别、离线co-controls可见性、两个0身份与相关时间样本边界。[完整报告](sa_same_state_results_review_20261020.md)后交付5C任务点；没有进一步授权，不启动实现/软件Adam/新学习。
+
 ## 2026-10-20：第五阶段诊断运行
 
 先读[合同](sa_effective_credit_contract_20261020.md)和[独立5A报告](sa_effective_credit_review_20261020.md)。新入口 `scripts/diagnose_sa_stage5_same_state.py`按contract→qualify→prepare→run执行；合同内列固定命令。必须清洁已push源码、阶段四SHA精确、软件资格pass及5A source-integrity complete receipt；同一输出root仅1/1，不resume/retry。status只读，正常20分钟查一次，无可行动变化安静结束。

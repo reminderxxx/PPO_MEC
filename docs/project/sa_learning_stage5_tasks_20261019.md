@@ -1,7 +1,7 @@
 # 第五阶段任务点：SA有效动作、连续交付与信用诊断
 
 - authored_at: 2026-10-19T23:00:35.724132+08:00
-- status: **2026-10-20用户已授权5A现有证据诊断及5B零训练同状态核对；5C算法改动、软件Adam和5D新训练仍未授权。5A已完成，5B按新合同冻结，实际运行见continuation。**
+- status: **2026-10-20用户已授权5A现有证据诊断及5B零训练同状态核对；5C算法改动、软件Adam和5D新训练仍未授权。5A/5B均已完整回收，见[完整第五阶段审查](sa_same_state_results_review_20261020.md)；后续[5C任务点](sa_learning_stage5c_tasks_20261020.md)未授权实施。**
 - current_contract: [sa_effective_credit_contract_20261020.md](sa_effective_credit_contract_20261020.md)，[先行5A报告](sa_effective_credit_review_20261020.md)。
 - evidence: [第四阶段独立审查](sa_group_clip_results_review_20261019.md)，run `20261018T082032Z_sa_group_clip_pair`。
 - baseline: 保留原版SA固定64；候选分组裁剪不晋级；原算法source35975cb/阶段四source8cacb6d及所有产物封存。

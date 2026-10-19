@@ -1,3 +1,9 @@
+## 2026-10-20：第五阶段5A/5B完整交付
+
+B唯一1/1完成144参考/63944帧，18542捕获/9271二遍/129794条件评分；2382094完整性检查、18cp/6初始化、864输出SHA及全部479190event/63944receipt canonical原ledger通过。资格16/112与968恒等式单列，新增训练/反向/Adam0，回收也无forward/env。root107交叉（含三图75数字）、安装168项匹配检查与40项纯软件测试通过。
+
+采样execution2920/9271自由、cache21、priority9271；reference prepare四编号按固定co-controls同order分1/2/3/4组=1251/7838/161/21，条件收缩52.8260%，非原训练浪费。离线类有未来owner可见性问题，不能直接在线mask。172采到paid离站163由prior支持、仅9严格残差覆盖且含正例/重复0身份；校准误差更小也不保证17改善。独立报告先行：[完整结果/边界/三图](sa_same_state_results_review_20261020.md)。原版固定64、全部优势门禁与正式封存保留，分组不晋级。下一步仅[5C因果有效信用合同任务点](sa_learning_stage5c_tasks_20261020.md)，未授权实现/软件Adam/新学习。
+
 ## 2026-10-20：第五阶段5A完成，5B按授权冻结
 
 按用户最新指令先只读诊断：130source/10日志SHA、96update/8572forward/25716head、384train+2592dev FIFO/decision行核对，158根交叉检查通过；环境/评分/梯度/Adam/新训练0。execution类别多选约16.2%、cache约1.1–1.5%、prepare_priority100%；priority占约85%active分母不是梯度/物理有效率。单owner priority同效可证但仅约0.5%训练行。MC/10/8无重复归一化，forced actor屏蔽成立；跨自身完成的团队tail是设计范围，非已证泄漏或错误。

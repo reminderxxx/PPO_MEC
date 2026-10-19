@@ -1,3 +1,10 @@
+## 2026-10-20：第五阶段离线消费与作图
+
+- `scripts/audit_sa_stage5_credit.py`：qualification/summarize，只读取完整已保存分位tensor/JSON；不构造agent/env、不forward/优化。
+- `tests/test_sa_stage5_credit_audit.py`：旧witness、稀疏候选、MC单位、reference-only、forced、类证明与float32纯软件fixtures。
+- `scripts/plot_sa_stage5_diagnostics.py`：消费已核compact/execution表，用现有ReportLab生成静态SVG和75点JSON；PNG由本地sharp渲染。
+- `docs/project/sa_same_state_results_review_20261020.md`及`sa_learning_stage5c_tasks_20261020.md`：已完成报告与未授权下一任务；私有回收目录不入Git。
+
 ## 2026-10-20：第五阶段诊断入口
 
 - `scripts/diagnose_sa_stage5_same_state.py`：contract/qualify/prepare/run/status，固定144参考、九帧分位、七条件评分、无学习守卫。
