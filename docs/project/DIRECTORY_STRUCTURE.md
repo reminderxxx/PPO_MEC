@@ -1,3 +1,10 @@
+## 2026-10-20：第五阶段诊断入口
+
+- `scripts/diagnose_sa_stage5_same_state.py`：contract/qualify/prepare/run/status，固定144参考、九帧分位、七条件评分、无学习守卫。
+- `tests/test_sa_stage5_same_state.py`：纯软件/fake状态资格，不运行真实环境或模型优化。
+- `artifacts/joint_stream_learning/sa_effective_credit_stage5_20261020/`：authorization、existing_evidence、a_review和same_state；私有产物不入Git，live指针见continuation.sa_learning_stage5。
+- `docs/project/sa_effective_credit_review_20261020.md`及contract：先审查、后有界核对；不覆写历史。
+
 ## 2026-10-18：第四阶段SA配对入口
 
 - `scripts/launch_sa_group_clip_pair.py`：qualification-plan/qualify/prepare/run/status；一次独占启动、两worker和失败停止。

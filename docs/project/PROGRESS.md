@@ -1,3 +1,9 @@
+## 2026-10-20：第五阶段5A完成，5B按授权冻结
+
+按用户最新指令先只读诊断：130source/10日志SHA、96update/8572forward/25716head、384train+2592dev FIFO/decision行核对，158根交叉检查通过；环境/评分/梯度/Adam/新训练0。execution类别多选约16.2%、cache约1.1–1.5%、prepare_priority100%；priority占约85%active分母不是梯度/物理有效率。单owner priority同效可证但仅约0.5%训练行。MC/10/8无重复归一化，forced actor屏蔽成立；跨自身完成的团队tail是设计范围，非已证泄漏或错误。
+
+原stochastic逐行T/B/advantage和候选mask缺失，退化因果仍未识别；保留原版7/27正例及17负例。已授权5B按144参考/最多69120帧、16缓存资格/112forward、九固定原steps分位、6模型+prior-only同输入/pass评分冻结；无新训练/优化/算法修改。实际source/启动/进度由continuation.sa_learning_stage5记录，不预报完成。[独立报告](sa_effective_credit_review_20261020.md)、[合同](sa_effective_credit_contract_20261020.md)。5C/新学习未授权，旧结果与formal/holdout/canonical保留。
+
 ## 2026-10-19：第四阶段SA配对学习完整回收
 
 两臂×3seed×64共384训练/162667实际帧、2592完整dev/1021120帧（资格2/378单列）结束；完整性审计及独立source/54cp/54RNG/6初始化/历史288行/费用账核验通过。分组固定64总体reward196.387336 vs原版210.399715，完成率84.809028% vs88.888889%，模型135.256944 vs96.937500KiB/会话，每交付9.967758 vs6.815918KiB；23胜121负。seed7/17/27奖励差−9.973771/−5.880353/−26.183010，17未恢复自身0点，12历史/16同轮门禁均未过，两臂8个尾稳组均未全部通过。负效果不是训练/完整性失败；保留原版和canonical，额度1/1用完，不重跑/延训。

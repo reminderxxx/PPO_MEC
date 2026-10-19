@@ -1,3 +1,9 @@
+## 2026-10-20：有效动作与信用诊断边界
+
+VERIFIED/5A：MC/10/8及2976session FIFO/active边界未发现算术/重置错误；forced actor/entropy/KL屏蔽成立，value/Q仍回归forced。prepare_priority类别多选100%与约85%active分母占比不能当物理机会或梯度贡献；单owner四priority同效仅约0.5%训练行，多owner有效率UNVERIFIED。
+
+OPEN：原训练逐behavior输入/action/mask/T/B/adv及每head梯度未存，无法恢复真实信用校准。跨请求团队MC可含后续请求贡献，不能自动改为逐请求账；Q/辅助detach也不支持value直接污染actor encoder的说法。分组裁剪退化因果仍未识别；5B仅授权冻结参考/同状态评分，不能补称原训练梯度或长期反事实。原版SA及完整精度优势门禁保留，5C/新训练未授权。[报告](sa_effective_credit_review_20261020.md)。
+
 ## 2026-10-19：分组裁剪科学候选未通过，保留原版
 
 CLOSED/negative candidate：第四阶段完整配对证实分组裁剪固定64三seed均退化，历史/同轮优势门禁失败，seed17自身0恢复false；两臂尾稳均未全部过。软件完整性通过，不能把负效果称训练故障或重跑理由。opt-in实现保留但不晋级，默认/原模型不变。

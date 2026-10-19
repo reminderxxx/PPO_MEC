@@ -1,3 +1,9 @@
+## 2026-10-20：SA第五阶段5A只读诊断
+
+诊断根 `artifacts/joint_stream_learning/sa_effective_credit_stage5_20261020`；`existing_evidence/`保存动作与信用独立JSON/helper，`a_review.json`绑定源SHA及158项根检查。130source、10日志SHA、96update、8572forward、2976原会话边界通过；5A新增环境/评分/梯度/Adam/训练0。正式E0/Unverifiable、原stochastic信用和多owner有效率仍UNVERIFIED。
+
+同根`same_state/`由新入口独占创建：计划144参考/最多69120帧、16缓存资格/112forward、固定九帧分位及6模型+prior-only条件评分。实际plan/qualification/contract/run_started/progress/result/failure与Git同步receipt由continuation.sa_learning_stage5指向；此记录不预称已运行或完成。原run/checkpoint/formal封存。[独立报告](sa_effective_credit_review_20261020.md)、[合同](sa_effective_credit_contract_20261020.md)。
+
 ## 2026-10-19：SA分组裁剪第四阶段完整开发证据
 
 - run：`artifacts/joint_stream_learning/20261018T082032Z_sa_group_clip_pair`；科学source `8cacb6de54c1cbde1da6f8089d9060810707958a`，合同SHA `79c42776c164bc5e3d14a53e00995c3af5486032fd4bfd2f8c376f95373b9232`。

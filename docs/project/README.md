@@ -1,3 +1,7 @@
+## 2026-10-20 第五阶段有效动作与信用
+
+[独立5A诊断](sa_effective_credit_review_20261020.md)：真实覆盖、窄同效类、团队MC单位和不可识别边界；[5A/5B合同](sa_effective_credit_contract_20261020.md)：已授权先诊断再同状态，144参考/最多69120帧、零训练/反向/Adam，原版优势保留。实际状态见continuation.sa_learning_stage5；5C算法改动未授权。
+
 ## 2026-10-19 第四阶段完整负结果
 
 [SA分组裁剪完整审查](sa_group_clip_results_review_20261019.md)：384训练/2592评估与完整性通过，三seed固定64均退化、保护/尾稳失败，原版保留。[第五阶段任务点](sa_learning_stage5_tasks_20261019.md)仅草案，未实施/未新训。

@@ -1,7 +1,8 @@
 # 第五阶段任务点：SA有效动作、连续交付与信用诊断
 
 - authored_at: 2026-10-19T23:00:35.724132+08:00
-- status: **任务草案；用户未授权第五阶段实现、评估、软件Adam或新训练。以下预算均为建议上限，不是启动许可。**
+- status: **2026-10-20用户已授权5A现有证据诊断及5B零训练同状态核对；5C算法改动、软件Adam和5D新训练仍未授权。5A已完成，5B按新合同冻结，实际运行见continuation。**
+- current_contract: [sa_effective_credit_contract_20261020.md](sa_effective_credit_contract_20261020.md)，[先行5A报告](sa_effective_credit_review_20261020.md)。
 - evidence: [第四阶段独立审查](sa_group_clip_results_review_20261019.md)，run `20261018T082032Z_sa_group_clip_pair`。
 - baseline: 保留原版SA固定64；候选分组裁剪不晋级；原算法source35975cb/阶段四source8cacb6d及所有产物封存。
 
@@ -15,9 +16,9 @@
 
 交付：head机会—动作—资源—交付字段映射；每seed正负例清单；哪些字段缺失、哪些问题可离线回答。缺决策前输入的地方标UNVERIFIED，不用事后event伪造logits。
 
-## 5B. 单独批准后做有界、零训练同状态见证
+## 5B. 已授权有界、零训练同状态见证
 
-建议固定见证条件：dev046/dev038/dev022/dev018（严重负例与旧seed17关注项），dev045/dev043/dev021（各seed正向反证），dev000（短任务对照）。三seed×两臂×0/32/64×8条件=144评估会话，上限69120物理帧；同checkpoint旧参考结果逐字段/事件receipt一致，不增加训练/Adam或holdout。**仅诊断用途，不能用该后验富集子集重估主效果。** 正式启动前须另行授权、冻结source/命令/硬上限与无重跑策略；若预算不批准，此任务保持未执行。
+固定见证条件：dev046/dev038/dev022/dev018（严重负例与旧seed17关注项），dev045/dev043/dev021（各seed正向反证），dev000（短任务对照）。三seed×两臂×0/32/64×8条件=144评估会话，上限69120物理帧；同checkpoint旧参考结果逐字段/事件receipt一致，不增加训练/Adam或holdout。**仅诊断用途，不能用该后验富集子集重估主效果。** 用户本轮已授权；正式启动前冻结source/命令/硬上限与无重跑策略，按新合同执行，禁止新训练。
 
 在环境采取动作前保存完整因果可见输入、mask、prior/logits/残差、commitment剩余时长、执行站可达性、statecopy版本/未付剩余费用、family准入/驻留、link预约/队列、节点剩余工作及output pending；分别标记 first/second pass；仅在同一 pass 的完全相同输入上比较不同臂和 checkpoint 的评分，输出允许不同。重复同一 checkpoint/输入的评分须可复核一致，评分不执行 env.step、不改 RNG/权重/控制器状态。比较同状态原版/候选/精确0评分，先观察排序翻转发生在哪个有效自由动作。模型共享时不把全局下载费强分到单请求；已付费用是sunk cost，不能直接新增奖励罚项。
 

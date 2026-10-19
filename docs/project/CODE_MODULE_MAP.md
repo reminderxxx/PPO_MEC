@@ -1,3 +1,7 @@
+## 2026-10-20：第五阶段同状态诊断消费端
+
+`diagnose_sa_stage5_same_state`只消费冻结阶段四protocol/checkpoint/dev/审计ledger与已有CaptureTap/FixedFrameCapture。原make_env/stream_episode只为参考轨迹服务，其他模型对捕获同pass/batch/reference prefix条件评分。passive hooks观察真实Q/surrogate/V/probability，不训练；物理state账是只读因果ledger，非可恢复env。预算先扣、源/轨迹精确对账、RNG/学习状态隔离及独占claim由诊断入口负责；算法/registry/环境不反向依赖诊断，均未修改。
+
 ## 2026-10-18：第四阶段编排与独立消费
 
 launch_sa_group_clip_pair负责冻结与一次两臂协调，调用train_sa_group_clip_pair；后者复用train_joint_stream_control.make_env/stream_episode和registry，不改算法。GradientObserver仅临时包裹原clip/forward/Adam，记录detach范数和真实delta，必须与未包装更新逐字段精确一致且不插入None-grad optimizerstate。audit_sa_group_clip_pair只读protocol/checkpoint/raw/收据/梯度输出完整性与预声明效果，算法不反向依赖审计。生产/消费以同一contract.json绑定，评估独立副本并恢复三类RNG/检查训练状态。

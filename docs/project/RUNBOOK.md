@@ -1,3 +1,9 @@
+## 2026-10-20：第五阶段诊断运行
+
+先读[合同](sa_effective_credit_contract_20261020.md)和[独立5A报告](sa_effective_credit_review_20261020.md)。新入口 `scripts/diagnose_sa_stage5_same_state.py`按contract→qualify→prepare→run执行；合同内列固定命令。必须清洁已push源码、阶段四SHA精确、软件资格pass及5A source-integrity complete receipt；同一输出root仅1/1，不resume/retry。status只读，正常20分钟查一次，无可行动变化安静结束。
+
+参考144/最多69120帧与缓存资格16/112forward单列，禁止训练/backward/Adam和替代policy轨迹。结果逐原summary及canonical event/receipt精确对账，先独立回收再长期文档/scoped commit/push；不得为归因补新环境或调参。5C未授权，原版与现有门禁保留。
+
 ## 2026-10-18 第四阶段一次SA配对执行
 
 用户已授权本轮，完整边界见[第四阶段合同](sa_group_clip_confirmation_contract_20261018.md)。源码/测试/文档先验证并scoped commit，真实尝试push；如果GitHub443不可达，记录待同步及实际错误，仍可用清洁本地commit冻结已授权研究。原run及旧确认1/1保持历史。
