@@ -1,3 +1,7 @@
+## 2026-10-20：有界软件资格与覆盖分开
+
+决定：用户承接授权的数值资格采用独立7pair/64Adam上限、环境0；实际48。矩阵bitwise通过与完整运行覆盖分别裁决：cache全部forced、idle0/21，故完整资格OPEN，不补原帧/额度。下一步先用已有见证明确合法条件前缀和idle来源，再独立冻结软件补验；不凭日志工具通过实施算法或新学习。原版及优势门禁保持。见[回收](sa_credit_numerical_review_20261020.md)。
+
 ## 2026-10-20：5C先审计概率/信用，不改学习算法
 
 当前逐head conditional PPO与整队joint/类PPO不等价；事后priority类有明确可见性/prepare子因子条件。采用显式、默认关闭的观察context与最小guard回调，保持原loss/mask/reward/clip/options/checkpoint源码路径；独立sink不自认证真实行为。软件预算全零科学调用，真实启用/数值资格另立合同；未发现一阶缺陷时允许以UNIDENTIFIED结束，不强行实现候选。依据[合同](sa_credit_audit_contract_20261020.md)及[审查](sa_credit_audit_results_review_20261020.md)。

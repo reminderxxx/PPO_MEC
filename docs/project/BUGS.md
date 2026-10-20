@@ -1,3 +1,9 @@
+## 2026-10-20：日志数值不变性有限通过，free-cache/idle仍OPEN
+
+VERIFIED/finite CPU：7组off/on完整forward、pre/postclip梯度、双Adam参数/状态、controller和三类RNG逐位一致；48私有软件Adam、环境/科学新训练0。不是分组裁剪退化修复。
+
+OPEN/runtime coverage：144缓存行全部forced，21team-frame均nonidle；缓存自由actor和实际模型idle未验。emptyAdam/GPU/长run容量与计时未覆盖，原真实stochastic信用仍缺。四既有条件cache多选见证不保证新随机prefix仍多选，两个单元无见证保留。不得为补覆盖续原claim或补环境。[回收](sa_credit_numerical_review_20261020.md)、[下一方案](sa_credit_numerical_followup_20261020.md)。
+
 ## 2026-10-20：5C审计能力完成，因果修复仍未识别
 
 VERIFIED/source+software：当前PPO逐head ratio/clip，类聚合一般改变目标；固定prepare的priority后缀条件命题不等于整个head2的future-conditioned baseline合法。默认关闭日志可关联behavior→credit→mini→双optimizer，KL未采样覆盖和step后写失败明确记录；90纯软件测试通过。

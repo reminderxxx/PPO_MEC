@@ -1,3 +1,7 @@
+## 2026-10-20：5C有限数值对照已回收
+
+[独立报告](docs/project/sa_credit_numerical_review_20261020.md)：7组私有模型日志on/off逐位一致，实际48软件Adam/24backward、环境/科学新训练0，105项软件测试通过。缓存144/144 forced、idle0/21，完整运行资格尚未齐；[下一补验方案](docs/project/sa_credit_numerical_followup_20261020.md)已定位4个既有多选见证，不追加本轮输入、不自动训练。原版SA/优势门禁保留。
+
 ## 2026-10-20：5C1/2零训练软件交付
 
 [因果概率与审计合同](docs/project/sa_credit_audit_contract_20261020.md)、[本轮交付审查](docs/project/sa_credit_audit_results_review_20261020.md)：默认关闭的真实行为/信用/mini/双优化器观察器与独立消费者完成，90项纯软件测试通过；未运行环境、真实模型、forward/backward/Adam或训练。原版/优势门禁保留，实际启用的数值无扰动资格及算法候选/新学习仍待另行授权。

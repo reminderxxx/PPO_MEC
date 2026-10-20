@@ -1,3 +1,7 @@
+## 2026-10-20：5C有界数值资格依赖
+
+`sa_stage5c_numerical_qualification`的bind/status只用stdlib，run才延迟导入真实SA及原观察器；RuntimeGuards在私有原调用前计数并封禁环境/CUDA/autograd.grad，合成targets与原科学MC分开。固定on/off在单线程CPU执行原act/update，保存完整forward/梯度/双Adam/RNG供独立消费者。算法/registry不反向依赖该runner；src本轮未修改。七组通过仍缺free-cache/idle，不能把完整日志schema当运行覆盖。
+
 ## 2026-10-20：5C观察器依赖
 
 `sa_stage5c_credit_audit`只用stdlib，producer供应已detach primitive；`sa_stage5c_credit_observer`仅显式绑定时拦截已有方法/两个原step，延迟读取现有torch/numpy RNG。`ScheduledControlPPO.update`依赖可选private callback协议，不反向import脚本，不改registry/options/checkpoint。默认无callback；删除guard后的完整算法AST等于基线。consumer仅审结构/账，不认证stochastic来源或性能。

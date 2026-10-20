@@ -1,6 +1,7 @@
 # 5C任务点：因果可用的有效动作与信用概率合同
 
-- authored_at: 2026-10-20；status: **用户已授权且完成第1、2项合同/默认关闭工具与零环境软件测试；算法候选、软件Adam、真实环境及新训练仍未授权。**
+- authored_at: 2026-10-20；status: **第1、2项已完成；用户后续另授权的有限数值矩阵已执行48私有软件Adam/0环境/0科学训练，7组逐位通过但free-cache/idle覆盖未齐。算法候选、实际环境/新学习及补验新额度未启动。**
+- numerical_followup: [有限数值独立回收](sa_credit_numerical_review_20261020.md)、[下一软件补验方案](sa_credit_numerical_followup_20261020.md)。
 - current_delivery: [5C1/2交付审查](sa_credit_audit_results_review_20261020.md)、[因果概率合同](sa_credit_audit_contract_20261020.md)。
 - evidence: [第五阶段完整独立审查](sa_same_state_results_review_20261020.md)。原版SA固定64及已有整体/seed7/27优势保留，分组裁剪候选不晋级。
 - 单一优先级：先明确有效动作类在实际采样时是否可知、正确联合/条件概率及真实行为信用记录，再决定一个最小opt-in候选。暂不叠加锁站、sunk-cost惩罚、clip/lr调参或更长训练。
@@ -25,7 +26,7 @@
 
 只用现有tensor/纯概率fixture，先覆盖None/forced、单owner、同order/不同order、相同prepare/未识别其他prepare、稀疏cache、FIFO/idle和高logit/subnormal边界；保留原版7/27正例、17负例及必要离站反证。不得用fixture reward挑参数。
 
-默认关闭路径必须与原版旧checkpoint、完整tensor/输出/RNG精确兼容。确认一个first-order缺陷后才设计一个opt-in最小信用/表征变化；不同时改先验、mask、loss、clip和训练长度。当前软件Adam预算仍0；若需要梯度/优化资格，另行批准最多128私有软件Adam/0环境，单列费用，不当原训练梯度或性能证据。
+默认关闭路径必须与原版旧checkpoint、完整tensor/输出/RNG精确兼容。确认一个first-order缺陷后才设计一个opt-in最小信用/表征变化；不同时改先验、mask、loss、clip和训练长度。此处原预算0已由后续独立数值合同覆盖：一次最多64、实际48私有软件Adam/0环境，单列费用；不能当原训练梯度或性能证据。free-cache/idle补验仍须独立冻结，当前合同不追加。
 
 若没有缺陷/无偏性证明，交付“未识别”及可检验缺口，不强行实现算法。实现后先独立审查、匹配测试与scoped commit/push，再提出新学习合同；本任务点不启动它。
 

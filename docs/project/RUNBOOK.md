@@ -1,3 +1,9 @@
+## 2026-10-20：5C数值资格已执行一次
+
+先读[冻结合同](sa_credit_numerical_contract_20261020.md)及[限定回收](sa_credit_numerical_review_20261020.md)。入口`python scripts/sa_stage5c_numerical_qualification.py bind --contract <fresh_authorized_root>/contract.json --output_root <fresh_authorized_root>`绑定clean commit/源资产；随后`run --output_root <same_root>`独占执行，`status --output_root <same_root>`只读。已完成root `artifacts/joint_stream_learning/sa_credit_numerical_stage5c_20261020`不得再次run/rebind，无resume/覆盖入口；新root本身不构成新预算授权。
+
+纯软件验证：`python -m pytest -q -p no:cacheprovider tests/test_sa_stage5c_numerical.py tests/test_sa_stage5c_credit_audit.py tests/test_sa_stage5c_observer.py tests/test_sa_stage5_credit_audit.py tests/test_sa_stage5_same_state.py`（105通过，0模型）。不要用环境smoke或旧Adam套件代替本合同资格。实际单次矩阵48软件Adam/0环境/0科学训练；自由cache和idle仍未覆盖，[下一方案](sa_credit_numerical_followup_20261020.md)只冻结既有见证，不自动执行。
+
 ## 2026-10-20：5C1/2软件审计（非训练启动）
 
 先读[因果概率合同](sa_credit_audit_contract_20261020.md)及[交付审查](sa_credit_audit_results_review_20261020.md)。默认`AuditSink(enable=False)`及`credit_audit(agent,sink)`不访问agent/文件/RNG。真实启用必须另获新行为/数值资格授权，绑定fresh目录、source/provenance及显式session身份；当前没有CLI自动开启训练，不把旧greedy转行为记录。
