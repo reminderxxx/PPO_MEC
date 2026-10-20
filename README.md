@@ -1,3 +1,7 @@
+## 2026-10-20：5C1/2零训练软件交付
+
+[因果概率与审计合同](docs/project/sa_credit_audit_contract_20261020.md)、[本轮交付审查](docs/project/sa_credit_audit_results_review_20261020.md)：默认关闭的真实行为/信用/mini/双优化器观察器与独立消费者完成，90项纯软件测试通过；未运行环境、真实模型、forward/backward/Adam或训练。原版/优势门禁保留，实际启用的数值无扰动资格及算法候选/新学习仍待另行授权。
+
 ## 2026-10-20：第五阶段同状态诊断完整回收
 
 144冻结参考/63944帧与原summary/events/receipts精确一致；零训练/反向/Adam。9271采样记录的priority四编号可按固定reference co-controls缩为1/2/3/4组（1251/7838/161/21），但离线类不能直接作在线mask；172采样付费后离站中163由prior支持，含快速交付正例，未识别唯一退化修复。原版及优势门禁保留。[完整报告与三图](docs/project/sa_same_state_results_review_20261020.md)、[下一5C任务点](docs/project/sa_learning_stage5c_tasks_20261020.md)；5C实现/新训练未授权。

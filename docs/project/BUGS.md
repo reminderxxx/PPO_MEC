@@ -1,3 +1,9 @@
+## 2026-10-20：5C审计能力完成，因果修复仍未识别
+
+VERIFIED/source+software：当前PPO逐head ratio/clip，类聚合一般改变目标；固定prepare的priority后缀条件命题不等于整个head2的future-conditioned baseline合法。默认关闭日志可关联behavior→credit→mini→双optimizer，KL未采样覆盖和step后写失败明确记录；90纯软件测试通过。
+
+OPEN/runtime：未真实启用observer或运行模型/梯度；无真实stochastic信用。raw learned logits/逐head梯度未捕获，旧greedy不能补造；日志default预算不适合直接整轮训练。任何有界资格/新行为须另授权，不能将工具完成称退化修复。[交付审查](sa_credit_audit_results_review_20261020.md)。
+
 ## 2026-10-20：同状态诊断已证结构机会与因果缺口
 
 VERIFIED/alias opportunity：9271固定分位记录的reference prepare四priority编号存在同全队稳定顺序充分类，19590/37084条件编号可收缩；这不是原训练梯度浪费。完整co-controls可能在owner采样后才生成，故在线mask/class logprob/联合ratio因果可用性OPEN。其他prepare60候选未识别，不同桶不证明物理不同。

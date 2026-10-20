@@ -1,3 +1,7 @@
+## 2026-10-20：5C先审计概率/信用，不改学习算法
+
+当前逐head conditional PPO与整队joint/类PPO不等价；事后priority类有明确可见性/prepare子因子条件。采用显式、默认关闭的观察context与最小guard回调，保持原loss/mask/reward/clip/options/checkpoint源码路径；独立sink不自认证真实行为。软件预算全零科学调用，真实启用/数值资格另立合同；未发现一阶缺陷时允许以UNIDENTIFIED结束，不强行实现候选。依据[合同](sa_credit_audit_contract_20261020.md)及[审查](sa_credit_audit_results_review_20261020.md)。
+
 ## 2026-10-18：第四阶段采用单因素配对与固定9点面板
 
 用户明确授权后，单独冻结新两臂SA实验，共384训练会话/184320帧上限，保留原确认1/1历史。候选只变policy/value裁剪组；dense0/8/…/64同48条件帮助区分训练负载锯齿与真实策略学习/尾部稳定，不能用平滑训练回报证明收敛。选择固定64，复用既有整体与seed7/27非回退门禁，seed17自身0点恢复和机制描述分开；无效结果完整保留，不自动加预算/重跑/实施第五阶段。

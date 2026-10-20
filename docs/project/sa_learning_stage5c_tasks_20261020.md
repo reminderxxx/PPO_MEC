@@ -1,6 +1,7 @@
 # 5C任务点：因果可用的有效动作与信用概率合同
 
-- authored_at: 2026-10-20；status: **仅下一阶段任务点，未授权实现、软件Adam、环境或新训练。**
+- authored_at: 2026-10-20；status: **用户已授权且完成第1、2项合同/默认关闭工具与零环境软件测试；算法候选、软件Adam、真实环境及新训练仍未授权。**
+- current_delivery: [5C1/2交付审查](sa_credit_audit_results_review_20261020.md)、[因果概率合同](sa_credit_audit_contract_20261020.md)。
 - evidence: [第五阶段完整独立审查](sa_same_state_results_review_20261020.md)。原版SA固定64及已有整体/seed7/27优势保留，分组裁剪候选不晋级。
 - 单一优先级：先明确有效动作类在实际采样时是否可知、正确联合/条件概率及真实行为信用记录，再决定一个最小opt-in候选。暂不叠加锁站、sunk-cost惩罚、clip/lr调参或更长训练。
 

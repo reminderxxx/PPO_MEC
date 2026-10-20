@@ -1,3 +1,7 @@
+## 2026-10-20：5C观察器依赖
+
+`sa_stage5c_credit_audit`只用stdlib，producer供应已detach primitive；`sa_stage5c_credit_observer`仅显式绑定时拦截已有方法/两个原step，延迟读取现有torch/numpy RNG。`ScheduledControlPPO.update`依赖可选private callback协议，不反向import脚本，不改registry/options/checkpoint。默认无callback；删除guard后的完整算法AST等于基线。consumer仅审结构/账，不认证stochastic来源或性能。
+
 ## 2026-10-20：第五阶段独立信用消费者
 
 `audit_sa_stage5_credit`延迟仅为可信tensor反序列化导入torch，读取完整B合同/结果/输出SHA，独立算categorical数值、reference-only事实MC偏差和保守priority order类。该consumer不依赖agent/env，float32逆log数值界只用于恒等式，不修改科学raw或效果门禁。`plot_sa_stage5_diagnostics`消费已归约表，经ReportLab绘图；算法/冻结参考runner不反向依赖它们。first/second head0和三head重复globalV不作新独立样本。

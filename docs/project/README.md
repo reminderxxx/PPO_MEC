@@ -1,3 +1,7 @@
+## 2026-10-20 5C1/2软件交付
+
+[因果时点/概率/日志合同](sa_credit_audit_contract_20261020.md)与[独立交付审查](sa_credit_audit_results_review_20261020.md)：90纯软件测试、默认关闭原路径源码兼容、四事件信用关联和失败边界。真实stochastic资格、算法候选与新训练尚未执行。
+
 ## 2026-10-20 第五阶段完成
 
 [同状态完整独立报告](sa_same_state_results_review_20261020.md)：144参考精确对账、priority条件同效类、prior/残差正反例、事实MC校准与三图；[下一5C任务点](sa_learning_stage5c_tasks_20261020.md)：先因果可用时点、概率与真实信用合同，未授权实现/优化/新训练。原版与优势门禁保留。

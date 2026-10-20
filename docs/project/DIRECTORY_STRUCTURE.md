@@ -1,3 +1,10 @@
+## 2026-10-20：5C被动信用审计
+
+- `scripts/sa_stage5c_credit_audit.py`：纯stdlib有限sink及独立只读validator/CLI。
+- `scripts/sa_stage5c_credit_observer.py`：显式context注入，观察原SA stream行为和更新；不提供训练启动入口。
+- `tests/test_sa_stage5c_credit_audit.py`、`tests/test_sa_stage5c_observer.py`：纯JSON/源码/数值/人工callback资格。
+- `docs/project/sa_credit_audit_contract_20261020.md`、`sa_credit_audit_results_review_20261020.md`：合同与交付；本轮私有artifact不入Git。
+
 ## 2026-10-20：第五阶段离线消费与作图
 
 - `scripts/audit_sa_stage5_credit.py`：qualification/summarize，只读取完整已保存分位tensor/JSON；不构造agent/env、不forward/优化。

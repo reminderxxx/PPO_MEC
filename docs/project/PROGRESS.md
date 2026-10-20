@@ -1,3 +1,9 @@
+## 2026-10-20：5C第1、2项软件完成
+
+用户“启动下一步”授权因果概率合同与默认关闭日志；零环境/真实模型/forward/backward/Adam/训练预算已事前单列并遵守。确认逐head conditional PPO不等同整队joint或类clip；最后owner/更早owner可见性与受限priority子因子分开，未实施动作合并。
+
+新增被动observer/sink/独立consumer与四事件UID链，guard剥离后完整ppo源码AST等于5c73ace；checkpoint/options/registry保持。90纯软件测试、独立源码/概率/JSON审查通过；日志错误明确可能发生在原step已完成之后，不回滚/重试。源级兼容不冒充真实数值资格，尚无真实stochastic信用。[合同](sa_credit_audit_contract_20261020.md)、[独立交付报告](sa_credit_audit_results_review_20261020.md)。原提醒保持暂停，原版与优势门禁保留，算法候选/新学习未授权。
+
 ## 2026-10-20：第五阶段5A/5B完整交付
 
 B唯一1/1完成144参考/63944帧，18542捕获/9271二遍/129794条件评分；2382094完整性检查、18cp/6初始化、864输出SHA及全部479190event/63944receipt canonical原ledger通过。资格16/112与968恒等式单列，新增训练/反向/Adam0，回收也无forward/env。root107交叉（含三图75数字）、安装168项匹配检查与40项纯软件测试通过。

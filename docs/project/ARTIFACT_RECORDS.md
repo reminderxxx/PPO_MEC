@@ -1,3 +1,7 @@
+## 2026-10-20：5C1/2软件交付
+
+私有`artifacts/joint_stream_learning/sa_credit_contract_stage5c_20261020/`事前authorization冻结环境/真实agent/model/forward/backward/Adam/训练全0，实际均0。源码基线5c73ace；新增审计脚本/fixture、ppo受guard callback、因果合同及独立交付报告。90纯软件测试、独立概率/源码/sink/observer记录保留，不上传真实artifact/checkpoint/data。旧5B result/18选定cp只读核对；历史run不重开。[合同](sa_credit_audit_contract_20261020.md)、[交付与未验证项](sa_credit_audit_results_review_20261020.md)。无算法候选/新学习。
+
 ## 2026-10-20：第五阶段完整回收
 
 `artifacts/joint_stream_learning/sa_effective_credit_stage5_20261020/same_state`唯一1/1：144/63944参考、18542capture、9271second、129794score；训练/backward/Adam0。源码27f6228真实push，原算法8cacb6d不变。完整原summary和479190event/63944receipt canonical均exact；18cp/6初始化/864输出SHA与RNG/学习状态通过。

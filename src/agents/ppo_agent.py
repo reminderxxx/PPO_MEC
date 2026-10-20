@@ -775,32 +775,42 @@ class ScheduledControlPPO(CoordinatedControlPPO):
         return controls,result
 
     def update(self,rollouts,*,epochs=4):
+        audit=getattr(self,'_credit_audit',None)
         self._pad_cache(rollouts,max(r['data']['m1'].shape[1] for r in rollouts))
         data={k:torch.cat([r['data'][k] for r in rollouts]) for k in rollouts[0]['data']}
         actions=torch.cat([r['actions'] for r in rollouts]);old=torch.cat([r['head_logs'] for r in rollouts])
         targets=torch.cat([r['credit_targets'] for r in rollouts]);team=torch.cat([r['returns'] for r in rollouts]);active=torch.cat([r['active_heads'] for r in rollouts])
         baseline=torch.cat([r['counterfactual_baselines'] for r in rollouts]);advantages=targets[:,None]-baseline
+        if audit is not None:audit.credit_inputs(rollouts,actions,old,targets,team,active,baseline,advantages)
         for j in range(3):
             sample=advantages[active[:,j],j]
             if len(sample)>1:advantages[:,j]=(advantages[:,j]-sample.mean())/sample.std().clamp(min=1e-6)
+        if audit is not None:audit.credit_normalized(advantages)
         costs=torch.cat([r['cost_targets'] for r in rollouts]);losses=[];kls=[];clips=[];entropies=[];qerrors=[];stopped=False
         progress=min(1.,float(self.completed_updates)*4/max(1,self.training_budget-4))
         lr=self.options['learning_rate']*(1-.9*progress) if self.stability_enabled else self.options['learning_rate']
         for group in self.optimizer.param_groups:group['lr']=lr
         for _ in range(epochs):
+            if audit is not None:audit.epoch_start()
             for index in torch.randperm(len(actions)).split(512):
                 batch={k:v[index] for k,v in data.items()}
+                if audit is not None:audit.minibatch_start(index,batch)
                 _,logs,entropy,value,surrogate,prefix,enabled,cf,q,_=self._evaluate(batch,actions=actions[index],return_details=True)
                 logratio=logs-old[index];ratio=logratio.exp();weight=enabled.float();den=weight.sum().clamp(min=1)
                 kl=(((ratio-1)-logratio)*weight).sum()/den
-                if self.stability_enabled and float(kl.detach())>.02:stopped=True;break
+                if audit is not None:audit.minibatch_scores(logs,entropy,value,surrogate,prefix,enabled,cf,q,ratio,kl,weight,den)
+                if self.stability_enabled and float(kl.detach())>.02:
+                    if audit is not None:audit.minibatch_stop(kl)
+                    stopped=True;break
                 objective=torch.minimum(ratio*advantages[index],ratio.clamp(.8,1.2)*advantages[index])
                 policy=-(objective*weight).sum()/den
                 vf=(prefix-targets[index,None]).square().mean()+(value-team[index]).square().mean()+(q-targets[index,None]).square().mean()
                 expected=torch.cat((targets[index,None],costs[index]),-1)[:,None]
                 aux=(surrogate-expected).square().mean() if self.surrogate_enabled else vf*0
                 loss=policy+.5*vf-self._entropy_coefficient(progress)*(entropy*weight).sum()/den+.2*aux
+                if audit is not None:audit.before_step(self,policy,vf,aux,loss)
                 self._apply_control_gradients(loss)
+                if audit is not None:audit.after_step(self,kl)
                 if self.surrogate_enabled:self.surrogate_mse.mul_(.95).add_(.05*(surrogate[...,0].detach()-targets[index,None]).square().mean())
                 losses.append([float(policy.detach()),float(vf.detach()),float(aux.detach())]);kls.append(float(kl.detach()));clips.append(float((((ratio-1).abs()>.2)*weight).sum().detach()/den));entropies.append(float((entropy*weight).sum().detach()/den));qerrors.append(float((q.detach()-targets[index,None]).square().mean()))
             if stopped:break

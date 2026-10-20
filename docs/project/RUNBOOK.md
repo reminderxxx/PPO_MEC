@@ -1,3 +1,11 @@
+## 2026-10-20：5C1/2软件审计（非训练启动）
+
+先读[因果概率合同](sa_credit_audit_contract_20261020.md)及[交付审查](sa_credit_audit_results_review_20261020.md)。默认`AuditSink(enable=False)`及`credit_audit(agent,sink)`不访问agent/文件/RNG。真实启用必须另获新行为/数值资格授权，绑定fresh目录、source/provenance及显式session身份；当前没有CLI自动开启训练，不把旧greedy转行为记录。
+
+只读消费命令：`python scripts/sa_stage5c_credit_audit.py <existing_audit_root>`；结构完整返回0仍actual_training_verified=false，partial/invalid/failed返回1。events默认总10000行/64MiB、failure receipt另≤8KiB；未来大run必须事前重估并冻结预算，硬限失败不采样、不重试。KL early stop未采到的eligible行单列。
+
+验证命令：`python -m pytest -q -p no:cacheprovider tests/test_sa_stage5c_credit_audit.py tests/test_sa_stage5c_observer.py tests/test_sa_stage5_credit_audit.py tests/test_sa_stage5_same_state.py`（90纯软件）。真实模型数值/RNG/optimizer资格仍未执行；不能为补资格调用旧科学run。
+
 ## 2026-10-20：第五阶段完成后离线审查
 
 完整结果后可用现有venv运行：`python scripts/audit_sa_stage5_credit.py summarize --root <same_state> --output_root <fresh_derived_root> --trusted_tensor_capsules`。它拒绝partial/failure或旧输出目录，仅反序列化SHA绑定可信tensor并消费保存评分；没有模型forward或环境。`qualification --scores <existing_qualification_scores.jsonl.gz> --output_root <fresh_root>`也仅算已有JSON。
