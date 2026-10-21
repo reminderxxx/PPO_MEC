@@ -178,3 +178,9 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 用户指出算法结构图在第四部分的位置不理想。定位为 R11 第 IV 节中 Fig. 2 排在 IV-A 首段之后；本轮仅将 Fig. 2 及其图注移到 `IV. SAGH DECISION AND LEARNING LOOP` 标题之后、`A. Why the controls are ordered` 之前，使进入方法节时先见状态—策略—环境—学习总览，再读设计理由与模块说明。第 III 节仍承载系统与问题定义，算法内容仍归第 IV 节。该新要求仅覆盖 R11 的 Fig. 2 位置，不改图文、实验或文献。
 - 基线：R11 `artifacts/manuscript/r11_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R11.docx`，SHA-256 `c5a9d8676c0230e8670436eb3e2fd1afe46c450fbe2b3d15ea6045b04b2e9275`。新稿：`artifacts/manuscript/r12_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R12.docx`，SHA-256 `f2e33a6eb4e1a06cd4eb425099e35b451b25ab2bfa7fb10476acbaa58ea5292b`；稿件在 Git 忽略的 `artifacts/` 内。
 - 核对：除 Fig. 2 与图注的顺序移动外，R11/R12 的 71 个段落文字、两张表所有单元格文字、两张图媒体字节均一致；25 条参考文献仍为 Times New Roman 8 pt。DOCX ZIP 可读，`render_docx.py --emit_pdf` 得 Letter 4 页，逐页及图 2 所在页原尺寸检查无图像裁切、文字遮挡或异常留白。没有修改算法实现或论文证据结论。
+
+## R13 Fig. 2 归入算法解析小节（2026-10-21）
+
+- 用户进一步明确：算法结构图应放在具体的算法解析部分，而非仅紧贴第 IV 节标题。此最新要求覆盖 R12 把图直接放到章标题后的决定；本轮将 IV-A 标题由 `A. Why the controls are ordered` 精确改为 `A. Algorithm rationale and architecture`，保持原 IV-A 首段解释“为何先选站点、再重建预约、再决定模型与切换”的文字，再将 Fig. 2 及图注放在该段之后、IV-B 之前。第 III 节系统/问题定义、IV-B/C 解释、实验和文献不改。
+- 基线：R12 `artifacts/manuscript/r12_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R12.docx`，SHA-256 `f2e33a6eb4e1a06cd4eb425099e35b451b25ab2bfa7fb10476acbaa58ea5292b`。新稿：`artifacts/manuscript/r13_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R13.docx`，SHA-256 `5dde382c3c6265892168b33bbd5c736fe9326c7be190bbad0fc775b978d0fba8`；稿件仍在 Git 忽略的 `artifacts/` 内。
+- 核对：除 IV-A 标题措辞和 Fig. 2/图注的顺序外，71 段文字、两张表单元格、两张图媒体字节均与 R12 一致；25 条参考文献仍为 Times New Roman 8 pt。DOCX ZIP 可读，`render_docx.py --emit_pdf` 得 Letter 4 页，逐页及图所在页原尺寸检查无裁切、遮挡或异常留白。未修改算法实现、实验数值和证据结论。
