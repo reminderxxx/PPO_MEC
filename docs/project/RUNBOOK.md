@@ -7,7 +7,9 @@
 
 ## 独立公平训练与奖励收敛（2026-10-21）
 
-见 `fair_reward_training_20261021.md`。先 `run_fair_reward_training.py prepare` 冻结配置/共同窗口并通过预检，
+本轮长预算按`long_fair_reward_training_20261021.md`执行：先完成配对动作诊断和四算法两轮预检，再prepare/run；30cell完整后先`audit_long_fair_reward_training.py`核验，再`plot_long_fair_reward_training.py`create-only导出全部真实episode和固定验证图。当前聊天每20分钟检查，不自动重跑。
+
+旧独立短预算见 `fair_reward_training_20261021.md`。先 `run_fair_reward_training.py prepare` 冻结配置/共同窗口并通过预检，
 再按该文执行 `run`；prepare output与每个cell均create-only。全量完成后用`plot_fair_reward_training.py`导出，
 不把未完成cell填充为曲线。训练需允许只读检查进程和设置nice；检测其他训练/benchmark后本实验自动等待。
 新实验CPU单线程且不恢复旧权重，不改算法优化任务、原始数据、旧结果、论文或holdout。

@@ -2,6 +2,9 @@
 
 ## 独立公平训练/奖励曲线
 
+- `scripts/diagnose_sagh_flat_reward.py`：透明observer和配对checkpoint动作诊断，保持算法输出不变。
+- `scripts/run_long_fair_reward_training.py`：复用短预算原生环境与配置，按统一32循环执行；仅拥有隔离实验调度/原始日志/动作证据。
+- `scripts/audit_long_fair_reward_training.py` / `scripts/plot_long_fair_reward_training.py`：只读核验循环/原生reward/执行动作/checkpoint与数据身份，再导出真实episode均值、全部原值和固定验证；不做checkpoint筛选。
 - `scripts/run_fair_reward_training.py`：从固定clean源码调用现有agent/environment/trainer；另冻结实际窗口身份、fresh配置、精确环境交互和资源让出，不拥有算法优化逻辑。
 - `scripts/plot_fair_reward_training.py`：消费本轮complete/CSV/plan，逐cell核验共同暴露与checkpoint数量，输出全部真实验证点和描述性平台诊断，不修改源数据或checkpoint。
 

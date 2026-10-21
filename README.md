@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+本轮扩大预算：`scripts/run_long_fair_reward_training.py`，全部算法32循环/196,608交互/768updates；配对动作诊断与真实episode图方案见 [长预算独立实验](docs/project/long_fair_reward_training_20261021.md)。
+
 独立公平训练与收敛实验：`scripts/run_fair_reward_training.py`，统一窗口/原生奖励/交互预算，从零训练且自动让出其他训练资源；
 见 [固定方案与执行边界](docs/project/fair_reward_training_20261021.md)。不修改算法优化代码、旧 checkpoint 或论文。
 

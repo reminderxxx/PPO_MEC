@@ -1,0 +1,62 @@
+{
+  "version": "long_fair_reward_training_v1",
+  "scope": "independent_development_convergence_experiment",
+  "agents": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "seeds": [
+    7,
+    13,
+    29
+  ],
+  "max_mobility_rows": 30000,
+  "window_length": 24,
+  "window_stride": 48,
+  "train_window_count": 24,
+  "validation_window_count": 12,
+  "validation_first_offset": 1248,
+  "max_workflows": 2,
+  "max_episode_steps": 22,
+  "prediction_horizon": 16,
+  "primary_vehicle_selection": "handoff_pressure",
+  "rsu_layout": "auto_dominant_tight",
+  "reward_positive_offset": 0.0,
+  "external_reward_shaping": false,
+  "initialization": "fresh_weights_and_optimizer_no_checkpoint_load",
+  "training_steps": 196608,
+  "steps_per_update": 256,
+  "steps_per_training_unit": 128,
+  "evaluate_every_updates": 24,
+  "checkpoint_selection": "initial_every_cycle_and_final_no_selection",
+  "convergence": {
+    "tail_evaluation_points": 5,
+    "relative_range_max": 0.05,
+    "relative_slope_max": 0.01,
+    "minimum_tail_completion_rate": 0.8,
+    "note": "Descriptive reward plateau only, not proof of parameter convergence. Report every seed; do not train until a preferred ranking appears."
+  },
+  "resources": {
+    "device": "cpu",
+    "torch_threads": 1,
+    "concurrent_cells": 1,
+    "nice": 19,
+    "yield_to_foreign_training": true
+  },
+  "claim": "development_only_not_formal_or_independent_holdout",
+  "training_cycles": 32,
+  "plotting": {
+    "episode_trailing_mean": 100,
+    "retain_all_raw_episodes": true,
+    "validation_smoothing": false,
+    "curve_shift_or_padding": false
+  }
+}

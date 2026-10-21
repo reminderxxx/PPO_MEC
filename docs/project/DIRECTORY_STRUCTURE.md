@@ -2,6 +2,8 @@
 
 ## 独立公平奖励训练（2026-10-21）
 
+- `configs/experiment/long_fair_reward_training_v1.json`、`scripts/run_long_fair_reward_training.py` / `audit_long_fair_reward_training.py` / `plot_long_fair_reward_training.py`：32循环独立训练及只读核验/真实episode图；`tests/test_long_fair_reward_training.py`覆盖循环与绘图边界。
+- `artifacts/analysis/long_fair_reward_training_20261021_v1/`：本轮完整独立run；`long_fair_reward_preflight_20261021_v1/`只作预检；`sagh_flat_action_diagnosis_20261021_v1/`为前置只读诊断。
 - `configs/experiment/fair_reward_training_v1.json`：共同窗口、奖励、预算、资源隔离与平台描述规则。
 - `scripts/run_fair_reward_training.py` / `scripts/plot_fair_reward_training.py`：固定 clean 源码、fresh training 和全量真实导出；不修改生产算法。
 - `tests/test_fair_reward_training.py`：预算、身份区间、资源让出、配置/hash及平台边界。

@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `long_fair_reward_training_20261021.md`：平线诊断后的32循环统一长预算、原生动作证据、episode曲线与20分钟监控。
+
 - `sagh_flat_action_diagnosis_20261021.md`：SAGH初始/中间/最终检查点配对动作及平线原因的只读重放证据。
 
 - `fair_reward_training_20261021.md`：独立共同窗口、原生奖励、fresh初始化、精确预算与资源让出的公平收敛实验；不影响算法优化主线。
