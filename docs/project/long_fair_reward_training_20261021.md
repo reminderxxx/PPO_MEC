@@ -125,5 +125,16 @@ reviewed_at=2026-10-21，literature_cutoff=2026-09-28未新评，target_venue=CS
 policy_version=tmc_review_policy_v3_20260621，source Git=8e15418，runner release=2d7cfce。
 完整30cell审计、另外两个SAGH seed、baseline比较及formal/holdout结论仍待完成或UNVERIFIED。
 
+## 只读审查补充（2026-10-21 14:19）
+
+用户随后要求只读查目标、映射和训练更新，保持当前run及优化主线不动并继续20分钟监控。
+独立报告`sagh_reward_decline_audit_20261021.md`已定位：native探索加分与成本/teacher辅助目标差异；
+option之后的最终动作仍使用前置env概率作PPO ratio；日志存在最大3.39e13的env-action loss且现有KL未拦住；
+本独立runner遗漏window_class，导致原方法部分分类依赖分支以unknown运行。没有漏更新/原生reward符号错误证据。
+这些属于现存算法/入口解释限制，不因未来完整性审计PASS消失。本run只能连同这些限制作为开发诊断，
+不能声称完整复现原方法机制或据此给原算法的正式优劣结论。本轮未修复/未改变输入，继续冻结预算。
+精确动作/奖励账本、原始日志/hash、闭式GAE检查及因果未定事项保存在
+`artifacts/analysis/sagh_reward_decline_audit_20261021_v1/`，无新环境重放、act或learn。
+
 风险：扩大交互和循环不保证规则后动作发生变化，也不保证所有方法稳定；没有搜索或匹配梯度计算成本，
 开发窗口不是untouched holdout，不进行paper-ready/novelty/正式优势判断。

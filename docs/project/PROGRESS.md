@@ -5,6 +5,13 @@
 
 ﻿# Progress
 
+## 2026-10-21 14:19：SAGH奖励下降的只读目标/映射/更新审查
+
+- 用户要求只读查因并继续20分钟监控。已核验seed7全部15,907episode/768updates/33checkpoints/792验证units，无新rollout/act/learn或算法改动；源与七文件保护hash一致。报告`sagh_reward_decline_audit_20261021.md`。
+- 验证轨迹75处prepare→补缓存、6处prepare→普通执行，奖励差额账本精确复现-3.40625均值；完成率/连续性不变，回传开销下降约12.4%。训练循环1→32的探索奖励减少1213，占净reward下降1248.57约97.2%；不能把该分项比例冒充验证因果份额。
+- 确认门控后的最终action仍用门控前env概率做PPO ratio，已有trace分支算术反例约0.505路径质量对2.27e-20前置prob。768updates中11次env-action loss>1e6，最大3.39e13；该峰值更新KL为负且未early stop，现有保护未覆盖完整目标。没有skip/NaN日志或checkpoint非有限值，不能称没训练，也不能称更新健康。
+- 确认独立runner漏传window_class（全部训练receipt缺失），部分原方法的分类保护/credit分支未激活；这是实验入口上下文缺口，完整保留原方法语义及正式比较不能据此确认。当前冻结实验按用户要求继续，不现场修复或重跑；20分钟提醒ACTIVE并补充本审查边界。
+
 ## 2026-10-21 14:10：长预算SAGH seed7动作开始变化，但固定验证回报下降
 
 - 用户查询时2/30cell完成，MAPPO seed7运行中；约51.7万/589.8万交互。SAGH seed7已完成196,608交互/768updates/15,907episodes，另外两个seed未执行，完整比较仍待完成。

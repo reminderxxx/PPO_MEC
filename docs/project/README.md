@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `sagh_reward_decline_audit_20261021.md`：长预算seed7下降的原生分项、目标差异、门控动作概率、loss尖峰及window_class缺口只读审查；不修改运行中的实验。
+
 - `long_fair_reward_training_20261021.md`：平线诊断后的32循环统一长预算、原生动作证据、episode曲线与20分钟监控。
 
 - `sagh_flat_action_diagnosis_20261021.md`：SAGH初始/中间/最终检查点配对动作及平线原因的只读重放证据。

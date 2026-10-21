@@ -5,6 +5,14 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-21 14:19：SAGH动作概率、更新稳定性与独立入口上下文缺口（OPEN，只读未修）
+
+- clean8e15418的env-action PPO在option/fallback改写后，仍按前置env score登记/重算最终action的概率，未边缘化base+option行为。原trace可做0.505单分支概率贡献对2.27e-20前置prob的算术反例；训练per-step ratio未保存，受影响样本数量及因果份额尚不确定。
+- 已完成seed7的env-action PPO loss有11次>1e6，最高3.39e13（update495，KL=-0.219108、未early stop）。额外ratio barrier平方项不受普通PPO clip整体约束，weighted-head signed KL不覆盖全部映射/辅助目标；不能用checkpoint有限或gradient norm clipping推断稳定。768次learn均未skip，实际Adam steps21488。
+- 独立runner漏传window_class，15,907训练metadata均缺失、mechanism_window_count全0；原trainer传该字段，分类依赖保护/credit不能照原语义激活。并非全部机制关闭，retrospective guidance仍有39,390条。共同窗口/预算成立不等于完整复现原方法；该run不能据此给正式原算法优势结论。
+- native reward含prepare/prefetch的探索诊断加分；减少prepare可降低reward而不改变完成率/连续性，并减少回传开销。辅助成本/teacher目标与图中native total存在已确认口径差异，尚无消融因果分解。
+- 用户明确要求不改当前实验/优化主线，本轮仅记录和核验，不修复、不调参、不追加实验；继续20分钟监控。证据与未确定项见`sagh_reward_decline_audit_20261021.md`。
+
 ## 2026-10-21 14:10：长预算SAGH seed7解除初始执行平线后回报下降（阶段证据）
 
 - 196,608交互后，相同初始验证状态的最终动作改变77/368；首次改变出现在104,448交互。固定验证reward由18.871250降至15.465000（-18.05%），完成率仍0.875；增加预算本身没有产生该seed的验证收益。
