@@ -1,3 +1,5 @@
+> 2026-10-21 用户授权独立合同修复：旧 long_fair v1 已 SIGINT 停止并保留360文件hash，3完整cell及DQN未完成cell不续跑。独立分支修复采样路径概率、总更新KL回退、原生window_class；311回归通过，真实全算法预检及新run待完成。详见 `fair_reward_contract_repair_20261021.md`。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

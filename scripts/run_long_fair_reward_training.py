@@ -70,6 +70,28 @@ def prepare(source, root, config, manifest):
     p["base_runner_sha256"] = p.pop("runner_sha256")
     p["runner_sha256"] = fair.sha(__file__)
     p["diagnostic_observer_sha256"] = fair.sha(Path(__file__).with_name("diagnose_sagh_flat_reward.py"))
+    from src.evaluators.main_results_support import (classify_window_activity, _estimate_prediction_activity,
+                                                   _estimate_physical_transfer_activity)
+    from src.evaluators.real_sample_support import scan_mobility_windows
+    for window in p["windows"]:
+        bundle = fair.window_bundle(source, p, window["frame_offset"])
+        scans = scan_mobility_windows(frames=bundle.frames, layout_candidates=[p["rsu_layout"]],
+                    frame_offset=0, window_length=p["window_length"], stride=p["window_length"], ranking_mode="max_handoff_candidate")
+        if len(scans) != 1:
+            raise ValueError("Exact frozen window must yield one classification record")
+        scanned = scans[0]
+        predicted = _estimate_prediction_activity(bundle.frames, bundle.rsu_states)
+        physical = _estimate_physical_transfer_activity(bundle.frames, bundle.rsu_states)
+        activity = {"mechanism_signal_count": int(physical["physical_transfer_opportunity_count"] if physical["physical_transfer_activity_available"] else scanned["estimated_handoff_count"]),
+                    "active_vehicle_count_mean": float(scanned["active_vehicle_count_mean"]),
+                    "predicted_next_ratio": float(predicted["predicted_next_rsu_non_null_ratio"]),
+                    "predicted_handoff_ratio": float(predicted["predicted_handoff_target_non_null_ratio"]),
+                    "estimated_association_change_count": int(scanned["estimated_association_change_count"])}
+        window["window_class"] = classify_window_activity(**activity)
+        window["window_class_activity"] = activity
+    p["window_class_protocol"] = "native_data_only_thresholds_v1_no_reward_selection"
+    p["probability_contract"] = "sampled_base_and_option_v1"
+    p["supersedes_user_paused_run"] = "long_fair_reward_training_20261021_v1"
     p["parent_experiment"] = "fair_reward_training_20261021_v2"
     p["parent_plan_sha256"] = "81de66f5f104ebcf582828a0dda941cf99079521eec026c434601bb21d13053b"
     p["protected_files"] = ["scripts/train_sa_ghmappo_real_sample.py", "src/agents/sa_ghmappo_agent.py",
@@ -111,7 +133,8 @@ def evaluate(source, root, p, name, seed, agent, bundles, workflows, step, cell,
                 fair.yield_resources(root)
                 for j, workflow in enumerate(workflows):
                     metadata = {"phase": "validation", "training_steps": step,
-                                "window_id": bundle.rsu_metadata["window_id"], "workflow_id": workflow.workflow_id}
+                                "window_id": bundle.rsu_metadata["window_id"], "workflow_id": workflow.workflow_id,
+                                "window_class": bundle.rsu_metadata["window_class"]}
                     summary, rollout = fair.make_episode(source, p, eval_agent, bundle, workflow,
                                                          seed+10000+i*len(workflows)+j,
                                                          p["max_episode_steps"], metadata, False)
@@ -120,6 +143,7 @@ def evaluate(source, root, p, name, seed, agent, bundles, workflows, step, cell,
                                     "window_id": metadata["window_id"], "workflow_id": workflow.workflow_id,
                                     "total_reward": summary["reward_breakdown"]["total"]["sum"],
                                     "completed": bool(summary["episode_status"].get("completed", False)),
+                                    "window_class": metadata["window_class"],
                                     "workflow_continuity_rate": metrics.get("workflow_continuity_rate"),
                                     "backhaul_traffic_cost": metrics.get("backhaul_traffic_cost")})
                     for k, row in enumerate(rollout):
@@ -127,7 +151,7 @@ def evaluate(source, root, p, name, seed, agent, bundles, workflows, step, cell,
                             "action": int(row["action"]), "reward": float(row["reward"]),
                             "aggregation_reason": row["action_info"].get("aggregation_reason")}
                         json_line(trace, {"window_id": metadata["window_id"], "workflow_id": workflow.workflow_id,
-                                          "step": k, **record})
+                                          "step": k, "window_class": metadata["window_class"], **record})
                         if name == "sa_ghmappo" and step == 0:
                             references.append((copy.deepcopy(row["observation"]), copy.deepcopy(row["decision_info"]), record))
         if name == "sa_ghmappo":
@@ -173,9 +197,15 @@ def run_cell(source, root, p, name, seed, train, validation, workflows):
                     metadata = {"phase": "train", "agent": name, "seed": seed, "episode_index": episode,
                                 "cycle": cycle+1, "unit_index": cycle*len(units)+local_unit,
                                 "window_id": train[i].rsu_metadata["window_id"], "workflow_id": workflows[j].workflow_id,
+                                "window_class": train[i].rsu_metadata["window_class"],
                                 "plan_sha256": p["plan_sha256"]}
                     summary, rollout = fair.make_episode(source, p, agent, train[i], workflows[j], seed+local_unit,
                                                          max_steps, metadata, True)
+                    for row in rollout:
+                        if row["decision_info"]["run_metadata"].get("window_class") != metadata["window_class"]:
+                            raise ValueError("Window classification did not reach learner")
+                        if hasattr(agent, "_latent_policy_statistics") and row["action_info"].get("probability_contract") != p["probability_contract"]:
+                            raise ValueError("Unverified action probability contract")
                     count = len(rollout)
                     if not 0 < count <= remaining:
                         raise ValueError("Interaction accounting failure")
@@ -184,12 +214,21 @@ def run_cell(source, root, p, name, seed, train, validation, workflows):
                     pending.extend(rollout)
                     history.append({"agent": name, "seed": seed, "episode_index": episode, "training_steps": total_steps,
                                     "cycle": cycle+1, "unit_index": metadata["unit_index"],
+                                    "window_class": metadata["window_class"],
                                     "window_id": metadata["window_id"], "workflow_id": metadata["workflow_id"],
                                     "episode_steps": count, "budget_cut": count == max_steps and max_steps < p["max_episode_steps"],
                                     "total_reward": summary["reward_breakdown"]["total"]["sum"],
                                     "completed": bool(summary["episode_status"].get("completed", False)),
                                     "action_counts": json.dumps(dict(Counter(int(r["action"]) for r in rollout)), sort_keys=True)})
+                    behaviors = []
+                    for row in rollout:
+                        action_info = row["action_info"]
+                        behavior = {key: action_info.get(key) for key in ("probability_contract", "sampled_base_action", "sampled_base_log_prob", "log_prob", "sampled_base_probs", "head_actions", "env_action_probability_scope")}
+                        option = action_info.get("option_gate", {})
+                        behavior["option_gate"] = {key: option[key] for key in ("enabled", "option_action", "option_log_prob", "option_probs", "option_mask", "prior_target", "option_actions", "base_env_action") if key in option}
+                        behaviors.append(behavior)
                     json_line(receipts, {"metadata": metadata, "training_steps": total_steps,
+                                         "behavior_diagnostics": behaviors,
                                          "episode_status": summary["episode_status"], "reward_breakdown": summary["reward_breakdown"],
                                          "system_metrics": summary["system_metrics"], "actions": [int(r["action"]) for r in rollout]})
                 if len(pending) == p["steps_per_update"]:
@@ -248,6 +287,9 @@ def execute(source, root):
                                           "vehicles": [v.to_dict() for v in f["vehicles"]]} for f in bundle.frames])
         if identity != {k: w[k] for k in identity} or frames_hash != w["frame_content_sha256"]:
             raise ValueError("Actual window identity/content changed")
+        if w.get("window_class") not in {"mechanism_activating", "active_non_mechanism", "idle_or_sparse"}:
+            raise ValueError("Missing frozen window class")
+        bundle.rsu_metadata["window_class"] = w["window_class"]
         bundles[w["split"]].append(bundle)
     fair.intervals_disjoint(p["windows"])
     workflows = fair.build_workflows(workflow_csv_path=p["workflow_path"], max_workflows=p["max_workflows"],

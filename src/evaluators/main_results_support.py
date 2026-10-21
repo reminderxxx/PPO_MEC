@@ -937,6 +937,47 @@ def _build_window_rsus(window_frames: list[dict[str, Any]], recommended_layout: 
     return build_sample_rsus(frames=window_frames, rsu_layout=recommended_layout)
 
 
+def classify_window_activity(*, mechanism_signal_count, active_vehicle_count_mean, predicted_next_ratio, predicted_handoff_ratio, estimated_association_change_count, effective_activating_handoff_threshold=2, effective_activating_vehicle_threshold=2.0, effective_activating_predicted_next_ratio_threshold=0.3, effective_activating_handoff_prediction_ratio_threshold=0.0, active_non_mechanism_vehicle_threshold=2.0, active_non_mechanism_association_change_min=1, active_non_mechanism_handoff_max=1, active_non_mechanism_handoff_prediction_ratio_max=0.1, idle_or_sparse_vehicle_max=1.5, idle_or_sparse_association_change_max=0, non_mechanism_handoff_max=0, non_mechanism_prediction_ratio_max=0.05):
+    """Native data-only classification, shared by selection and matched training."""
+    is_activating = (
+        mechanism_signal_count >= effective_activating_handoff_threshold
+        and active_vehicle_count_mean >= effective_activating_vehicle_threshold
+        and predicted_next_ratio >= effective_activating_predicted_next_ratio_threshold
+        and predicted_handoff_ratio >= effective_activating_handoff_prediction_ratio_threshold
+    )
+    is_active_non_mechanism = (
+        not is_activating
+        and active_vehicle_count_mean >= float(active_non_mechanism_vehicle_threshold)
+        and estimated_association_change_count >= int(active_non_mechanism_association_change_min)
+        and mechanism_signal_count <= int(active_non_mechanism_handoff_max)
+        and predicted_handoff_ratio <= float(active_non_mechanism_handoff_prediction_ratio_max)
+    )
+    is_idle_or_sparse = (
+        active_vehicle_count_mean <= float(idle_or_sparse_vehicle_max)
+        or (
+            estimated_association_change_count <= int(idle_or_sparse_association_change_max)
+            and mechanism_signal_count <= int(non_mechanism_handoff_max)
+            and predicted_handoff_ratio <= float(non_mechanism_prediction_ratio_max)
+        )
+    )
+    if is_activating:
+        window_class = "mechanism_activating"
+    elif is_active_non_mechanism:
+        window_class = "active_non_mechanism"
+    elif is_idle_or_sparse:
+        window_class = "idle_or_sparse"
+    elif (
+        active_vehicle_count_mean > float(idle_or_sparse_vehicle_max)
+        and estimated_association_change_count > int(idle_or_sparse_association_change_max)
+        and mechanism_signal_count <= int(active_non_mechanism_handoff_max)
+    ):
+        window_class = "active_non_mechanism"
+    else:
+        window_class = "idle_or_sparse"
+
+    return window_class
+
+
 def resolve_window_candidates(
     root_dir: Path,
     mobility_csv_path: str,
@@ -1030,41 +1071,7 @@ def resolve_window_candidates(
             physical_transfer_opportunity_count if physical_transfer_available else estimated_handoff_count
         )
 
-        is_activating = (
-            mechanism_signal_count >= effective_activating_handoff_threshold
-            and active_vehicle_count_mean >= effective_activating_vehicle_threshold
-            and predicted_next_ratio >= effective_activating_predicted_next_ratio_threshold
-            and predicted_handoff_ratio >= effective_activating_handoff_prediction_ratio_threshold
-        )
-        is_active_non_mechanism = (
-            not is_activating
-            and active_vehicle_count_mean >= float(active_non_mechanism_vehicle_threshold)
-            and estimated_association_change_count >= int(active_non_mechanism_association_change_min)
-            and mechanism_signal_count <= int(active_non_mechanism_handoff_max)
-            and predicted_handoff_ratio <= float(active_non_mechanism_handoff_prediction_ratio_max)
-        )
-        is_idle_or_sparse = (
-            active_vehicle_count_mean <= float(idle_or_sparse_vehicle_max)
-            or (
-                estimated_association_change_count <= int(idle_or_sparse_association_change_max)
-                and mechanism_signal_count <= int(non_mechanism_handoff_max)
-                and predicted_handoff_ratio <= float(non_mechanism_prediction_ratio_max)
-            )
-        )
-        if is_activating:
-            window_class = "mechanism_activating"
-        elif is_active_non_mechanism:
-            window_class = "active_non_mechanism"
-        elif is_idle_or_sparse:
-            window_class = "idle_or_sparse"
-        elif (
-            active_vehicle_count_mean > float(idle_or_sparse_vehicle_max)
-            and estimated_association_change_count > int(idle_or_sparse_association_change_max)
-            and mechanism_signal_count <= int(active_non_mechanism_handoff_max)
-        ):
-            window_class = "active_non_mechanism"
-        else:
-            window_class = "idle_or_sparse"
+        window_class = classify_window_activity(mechanism_signal_count=mechanism_signal_count, active_vehicle_count_mean=active_vehicle_count_mean, predicted_next_ratio=predicted_next_ratio, predicted_handoff_ratio=predicted_handoff_ratio, estimated_association_change_count=estimated_association_change_count, effective_activating_handoff_threshold=effective_activating_handoff_threshold, effective_activating_vehicle_threshold=effective_activating_vehicle_threshold, effective_activating_predicted_next_ratio_threshold=effective_activating_predicted_next_ratio_threshold, effective_activating_handoff_prediction_ratio_threshold=effective_activating_handoff_prediction_ratio_threshold, active_non_mechanism_vehicle_threshold=active_non_mechanism_vehicle_threshold, active_non_mechanism_association_change_min=active_non_mechanism_association_change_min, active_non_mechanism_handoff_max=active_non_mechanism_handoff_max, active_non_mechanism_handoff_prediction_ratio_max=active_non_mechanism_handoff_prediction_ratio_max, idle_or_sparse_vehicle_max=idle_or_sparse_vehicle_max, idle_or_sparse_association_change_max=idle_or_sparse_association_change_max, non_mechanism_handoff_max=non_mechanism_handoff_max, non_mechanism_prediction_ratio_max=non_mechanism_prediction_ratio_max)
 
         mechanism_score = round(
             0.08 * mechanism_signal_count

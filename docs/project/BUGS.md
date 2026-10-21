@@ -1,3 +1,5 @@
+> 2026-10-21 独立修复进行中：旧 SAGH post-map likelihood 错配、指数ratio平方爆炸及runner漏window_class已定位。修复只在独立实验分支，单测通过不等于长训练稳定或收益改善；辅助目标与原生环境奖励不完全相同的风险仍保留。旧轮已用户暂停，禁止将未完成cell当完整结果。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

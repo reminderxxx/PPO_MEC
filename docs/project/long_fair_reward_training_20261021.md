@@ -1,3 +1,5 @@
+> 2026-10-21 用户停止本轮：旧run于14:32:50+08:00 SIGINT退出，完整和未完整cell原样保留，`user_pause_receipt.json`为停止身份与文件清单证据。旧status是停止前快照，不再视为正在运行。后续独立修复及全新重训见 `fair_reward_contract_repair_20261021.md`。
+
 # 扩大循环与预算的独立公平奖励训练
 
 - reviewed_at: 2026-10-21；literature_cutoff: 2026-09-28（未重新评价 novelty）

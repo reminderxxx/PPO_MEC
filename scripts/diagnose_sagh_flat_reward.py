@@ -85,7 +85,10 @@ def action_record(row):
     return {"action": int(row["action"]), "reward": float(row["reward"]),
             "head_actions": info["head_actions"], "raw_env_action": info["raw_env_action"],
             "projected_env_action": info["projected_env_action"],
-            "env_probs": info["env_action_probs"], "mask": info["action_mask"],
+            "env_probs": info["env_action_probs"], "env_probs_scope": info.get("env_action_probability_scope", "legacy_pre_mapping"),
+            "probability_contract": info.get("probability_contract"),
+            "sampled_base_action": info.get("sampled_base_action"), "sampled_path_log_prob": info["log_prob"],
+            "mask": info["action_mask"],
             "stages": info["checkpoint_probe"], "guard_action_delta": info["guard_action_delta"],
             "option_gate": info["option_gate"], "aggregation_reason": info["aggregation_reason"],
             "continuity_guard": info["continuity_guard"],
@@ -99,7 +102,7 @@ def compare_records(a, b):
             "head_actions_changed": a["head_actions"] != b["head_actions"],
             "network_argmax_changed": a["stages"][0]["env_argmax"] != b["stages"][0]["env_argmax"],
             "network_probability_l1": sum(abs(x-y) for x, y in zip(a["stages"][0]["env_probs"], b["stages"][0]["env_probs"])),
-            "final_probability_l1": sum(abs(x-y) for x, y in zip(a["env_probs"], b["env_probs"]))}
+            "proposal_probability_l1": sum(abs(x-y) for x, y in zip(a["env_probs"], b["env_probs"]))}
 
 
 def main():
@@ -193,7 +196,7 @@ def main():
                             "head_action_changes": sum(r["head_actions_changed"] for r in rows),
                             "network_argmax_changes": sum(r["network_argmax_changed"] for r in rows),
                             "network_probability_l1_mean": sum(r["network_probability_l1"] for r in rows)/len(rows),
-                            "final_probability_l1_mean": sum(r["final_probability_l1"] for r in rows)/len(rows),
+                            "proposal_probability_l1_mean": sum(r["proposal_probability_l1"] for r in rows)/len(rows),
                             "evaluation_reward_mean": sum(r["total_reward"] for r in eps)/len(eps),
                             "completion_rate": sum(r["completed"] for r in eps)/len(eps)})
     fair.csv_write(out / "summary.csv", summary)

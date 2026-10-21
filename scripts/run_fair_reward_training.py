@@ -20,7 +20,7 @@ import time
 from pathlib import Path
 
 
-PROJECT = Path(__file__).resolve().parents[1]
+PROJECT = Path(os.environ.get("PPO_MEC_EXPERIMENT_PROJECT_ROOT", str(Path(__file__).resolve().parents[1])))
 
 
 def sha(path):

@@ -46,6 +46,21 @@ def validate_cell(cell, p, name, seed):
             if (row["window_id"], row["workflow_id"]) != train_units[unit % len(train_units)]:
                 raise ValueError("Training unit schedule mismatch")
             meta = receipt["metadata"]
+            expected_class = next(w["window_class"] for w in p["windows"] if w["window_id"] == row["window_id"])
+            if meta.get("window_class") != expected_class or row.get("window_class") != expected_class:
+                raise ValueError("Frozen classification did not reach training")
+            behaviors = receipt.get("behavior_diagnostics", [])
+            if len(behaviors) != n:
+                raise ValueError("Missing sampled-path receipts")
+            for behavior in behaviors:
+                if behavior.get("probability_contract") is None:
+                    continue  # value-based baselines do not publish a policy density
+                if behavior["probability_contract"] != p["probability_contract"]:
+                    raise ValueError("Unexpected probability contract")
+                option = behavior.get("option_gate") or {}
+                expected_lp = float(behavior["sampled_base_log_prob"]) + (float(option["option_log_prob"]) if option.get("enabled") else 0.)
+                if not np.isclose(expected_lp, float(behavior["log_prob"]), atol=2e-5, rtol=0):
+                    raise ValueError("Sampled path log likelihood mismatch")
             if meta["agent"] != name or meta["seed"] != seed or meta["plan_sha256"] != p["plan_sha256"] or meta["unit_index"] != unit:
                 raise ValueError("Receipt identity mismatch")
             reward = receipt["reward_breakdown"]
@@ -76,6 +91,8 @@ def validate_cell(cell, p, name, seed):
         sub = read_csv(cell / f"evaluation_{step:07d}.csv")
         if len(sub) != len(units) or {(r["window_id"], r["workflow_id"]) for r in sub} != units:
             raise ValueError("Validation units differ")
+        if any(r.get("window_class") != next(w["window_class"] for w in p["windows"] if w["window_id"] == r["window_id"]) for r in sub):
+            raise ValueError("Validation classification differs")
         if any(r["agent"] != name or int(r["seed"]) != seed or int(r["training_steps"]) != step for r in sub):
             raise ValueError("Validation identity differs")
         combined.extend(sub)

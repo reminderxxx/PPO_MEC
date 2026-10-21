@@ -1,3 +1,5 @@
+> 2026-10-21 独立分支新增：`configs/experiment/repaired_fair_reward_training_v1.json`、`tests/test_repaired_probability_contract.py`、`docs/project/fair_reward_contract_repair_20261021.md`；新root为 `artifacts/analysis/repaired_fair_reward_training_20261021_v1`，旧long root只读保留。
+
 ﻿# Directory Structure
 
 ## 独立公平奖励训练（2026-10-21）

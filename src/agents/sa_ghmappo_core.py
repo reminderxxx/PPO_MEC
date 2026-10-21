@@ -1,4 +1,4 @@
-﻿"""多时间尺度 MARL 智能体公共组件。"""
+"""多时间尺度 MARL 智能体公共组件。"""
 
 from __future__ import annotations
 
@@ -2812,6 +2812,89 @@ class 分层PPO基类(BaseAgent):
             ),
         }
 
+    @staticmethod
+    def _stable_probability_ratio(new_log_prob, old_log_prob):
+        # Numerical ceiling only; accepted policy steps are independently KL checked.
+        return torch.exp(torch.clamp(new_log_prob - old_log_prob, min=-20.0, max=20.0))
+
+    def _latent_policy_statistics(self, batch_outputs, batch_rows, batch_action_masks):
+        log_probs, base_probs, conditional_probs = [], [], []
+        for output, row, mask in zip(batch_outputs, batch_rows, batch_action_masks):
+            info = row["action_info"]
+            if info.get("probability_contract") != "sampled_base_and_option_v1":
+                raise ValueError("Missing sampled-path probability contract")
+            scores = self._hierarchical_env_action_scores(output) if self._use_hierarchy else output["flat_logits"]
+            distribution = Categorical(logits=self._masked_flat_logits(scores, mask))
+            base = torch.tensor(info["sampled_base_action"], device=self._device)
+            log_prob = distribution.log_prob(base)
+            base_probs.append(distribution.probs)
+            option = info.get("option_gate", {})
+            if bool(option.get("enabled", False)):
+                logits = self._masked_option_logits(output["option_logits"], option["option_mask"], prior_target=option["prior_target"])
+                # The matched repair protocol excludes model-critic policy improvement.
+                if self._option_counterfactual_policy_improvement_enabled:
+                    raise ValueError("Unsupported critic-improved option contract")
+                conditional = Categorical(logits=logits)
+                log_prob = log_prob + conditional.log_prob(torch.tensor(option["option_action"], device=self._device))
+                conditional_probs.append(conditional.probs)
+            else:
+                conditional_probs.append(None)
+            log_probs.append(log_prob)
+        return torch.stack(log_probs), torch.stack(base_probs), conditional_probs
+
+    def _sampled_policy_kl(self, outputs, rows, masks):
+        _, current_base, current_option = self._latent_policy_statistics(outputs, rows, masks)
+        old_base = torch.as_tensor([r["action_info"]["sampled_base_probs"] for r in rows], device=self._device)
+        # Exact categorical KL for the base plus conditional KL on each observed path.
+        # This is an observed-context trust constraint, not a global convergence claim.
+        def kl(old, new):
+            term = old * (old.clamp_min(1e-30).log() - new.clamp_min(1e-30).log())
+            return term.sum(dim=-1).clamp_min(0.0)
+        result = kl(old_base, current_base)
+        for index, probs in enumerate(current_option):
+            if probs is not None:
+                old = torch.as_tensor(rows[index]["action_info"]["option_gate"]["option_probs"], device=self._device)
+                result[index] += kl(old, probs)
+        return result
+
+    def _guarded_policy_step(self, total_loss, rows, states, metadata, masks):
+        if not bool(torch.isfinite(total_loss).item()):
+            raise FloatingPointError("Non-finite loss; refusing optimizer step")
+        before = {k: v.detach().clone() for k, v in self._network.state_dict().items()}
+        optimizer_before = deepcopy(self._optimizer.state_dict())
+        self._optimizer.zero_grad()
+        total_loss.backward()
+        gradients = [v.grad for v in self._network.parameters() if v.grad is not None]
+        if any(not bool(torch.isfinite(v).all().item()) for v in gradients):
+            self._optimizer.zero_grad()
+            raise FloatingPointError("Non-finite gradient; refusing optimizer step")
+        norm = float(nn.utils.clip_grad_norm_(self._network.parameters(), max_norm=self._max_grad_norm, error_if_nonfinite=True))
+        if not math.isfinite(norm):
+            raise FloatingPointError("Non-finite gradient norm; refusing optimizer step")
+        self._optimizer.step()
+        proposal = {k: v.detach().clone() for k, v in self._network.state_dict().items()}
+        finite = all(bool(torch.isfinite(v).all().item()) for v in proposal.values())
+        last_kl = float("inf")
+        if finite:
+            for backtracks in range(8):
+                scale = 0.5 ** backtracks
+                if backtracks:
+                    self._network.load_state_dict({k: before[k] + scale * (proposal[k] - before[k]) for k in before})
+                with torch.no_grad():
+                    outputs = [self._forward_policy(st, run_metadata=meta) for st, meta in zip(states, metadata)]
+                    divergence = self._sampled_policy_kl(outputs, rows, masks)
+                    last_kl = float(divergence.mean())
+                    max_kl = float(divergence.max())
+                limit = self._target_kl if self._target_kl > 0 else 0.01
+                if math.isfinite(last_kl) and last_kl <= limit and max_kl <= 8.0 * limit:
+                    return {"accepted": True, "backtracks": backtracks, "kl": last_kl,
+                            "max_kl": max_kl, "gradient_norm_before_clip": norm}
+        self._network.load_state_dict(before)
+        self._optimizer.load_state_dict(optimizer_before)
+        self._optimizer.zero_grad()
+        return {"accepted": False, "backtracks": 8, "kl": last_kl if math.isfinite(last_kl) else 0.0,
+                "max_kl": 0.0, "gradient_norm_before_clip": norm}
+
     def act(self, observation: Any, info: dict[str, Any] | None = None) -> tuple[int, dict[str, Any]]:
         del observation
         semantic_state = self._extract_semantic_state(info)
@@ -2857,6 +2940,11 @@ class 分层PPO基类(BaseAgent):
                 event_head_enabled=self._event_head_enabled,
                 adapter_prefetch_enabled=self._adapter_prefetch_enabled,
             )
+            sampled_base_action = int(projected_env_action)
+            sampled_base_log_prob, _, sampled_base_probs = self._env_action_distribution_statistics(
+                policy_output=policy_output, env_action=sampled_base_action, action_mask=action_mask)
+            proposal_scores = self._hierarchical_env_action_scores(policy_output) if self._use_hierarchy else policy_output["flat_logits"]
+            sampled_base_probs = torch.softmax(self._masked_flat_logits(proposal_scores, action_mask), dim=-1).tolist()
             guard_info = dict(policy_output.get("continuity_guard_info", {}))
             if (not raw_policy_evaluation) and self._should_hard_apply_continuity_guard(
                 selected_actions=selected_actions,
@@ -2980,7 +3068,7 @@ class 分层PPO基类(BaseAgent):
                 if not raw_policy_evaluation
                 else {"enabled": False, "applied": False, "reason": "raw_policy_evaluation"}
             )
-            option_gate_info.pop("_option_log_prob_tensor", None)
+            sampled_option_log_prob = option_gate_info.pop("_option_log_prob_tensor", None)
             option_entropy_tensor = option_gate_info.pop("_option_entropy_tensor", None)
             if option_gate_info.get("applied", False):
                 env_action = int(option_gate_info["option_env_action"])
@@ -3035,6 +3123,12 @@ class 分层PPO基类(BaseAgent):
             )
             if option_entropy_tensor is not None:
                 entropy = 0.5 * (entropy + option_entropy_tensor)
+            sampled_path_log_prob = sampled_base_log_prob
+            if sampled_option_log_prob is not None:
+                sampled_path_log_prob = sampled_path_log_prob + sampled_option_log_prob
+            probability_contract = "sampled_base_and_option_v1" if self._action_mask_has_valid_action(action_mask) else "legacy_unmasked_heads"
+            if probability_contract == "sampled_base_and_option_v1":
+                log_prob = sampled_path_log_prob
             value = float(policy_output["value"].item())
             prediction_gate = float(policy_output["encoded"].get("prediction_gate", torch.tensor([1.0], device=self._device)).flatten()[0].item())
             temporal_urgency = float(policy_output["encoded"].get("temporal_urgency", torch.tensor([0.0], device=self._device)).flatten()[0].item())
@@ -3077,8 +3171,15 @@ class 分层PPO基类(BaseAgent):
             "guard_action_delta": guard_action_delta,
             "projected_aggregation_reason": projected_aggregation_reason,
             "aggregation_reason": aggregation_reason,
-            "log_prob": round(float(log_prob.item()), 6),
-            "env_action_log_prob": round(float(env_action_log_prob.item()), 6),
+            "log_prob": float(log_prob.item()),
+            "probability_contract": probability_contract,
+            "sampled_base_action": sampled_base_action,
+            "sampled_base_log_prob": float(sampled_base_log_prob.item()),
+            "sampled_base_probs": [float(v) for v in sampled_base_probs],
+            "pre_mapping_env_action_probs": [float(v) for v in sampled_base_probs],
+            "env_action_probability_scope": "pre_mapping_proposal_diagnostic_only",
+            "env_action_log_prob": float(sampled_base_log_prob.item()),
+            "env_action_log_prob_action": sampled_base_action,
             "env_action_entropy": round(float(env_action_entropy.item()), 6),
             "env_action_probs": env_action_probs,
             "env_action_model_critic": env_action_model_critic_info,
@@ -3480,6 +3581,10 @@ class 分层PPO基类(BaseAgent):
         learned_transition_model_stats["counterfactual_sample_count"] = (
             counterfactual_sample_count
         )
+        repaired_probability_contract = all(row.get("action_info", {}).get("probability_contract") == "sampled_base_and_option_v1" for row in rollout)
+        if any(row.get("action_info", {}).get("probability_contract") == "sampled_base_and_option_v1" for row in rollout) and not repaired_probability_contract:
+            raise ValueError("Mixed probability contracts in one rollout")
+        guarded_steps = []
         imitation_rollout_stats = self._annotate_heuristic_imitation_targets(rollout)
         semantic_states = [self._extract_semantic_state(row.get("decision_info")) for row in rollout]
         run_metadata_by_row = [
@@ -3492,6 +3597,14 @@ class 分层PPO基类(BaseAgent):
         advantages = np.asarray([float(row.get("advantage", 0.0)) for row in rollout], dtype=np.float32)
         values = np.asarray([float(row.get("value", 0.0)) for row in rollout], dtype=np.float32)
         old_log_probs = np.asarray([float(row.get("log_prob", 0.0)) for row in rollout], dtype=np.float32)
+        initial_log_prob_error = 0.0
+        if repaired_probability_contract:
+            with torch.no_grad():
+                initial_outputs = [self._forward_policy(st, run_metadata=meta) for st, meta in zip(semantic_states, run_metadata_by_row)]
+                initial_lp, _, _ = self._latent_policy_statistics(initial_outputs, rollout, action_masks)
+                initial_log_prob_error = float((initial_lp - torch.as_tensor(old_log_probs, device=self._device)).abs().max())
+            if not math.isfinite(initial_log_prob_error) or initial_log_prob_error > 2e-5:
+                raise ValueError(f"Behavior likelihood changed before first policy step: {initial_log_prob_error}")
         old_env_action_log_prob_values: list[float] = []
         old_env_action_log_prob_missing_count = 0
         for row in rollout:
@@ -3995,6 +4108,11 @@ class 分层PPO基类(BaseAgent):
                         event_advantage=event_advantage_tensor[batch_indices],
                         counterfactual_head_advantages=counterfactual_head_advantages,
                     )
+                    if repaired_probability_contract:
+                        new_log_prob, _, _ = self._latent_policy_statistics(batch_outputs, batch_rows, batch_action_masks)
+                        actor_ratio = self._stable_probability_ratio(new_log_prob, old_log_prob_tensor[batch_indices])
+                        actor_loss = -torch.minimum(actor_ratio * advantage_tensor[batch_indices],
+                            torch.clamp(actor_ratio, 1.0-self._clip_ratio, 1.0+self._clip_ratio) * advantage_tensor[batch_indices]).mean()
                     if counterfactual_head_advantages is not None:
                         counterfactual_head_advantage_applied_batches += 1
                         for head_name, tensor in counterfactual_head_advantages.items():
@@ -4062,8 +4180,10 @@ class 分层PPO基类(BaseAgent):
                     )
                     distribution = Categorical(logits=logits)
                     new_log_prob = distribution.log_prob(action_tensor[batch_indices])
+                    if repaired_probability_contract:
+                        new_log_prob, _, _ = self._latent_policy_statistics(batch_outputs, batch_rows, batch_action_masks)
                     entropy = distribution.entropy().mean()
-                    ratio = torch.exp(new_log_prob - old_log_prob_tensor[batch_indices])
+                    ratio = self._stable_probability_ratio(new_log_prob, old_log_prob_tensor[batch_indices])
                     surrogate_1 = ratio * advantage_tensor[batch_indices]
                     surrogate_2 = torch.clamp(
                         ratio,
@@ -4102,7 +4222,7 @@ class 分层PPO基类(BaseAgent):
                     env_action_model_teacher_distillation_batch_support = 0
 
                 value_prediction = torch.stack([output["value"] for output in batch_outputs], dim=0)
-                ratio = torch.exp(new_log_prob - old_log_prob_tensor[batch_indices])
+                ratio = self._stable_probability_ratio(new_log_prob, old_log_prob_tensor[batch_indices])
                 value_loss = torch.mean((return_tensor[batch_indices] - value_prediction) ** 2)
                 auxiliary_loss = self._compute_auxiliary_loss(batch_states=batch_states, batch_outputs=batch_outputs)
                 heuristic_imitation_loss = self._compute_heuristic_imitation_loss(
@@ -4181,13 +4301,20 @@ class 分层PPO基类(BaseAgent):
                     * env_action_model_teacher_distillation_loss
                 )
 
-                self._optimizer.zero_grad()
-                total_loss.backward()
-                nn.utils.clip_grad_norm_(self._network.parameters(), max_norm=self._max_grad_norm)
-                self._optimizer.step()
+                if repaired_probability_contract:
+                    step_result = self._guarded_policy_step(total_loss, batch_rows, batch_states, batch_run_metadata, batch_action_masks)
+                    guarded_steps.append(step_result)
+                    if not step_result["accepted"]:
+                        early_stop_triggered = True
+                        break
+                else:
+                    self._optimizer.zero_grad()
+                    total_loss.backward()
+                    nn.utils.clip_grad_norm_(self._network.parameters(), max_norm=self._max_grad_norm)
+                    self._optimizer.step()
 
                 with torch.no_grad():
-                    approx_kl = torch.mean(old_log_prob_tensor[batch_indices] - new_log_prob)
+                    approx_kl = torch.as_tensor(step_result["kl"], device=self._device) if repaired_probability_contract else torch.mean(old_log_prob_tensor[batch_indices] - new_log_prob)
                     clip_fraction = torch.mean((torch.abs(ratio - 1.0) > self._clip_ratio).float())
 
                 actor_loss_total += float(actor_loss.item())
@@ -4245,6 +4372,8 @@ class 分层PPO基类(BaseAgent):
                 update_steps += 1
                 epoch_kl_values.append(float(approx_kl.item()))
             executed_epochs += 1
+            if repaired_probability_contract and guarded_steps and not guarded_steps[-1]["accepted"]:
+                break
             if self._kl_early_stop_enabled and self._target_kl > 0.0 and epoch_kl_values:
                 epoch_kl_mean = float(sum(epoch_kl_values) / len(epoch_kl_values))
                 if epoch_kl_mean >= self._target_kl:
@@ -4307,7 +4436,15 @@ class 分层PPO基类(BaseAgent):
         return {
             "agent_name": self.agent_name,
             "policy_type": self.policy_type,
-            "policy_update_skipped": False,
+            "policy_update_skipped": bool(repaired_probability_contract and not any(v["accepted"] for v in guarded_steps)),
+            "probability_contract": "sampled_base_and_option_v1" if repaired_probability_contract else "legacy_unverified",
+            "initial_log_prob_error_max": initial_log_prob_error,
+            "guarded_optimizer_steps": len(guarded_steps),
+            "accepted_optimizer_steps": sum(v["accepted"] for v in guarded_steps),
+            "rejected_optimizer_steps": sum(not v["accepted"] for v in guarded_steps),
+            "optimizer_backtracks": sum(v["backtracks"] for v in guarded_steps),
+            "accepted_policy_kl_max": max([v["kl"] for v in guarded_steps if v["accepted"]] or [0.0]),
+            "gradient_norm_before_clip_max": max([v["gradient_norm_before_clip"] for v in guarded_steps] or [0.0]),
             "update_count": self._update_count,
             "collected_steps": len(rollout),
             "clip_ratio": self._clip_ratio,
@@ -6289,14 +6426,14 @@ class 分层PPO基类(BaseAgent):
                 candidate_info.get("sparse_tail_risk_option_context", {})
             ),
             "window_class": str(candidate_info.get("window_class", "unknown")),
-            "option_probs": [round(float(item), 6) for item in option_probs.tolist()],
+            "option_probs": [float(item) for item in option_probs.tolist()],
             "top_option_prob": round(float(option_probs[top_action].item()), 6),
             "prior_option_prob": round(
                 float(option_probs[prior_target].item()) if 0 <= prior_target < int(option_probs.shape[-1]) else 0.0,
                 6,
             ),
             "base_option_prob": round(float(option_probs[0].item()) if int(option_probs.shape[-1]) > 0 else 0.0, 6),
-            "option_log_prob": round(float(distribution.log_prob(option_tensor).item()), 6),
+            "option_log_prob": float(distribution.log_prob(option_tensor).item()),
             "option_entropy": round(float(distribution.entropy().item()), 6),
             "critic_policy_improvement_enabled": bool(
                 self._option_counterfactual_policy_improvement_enabled
@@ -7801,7 +7938,7 @@ class 分层PPO基类(BaseAgent):
                         (1.0 - blend) * head_advantage
                         + blend * counterfactual_advantage
                     )
-            ratio = torch.exp(head_log_probs[head_name] - old_head_log_probs[head_name])
+            ratio = self._stable_probability_ratio(head_log_probs[head_name], old_head_log_probs[head_name])
             surrogate_1 = ratio * head_advantage
             surrogate_2 = torch.clamp(
                 ratio,
@@ -7844,7 +7981,8 @@ class 分层PPO基类(BaseAgent):
             dim=0,
         )
         distribution = Categorical(logits=env_scores)
-        new_log_probs = distribution.log_prob(batch_actions)
+        sampled_base_actions = torch.as_tensor([row.get("action_info", {}).get("sampled_base_action", int(action)) for row, action in zip(batch_rows, batch_actions.detach().cpu().tolist())], dtype=torch.long, device=self._device)
+        new_log_probs = distribution.log_prob(sampled_base_actions)
         blend = self._env_action_ppo_advantage_blend
         action_advantage = blend * base_advantage + (1.0 - blend) * event_advantage
         if (
@@ -7957,7 +8095,7 @@ class 分层PPO基类(BaseAgent):
             sample_weights = sample_weights + self._env_action_risk_adjusted_recovery_coef * risk_focus
         if self._env_action_ppo_max_weight > 0.0:
             sample_weights = torch.clamp(sample_weights, max=self._env_action_ppo_max_weight)
-        ratio = torch.exp(new_log_probs - old_env_action_log_probs)
+        ratio = self._stable_probability_ratio(new_log_probs, old_env_action_log_probs)
         surrogate_1 = ratio * action_advantage
         surrogate_2 = torch.clamp(
             ratio,
@@ -7971,8 +8109,9 @@ class 分层PPO基类(BaseAgent):
             upper = 1.0 + self._env_action_ppo_ratio_barrier_margin
             positive_advantage = torch.relu(action_advantage.detach())
             negative_advantage = torch.relu(-action_advantage.detach())
-            under_update_gap = torch.relu(lower - ratio) * positive_advantage
-            over_update_gap = torch.relu(ratio - upper) * negative_advantage
+            log_ratio = torch.clamp(new_log_probs - old_env_action_log_probs, min=-20.0, max=20.0)
+            under_update_gap = torch.relu(math.log(lower) - log_ratio) * positive_advantage
+            over_update_gap = torch.relu(log_ratio - math.log(upper)) * negative_advantage
             barrier = (under_update_gap.square() + over_update_gap.square()) * sample_weights
             loss = loss + self._env_action_ppo_ratio_barrier_coef * (
                 barrier.sum() / torch.clamp(sample_weights.sum(), min=1e-6)
@@ -8270,7 +8409,7 @@ class 分层PPO基类(BaseAgent):
                 device=self._device,
             )
             new_log_prob = distribution.log_prob(action_tensor)
-            ratio = torch.exp(new_log_prob - old_log_prob)
+            ratio = self._stable_probability_ratio(new_log_prob, old_log_prob)
             option_advantage = self._option_gate_advantage(
                 row=row,
                 base_advantage=batch_advantage[row_index],
