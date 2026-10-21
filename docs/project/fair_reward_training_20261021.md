@@ -6,7 +6,7 @@
 - `artifact_run_id`: `fair_reward_training_20261021_v2`
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `git_commit`: 隔离算法源码固定为 `8e15418`；新 runner 自身 SHA-256 和配置 hash 写入 frozen plan
-- `evidence_level`: 冻结方案与小规模执行预检通过，完整结果以各 cell 的 `complete.json` 和导出报告为准
+- `evidence_level`: `MATCHED_DEVELOPMENT_RAW_RECEIPTS_CHECKPOINTS_AUDITED`；30 cell 全量记录核验通过，仅限本轮开发实验
 - `verdict`: 正式算法优势、holdout 泛化及策略参数收敛均 `UNVERIFIED`
 
 ## 授权与隔离
@@ -82,3 +82,64 @@ plan/hash 变化及平台/业务质量/参数收敛的区分。`prepare` 和 `ru
 用户要求“开启实验后隔20min轮询，后续再优化”。本聊天已创建 heartbeat `ppo-mec-3`，每20分钟检查既有 run；
 `continuation_monitor.json` 记录下次最早检查时间和通知去重。正常运行或让出资源时保持安静；只在完成、失败或需行动时反馈。
 完成后只核验原件、导出真实曲线和报告并暂停提醒，不启动新训练或优化。失败保留现场、独立诊断，不自动重跑。
+
+## 完成回收与真实结果（2026-10-21 11:04 轮询）
+
+30/30 cell 全部完成，无科学重跑或追加预算。累计 **184,320 次训练交互、720 次 update、13,853 个训练
+episode、9,360 条验证 unit、750 个 checkpoint**。独立离线核验记录在 `completion_audit.json`，核验代码保留为
+同目录 `completion_audit.py`，没有重放环境或调用学习。审查时主仓库 HEAD=`200bf96`，算法 source=`8e15418`，
+runner release=`ba1b04e`；本节仍沿用上述日期、literature cutoff、venue 和 policy 元数据，不评价新文献。
+
+### 核验范围
+
+- frozen plan semantic hash、runner/config/旧配置来源 manifest、两个原始数据文件及30个配置来源 checkpoint hash 全部一致。
+- 重新只读加载36个实际窗口并复算 frame 内容 hash；630对原始 source-segment/time interval 全部互斥。两个workflow内容hash一致。
+- 每cell恰好6,144 steps/24 updates、48个unit各128steps；全部episode次序、累计steps、receipt/CSV回报、原生奖励分项恒等式和zero offset一致。
+- 每cell13×12×2=312条验证unit，所有窗口/workflow/seed/checkpoint身份一致，逐checkpoint CSV与汇总CSV完全一致。
+- 750个checkpoint的agent/update计数、网络key/shape与有限数值通过；30个initial checkpoint均update=0且optimizer state为空，identity中replay initial size=0。
+- 每个训练单元的网络参数都实际变化。SAGH三个seed均有88个tensor改变，网络L2变化约2.4097/2.4247/2.4361。
+- 七个受保护用户修改的整体diff SHA-256仍为`1b10c6e1739314267d12bf86b56069efb4efd2a348ecdd0c519a132733908bb2`。未修改优化代码、原checkpoint或其他训练任务；本轮没有触发等待其他训练的记录。
+
+### 全算法结果
+
+回报为同一固定验证集上的episode total reward，表内是3 seed均值；平台数量按**每seed末5点**的事前规则判断，
+不是把3-seed均值曲线直接判收敛。完成率为各seed末5个checkpoint的均值。23/30个seed满足奖励平台描述规则，
+其中6/10个算法在3个seed上全部满足；仍不能据此确认策略参数收敛。
+
+| 算法 | 初始验证回报 | 最终验证回报 | 最终减初始 | 平台seed数 | 末段完成率 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| SAGH | 18.871250 | 18.871250 | 0.000000 | 3/3 | 0.875000 |
+| PPO | -27.896528 | 18.871250 | +46.767778 | 2/3 | 0.875000 |
+| MAPPO | 18.871250 | 18.871250 | 0.000000 | 3/3 | 0.875000 |
+| DQN | -23.773194 | 12.029306 | +35.802500 | 2/3 | 0.875000 |
+| Dueling DQN | -31.810417 | 12.029306 | +43.839722 | 3/3 | 0.875000 |
+| QMIX | 3.268750 | 18.871250 | +15.602500 | 3/3 | 0.875000 |
+| Controller MAT | 18.871250 | 18.871250 | 0.000000 | 3/3 | 0.875000 |
+| DAG Offload DRL | 18.871250 | 15.080833 | -3.790417 | 0/3 | 0.869444 |
+| Cache Offload DRL | 18.871250 | 17.448750 | -1.422500 | 1/3 | 0.875000 |
+| DT Handoff DRL | 18.871250 | 18.871250 | 0.000000 | 3/3 | 0.875000 |
+
+SAGH三个seed在13次验证中都保持18.871250，完成率0.875；参数变化但验证回报未改善。这是**从初始就有的
+奖励平台**，不能写成训练逐步收敛、学习带来收益或优于全部baseline。DT也从初始起处于相同平台。最终SAGH与
+PPO/MAPPO/QMIX/Controller MAT/DT共6个方法并列；总览图的重叠线是原值重合，不是缺失或人为拉齐。
+相同回报不等于动作trace相同，本轮没有用新rollout追加行为归因。
+
+PPO、DQN、Dueling DQN、QMIX的均值有提升，但PPO和DQN各一个seed仍不满足末5点平台规则。
+DAG三个seed和Cache两个seed也未满足。DAG/Cache的最终均值低于初始值，负结果保留；未因这些结果续训或调参。
+训练step reward中的周期波动同时受固定窗口/workflow顺序影响，不能把它与固定验证episode reward混作同一曲线。
+
+### 交付、验证与剩余风险
+
+- `figures/fair_evaluation_reward_all_algorithms.png/.pdf`：全部13个原始验证点、mean与seed SD，无平滑、平移、插值或补尾。
+- `figures/fair_reward_<agent>.png/.pdf`：十算法各自的训练step reward及固定验证episode reward，并显示seed线。
+- `figures/all_training_episodes.csv`、`all_evaluation_units.csv`、`evaluation_reward_summary.csv`、`convergence_diagnostics.csv`与`report.json`：完整原值和平台规则结果。
+- 根目录`algorithm_result_summary.csv`、`completion_audit.json`及本报告副本构成离线回收证据。
+- 本地交付包为`artifacts/analysis/fair_reward_training_20261021_v2_delivery.zip`，只含曲线、派生CSV和证据说明，不含checkpoint、原始数据或依赖环境。
+
+重新执行专项测试：19项通过；独立核验和原生奖励对账通过。11套PNG/PDF均已目视检查，没有文字遮挡或图像裁切。
+图中回报重合、初始平台和负向变化均保留。包内hash和ZIP CRC另行核对。
+
+局限：验证只保留每unit的压缩CSV，没有逐step validation trace；离线回收依赖固定runner实际执行时的直接原生
+回报记录，未通过新rollout重测。数据曾用于开发，不是untouched holdout；native train_epochs、模型规模和实际
+梯度工作不同，只匹配交互与update/验证机会。未进行机制归因、holdout、support或论文晋级，正式结论仍`UNVERIFIED`，
+不评分、不作投稿建议。本轮交付后暂停20分钟提醒，按用户要求**后续再优化**。

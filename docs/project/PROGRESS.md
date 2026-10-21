@@ -5,6 +5,13 @@
 
 ﻿# Progress
 
+## 2026-10-21：独立公平奖励训练30单元完成并只读回收
+
+- `fair_reward_training_20261021_v2`完成10算法×3seeds：184,320 steps、720 updates、13,853训练episodes、9,360验证units、750 checkpoints；独立回收630对真实时间区间、共同暴露/初始化/原生奖励和文件hash均通过。
+- 23/30 seeds符合事前末5点奖励平台规则，6/10算法的3seeds全部符合。SAGH三seed验证从初始到最终恒18.871250、完成率0.875；网络参数有变化但验证奖励没有提升，不能称为训练逐步收敛或学习优势。
+- 最终SAGH与PPO/MAPPO/QMIX/Controller MAT/DT并列18.871250；DQN/Dueling为12.029306、DAG15.080833、Cache17.448750。DAG/Cache最终低于初始，所有负结果和未平台seed保留，不调参、不追加预算。
+- 十算法单图/总览、全部真实CSV和独立核验已导出；结果与边界见`fair_reward_training_20261021.md`。19项测试通过，七个用户修改保护hash未变；当前仅matched development，formal/holdout与策略收敛仍UNVERIFIED，论文/优化主线不变，回收后暂停`ppo-mec-3`。
+
 ## 2026-10-21：独立公平奖励训练方案冻结与预检通过
 
 - 已启动完整30-cell独立训练，代码提交`ba1b04e`已push。用户随后指定每20分钟轮询、优化留待后续；已创建当前聊天heartbeat `ppo-mec-3`，仅完成/失败/需处理时通知，不追加预算或启动优化。

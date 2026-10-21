@@ -5,6 +5,16 @@
 
 # Artifact Records
 
+## 2026-10-21 独立公平奖励训练完成记录
+
+- `reviewed_at`: 2026-10-21；`literature_cutoff`: 2026-09-28（未新评价）；`target_venue`: CSCWD 2027 development only。
+- `artifact_run_id`: `fair_reward_training_20261021_v2`；`policy_version`: `tmc_review_policy_v3_20260621`；algorithm Git `8e15418`、runner `ba1b04e`、回收基线 `200bf96`。
+- `evidence_level`: `MATCHED_DEVELOPMENT_RAW_RECEIPTS_CHECKPOINTS_AUDITED`；正式/holdout/策略参数收敛 `UNVERIFIED`。
+- root=`artifacts/analysis/fair_reward_training_20261021_v2/`，plan SHA=`81de66f5f104ebcf582828a0dda941cf99079521eec026c434601bb21d13053b`；30cells、184,320steps、720updates、13,853训练receipts、9,360验证rows、750checkpoints、630对原始区间通过独立核验。
+- SAGH三seed验证从0交互到6144均18.871250，最终与PPO/MAPPO/QMIX/Controller MAT/DT并列；23/30seeds奖励平台，6/10算法三seed全满足。DAG/Cache负变化保留，不声称全部收敛或SAGH独占优势。
+- 证据：`completion_audit.json`、`algorithm_result_summary.csv`、`figures/report.json`、全部原始CSV；交付包`artifacts/analysis/fair_reward_training_20261021_v2_delivery.zip`；完整口径/限制见`fair_reward_training_20261021.md`。无新训练、优化或论文晋级。
+
+
 ## 2026-10-05 minimal mechanism evidence closure
 
 - `artifacts/analysis/mechanism_evidence_closure_20261005_v1/`：固定 commit `f323fa2...`，A/C wall 34.193 s，

@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-21：公平训练后的初始平台与未稳定结果（待后续优化）
+
+- 独立`fair_reward_training_20261021_v2`中，SAGH三seed的13次验证从初始起恒18.871250（完成率0.875），尽管每seed88个网络tensor实际改变；这证明有参数更新，不能证明学习带来验证收益、参数收敛或严格优势。
+- 最终SAGH与PPO/MAPPO/QMIX/Controller MAT/DT并列；重合reward不能证明相同动作trace。23/30 seeds满足事前奖励平台规则，但DAG0/3、Cache1/3、PPO2/3、DQN2/3仍有未满足者，不能声称全部算法收敛。
+- DAG/Cache最终验证均值低于初始；本轮没有调参、续跑或追加机制归因。统一了环境交互/update机会、窗口和原生reward，未统一native梯度工作或建立新untouched holdout；独立实验不取代旧论文或算法优化结果。详见`fair_reward_training_20261021.md`。
+
 ## 2026-10-21：奖励平台不等于策略收敛（历史日志观察）
 
 - v70 SAGH 的训练首/末 16-episode mean 为 24.3423/31.4894；但 safety-projected 固定评估由初始 32.385729 到末次 29.426840（三 seed 均值），raw-policy 由 32.821667 到 7.368993。后期平台不能解释为持续评估提升，更不能证明保留早期最佳 checkpoint 的收益。
