@@ -11,6 +11,8 @@
 
 ## Live 文档
 
+- 本地审查与曲线索引：`artifacts/analysis/paper_gap_convergence_20261021/`；包含顶刊差距、叙事建议及状态图。详细材料在Git忽略目录保留，不随公开文档提交上传。
+
 - `sagh_reward_decline_audit_20261021.md`：长预算seed7下降的原生分项、目标差异、门控动作概率、loss尖峰及window_class缺口只读审查；不修改运行中的实验。
 
 - `long_fair_reward_training_20261021.md`：平线诊断后的32循环统一长预算、原生动作证据、episode曲线与20分钟监控。

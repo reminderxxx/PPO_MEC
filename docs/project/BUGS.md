@@ -7,6 +7,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-21：跨合同引用与公开仓库保密边界（持续生效）
+
+- 不同场景、动作、来源commit和训练合同的奖励曲线或缺陷诊断不能直接拼接；开发证据、奖励平台和正式独立验证继续分别判断。详审保存在本地`artifacts/analysis/paper_gap_convergence_20261021/`，不在公开仓库发布本轮详细审稿材料。
+- GitHub仓库为public；长期文献表可记录公开来源及谨慎的差异边界，但未发表manuscript、详细审查、实验产物、checkpoint和真实数据不随维护提交上传。新增来源不自动代表已完成论文贡献、独立检验或canonical晋级。
+
 ## 2026-10-21 14:19：SAGH动作概率、更新稳定性与独立入口上下文缺口（OPEN，只读未修）
 
 - clean8e15418的env-action PPO在option/fallback改写后，仍按前置env score登记/重算最终action的概率，未边缘化base+option行为。原trace可做0.505单分支概率贡献对2.27e-20前置prob的算术反例；训练per-step ratio未保存，受影响样本数量及因果份额尚不确定。

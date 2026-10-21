@@ -7,6 +7,12 @@
 
 ﻿# Progress
 
+## 2026-10-21：公开文献登记与本地论文审查索引
+
+- 公开一手近邻检索刷新至2026-10-21，新增MMTO、异构图依赖卸载及相关serving工作和待核线索；POLAR录用状态由MobiHoc官方名单增量核验。各条保留阅读深度与证据边界，不自动增加文稿参考文献。
+- 本轮论文差距审查、叙事建议与真实曲线保存在本地Git忽略的`artifacts/analysis/paper_gap_convergence_20261021/`。远程仓库为public，依据AGENTS保密规则不提交详细审查、未发表稿件或实验产物。
+- 本轮不改稿件或算法、不训练、不打开sealed测试；当前不同场景/动作合同的结果不能拼接。未发布新的canonical或paper-ready结论。
+
 ## 2026-10-21 14:19：SAGH奖励下降的只读目标/映射/更新审查
 
 - 用户要求只读查因并继续20分钟监控。已核验seed7全部15,907episode/768updates/33checkpoints/792验证units，无新rollout/act/learn或算法改动；源与七文件保护hash一致。报告`sagh_reward_decline_audit_20261021.md`。
