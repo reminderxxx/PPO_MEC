@@ -114,3 +114,11 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 实验与结论前后对照：原摘要、V-B、图 3/4 图注及结论把旧奖励排名和原窗口重采样区间放在优势叙事中；现在仅保留既有数值作为历史开发配置的描述性观察，明示计划窗口与执行行源段不一致、原始区间重叠、基线训练/选择不匹配，原 Fig. 4 whiskers 不可解释为独立窗口的有效 95% CI。V-C 的共享/次序和过早加载数值仍是固定策略构造例，明确不归因于 SAGH。结论对应区分“模型内时机冲突已展示”和“算法独立优势、完成率/传输改善尚未证实”。不新增实验、文献、数值或投稿可用性判断。
 - 审查元数据与边界：`reviewed_at=2026-10-21 Asia/Shanghai`；`literature_cutoff=2026-09-28`（沿用既有近邻审查，本轮没有新检索或文献水平评价）；`target_venue=CSCWD 2027`；`artifact_run_id=top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730`；`policy_version=tmc_review_policy_v3_20260621`（仅作内部严谨性约束）；修订起点 Git `4208494d5dc4eeae0b007e11cfa53493e1eaa1e7`；`evidence_level=E1_PLUS_RAW_PARTIAL`，核对 manifest、Mixed/Full aggregate、paired statistics 的既有 SHA 与 2026-10-09 独立审查相符，但本轮没有完成 E2 全包审计或新的独立评价。Confirmatory algorithm advantage 仍为 `UNVERIFIED`；审查结论沿用既有 blocker，没有晋级或改变规范。
 - 验证：R4 DOCX ZIP 完整可读；相对 R3 参考文献 25 条和全部四张表文字不变，Word 数学对象均为 67 个，原六张媒体字节保留，Fig. 2 另嵌新图。`render_docx.py` 渲染为 8 页，逐页检查未见裁切、遮挡或图片缺失。页数由 R3 的 7 页增至 8 页；CSCWD 目标版面上限尚未核定，不能声称已满足投稿格式。作者、邮箱和基金占位及初稿缺失问题仍待用户核定。
+
+## R5 Fig. 2 强化学习与车联网图式优化（2026-10-21）
+
+- 用户要求针对 R4 图 2 优化图式：参考强化学习和车联网论文的表达，加入强化学习交互与训练要素，改善箭头和整体形式。本轮覆盖 R4 的图 2 图片和图注；不改正文、表格、公式、参考文献或实验结论。
+- 基线：R4 `artifacts/manuscript/r4_20261021/CSCWD2027_He_Zhu_R4_Problem_Method_Evidence.docx`，SHA-256 `6266496763a78678546ea99c453277bb9dcd8d743446c96ca774e0e5ede879bd`。新工作副本：`artifacts/manuscript/r5_20261021/CSCWD2027_He_Zhu_R5_RL_VEC_Figure.docx`，SHA-256 `638d80c71e6d9b8b65382b40cfb126ffbfcf0e19cad0b0ef7483e75f0a0ca767`。宽版与论文窄版的 SVG/PNG 同目录保存；该目录被 Git 忽略，不随台账推送。
+- 图式参考：核对了已列入 `literature_reference_table.md` 的 MAPPO 原论文与 mobility-aware VEC migration 论文公开页面，仅参考 actor–critic、环境交互闭环与车/RSU 场景的常见呈现方式，未复制原图、改写技术结果或新增文献。
+- 前后对照：R4 图 2 为线性的问题→编码→三类分数→动作→训练列表；R5 图 2 先显示车辆跨 RSU 时未完结 DAG 的准备时机冲突，再以实线连接观察、单控制器 actor、合法动作、VEC 环境结果和下一观察，以青色虚线区分 rollout、集中价值估计、GAE/结果信用和 clipped PPO 参数更新。三头仍是同一步的条件角色分数，环境仍只执行一个语义动作；图注同步为交互与学习闭环说明。宽版细分 actor、critic、rollout 和更新，窄版用于双栏论文。
+- 验证：R4→R5 的 DOCX ZIP 成员仅 `word/document.xml` 和图 2 的 `word/media/image7.png` 不同；仅第 76 个段落的图注文字变化，其他六张媒体字节、四张表文字及 67 个 Word 数学对象不变。`render_docx.py` 渲染为 8 页；逐页缩略图与第 4 页原尺寸检查未见裁切、遮挡或图片缺失。图示不构成算法性能或实验晋级证据。投稿页数上限、占位作者/基金与初稿缺失问题沿用 R4 的待核验状态。
