@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-12
+更新日期：2026-10-21
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -10,6 +10,17 @@
 - 正式投稿前需要再次核对 IEEE Xplore、ACM DL、USENIX 或会议官网的最终卷期、页码和 BibTeX。
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
+
+### 2026-10-21：算法图式对照检索
+
+本轮只借鉴公开论文的系统场景与算法数据流表达，不复制图片，也不将图式相似性当作创新或性能证据。以下近邻不自动加入 CSCWD 文稿参考文献。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| VEC 场景与 DRL 分图 | [Vehicle Speed Aware Computing Task Offloading and Resource Allocation Based on Multi-Agent Reinforcement Learning in a Vehicular Edge Computing Network](https://arxiv.org/abs/2008.06641) | arXiv 2020；正式 venue 待核验 | 公开 PDF 的 Fig. 1 单独表示车辆、RSU/VEC server 和任务卸载场景；Fig. 2 对比不同执行位置的时延与能耗流程。可参考场景图与算法/代价图分离。 | 本项目图需突出跨 RSU 的未完成 DAG、adapter 准备时机及单控制器五动作合同；不可把该文多车 agent 表述直接套用。 | Fig. 2 图式对照；正式 Related Work 引用另审。 |
+| VEC DAG 与 DRL | [Vehicular Edge Computing via Deep Reinforcement Learning](https://arxiv.org/abs/1901.04290) | arXiv 2020；正式 venue 待核验 | 作者 PDF 的 Fig. 1 把车载服务画成 DAG，可作任务依赖图式参考；未据图推断与本项目同样的连续跨 RSU 状态。 | 本项目将未完成 DAG 与 adapter cache 和 handoff 准备结合，但对应差异和收益仍须本项目 artifact 验证。 | DAG 场景图式；动机近邻。 |
+| VEC 图表征与 PPO | [GAPO: A Graph Attention-Based Reinforcement Learning Algorithm for Congestion-Aware Task Offloading in Multi-Hop Vehicular Edge Computing](https://doi.org/10.3390/s25154838) | Sensors 2025, 25(15):4838；出版页面核验 | 出版页面的 Fig. 2 标为算法框架，正文明确按 VEC 状态、图表征、Actor–Critic 决策、奖励与 PPO 训练说明。可参考从状态到动作再到学习的箭头关系。 | 该文优化多跳卸载/资源分配与拥塞；本项目目标是跨 RSU 连续 DAG 的 adapter 准备和单控制器合法动作，不得仅凭采用 PPO 或图表征宣称新颖。 | 算法图式与 Related Work 近邻。 |
+| DAG 任务卸载与 PPO | [Dependent Task Graph Offloading Model Based on Deep Reinforcement Learning in Mobile Edge Computing](https://doi.org/10.3390/electronics14163184) | Electronics 2025, 14(16):3184；出版页面核验 | 将任务依赖表为 DAG，并用 attention + PPO 学习卸载策略；说明“DAG + PPO”本身已有直接近邻。 | 本项目需以跨 RSU 连续执行、adapter 缓存与准备时机及对应可观测指标区分，不能把 DAG 编码或 PPO 单独列为原创机制。 | Related Work / novelty 边界；图式对照。 |
 
 ## 维护规范
 

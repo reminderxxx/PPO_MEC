@@ -122,3 +122,11 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 图式参考：核对了已列入 `literature_reference_table.md` 的 MAPPO 原论文与 mobility-aware VEC migration 论文公开页面，仅参考 actor–critic、环境交互闭环与车/RSU 场景的常见呈现方式，未复制原图、改写技术结果或新增文献。
 - 前后对照：R4 图 2 为线性的问题→编码→三类分数→动作→训练列表；R5 图 2 先显示车辆跨 RSU 时未完结 DAG 的准备时机冲突，再以实线连接观察、单控制器 actor、合法动作、VEC 环境结果和下一观察，以青色虚线区分 rollout、集中价值估计、GAE/结果信用和 clipped PPO 参数更新。三头仍是同一步的条件角色分数，环境仍只执行一个语义动作；图注同步为交互与学习闭环说明。宽版细分 actor、critic、rollout 和更新，窄版用于双栏论文。
 - 验证：R4→R5 的 DOCX ZIP 成员仅 `word/document.xml` 和图 2 的 `word/media/image7.png` 不同；仅第 76 个段落的图注文字变化，其他六张媒体字节、四张表文字及 67 个 Word 数学对象不变。`render_docx.py` 渲染为 8 页；逐页缩略图与第 4 页原尺寸检查未见裁切、遮挡或图片缺失。图示不构成算法性能或实验晋级证据。投稿页数上限、占位作者/基金与初稿缺失问题沿用 R4 的待核验状态。
+
+## R6 按已发表算法图重新划分图 2（2026-10-21）
+
+- 用户质疑 R5 是否符合实际算法论文图式。经公开论文图题与方法段落核对，R5 仍将场景、在线控制和训练压在一条主流程，critic/rollout 关系表达过于简略。本轮仅覆盖 Fig. 2 图片和图注；R5 其他正文和结果冻结。
+- 基线：R5 `artifacts/manuscript/r5_20261021/CSCWD2027_He_Zhu_R5_RL_VEC_Figure.docx`，SHA-256 `638d80c71e6d9b8b65382b40cfb126ffbfcf0e19cad0b0ef7483e75f0a0ca767`。新工作副本：`artifacts/manuscript/r6_20261021/CSCWD2027_He_Zhu_R6_Algorithm_Figure.docx`，SHA-256 `f580353e6000ea6a452a9ddcb1faab42e2fa12d9f42b1b9a647301dda656ab8c`。宽版与论文窄版 SVG/PNG 同目录保存；产物目录被 Git 忽略。
+- 前后对照：R5 的场景图占图首、控制器与 PPO 训练较笼统；R6 将 Fig. 2 明确分为 (a) 跨 RSU 的未完成 DAG 场景、(b) 观察→编码/预测门控→融合→三头角色分数→五动作合法解码→环境反馈、(c) rollout→central critic→GAE/结果信用→clipped PPO。三头同属一个 actor，训练虚线与在线实线分开；既不表示多实体 agent，也不把价值网络画成直接执行动作的控制器。图注按三分图同步。
+- 图式对照来源为本轮新增至 `literature_reference_table.md` 的公开 VEC/PPO/DAG 论文。只借鉴场景/算法分图和 actor–critic 数据流的表达形式，没有复制原图，也没有把这几篇增加到文稿的 25 篇正式参考文献。
+- 验证：R5→R6 的 DOCX ZIP 成员仅 `word/document.xml` 与 `word/media/image7.png` 变化；仅第 76 个段落图注文字变化，其他六张媒体字节、四张表文字和 67 个 Word 数学对象不变。`render_docx.py` 输出 8 页，逐页缩略图及第 4 页原尺寸检查未发现裁切、遮挡或图片缺失。图示不提供算法性能新证据；R4/R5 的实验与投稿限制继续有效。
