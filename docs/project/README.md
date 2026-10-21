@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `sagh_flat_action_diagnosis_20261021.md`：SAGH初始/中间/最终检查点配对动作及平线原因的只读重放证据。
+
 - `fair_reward_training_20261021.md`：独立共同窗口、原生奖励、fresh初始化、精确预算与资源让出的公平收敛实验；不影响算法优化主线。
 
 - `manuscript_revision_ledger.md`：CSCWD 2027 论文逐轮要求、来源基线、精准位置和已固定位置；修改论文前必读。
