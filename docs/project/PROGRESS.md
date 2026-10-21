@@ -7,6 +7,7 @@
 
 ## 2026-10-21：独立公平奖励训练方案冻结与预检通过
 
+- 已启动完整30-cell独立训练，代码提交`ba1b04e`已push。用户随后指定每20分钟轮询、优化留待后续；已创建当前聊天heartbeat `ppo-mec-3`，仅完成/失败/需处理时通知，不追加预算或启动优化。
 - 用户授权统一所有算法窗口、原生奖励和预算，独立于大规模算法优化任务执行。固定clean算法源码`8e15418`，不导入主工作区七个用户修改。
 - 10算法×3seeds，全新权重/optimizer/replay；共同24 train+12 validation窗口，每cell6,144 steps/24 updates/13 validations，同unit暴露128steps，先验证0交互策略。
 - 计划hash=`81de66f5f104ebcf582828a0dda941cf99079521eec026c434601bb21d13053b`，root=`artifacts/analysis/fair_reward_training_20261021_v2/`；SAGH/PPO/DQN/QMIX各256step真实预检及绘图链通过，19项测试通过。
