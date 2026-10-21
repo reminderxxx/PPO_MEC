@@ -1,3 +1,5 @@
+> 2026-10-21：旧长预算轮按用户要求停止保留；独立修复分支通过312测试和10算法真实预检后，已启动同条件全新重训。见 [本轮记录](docs/project/fair_reward_contract_repair_20261021.md)。算法优化主线未合并修复。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

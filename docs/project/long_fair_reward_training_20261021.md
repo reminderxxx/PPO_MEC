@@ -1,3 +1,5 @@
+> 2026-10-21 用户暂停旧轮：14:32:50+08:00核对命令后SIGINT退出，user_pause_receipt.json保存360文件hash并复核未变；3完整cell和DQN seed7未完成单元保留，不续跑。本文件旧RUNNING叙述为历史。修复后独立新轮见fair_reward_contract_repair_20261021.md。
+
 # 扩大循环与预算的独立公平奖励训练
 
 - reviewed_at: 2026-10-21；literature_cutoff: 2026-09-28（未重新评价 novelty）

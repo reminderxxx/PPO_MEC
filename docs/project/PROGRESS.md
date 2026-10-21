@@ -1,3 +1,5 @@
+> 2026-10-21 修复后统一重训已启动：旧long v1按用户指令SIGINT退出，360文件hash复核保留；独立分支45c8c88已push，312测试及10算法512step预检/30checkpoints审计/绘图通过。新repaired_fair_reward_training_20261021_v1于14:48:46启动，10算法×3seed各196608step/768learner机会/32循环/33固定验证，全部fresh，奖励和原窗口数据未改。采样路径联合概率、完整更新KL回退、native window_class已贯通；启动检查有有效更新。每20分钟复用ppo-mec-3监控，完整结果未出；详见 fair_reward_contract_repair_20261021.md。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。
