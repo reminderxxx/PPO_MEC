@@ -54,10 +54,27 @@ def validate_cell(cell, p, name, seed):
                 raise ValueError("Missing sampled-path receipts")
             for behavior in behaviors:
                 if behavior.get("probability_contract") is None:
+                    if name not in {"dqn", "dueling_dqn", "qmix"}:
+                        raise ValueError("Missing policy behavior density")
                     continue  # value-based baselines do not publish a policy density
                 if behavior["probability_contract"] != p["probability_contract"]:
                     raise ValueError("Unexpected probability contract")
+                base_probs = np.asarray(behavior["sampled_base_probs"], dtype=float)
+                base_action = int(behavior["sampled_base_action"])
+                if not np.all(np.isfinite(base_probs)) or np.any(base_probs < 0) or not np.isclose(base_probs.sum(), 1., atol=2e-6):
+                    raise ValueError("Invalid base categorical distribution")
+                if base_probs[base_action] <= 0 or not np.isclose(np.log(base_probs[base_action]), float(behavior["sampled_base_log_prob"]), atol=2e-5, rtol=0):
+                    raise ValueError("Base sampled likelihood mismatch")
+                if behavior.get("env_action_probability_scope") != "pre_mapping_proposal_diagnostic_only":
+                    raise ValueError("Proposal probability scope missing")
                 option = behavior.get("option_gate") or {}
+                if option.get("enabled"):
+                    probs = np.asarray(option["option_probs"], dtype=float)
+                    action = int(option["option_action"])
+                    if not np.all(np.isfinite(probs)) or np.any(probs < 0) or not np.isclose(probs.sum(), 1., atol=2e-6):
+                        raise ValueError("Invalid conditional option distribution")
+                    if not option["option_mask"][action] or probs[action] <= 0 or not np.isclose(np.log(probs[action]), float(option["option_log_prob"]), atol=2e-5, rtol=0):
+                        raise ValueError("Option sampled likelihood mismatch")
                 expected_lp = float(behavior["sampled_base_log_prob"]) + (float(option["option_log_prob"]) if option.get("enabled") else 0.)
                 if not np.isclose(expected_lp, float(behavior["log_prob"]), atol=2e-5, rtol=0):
                     raise ValueError("Sampled path log likelihood mismatch")
@@ -83,6 +100,16 @@ def validate_cell(cell, p, name, seed):
         raise ValueError("Incorrect learner update opportunities")
     if [r["update"] for r in updates] != list(range(1, c["updates"]+1)):
         raise ValueError("Incorrect update sequence")
+    if name not in {"dqn", "dueling_dqn", "qmix"}:
+        for record in updates:
+            info = record["learn_info"]
+            if info.get("probability_contract") != p["probability_contract"] or not 0 <= info["initial_log_prob_error_max"] <= 2e-5:
+                raise ValueError("Learner behavior likelihood contract mismatch")
+            if info["guarded_optimizer_steps"] != info["accepted_optimizer_steps"] + info["rejected_optimizer_steps"]:
+                raise ValueError("Optimizer acceptance accounting mismatch")
+            target = float(p["agent_configs"][name][str(seed)].get("target_kl", .01))
+            if not np.isfinite(info["accepted_policy_kl_max"]) or not 0 <= info["accepted_policy_kl_max"] <= (target if target > 0 else .01) + 1e-8:
+                raise ValueError("Accepted update exceeded frozen policy KL constraint")
     evaluation = read_csv(cell / "evaluation.csv")
     points = list(range(0, total+1, p["steps_per_update"]*p["evaluate_every_updates"]))
     units = {(w["window_id"], wf) for w in p["windows"] if w["split"] == "validation" for wf in p["workflow_ids"]}

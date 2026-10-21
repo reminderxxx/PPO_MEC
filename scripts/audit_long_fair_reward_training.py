@@ -84,11 +84,18 @@ def main():
                 inventory.append({"cell": str(cell.relative_to(root)), "update": update, "sha256": fair.sha(path)})
             changed = [key for key in initial if not fair.torch.equal(initial[key], final[key])]
             l2 = sum(float((initial[k]-final[k]).float().pow(2).sum()) for k in changed)**.5
+            learning = [json.loads(line)["learn_info"] for line in (cell / "updates.jsonl").open()]
+            stability = {"accepted_optimizer_steps": sum(v.get("accepted_optimizer_steps", 0) for v in learning),
+                         "rejected_optimizer_steps": sum(v.get("rejected_optimizer_steps", 0) for v in learning),
+                         "optimizer_backtracks": sum(v.get("optimizer_backtracks", 0) for v in learning),
+                         "initial_log_prob_error_max": max(v.get("initial_log_prob_error_max", 0.) for v in learning),
+                         "accepted_policy_kl_max": max(v.get("accepted_policy_kl_max", 0.) for v in learning)}
             cells.append({"agent": name, "seed": seed, "steps": p["training_steps"], "updates": total_updates,
                           "cycles": p["training_cycles"], "episodes": len(rows), "validation_rows": len(evaluations),
                           "initial_validation_reward": means[0], "final_validation_reward": means[-1],
                           "initial_completion_rate": completion[0], "final_completion_rate": completion[-1],
-                          "changed_network_tensors": len(changed), "network_l2_change": l2})
+                          "changed_network_tensors": len(changed), "network_l2_change": l2,
+                          "stability_diagnostics": stability})
     report = {"audit_status": "PASS", "reviewed_at": datetime.now().astimezone().isoformat(),
               "literature_cutoff": "2026-09-28 (not reassessed)", "target_venue": "CSCWD 2027 development",
               "artifact_run_id": root.name, "policy_version": "tmc_review_policy_v3_20260621", "git_commit": p["source_commit"],

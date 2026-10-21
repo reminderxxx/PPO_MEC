@@ -29,3 +29,11 @@ window_class 从每个既定窗口的原始 mobility 活动统计计算，提取
 本文件建立时：旧训练停止；代码回归311项通过，真实预检/新训练待完成；后续启动信息以本文件追加记录和新run execution_receipt为准。
 
 reviewed_at: 2026-10-21；literature_cutoff: 2026-09-28（沿用，未新评novelty）；target_venue: CSCWD2027；artifact_run_id: repaired_fair_reward_training_20261021_v1；policy_version: tmc_review_policy_v3_20260621；source Git: 独立分支冻结后由 frozen_plan.source_commit 记录；evidence: 修复回归测试，完整训练 UNVERIFIED。此轮 matched development，不是 untouched holdout、formal 晋级或 paper-ready。旧审计指出的 native exploration bonus 和辅助成本目标差异保留；本轮不以改奖励或关辅助目标制造上升曲线。
+
+## 冻结前验收追加
+
+312项相关回归全部通过，包括多路径合并概率、七类策略初始ratio=1、非有限loss拒绝、接受步KL、空及已有Adam动量的完整回退。命令：`OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest tests/test_repaired_probability_contract.py tests/test_window_selection_contract.py tests/test_env_contract.py tests/test_algo_pool_contract.py tests/test_checkpoint_compat.py tests/test_long_fair_reward_training.py tests/test_fair_reward_training.py tests/test_training_reward_plots.py -q`。
+
+真实预检 `artifacts/analysis/repaired_fair_reward_preflight_20261021_v1`（源码 `cc0232ef9459efab494a6fa7b0242d0a735b23cd`，plan `a07556890455021b284d98ce57795c2c98b0c0d464ae30daad2d5c9a0450bd45`）完成全部10算法×seed7，各512step/2循环/2learner调用/3检查点；原生receipt与30 checkpoints离线审计PASS，严格概率消费端及create-only绘图PASS，SAGH双面板目视无截字。七类策略所有更新前logp复算误差均0；每算法都有接受梯度步，SAGH70步接受、2候选步拒绝并回退，最大接受平均KL约0.00139772。预检存在原生奖励负值和固定验证平线，不因结果更改奖励、初始值、类别或预算。小预算不能用于长训练收敛或优势结论。
+
+预检后只补充非空Adam回退测试及只读消费端的归一化/采样概率/计数/KL核验，没有再次改动训练、映射或分类源码。正式新run将锁定最终clean commit；启动后该source worktree的HEAD、源码和plan全部保持不动，完成文档通过主工作区的scoped docs提交更新，不改变冻结源码。

@@ -99,3 +99,23 @@ def test_nonfinite_loss_never_enters_optimizer():
     ({'mechanism_signal_count':0,'active_vehicle_count_mean':1.,'predicted_next_ratio':.0,'predicted_handoff_ratio':.0,'estimated_association_change_count':0},'idle_or_sparse')])
 def test_shared_native_window_classification_without_rewards(activity,expected):
     assert classify_window_activity(**activity)==expected
+
+
+def test_rejection_restores_existing_adam_moments_and_step_counters():
+    agent=build_agent('ppo',device='cpu',learning_rate=1e-5,target_kl=.0014)
+    row,state,out,mask=collected(agent)
+    assert agent._guarded_policy_step(-out['flat_logits'][3],[row],[state],[row['decision_info']['run_metadata']],[mask])['accepted']
+    assert agent._optimizer.state
+    before=copy.deepcopy(agent._network.state_dict())
+    agent._optimizer.param_groups[0]['lr']=100.
+    optimizer_before=copy.deepcopy(agent._optimizer.state_dict())
+    agent._target_kl=1e-12
+    row,state,out,mask=collected(agent)
+    assert not agent._guarded_policy_step(-out['flat_logits'][3]*100.,[row],[state],[row['decision_info']['run_metadata']],[mask])['accepted']
+    after=agent._optimizer.state_dict()
+    assert after['param_groups']==optimizer_before['param_groups']
+    for key,state_before in optimizer_before['state'].items():
+        for field,value in state_before.items():
+            if torch.is_tensor(value):assert torch.equal(value,after['state'][key][field])
+            else:assert value==after['state'][key][field]
+    for key,value in before.items():assert torch.equal(value,agent._network.state_dict()[key])
