@@ -5,6 +5,13 @@
 
 ﻿# Progress
 
+## 2026-10-21：论文现有实验奖励曲线整理
+
+- 按 v70 manifest 追溯十个学习算法、各 3 seeds，逐一复核 2,976 个 episode 的日志回报与 receipt；SAGH 为 128 episodes，其余为 96，不补齐尾段。
+- 新增只读绘图入口 `scripts/plot_training_rewards.py` 和专项验证；统一 16-episode trailing mean，保留原始波动、seed SD、源文件及 checkpoint SHA-256；同时输出 SAGH safety-projected/raw-policy 两种未平滑 checkpoint 评估历史。
+- SAGH 首/末 16 episodes 平均回报为 24.3423/31.4894，末两块相差 +0.6777；这是训练提升及末段趋稳的描述性观察。固定评估后期低于早期最佳；其他算法没有可核验的逐 checkpoint 固定评估历史，不能确认全部收敛或通过续训保住优势。
+- 机器证据 `artifacts/analysis/paper_reward_curves_20261021_v2/`，报告 `paper_reward_curves_20261021.md`。沿用 10/09 身份、窗口独立性和公平预算限制，confirmatory claim 仍 `UNVERIFIED`；未训练、未改算法/奖励/历史 checkpoint/论文，未开启 holdout。
+
 ## 2026-10-09：CSCWD 强基线与贡献证据只读审查
 
 - 已从 v70 mixed/full 原始 rows、episode receipt、checkpoint manifest 和统计包复核旧奖励均值；这些仍是开发协议描述性结果。

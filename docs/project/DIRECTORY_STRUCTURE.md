@@ -1,5 +1,12 @@
 ﻿# Directory Structure
 
+## 2026-10-21 论文奖励曲线
+
+- `scripts/plot_training_rewards.py`：从指定 checkpoint manifest 追溯训练日志，逐 episode 对照 receipt 后绘图。
+- `tests/test_training_reward_plots.py`：因果移动平均、原长度保留、日志不一致拒绝和收敛边界检查。
+- `artifacts/analysis/paper_reward_curves_20261021_v2/`：十算法总览/单图、SAGH checkpoint 评估图、原始/平滑 CSV、末段诊断与 SHA-256 来源清单。v1 是缺少绘图库时留下的未完成导出，不作交付结果。
+- `docs/project/paper_reward_curves_20261021.md`：口径、结果与现有可比性限制；不改历史实验或论文文件。
+
 ## 2026-10-05 最小机制证据闭环
 
 - `configs/experiment/mechanism_evidence_closure_v1.json`：A/C 冻结矩阵、成本模型、预算和命令。

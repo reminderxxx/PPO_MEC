@@ -5,6 +5,25 @@
 
 # Runbook
 
+## 论文现有训练奖励曲线（2026-10-21）
+
+只读取指定 manifest 引用的训练 run，不启动训练/benchmark，不打开 holdout。需要 NumPy 与 Matplotlib；
+本轮 Matplotlib 3.9.4 隔离在临时目录，未修改项目虚拟环境。复用本机临时依赖时：
+
+```bash
+PYTHONPATH=/private/tmp/ppo_mec_reward_plot_deps .venv/bin/python scripts/plot_training_rewards.py \
+  --manifest artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/seed_checkpoint_manifest.json \
+  --output-root artifacts/analysis/paper_reward_curves_20261021_v2 \
+  --rolling-window 16
+.venv/bin/python -m pytest tests/test_training_reward_plots.py -q
+```
+
+输出目录必须不存在；重建时使用新目录。临时依赖若被系统清理，在用户自己的绘图环境安装
+`matplotlib==3.9.4` 后省略 `PYTHONPATH` 即可。全量回报不裁剪，不对齐成虚构等长训练，不对不同算法做
+独立归一化。移动平均只使用完整的过去 16 个 episode；阴影是 seed SD，不是置信区间或窗口独立性证据。
+该历史池训练窗口、预算和 checkpoint 选择不一致，不能用曲线排名代替公平比较。
+结果与限制见 `paper_reward_curves_20261021.md`；论文及 canonical 不因绘图自动更新。
+
 ## 最小机制证据闭环（2026-10-05）
 
 冻结方案与结果分别见 `mechanism_evidence_closure_plan_20261005.md` 和

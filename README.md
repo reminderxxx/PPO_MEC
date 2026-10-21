@@ -5,6 +5,10 @@
 
 # PPO_MEC
 
+论文现有训练日志的奖励曲线入口：`scripts/plot_training_rewards.py`；
+见 [绘图口径与结果](docs/project/paper_reward_curves_20261021.md)。保留完整 seed 波动、实际训练长度和
+checkpoint 评估历史；仅作历史训练诊断，不修改算法、checkpoint、论文或正式结论。
+
 最小机制证据闭环（共享缓存四配置、连续/重跑/后缀恢复、12 个有界决策场景）见
 [results](docs/project/mechanism_evidence_closure_results_20261005.md)；结论是 bounded diagnostic，非 formal、holdout、
 算法优势或 paper-ready 证据。

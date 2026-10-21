@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-21：奖励平台不等于策略收敛（历史日志观察）
+
+- v70 SAGH 的训练首/末 16-episode mean 为 24.3423/31.4894；但 safety-projected 固定评估由初始 32.385729 到末次 29.426840（三 seed 均值），raw-policy 由 32.821667 到 7.368993。后期平台不能解释为持续评估提升，更不能证明保留早期最佳 checkpoint 的收益。
+- 基线训练日志仍有明显波动，原包没有基线逐 checkpoint 固定评估历史；缺失曲线不得通过插值、重复最终值或换用 benchmark 常数补造。
+- 本轮只读导出不消除 10/09 的窗口身份、重叠和训练/选择预算不匹配问题，不改变既有审查等级。详见 `paper_reward_curves_20261021.md`。
+
 ## 2026-10-09：v70 窗口身份与强基线可比性（OPEN）
 
 - v70 mixed/full 的 `selected_window_plan` 是 Peachtree，原始 rows/episode receipt 是 Lankershim，ID 交集为 0；普通 frozen-plan 路径传入的 `expected_window_id` 未被普通 mobility loader 校验。需要独立实现任务修复身份链和 rollout 前错段负例。
