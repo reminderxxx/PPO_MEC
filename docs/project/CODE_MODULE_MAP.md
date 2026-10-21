@@ -1,5 +1,10 @@
 # Code Module Map
 
+## 独立公平训练/奖励曲线
+
+- `scripts/run_fair_reward_training.py`：从固定clean源码调用现有agent/environment/trainer；另冻结实际窗口身份、fresh配置、精确环境交互和资源让出，不拥有算法优化逻辑。
+- `scripts/plot_fair_reward_training.py`：消费本轮complete/CSV/plan，逐cell核验共同暴露与checkpoint数量，输出全部真实验证点和描述性平台诊断，不修改源数据或checkpoint。
+
 ## 2026-10-05 bounded mechanism evidence
 
 - `scripts/run_mechanism_evidence_closure.py`：只读复用 native request ledgers，构建 A 的公平成本表；通过正常

@@ -5,6 +5,13 @@
 
 ﻿# Progress
 
+## 2026-10-21：独立公平奖励训练方案冻结与预检通过
+
+- 用户授权统一所有算法窗口、原生奖励和预算，独立于大规模算法优化任务执行。固定clean算法源码`8e15418`，不导入主工作区七个用户修改。
+- 10算法×3seeds，全新权重/optimizer/replay；共同24 train+12 validation窗口，每cell6,144 steps/24 updates/13 validations，同unit暴露128steps，先验证0交互策略。
+- 计划hash=`81de66f5f104ebcf582828a0dda941cf99079521eec026c434601bb21d13053b`，root=`artifacts/analysis/fair_reward_training_20261021_v2/`；SAGH/PPO/DQN/QMIX各256step真实预检及绘图链通过，19项测试通过。
+- 单CPU线程、nice19、逐episode/update自动让出其他训练；固定预算不按胜负续跑。完整结果以cell complete与figures为准，当前不确认算法优势或策略收敛。详见`fair_reward_training_20261021.md`。
+
 ## 2026-10-21：论文现有实验奖励曲线整理
 
 - 按 v70 manifest 追溯十个学习算法、各 3 seeds，逐一复核 2,976 个 episode 的日志回报与 receipt；SAGH 为 128 episodes，其余为 96，不补齐尾段。

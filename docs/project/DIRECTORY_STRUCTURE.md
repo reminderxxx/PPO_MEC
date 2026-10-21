@@ -1,5 +1,13 @@
 ﻿# Directory Structure
 
+## 独立公平奖励训练（2026-10-21）
+
+- `configs/experiment/fair_reward_training_v1.json`：共同窗口、奖励、预算、资源隔离与平台描述规则。
+- `scripts/run_fair_reward_training.py` / `scripts/plot_fair_reward_training.py`：固定 clean 源码、fresh training 和全量真实导出；不修改生产算法。
+- `tests/test_fair_reward_training.py`：预算、身份区间、资源让出、配置/hash及平台边界。
+- `artifacts/analysis/fair_reward_training_20261021_v2/`：独立 frozen plan、30 cells、status和最终figures；四算法预检单独放 `fair_reward_training_preflight_20261021_v1/`。
+- `docs/project/fair_reward_training_20261021.md`：协议、授权、复核和结论边界。
+
 ## 2026-10-21 论文奖励曲线
 
 - `scripts/plot_training_rewards.py`：从指定 checkpoint manifest 追溯训练日志，逐 episode 对照 receipt 后绘图。

@@ -5,6 +5,13 @@
 
 # Runbook
 
+## 独立公平训练与奖励收敛（2026-10-21）
+
+见 `fair_reward_training_20261021.md`。先 `run_fair_reward_training.py prepare` 冻结配置/共同窗口并通过预检，
+再按该文执行 `run`；prepare output与每个cell均create-only。全量完成后用`plot_fair_reward_training.py`导出，
+不把未完成cell填充为曲线。训练需允许只读检查进程和设置nice；检测其他训练/benchmark后本实验自动等待。
+新实验CPU单线程且不恢复旧权重，不改算法优化任务、原始数据、旧结果、论文或holdout。
+
 ## 论文现有训练奖励曲线（2026-10-21）
 
 只读取指定 manifest 引用的训练 run，不启动训练/benchmark，不打开 holdout。需要 NumPy 与 Matplotlib；
