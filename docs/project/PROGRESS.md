@@ -9,7 +9,7 @@
 
 - SAGH平线配对诊断完成后，用户明确授权统一扩大所有算法交互与循环；新run为`long_fair_reward_training_20261021_v1`，10算法×3seeds，从零训练，每cell196,608交互/768updates/32循环/33固定验证点，全部方法同窗口/原生reward/预算。
 - 新独立runner保持clean算法source8e15418和七个用户文件不动；不删除先验/门控、不调参来制造曲线。100episode移动均值仅用于训练图，原值全部保留；固定验证不平滑，并在每个检查点记录SAGH相同状态动作变化。
-- 28测试通过，四算法512step/两循环/12checkpoints预检离线审计PASS、绘图链通过。启动信息以run内execution_receipt为准，后续复用ppo-mec-3每20分钟检查；完整结果未出，不宣称收敛或领先。方案见`long_fair_reward_training_20261021.md`。
+- 28测试通过，四算法512step/两循环/12checkpoints预检离线审计PASS、绘图链通过。11:32:50已启动完整训练，release=2d7cfce已push，plan=9a30d9ac0ebf841d7747bc2d5762ed6ec1ff0a3dfd36d2a9e53228070bd3fcc8；启动验收已完成5updates/1,280交互，pid与命令/run-root一致、nice19、保护diff未变。ppo-mec-3已恢复ACTIVE每20分钟检查；完整结果未出，不宣称收敛或领先。方案见`long_fair_reward_training_20261021.md`。
 
 ## 2026-10-21：SAGH 平线的 checkpoint 动作诊断完成
 

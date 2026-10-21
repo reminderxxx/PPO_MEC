@@ -89,5 +89,16 @@ prepare、run cell、audit、figures均create-only；失败保留现场，不自
 原生回报、实际动作、共同暴露、数据和保护hash，再导出全部曲线/CSV/report与本地zip；不含checkpoint或原始数据。
 完成或失败后暂停该提醒，不归档聊天。完整训练结果仍在运行时不得称已出收敛结论。
 
+## 启动验收（2026-10-21 11:32:50 Asia/Shanghai）
+
+完整30cell独立训练已启动；runner release=`2d7cfce`已push，plan semantic SHA-256为
+`9a30d9ac0ebf841d7747bc2d5762ed6ec1ff0a3dfd36d2a9e53228070bd3fcc8`。
+`parent_protocol_comparison.json`确认全部算法/seed/窗口/配置/原始数据/source/reward及unit/update粒度
+与父实验一致，仅增加预算、循环及预先声明的验证间距/日志。启动进程pid=19388，经命令与output-root核对，
+nice19、约一个CPU核、约408MiB RSS；启动验收已实际完成SAGH seed7的5updates/1,280交互，无Traceback。
+这是启动时快照，不作为训练完成或效果证据。完整命令、进程观察和绘图/审计脚本hash见execution_receipt.json。
+七文件保护diff未变。当前聊天原`ppo-mec-3`已恢复ACTIVE、20分钟间隔，最早下一次检查为11:52:50；
+正常运行/资源等待不重复通知。
+
 风险：扩大交互和循环不保证规则后动作发生变化，也不保证所有方法稳定；没有搜索或匹配梯度计算成本，
 开发窗口不是untouched holdout，不进行paper-ready/novelty/正式优势判断。
