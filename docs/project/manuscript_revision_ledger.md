@@ -172,3 +172,9 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 基线：R10 `artifacts/manuscript/r10_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R10.docx`，SHA-256 `e45b0c1dd5f070d6883b308630635a4ea89da0f32985b4003f8e2a337136937b`。只读格式样稿 SHA-256 `2e85afae2afcb6b0aa6cb0df0a0af8f95149a0a34ccaacb2e9b0508930eff490`。新稿 `artifacts/manuscript/r11_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R11.docx`，SHA-256 `c5a9d8676c0230e8670436eb3e2fd1afe46c450fbe2b3d15ea6045b04b2e9275`；论文在 Git 忽略的 `artifacts/` 内，台账提交不上传稿件。
 - 格式对照与实改：Letter 纸、0.75/1.0 英寸上下页边距、约 0.625 英寸左右页边距；通栏居中标题和作者信息，其下双栏正文、0.25 英寸栏距；Times New Roman 24 pt 标题、9 pt 作者/摘要/关键词、10 pt 正文、居中一级标题与斜体二级标题、8 pt 图表标题与表格文字、8 pt 悬挂缩进参考文献。两张原图按样稿的单栏图式等比缩放，表 I/II 置于各栏内；图像字节和图文顺序不变。未复制样稿正文或样稿标注。
 - 前后核对：R10 与 R11 的 71 个段落文字、两张表全部单元格文字、两张嵌入图片字节及 `[1]`–`[25]` 文献文字完全一致；仅页面设置、段落/字符样式、图表尺寸和布局变化。R11 所有参考文献文字 run 均为 Times New Roman 8 pt；DOCX ZIP 可读。`render_docx.py --emit_pdf` 输出 Letter 4 页，逐页检查标题、双栏顺序、完整 Fig. 1/2、表 I/II 与文献，无裁切或遮挡。该轮只验证格式及内容未变，不构成投稿模板官方验收或论文证据晋级。
+
+## R12 算法总览图前置（2026-10-21）
+
+- 用户指出算法结构图在第四部分的位置不理想。定位为 R11 第 IV 节中 Fig. 2 排在 IV-A 首段之后；本轮仅将 Fig. 2 及其图注移到 `IV. SAGH DECISION AND LEARNING LOOP` 标题之后、`A. Why the controls are ordered` 之前，使进入方法节时先见状态—策略—环境—学习总览，再读设计理由与模块说明。第 III 节仍承载系统与问题定义，算法内容仍归第 IV 节。该新要求仅覆盖 R11 的 Fig. 2 位置，不改图文、实验或文献。
+- 基线：R11 `artifacts/manuscript/r11_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R11.docx`，SHA-256 `c5a9d8676c0230e8670436eb3e2fd1afe46c450fbe2b3d15ea6045b04b2e9275`。新稿：`artifacts/manuscript/r12_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R12.docx`，SHA-256 `f2e33a6eb4e1a06cd4eb425099e35b451b25ab2bfa7fb10476acbaa58ea5292b`；稿件在 Git 忽略的 `artifacts/` 内。
+- 核对：除 Fig. 2 与图注的顺序移动外，R11/R12 的 71 个段落文字、两张表所有单元格文字、两张图媒体字节均一致；25 条参考文献仍为 Times New Roman 8 pt。DOCX ZIP 可读，`render_docx.py --emit_pdf` 得 Letter 4 页，逐页及图 2 所在页原尺寸检查无图像裁切、文字遮挡或异常留白。没有修改算法实现或论文证据结论。
