@@ -1,3 +1,5 @@
+> 2026-10-22 独立continue_fair_reward_training.py启动层只负责安全资源扫描、继承完整cell的inventory核验/只读跳过和pending原参数委托；不修改原45c8c88 agent/runner/auditor/plotter，原科学生产者消费者字段保持；科学与操作provenance分别记录。
+
 # Code Module Map
 
 ## 独立公平训练/奖励曲线

@@ -1,3 +1,5 @@
+> 2026-10-22 当前仅监控repaired_fair_reward_continuation_20261022_v1：独立启动层已运行，禁止重复run。完成先用冻结launcher的verify核验parent现场与contract，再用原45c8c88 source的audit/plot入口；同PROJECT env，主.venv Python。详细绝对命令及20分钟监控见fair_reward_resource_continuation_20261022.md。
+
 > 2026-10-21 当前只监控新repaired_fair_reward_training_20261021_v1，命令/source/env/审核及绘图链见fair_reward_contract_repair_20261021.md。冻结源码在独立worktree45c8c88，禁止改变其HEAD或重复启动；旧long v1按用户暂停不得恢复。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。

@@ -1,3 +1,5 @@
+> 当前公平训练续作入口：fair_reward_resource_continuation_20261022.md；新root运行中，旧failed run和partial保留。
+
 > 当前独立实验入口：`fair_reward_contract_repair_20261021.md`；修复后新run已启动，旧long v1用户暂停，勿将旧status快照当live。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。

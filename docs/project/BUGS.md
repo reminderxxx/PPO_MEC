@@ -1,3 +1,5 @@
+> 2026-10-22 资源进程扫描编码缺陷已在独立启动层71ca85d修复并通过322测试及真实续作预检：无效bytes可见转义，ps失败保守等待；原冻结算法/runner保持。续作已启动，旧故障证据和SAGH seed13 partial保留，10完整单元原样引用，其余fresh。不代表训练收益问题已解决，也不支持partial精确续接。
+
 > 2026-10-22T08:57:22.290579+08:00 OPEN资源监控编码缺陷：独立冻结runner的yield_resources使用subprocess.check_output(ps, text=True)严格UTF-8解码，系统进程列表含无效字节时未捕获异常而退出。本次发生于SAGH seed13第38912step/152更新后，10cell完整；字节来源未定位。现场保留、未改代码或重跑。partial最后checkpoint144，不支持声称可精确从update152续训。详见fair_reward_contract_repair_20261021.md和独立failure report。
 
 > 2026-10-21 授权修复状态：旧轮post-map概率错配/ratio指数平方尖峰/window_class遗漏已在独立分支45c8c88修复并通过312测试与全10算法预检。旧轮用户暂停保留，新轮已fresh启动；优化主线算法未改。观测上下文KL保护不证明全局收敛，原生exploration bonus/成本dual/teacher目标差异保留；修复不保证奖励上升或SAGH领先。不得把旧新差异全归因于训练量。

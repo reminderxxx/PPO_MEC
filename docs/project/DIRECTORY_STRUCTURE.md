@@ -1,3 +1,5 @@
+> 2026-10-22 新续作root artifacts/analysis/repaired_fair_reward_continuation_20261022_v1包含原样scientific plan、独立continuation_contract、10原完整cell的只读symlink、20待fresh cell及attempt receipts。代码仅在独立fair-reward-resource-guard worktree；旧root和partial原位保留。
+
 > 2026-10-21 当前独立run：artifacts/analysis/repaired_fair_reward_training_20261021_v1；全算法小预算预检：repaired_fair_reward_preflight_20261021_v1；旧long v1停止回执和文件hash原位保留。算法修复及配置只在独立分支worktree，主工作区不合并；入口docs/project/fair_reward_contract_repair_20261021.md。
 
 ﻿# Directory Structure
