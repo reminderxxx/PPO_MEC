@@ -1,5 +1,7 @@
 ## 2026-10-22：独立稳定性诊断
 
+四方法长训使用新 `joint_stream_long_four_v1` 协议，不复用旧七方法manifest。事前授权后用 `advance_stream_long.py check/run --authorization <frozen.json>`核验并条件启动一次；完成后由 `plot_stream_long_convergence.py`消费完整产物并导出真实曲线/CSV/尾稳报告。诊断未齐无claim，失败不自动重试，正式holdout不由此流程开启。预算和命令解释见[长训说明](stream_long_training.md)。
+
 日志消费者需要低内存核验时，先读[独立回收流程](stream_diagnostic_recovery.md)。`recover_stream_seed7.py check/run --contract <frozen.json>`只读原件、写新派生目录；`complete_stream_diagnostic.py check/run --contract <new_frozen.json>`仅执行原来未运行的 seed 17/27。两者不得复用失败 claim、补写旧 result、重跑已运行 seed 或扩大原总预算。标准库预检先于数值导入；实际合同和明确执行范围必须先冻结。
 
 后续统一长训须另用[独立入口与合同](stream_long_training.md)：先prepare/check、独立回收诊断并冻结root决策，再run。没有决策receipt拒绝数值导入和claim；旧64不可恢复续接，不因曲线形状重跑或延长。

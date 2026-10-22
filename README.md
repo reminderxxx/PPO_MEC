@@ -4,6 +4,8 @@
 
 [统一长训准备入口](docs/project/stream_long_training.md)独立冻结完整场景轮转与固定评估面板；没有诊断回收决策不得启动，软件交付不等于真实长训已执行。
 
+当前主图长训仅四方法×三个seed×504会话，支持事前授权后的诊断条件衔接与完整真实曲线消费；旧七方法准备协议不自动续用。详细预算与边界见同一[长训说明](docs/project/stream_long_training.md)。
+
 [低内存日志核验与未运行单元补全](docs/project/stream_diagnostic_recovery.md)分别保留失败原件、局部回收和独立补全，默认算法与原日志校验标准保持。
 
 ## 2026-10-20：5C有限数值对照已回收

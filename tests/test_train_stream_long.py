@@ -75,13 +75,20 @@ class ProtocolTests(unittest.TestCase):
 
     def test_counts_distinguish_learner_eval_predictor_and_reused_rows(self):
         count=M.budget_counts()
-        self.assertEqual(count['training_sessions'],10584)
-        self.assertEqual(count['unique_evaluation_sessions'],11592)
-        self.assertEqual(count['learner_models'],21)
-        self.assertEqual(count['evaluation_models'],462)
-        self.assertEqual(count['predictor_models'],22176)
-        self.assertEqual(count['logical_full_panel_rows']+count['logical_probe_panel_rows']-count['reused_probe_rows_at_full_points'],11592)
-        self.assertEqual(count['learner_updates'],2646)
+        self.assertEqual(M.SCHEMA,'joint_stream_long_four_v1')
+        self.assertEqual(M.METHODS,['sa_ghmappo','mappo','ppo','dag_offload_drl'])
+        self.assertEqual(count['training_sessions'],6048)
+        self.assertEqual(count['unique_evaluation_sessions'],6624)
+        self.assertEqual(count['learner_models'],12)
+        self.assertEqual(count['evaluation_models'],264)
+        self.assertEqual(count['predictor_models'],12672)
+        self.assertEqual(count['logical_full_panel_rows']+count['logical_probe_panel_rows']-count['reused_probe_rows_at_full_points'],6624)
+        self.assertEqual(count['learner_updates'],1512)
+        self.assertEqual(M.LIMITS['training_frames'],6048*480)
+        self.assertEqual(M.LIMITS['evaluation_frames'],6624*480)
+        self.assertEqual(M.LIMITS['backward_calls'],12*126*120)
+        self.assertEqual(M.LIMITS['main_optimizer_steps'],12*126*120)
+        self.assertEqual(M.LIMITS['surrogate_optimizer_steps'],3*126*120)
 
     def test_protocol_identity_survives_json_key_order_but_binds_budget(self):
         plan=self.plan();identity=M.protocol_identity(plan);plan['protocol_id']=identity
@@ -207,6 +214,160 @@ class DecisionTests(unittest.TestCase):
             ('algorithm_stability_fix_verified',True),('intervention_type','algorithm_fix')):
             with self.subTest(field=field),tempfile.TemporaryDirectory() as root:
                 protocol,plan,path,receipt=self.fixture(root);receipt[field]=value;path.write_text(json.dumps(receipt))
+                with self.assertRaises(ValueError):M.check_decision(path,protocol,plan)
+
+
+class CompositeDecisionTests(DecisionTests):
+    """Pure on-disk receipts and opaque byte fixtures; no tensor/model imports."""
+    def composite_fixture(self, directory):
+        root=Path(directory).resolve();protocol,plan,path,receipt=self.fixture(root)
+        old_root=root/'failed';old_root.mkdir();new_root=root/'remaining';new_root.mkdir()
+        recovered=root/'recovered';recovered.mkdir()
+        scientific=root/'science';(scientific/'src').mkdir(parents=True)
+        source=scientific/'src/example.py';source.write_text('# opaque frozen scientific source\n')
+        fingerprints={'src/example.py':M.sha_file(source)}
+        def put(where,value):
+            where=Path(where);where.parent.mkdir(parents=True,exist_ok=True);M.write_json(where,value);return where
+        def spec(where):return dict(path=str(Path(where)),sha256=M.sha_file(where))
+        def binding(where):return dict(spec(where),size_bytes=Path(where).stat().st_size)
+        cases=['train_%03d'%i for i in range(4)]
+        original_protocol=put(root/'original_protocol.json',dict(training_schedule={str(seed):cases*16 for seed in M.SEEDS}))
+        plan.update(source_protocol=spec(original_protocol),source_fingerprints=fingerprints)
+        old=dict(schema='stream_stability_diagnostic_v1',status='frozen',seeds=M.SEEDS,sides=['off','on'],
+            training_budget=64,sessions_per_seed=4,epochs=4,output_root=str(old_root),
+            repo_root=str(scientific),source_commit='a'*40,source_fingerprints=fingerprints,protocol=spec(original_protocol))
+        old_path=put(root/'original_contract.json',old)
+        side_counts=dict(training_sessions=4,training_updates=1,training_frames=20,environments=4,
+            adam_calls=2,backward_calls=1,categorical_sample_calls=8,evaluate_calls=10)
+        fail_counts={key:value*2 for key,value in side_counts.items()}
+        failure=put(old_root/'failure.json',dict(status='failed',no_retry=True,completed_seeds=0,
+            context=dict(seed=7,side='on',phase='independent_consumer'),counts=fail_counts))
+        put(old_root/'run_started.json',dict(contract_sha256=M.sha_file(old_path),source_commit=old['source_commit']))
+        audits={};all_sides={}
+        for seed in M.SEEDS:
+            home=(old_root if seed==7 else new_root)/('seed%d'%seed);sides=[]
+            audit=dict(status='complete_unverified',structural_complete=True,
+                actual_training_verified=False,synthetic_fixture=False)
+            audits[seed]=audit
+            for side in ('off','on'):
+                folder=home/side;folder.mkdir(parents=True)
+                for name in ('checkpoint.pt','final_evidence.pt'):
+                    (folder/name).write_bytes(('%s_%d'%(name,seed)).encode())
+                for episode,case in enumerate(cases,1):
+                    put(folder/('episode%d.json'%episode),dict(episode=episode,case_id=case,
+                        summary_sha256='summary'+str(episode),rolls_sha256='rolls'+str(episode),
+                        receipts_sha256='receipts'+str(episode),rng_after_sha256='rng'+str(episode)))
+                row=dict(seed=seed,side=side,episode_count=4,case_ids=cases,
+                    original_call_counts=side_counts.copy(),coverage={},initial_learned_state_sha256='initial',
+                    checkpoint_sha256=M.sha_file(folder/'checkpoint.pt'),
+                    final_evidence_sha256=M.sha_file(folder/'final_evidence.pt'))
+                if side=='on':row['audit']=audit
+                if seed!=7 or side=='off':put(folder/'result.json',row)
+                sides.append(row)
+            audit_path=home/'on/audit/events.jsonl';audit_path.parent.mkdir()
+            audit_path.write_text('opaque raw audit seed%d\n'%seed)
+            all_sides[seed]=sides
+        input_bindings={str(p):binding(p) for p in [old_path,failure,original_protocol,*old_root.rglob('*')] if p.is_file()}
+        recovery=dict(schema='stream_seed7_partial_recovery_v1',status='frozen',seed=7,recovered_seeds=[7],
+            not_run_seeds=[17,27],counts=dict(training_sessions=0,training_updates=0,models=0,environments=0),
+            output_root=str(recovered),original_source_commit=old['source_commit'],
+            input_bindings=input_bindings,recovery_sources={'pure_schema':binding(source)})
+        recovery_path=put(root/'recovery_contract.json',recovery)
+        partial=dict(status='RECOVERED_SEED7_ONLY_OBSERVER_PARITY',original_run_status='failed',original_run_failed=True,
+            full_matrix_incomplete=True,recovered_seeds=[7],not_run_seeds=[17,27],
+            counts=dict(training_sessions=0,training_updates=0),saved_final_files_byte_equal=True,
+            four_episode_exact_digest_parity=True,actual_training_verified=False,formal_holdout='not_read',
+            recovery_contract_sha256=M.sha_file(recovery_path),qualification_root=str(old_root),
+            original_run_counts=fail_counts,original_source_commit=old['source_commit'],
+            input_bindings=input_bindings,recovery_sources=recovery['recovery_sources'],compact_schema_validation=audits[7])
+        partial_path=put(recovered/'result.json',partial)
+        limits=dict(training_sessions=16,training_updates=4,models=4,environments=16)
+        remaining_counts={key:value*4 for key,value in side_counts.items()};remaining_counts['models']=4
+        profile=dict(schema='unexecuted_stream_diagnostic_v1',status='frozen',seeds=[17,27],sides=['off','on'],
+            training_budget=64,sessions_per_seed=4,epochs=4,compact_joins=True,no_resume=True,no_retry=True,
+            already_executed=dict(seeds=[7],training_sessions=8,training_updates=2),
+            original_scientific_budget=dict(training_sessions=24,training_updates=6),limits=limits,
+            parent_contract=spec(old_path),parent_failure=spec(failure),partial_seed7_recovery=spec(partial_path),
+            output_root=str(new_root),repo_root=str(scientific),source_commit='b'*40,
+            source_fingerprints=fingerprints,protocol=spec(original_protocol))
+        profile_path=put(root/'remaining_contract.json',profile)
+        put(new_root/'run_started.json',dict(contract_sha256=M.sha_file(profile_path),source_commit=profile['source_commit']))
+        remaining=dict(schema=profile['schema'],status='complete_unexecuted_seed_observer_parity',
+            executed_seeds=[17,27],original_run_status='failed',original_root_completed=False,formal_holdout='not_read',
+            no_resume=True,no_retry=True,source_commit=profile['source_commit'],contract_sha256=M.sha_file(profile_path),
+            parent_contract=profile['parent_contract'],parent_failure=profile['parent_failure'],
+            partial_seed7_recovery=profile['partial_seed7_recovery'],limits=limits,counts=remaining_counts,
+            seeds=[dict(seed=seed,status='exact_parity',sides=all_sides[seed]) for seed in (17,27)])
+        remaining_path=put(new_root/'result.json',remaining)
+        diagnostic=dict(schema=M.COMPOSITE_SCHEMA,status=M.COMPOSITE_STATUS,
+            counts=dict(training_sessions=0,training_updates=0,models=0,environments=0),
+            original_run_status='failed',original_root_completed=False,original_run_failed=True,
+            original_matrix_remains_incomplete=True,composite_observer_matrix_complete=True,
+            recovered_seed7_scientific_counts=dict(training_sessions=0,training_updates=0),
+            previously_executed_counts=dict(training_sessions=8,training_updates=2),
+            remaining_executed_counts=dict(training_sessions=16,training_updates=4),
+            combined_observed_counts=dict(training_sessions=24,training_updates=6),observed_seeds=M.SEEDS,
+            actual_training_verified=False,formal_holdout='not_read',convergence='UNVERIFIED',
+            causal_root_cause='UNIDENTIFIED_by_descriptive_statistics',algorithm_fix='NOT_CLAIMED',
+            scientific_sources={str(seed):old['source_commit'] if seed==7 else profile['source_commit'] for seed in M.SEEDS},
+            seeds=[dict(seed=seed,independent_schema_validation=audits[seed],counts=dict(updates=1),
+                scientific_source_commit=old['source_commit'] if seed==7 else profile['source_commit'],
+                file_sha256=M.sha_file((old_root if seed==7 else new_root)/('seed%d/on/audit/events.jsonl'%seed)),
+                bytes=((old_root if seed==7 else new_root)/('seed%d/on/audit/events.jsonl'%seed)).stat().st_size) for seed in M.SEEDS])
+        diagnostic['input_bindings']={str(p):binding(p) for p in root.rglob('*') if p.is_file() and p!=path}
+        diagnostic_path=root/'composite.json';put(diagnostic_path,diagnostic)
+        receipt['diagnostic_result']=spec(diagnostic_path)
+        receipt['diagnostic_components']={name:spec(p) for name,p in dict(original_contract=old_path,
+            original_failure=failure,seed7_recovery_contract=recovery_path,seed7_recovery_result=partial_path,
+            remaining_contract=profile_path,remaining_result=remaining_path).items()}
+        receipt.update(decision_origin='root_conditional_authorization_after_complete_diagnostic',
+            conditional_authorization=dict(path=str(root/'root_authorization.json'),sha256='c'*64))
+        path.write_text(json.dumps(receipt))
+        return protocol,plan,path,receipt,diagnostic,old_root,new_root
+
+    def save_summary(self,path,receipt,diagnostic):
+        where=Path(receipt['diagnostic_result']['path']);where.write_text(json.dumps(diagnostic))
+        receipt['diagnostic_result']['sha256']=M.sha_file(where);path.write_text(json.dumps(receipt))
+
+    def test_complete_composite_binds_failed_original_components_and_exact_files(self):
+        with tempfile.TemporaryDirectory() as root:
+            protocol,plan,path,receipt,diagnostic,old_root,new_root=self.composite_fixture(root)
+            M.check_decision(path,protocol,plan)
+            self.assertFalse((old_root/'result.json').exists())
+
+    def test_status_alone_or_wrong_scope_never_authorizes(self):
+        changes=[('observed_seeds',[7,17]),('combined_observed_counts',dict(training_sessions=24,training_updates=7)),
+            ('original_run_status','complete'),('original_root_completed',True),
+            ('composite_observer_matrix_complete',False),('actual_training_verified',True),
+            ('algorithm_fix','VERIFIED'),('input_bindings',{})]
+        for field,value in changes:
+            with self.subTest(field=field),tempfile.TemporaryDirectory() as root:
+                protocol,plan,path,receipt,diagnostic,*_=self.composite_fixture(root)
+                diagnostic[field]=value;self.save_summary(path,receipt,diagnostic)
+                with self.assertRaises(ValueError):M.check_decision(path,protocol,plan)
+
+    def test_component_missing_mismatch_raw_tamper_and_backfilled_failure_rejected(self):
+        for mode in ('missing','sha','raw','backfill','remaining_failure','source','duplicate_seed','audit'):
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory() as root:
+                protocol,plan,path,receipt,diagnostic,old_root,new_root=self.composite_fixture(root)
+                if mode=='missing':receipt['diagnostic_components'].pop('original_failure')
+                elif mode=='sha':receipt['diagnostic_components']['remaining_contract']['sha256']='d'*64
+                elif mode=='raw':(old_root/'seed7/on/checkpoint.pt').write_bytes(b'tampered')
+                elif mode=='backfill':(old_root/'result.json').write_text('{}')
+                elif mode=='remaining_failure':(new_root/'failure.json').write_text('{}')
+                elif mode=='source':plan['source_fingerprints']['src/example.py']='e'*64
+                elif mode=='duplicate_seed':diagnostic['seeds'][2]['seed']=17
+                else:diagnostic['seeds'][1]['independent_schema_validation']['structural_complete']=False
+                self.save_summary(path,receipt,diagnostic)
+                with self.assertRaises(ValueError):M.check_decision(path,protocol,plan)
+
+    def test_composite_cannot_be_relabelled_as_identified_stability_fix(self):
+        for field,value in (('root_cause_status','IDENTIFIED'),('intervention_type','verified_nonalgorithmic_protocol_fix'),
+                ('algorithm_stability_fix_verified',True)):
+            with self.subTest(field=field),tempfile.TemporaryDirectory() as root:
+                protocol,plan,path,receipt,diagnostic,*_=self.composite_fixture(root)
+                receipt[field]=value;receipt['nonalgorithmic_fix_scope']='statistical_reporting'
+                self.save_summary(path,receipt,diagnostic)
                 with self.assertRaises(ValueError):M.check_decision(path,protocol,plan)
 
 

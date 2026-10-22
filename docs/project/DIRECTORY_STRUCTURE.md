@@ -1,5 +1,7 @@
 ## 2026-10-22：独立稳定性诊断
 
+`scripts/advance_stream_long.py`与对应测试负责已授权四方法的条件衔接；`scripts/plot_stream_long_convergence.py`与对应测试负责完整结果的只读核验、统计和静态科研图。授权、handoff、运行、曲线分别保存于新的私有根目录，实际指针由本聊天私有continuation记录。
+
 `scripts/recover_stream_seed7.py`与`tests/test_recover_stream_seed7.py`：只读部分回收及纯 mock；`scripts/complete_stream_diagnostic.py`与`tests/test_complete_stream_diagnostic.py`：仅原未运行单元的独立入口及纯 mock。新派生回执、合同和补全产物均在独立私有 root，旧失败目录保持，见[回收说明](stream_diagnostic_recovery.md)。
 
 `scripts/train_stream_long.py`：独立prepare/check/run统一长训入口；`tests/test_train_stream_long.py`：纯软件编排/隔离/边界验证。新的私有root存独立protocol与run，不续写原64结果，详情见[长训说明](stream_long_training.md)。

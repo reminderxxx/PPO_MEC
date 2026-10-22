@@ -1,5 +1,7 @@
 ## 2026-10-22 独立诊断与统一长训准备
 
+当前[四方法长训](stream_long_training.md)区分条件授权、真实执行和完整结果绘图；诊断与预算证据先核验，不以入口或授权状态宣称收敛。
+
 [稳定性诊断](stream_stability_diagnostic.md)与[统一长训入口](stream_long_training.md)分别执行；真实运行与决策回执留在私有产物中，不以软件交付宣称修复或收敛。
 
 [诊断日志低内存回收](stream_diagnostic_recovery.md)提供原件只读核验和仅未运行 seed 的独立补全；原失败状态不能覆盖为通过。

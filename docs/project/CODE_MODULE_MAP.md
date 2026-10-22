@@ -1,5 +1,7 @@
 ## 2026-10-22：稳定性诊断依赖
 
+`advance_stream_long`单向调用`train_stream_long`的纯协议/决策门禁，仅在独立诊断齐全时启动冻结入口一次；`plot_stream_long_convergence`单向消费完成后的协议、原始行、checkpoint字节与RNG隔离回执，不反向调用训练或环境。算法与registry不依赖衔接器和绘图器。
+
 `recover_stream_seed7`仅单向消费原件和`sa_stage5c_credit_audit.validate(compact_joins=True)`；不导入数值运行时。`complete_stream_diagnostic`复用原诊断的数值比较与资源保护 helper，使用显式紧凑 sink/consumer；算法和原冻结 runner 不反向依赖这两个入口。默认日志接口及原始 wire schema 保持，见[回收说明](stream_diagnostic_recovery.md)。
 
 `train_stream_long`单向复用原stream构造/rollout、固定日程及数值比较helper；prepare读取既有可信资产，不拟合模型；run依赖独立诊断回收决策，算法及registry不反向依赖长训入口。训练与评估副本、RNG、完整/窄面板分开验证，见[长训说明](stream_long_training.md)。

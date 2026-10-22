@@ -27,11 +27,12 @@ import traceback
 import zlib
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA = 'joint_stream_long_v1'
+SCHEMA = 'joint_stream_long_four_v1'
 DECISION_SCHEMA = 'stream_long_execution_decision_v1'
+COMPOSITE_SCHEMA = 'composite_stream_credit_summary_v1'
+COMPOSITE_STATUS = 'COMPOSITE_SEED7_RECOVERED_SEEDS17_27_EXACT_OBSERVER_PARITY'
 BASELINE_COMMIT = '8c836f9edbaedb42e99dd3026ea6935796533ba0'
-METHODS = ['sa_ghmappo', 'mappo', 'ppo', 'dag_offload_drl',
-    'sa_no_prediction', 'cache_offload_drl', 'dt_handoff_drl']
+METHODS = ['sa_ghmappo', 'mappo', 'ppo', 'dag_offload_drl']
 SEEDS = [7, 17, 27]
 EPISODES = 504
 PROBE_POINTS = list(range(0, 505, 24))
@@ -53,12 +54,12 @@ OUTPUT_BYTE_COUNT_SCOPE = ('Conservative cumulative write charges: checkpoint wr
     'before saving with no refund, with cumulative checkpoint writes bounded by that reservation; '
     'streams/metadata actual cumulative bytes, including replaced progress writes. '
     'Not measured resident directory size.')
-LIMITS = dict(learner_models=21, evaluation_models=462, predictor_models=22176,
-    training_sessions=10584, evaluation_sessions=11592, environments=22176,
-    training_frames=5080320, evaluation_frames=5564160, frames_per_session=480,
-    learner_updates=2646, backward_calls=317520, main_optimizer_steps=317520,
-    surrogate_optimizer_steps=90720, categorical_sample_calls=121927680,
-    evaluate_calls=170629200, checkpoints=462, max_wall_seconds=7*24*3600,
+LIMITS = dict(learner_models=12, evaluation_models=264, predictor_models=12672,
+    training_sessions=6048, evaluation_sessions=6624, environments=12672,
+    training_frames=2903040, evaluation_frames=3179520, frames_per_session=480,
+    learner_updates=1512, backward_calls=181440, main_optimizer_steps=181440,
+    surrogate_optimizer_steps=45360, categorical_sample_calls=69672960,
+    evaluate_calls=97502400, checkpoints=264, max_wall_seconds=7*24*3600,
     max_rss_bytes=8*GIB, minimum_free_disk_bytes=30*GIB,
     output_bytes=20*GIB, failure_receipt_bytes=65536, checkpoint_bytes=16*MIB,
     training_jsonl_bytes_per_cell=16*MIB, dev_jsonl_bytes_per_cell=32*MIB,
@@ -297,6 +298,195 @@ def check_protocol(path, *, require_unclaimed=True):
     return plan,path,original
 
 
+def check_composite_diagnostic(diagnostic, receipt, plan):
+    """Bind the recovered matrix without relabeling its failed original run.
+
+    This is a provenance gate, not a replacement for the independent root review
+    or for the bounded schema/statistics consumers that produced the summary.
+    All referenced bytes are checked; no tensor, environment or audit replay is
+    loaded here. The original FAILED directory remains permanently incomplete.
+    """
+    def require(condition, message):
+        if not condition: raise ValueError('Composite diagnostic: '+message)
+    def equal(actual, expected, message):
+        require(canonical(actual)==canonical(expected),message)
+    expected=dict(schema=COMPOSITE_SCHEMA,status=COMPOSITE_STATUS,
+        counts=dict(training_sessions=0,training_updates=0,models=0,environments=0),
+        original_run_status='failed',original_root_completed=False,original_run_failed=True,
+        original_matrix_remains_incomplete=True,composite_observer_matrix_complete=True,
+        recovered_seed7_scientific_counts=dict(training_sessions=0,training_updates=0),
+        previously_executed_counts=dict(training_sessions=8,training_updates=2),
+        remaining_executed_counts=dict(training_sessions=16,training_updates=4),
+        combined_observed_counts=dict(training_sessions=24,training_updates=6),
+        observed_seeds=SEEDS,actual_training_verified=False,formal_holdout='not_read',
+        convergence='UNVERIFIED',causal_root_cause='UNIDENTIFIED_by_descriptive_statistics',
+        algorithm_fix='NOT_CLAIMED')
+    for key,value in expected.items():equal(diagnostic.get(key),value,'summary scope differs: '+key)
+    require(receipt.get('intervention_type')=='bounded_exposure_budget_test' and
+        receipt.get('root_cause_status')=='UNIDENTIFIED' and
+        receipt.get('algorithm_stability_fix_verified') is False,
+        'observer recovery cannot certify an algorithm stability repair')
+    inventory=diagnostic.get('input_bindings')
+    require(type(inventory) is dict and 0<len(inventory)<=2000,'bounded input inventory required')
+    total_bytes=0
+    for name,spec in inventory.items():
+        path=Path(name).resolve()
+        require(str(path)==name and type(spec) is dict and
+            set(spec)=={'path','size_bytes','sha256'} and spec['path']==name,'canonical input binding required')
+        size=spec['size_bytes'];digest=spec['sha256']
+        require(type(size) is int and 0<=size<=6*GIB and type(digest) is str and len(digest)==64 and
+            all(c in '0123456789abcdef' for c in digest),'invalid input size/SHA')
+        total_bytes+=size;require(total_bytes<=20*GIB,'input byte scope exceeds bounded recovery')
+        require(path.stat().st_size==size and sha_file(path)==digest,'actual input bytes differ: '+name)
+    components=receipt.get('diagnostic_components')
+    required={'original_contract','original_failure','seed7_recovery_contract','seed7_recovery_result',
+        'remaining_contract','remaining_result'}
+    require(type(components) is dict and set(components)==required,'six component bindings required')
+    def bound_json(spec):
+        require(type(spec) is dict and set(spec)=={'path','sha256'},'component path/SHA binding required')
+        path=Path(spec['path']).resolve();name=str(path)
+        require(name==spec['path'] and name in inventory and
+            inventory[name]['sha256']==spec['sha256'],'component missing from checked inventory')
+        require(path.stat().st_size<=32*MIB,'component receipt unexpectedly large')
+        return read_json(path)
+    parts={key:bound_json(spec) for key,spec in components.items()}
+    old=parts['original_contract'];failure=parts['original_failure']
+    recovery=parts['seed7_recovery_contract'];partial=parts['seed7_recovery_result']
+    profile=parts['remaining_contract'];remaining=parts['remaining_result']
+    for key,value in dict(schema='stream_stability_diagnostic_v1',status='frozen',seeds=SEEDS,
+            sides=['off','on'],training_budget=64,sessions_per_seed=4,epochs=4).items():
+        equal(old.get(key),value,'original contract differs: '+key)
+    root=Path(old['output_root']).resolve();new_root=Path(profile['output_root']).resolve()
+    require(Path(components['original_failure']['path'])==root/'failure.json','failure belongs to another root')
+    for absent in ('result.json','seed7/result.json','seed7/on/result.json','seed17','seed27'):
+        require(not (root/absent).exists(),'original FAILED root was backfilled')
+    require(failure.get('status')=='failed' and failure.get('no_retry') is True and
+        failure.get('completed_seeds')==0 and failure['context'].get('seed')==7 and
+        failure['context'].get('side')=='on' and failure['context'].get('phase')=='independent_consumer',
+        'original failure boundary differs')
+    equal({key:failure['counts'].get(key) for key in ('training_sessions','training_updates')},
+        dict(training_sessions=8,training_updates=2),'original executed counts differ')
+    for key,value in dict(schema='stream_seed7_partial_recovery_v1',status='frozen',seed=7,
+            recovered_seeds=[7],not_run_seeds=[17,27],
+            counts=dict(training_sessions=0,training_updates=0,models=0,environments=0)).items():
+        equal(recovery.get(key),value,'recovery contract differs: '+key)
+    for key,value in dict(status='RECOVERED_SEED7_ONLY_OBSERVER_PARITY',original_run_status='failed',
+            original_run_failed=True,full_matrix_incomplete=True,recovered_seeds=[7],not_run_seeds=[17,27],
+            counts=dict(training_sessions=0,training_updates=0),saved_final_files_byte_equal=True,
+            four_episode_exact_digest_parity=True,actual_training_verified=False,formal_holdout='not_read').items():
+        equal(partial.get(key),value,'partial recovery differs: '+key)
+    require(partial['recovery_contract_sha256']==components['seed7_recovery_contract']['sha256'] and
+        Path(partial['qualification_root']).resolve()==root and
+        Path(recovery['output_root']).resolve()==Path(components['seed7_recovery_result']['path']).parent,
+        'partial recovery identity differs')
+    equal(partial['original_run_counts'],failure['counts'],'partial original counts differ')
+    for key in ('input_bindings','recovery_sources'):
+        equal(partial[key],recovery[key],'recovery binding differs: '+key)
+        for spec in partial[key].values():
+            require(type(spec) is dict and inventory.get(spec.get('path'))==spec,
+                'recovery original/source missing from checked inventory')
+    require(partial['original_source_commit']==recovery['original_source_commit']==old['source_commit'],
+        'recovered scientific source differs')
+    for key,value in dict(schema='unexecuted_stream_diagnostic_v1',status='frozen',seeds=[17,27],
+            sides=['off','on'],training_budget=64,sessions_per_seed=4,epochs=4,compact_joins=True,
+            no_resume=True,no_retry=True,already_executed=dict(seeds=[7],training_sessions=8,training_updates=2),
+            original_scientific_budget=dict(training_sessions=24,training_updates=6)).items():
+        equal(profile.get(key),value,'remaining contract differs: '+key)
+    for key,component in (('parent_contract','original_contract'),('parent_failure','original_failure'),
+            ('partial_seed7_recovery','seed7_recovery_result')):
+        equal(profile[key],components[component],'remaining component binding differs: '+key)
+        equal(remaining[key],components[component],'remaining result binding differs: '+key)
+    require(Path(components['remaining_result']['path'])==new_root/'result.json' and
+        not (new_root/'failure.json').exists(),'remaining output failed or belongs elsewhere')
+    for key,value in dict(schema=profile['schema'],status='complete_unexecuted_seed_observer_parity',
+            executed_seeds=[17,27],original_run_status='failed',original_root_completed=False,
+            formal_holdout='not_read',no_resume=True,no_retry=True,source_commit=profile['source_commit'],
+            contract_sha256=components['remaining_contract']['sha256']).items():
+        equal(remaining.get(key),value,'remaining result differs: '+key)
+    for key,value in dict(training_sessions=16,training_updates=4,models=4,environments=16).items():
+        equal(remaining['counts'].get(key),value,'remaining operation scope differs: '+key)
+        equal(profile['limits'].get(key),value,'remaining frozen scope differs: '+key)
+    equal(remaining['limits'],profile['limits'],'remaining limits changed')
+    equal(profile['protocol'],old['protocol'],'original protocol binding changed')
+    require(old['protocol']['sha256']==plan['source_protocol']['sha256'],'long run uses another scientific protocol')
+    original_protocol=bound_json(old['protocol'])
+    scientific_sources={str(seed):old['source_commit'] if seed==7 else profile['source_commit'] for seed in SEEDS}
+    equal(diagnostic.get('scientific_sources'),scientific_sources,'summary scientific sources differ')
+    for source in (old,profile):
+        src={name:digest for name,digest in source['source_fingerprints'].items() if name.startswith('src/')}
+        equal(src,{name:digest for name,digest in plan['source_fingerprints'].items() if name.startswith('src/')},
+            'scientific algorithm source changed')
+        for name,digest in source['source_fingerprints'].items():
+            relative=Path(name)
+            require(not relative.is_absolute() and '..' not in relative.parts,'unsafe source binding')
+            spec=inventory.get(str((Path(source['repo_root'])/relative).resolve()))
+            require(spec is not None and spec['sha256']==digest,'source absent from checked inventory')
+    for where,component,source in ((root,'original_contract',old),(new_root,'remaining_contract',profile)):
+        name=str(where/'run_started.json');spec=inventory.get(name)
+        require(spec is not None,'run start absent from checked inventory')
+        start=bound_json(dict(path=name,sha256=spec['sha256']))
+        require(start['contract_sha256']==components[component]['sha256'] and
+            start['source_commit']==source['source_commit'],'run start source/contract differs')
+    summaries=diagnostic.get('seeds');require(type(summaries) is list,'per-seed summaries required')
+    equal([row.get('seed') for row in summaries],SEEDS,'missing/duplicate diagnostic seed')
+    equal([row.get('seed') for row in remaining['seeds']],[17,27],'missing/duplicate remaining seed')
+    for seed,summary in zip(SEEDS,summaries):
+        audit=summary['independent_schema_validation']
+        require(audit.get('status')=='complete_unverified' and audit.get('structural_complete') is True and
+            audit.get('actual_training_verified') is False and audit.get('synthetic_fixture') is False and
+            summary['counts'].get('updates')==1,'incomplete independent per-seed schema/first update')
+        equal(summary['scientific_source_commit'],scientific_sources[str(seed)],'per-seed source differs')
+        home=(root if seed==7 else new_root)/('seed%d'%seed)
+        log=inventory.get(str(home/'on/audit/events.jsonl'))
+        require(log is not None and summary['file_sha256']==log['sha256'] and summary['bytes']==log['size_bytes'],
+            'summary raw audit binding differs')
+        equal(audit,partial['compact_schema_validation'] if seed==7 else remaining['seeds'][SEEDS.index(seed)-1]['sides'][1]['audit'],
+            'component/summary schema validation differs')
+        cases=original_protocol['training_schedule'][str(seed)][:4]
+        require(len(cases)==len(set(cases))==4,'four original distinct cases required')
+        sides=[]
+        for side in ('off','on'):
+            if seed==7 and side=='on':continue
+            side_path=home/side/'result.json'
+            spec=inventory.get(str(side_path));require(spec is not None,'side receipt absent from inventory')
+            row=bound_json(dict(path=str(side_path),sha256=spec['sha256']));sides.append(row)
+            equal([row['seed'],row['side'],row['episode_count'],row['case_ids']],
+                [seed,side,4,cases],'side scientific scope differs')
+            equal({key:row['original_call_counts'][key] for key in ('training_sessions','training_updates')},
+                dict(training_sessions=4,training_updates=1),'side operation scope differs')
+        if seed!=7:
+            for field in ('original_call_counts','coverage','initial_learned_state_sha256'):
+                equal(sides[0][field],sides[1][field],'saved off/on receipts differ: '+field)
+            row=remaining['seeds'][SEEDS.index(seed)-1]
+            require(row.get('status')=='exact_parity','remaining seed parity missing')
+            equal(row['sides'],sides,'remaining root/side receipts differ')
+        for name,field in (('checkpoint.pt','checkpoint_sha256'),('final_evidence.pt','final_evidence_sha256')):
+            specs=[inventory.get(str(home/side/name)) for side in ('off','on')]
+            require(all(type(spec) is dict for spec in specs) and
+                specs[0]['sha256']==specs[1]['sha256'] and specs[0]['size_bytes']==specs[1]['size_bytes'],
+                'saved final off/on bytes differ')
+            require(all(side[field]==specs[0]['sha256'] for side in sides),'saved final side SHA differs')
+        for episode,case in enumerate(cases,1):
+            rows=[]
+            for side in ('off','on'):
+                name=str(home/side/('episode%d.json'%episode));spec=inventory.get(name)
+                require(spec is not None,'episode receipt absent from inventory')
+                rows.append(bound_json(dict(path=name,sha256=spec['sha256'])))
+            for field in ('episode','case_id','summary_sha256','rolls_sha256','receipts_sha256','rng_after_sha256'):
+                equal(rows[0][field],rows[1][field],'episode exact digest parity differs')
+            equal([rows[0]['episode'],rows[0]['case_id']],[episode,case],'episode schedule differs')
+    for key in ('training_sessions','training_updates','training_frames','environments','adam_calls',
+            'backward_calls','categorical_sample_calls','evaluate_calls'):
+        old_spec=inventory[str(root/'seed7/off/result.json')]
+        old_off=bound_json(dict(path=old_spec['path'],sha256=old_spec['sha256']))
+        require(type(failure['counts'].get(key)) is int and
+            failure['counts'][key]==2*old_off['original_call_counts'][key],'original off/on operation total differs')
+        total=sum(side['original_call_counts'][key] for row in remaining['seeds'] for side in row['sides'])
+        require(type(remaining['counts'].get(key)) is int and remaining['counts'][key]==total,
+            'remaining global/side operation total differs')
+        if key in profile['limits']:require(total<=profile['limits'][key],'remaining operation cap exceeded')
+
+
 def check_decision(path, protocol_path, plan):
     """A local execution gate, not a self-authenticating scientific review."""
     receipt=read_json(path)
@@ -323,7 +513,10 @@ def check_decision(path, protocol_path, plan):
         spec=receipt[key]
         if sha_file(spec['path'])!=spec['sha256']: raise ValueError('Decision evidence SHA differs: '+key)
     diagnostic=read_json(receipt['diagnostic_result']['path'])
-    if diagnostic.get('status')!='complete_exact_observer_parity': raise ValueError('Diagnostic run did not complete required parity')
+    if diagnostic.get('status')==COMPOSITE_STATUS:
+        check_composite_diagnostic(diagnostic,receipt,plan)
+    elif diagnostic.get('status')!='complete_exact_observer_parity':
+        raise ValueError('Diagnostic run did not complete required parity')
     if not receipt.get('reviewed_at') or not receipt.get('diagnostic_run_id'):
         raise ValueError('Independent diagnostic recovery identity/date required')
     evidence=receipt.get('validation_evidence')
