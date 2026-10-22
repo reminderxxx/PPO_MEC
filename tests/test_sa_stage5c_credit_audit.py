@@ -174,6 +174,101 @@ class AuditTests(unittest.TestCase):
     elif mode=='nan':rows[1]=rows[1].replace(b'"frame":0',b'"frame":NaN')
     else:rows[1]=rows[1].replace(b'"frame":0',b'"frame":1e999')
     f.write_bytes(b''.join(rows));self.assertEqual(M.validate(p)['status'],'invalid')
+class CompactAuditTests(AuditTests):
+ """Run every established positive/negative fixture with compact producer/consumer."""
+ def setUp(self):
+  sink=M.AuditSink;validate=M.validate;joins=M._Joins
+  class CompactJoins(joins):
+   def __init__(self,header,*,compact_joins=True):super().__init__(header,compact_joins=compact_joins)
+  def compact_sink(*args,**kwargs):kwargs.setdefault('compact_joins',True);return sink(*args,**kwargs)
+  def compact_validate(*args,**kwargs):kwargs.setdefault('compact_joins',True);return validate(*args,**kwargs)
+  for name,value in (('_Joins',CompactJoins),('AuditSink',compact_sink),('validate',compact_validate)):
+   patcher=mock.patch.object(M,name,value);patcher.start();self.addCleanup(patcher.stop)
+
+class CompactJoinParityTests(unittest.TestCase):
+ def rows(self):
+  b=behavior();bu=M.behavior_uid('fixture_run',b);u=M.update_uid('fixture_run',17,1)
+  c=credit(bu,u);cu=M.credit_uid('fixture_run',u,bu);mb=minibatch(bu,cu,u)
+  return [('behavior',b),('credit',c),('minibatch',mb),('update',update(u,[mb['step_uid']]))]
+ def join(self,compact):return M._Joins(M._header(header(),1000,10000000),compact_joins=compact)
+ def test_normalized_returns_are_full_equal_and_input_unchanged_but_history_is_projected(self):
+  rows=self.rows();marker='large-metadata-marker-'+'x'*16384
+  for kind,p in rows:
+   p.setdefault('metadata',{}).update(big=marker,scores=[.25]*4096)
+  rows[0][1]['candidates'][0]=[dict(name='a',detail=marker),dict(name='b',detail=marker)]
+  original=copy.deepcopy(rows);full=self.join(False);compact=self.join(True)
+  for kind,p in rows:
+   self.assertEqual(full.event(kind,p),compact.event(kind,p))
+  full.completion();compact.completion();self.assertEqual(rows,original)
+  self.assertIn(marker,json.dumps(full.behaviors));self.assertNotIn(marker,json.dumps(compact.__dict__))
+  for b in compact.behaviors.values():self.assertEqual(set(b),{'seed','session_id','frame','masks','behavior_uid'})
+  for c in compact.credits.values():self.assertEqual(set(c),{'seed','behavior_uid','update_uid','credit_uid'})
+  for mb in compact.minibatches.values():self.assertNotIn('metadata',mb);self.assertIn('credit_uids',mb)
+  for up in compact.updates.values():self.assertEqual(up['metadata'],dict(optimizer_step_counts=dict(main=1,surrogate=1)))
+  preflight=self.join(True);normalized,uid=preflight.event('behavior',rows[0][1],commit=False)
+  self.assertEqual(preflight.behaviors,{});self.assertEqual(normalized['metadata'],rows[0][1]['metadata']);self.assertIn('candidates',normalized)
+ def test_raw_log_uids_and_all_consumer_reports_are_exactly_equal(self):
+  with tempfile.TemporaryDirectory() as d:
+   outputs=[];uids=[]
+   for compact in (False,True):
+    path=Path(d)/str(compact);sink=M.AuditSink(path,enable=True,header=header(),compact_joins=compact)
+    rows=self.rows()
+    for kind,p in rows:p.setdefault('metadata',{}).update(large_raw_field='raw-payload-'*1024,scores=[.5]*512)
+    before=copy.deepcopy(rows);uids.append([sink.emit(kind,p) for kind,p in rows]);sink.finish(complete=True)
+    self.assertEqual(rows,before);outputs.append(path)
+   self.assertEqual(uids[0],uids[1]);self.assertEqual((outputs[0]/'events.jsonl').read_bytes(),(outputs[1]/'events.jsonl').read_bytes())
+   reports=[M.validate(path,compact_joins=compact) for path in outputs for compact in (False,True)]
+   self.assertTrue(reports[0]['structural_complete']);self.assertTrue(all(report==reports[0] for report in reports))
+ def test_foreign_future_cross_seed_duplicate_steps_and_tampered_uids_have_same_rejection(self):
+  rows=self.rows();cases=[]
+  def add(name,prefix,index,change):
+   kind,p=copy.deepcopy(rows[index]);change(p);cases.append((name,copy.deepcopy(prefix),kind,p))
+  add('duplicate behavior',rows[:1],0,lambda p:None)
+  add('tampered behavior UID',[],0,lambda p:p.update(behavior_uid='behavior_bad'))
+  add('masked',[],0,lambda p:p['masks'][0].__setitem__(0,False))
+  add('unknown causal reference',[],0,lambda p:p['causal_prefix'].update(behavior_uids=['foreign']))
+  add('unknown credit',rows[:1],1,lambda p:p.update(behavior_uid='foreign'))
+  add('duplicate credit',rows[:2],1,lambda p:None)
+  add('credit active masks',rows[:1],1,lambda p:p['active_heads'].__setitem__(1,True))
+  add('foreign minibatch',rows[:2],2,lambda p:p.update(credit_uids=['foreign']))
+  add('tampered minibatch UID',rows[:2],2,lambda p:p.update(minibatch_uid='minibatch_bad'))
+  add('duplicate optimizer step',rows[:3],2,lambda p:p.update(epoch=1))
+  add('step after completed update',rows,2,lambda p:p.update(epoch=1,step_uid='new_step'))
+  add('credit after completed update',rows,1,lambda p:None)
+  add('step count mismatch',rows[:3],3,lambda p:p.update(observed_adam_steps=2))
+  add('eligible coverage',rows[:3],3,lambda p:p['metadata'].update(eligible_behavior_uids=['foreign']))
+  for name,change in [('future frame',lambda p:p.update(frame=0)),('cross session',lambda p:p.update(session_id='other')),('cross seed',lambda p:p.update(seed=7))]:
+   first=behavior(1);second=behavior(2);second['causal_prefix']['behavior_uids']=[M.behavior_uid('fixture_run',first)];change(second)
+   cases.append((name,[('behavior',first)],'behavior',second))
+  for name,prefix,kind,p in cases:
+   errors=[]
+   for compact in (False,True):
+    with self.subTest(name=name,compact=compact):
+     joins=self.join(compact)
+     for k,row in prefix:joins.event(k,row)
+     before=copy.deepcopy(p);counts=dict(joins.counts)
+     with self.assertRaises(M.AuditError) as error:joins.event(kind,p)
+     errors.append(str(error.exception));self.assertEqual(p,before);self.assertEqual(dict(joins.counts),counts)
+   self.assertEqual(errors[0],errors[1])
+ def test_optional_optimizer_counts_and_partial_pending_reports_match(self):
+  with tempfile.TemporaryDirectory() as d:
+   path=Path(d)/'partial';sink=M.AuditSink(path,enable=True,header=header(),compact_joins=True)
+   for kind,p in self.rows()[:2]:sink.emit(kind,p)
+   sink.finish();self.assertEqual(M.validate(path),M.validate(path,compact_joins=True))
+  full=self.join(False);compact=self.join(True)
+  for kind,p in self.rows():
+   if kind=='update':p.pop('metadata')
+   self.assertEqual(full.event(kind,p),compact.event(kind,p))
+  full.completion();compact.completion()
+ def test_option_requires_bool_when_enabled_and_disabled_stays_inert(self):
+  with tempfile.TemporaryDirectory() as d:
+   for value in (0,1,None,'true'):
+    with self.assertRaises(M.AuditError):M._Joins(M._header(header(),100,100000),compact_joins=value)
+    path=Path(d)/str(value)
+    with self.assertRaises(M.AuditError):M.AuditSink(path,enable=True,header=header(),compact_joins=value)
+    self.assertFalse(path.exists())
+   self.assertIsNone(M.AuditSink(object(),enable=False,compact_joins=object()).finish())
+
 class ConsumerCLITests(unittest.TestCase):
  def test_readonly_CLI_fixture_and_incomplete_exit_codes(self):
   import io

@@ -1,5 +1,7 @@
 ## 2026-10-22：独立稳定性诊断
 
+日志消费者需要低内存核验时，先读[独立回收流程](stream_diagnostic_recovery.md)。`recover_stream_seed7.py check/run --contract <frozen.json>`只读原件、写新派生目录；`complete_stream_diagnostic.py check/run --contract <new_frozen.json>`仅执行原来未运行的 seed 17/27。两者不得复用失败 claim、补写旧 result、重跑已运行 seed 或扩大原总预算。标准库预检先于数值导入；实际合同和明确执行范围必须先冻结。
+
 后续统一长训须另用[独立入口与合同](stream_long_training.md)：先prepare/check、独立回收诊断并冻结root决策，再run。没有决策receipt拒绝数值导入和claim；旧64不可恢复续接，不因曲线形状重跑或延长。
 
 先完成独立问题审查，再冻结新的私有合同；用 `python scripts/diagnose_stream_stability.py check --contract <frozen.json>` 预检，以同一合同执行 `run` 一次。短诊断仍沿用绑定的原训练预算及退火，不能把截断长度当新预算。源码、输入、上限、独占失败边界和证据解释见[入口说明](stream_stability_diagnostic.md)。禁止以诊断结果挑选 seed 或补跑失败组。

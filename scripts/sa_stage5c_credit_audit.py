@@ -93,8 +93,29 @@ def _header(header,max_rows,max_bytes):
 
 class _Joins:
     """Shared schema logic; consumer builds fresh state independently of sink."""
-    def __init__(self,header):
+    def __init__(self,header,*,compact_joins=False):
+        if type(compact_joins) is not bool:raise AuditError('compact_joins must be bool')
+        self.compact_joins=compact_joins
         self.header=header;self.run=header['run_uid'];self.behaviors={};self.credits={};self.minibatches={};self.updates={};self.steps={};self.counts=Counter();self.samples=0
+    def _history(self,kind,p):
+        """Project only after full schema checks; return payload/log bytes stay full."""
+        if not self.compact_joins:return p
+        fields=dict(behavior=('seed','session_id','frame','masks','behavior_uid'),
+            credit=('seed','behavior_uid','update_uid','credit_uid'),
+            minibatch=('seed','update_uid','behavior_uids','credit_uids','kl_early_stop','step_observed','step_uid','minibatch_uid'),
+            update=('seed','update_uid','observed_adam_steps'))
+        out={key:p[key] for key in fields[kind]}
+        if kind=='update':
+            metadata=p.get('metadata',{})
+            if type(metadata) is dict:
+                if 'optimizer_step_counts' in metadata:
+                    counts=metadata['optimizer_step_counts']
+                    out['metadata']=dict(optimizer_step_counts={key:counts[key] for key in ('main','surrogate')})
+            else:
+                # Only its type is needed to preserve legacy downstream handling
+                # of non-object metadata; never retain its arbitrary contents.
+                out['metadata']=type(metadata)()
+        return out
     def event(self,kind,payload,*,commit=True):
         if kind not in EVENTS:raise AuditError('unknown event type')
         primitive(payload)
@@ -194,7 +215,7 @@ class _Joins:
         if expected in target:raise AuditError('duplicate '+field)
         p[field]=expected
         if commit:
-            target[expected]=p
+            target[expected]=self._history(kind,p)
             if kind=='minibatch':
                 self.samples+=len(p['behavior_uids'])
                 if p['step_observed']:self.steps[p['step_uid']]=p['update_uid']
@@ -212,14 +233,14 @@ class _Joins:
         if any(not any(m['update_uid']==u for m in self.minibatches.values()) for u in self.updates):raise AuditError('update without observed minibatch')
 
 class AuditSink:
-    def __init__(self,output_root=None,*,enable=False,header=None,max_rows=10000,max_bytes=67108864):
+    def __init__(self,output_root=None,*,enable=False,header=None,max_rows=10000,max_bytes=67108864,compact_joins=False):
         self.enabled=enable is True;self.closed=False
         if enable is not True:
             if enable is not False:raise AuditError('enable must be bool')
             return
         import threading
         self.owner_thread=threading.get_ident();self.busy=False
-        self.header=_header(header,max_rows,max_bytes);self.rows=0;self.bytes=0;self.seq=0;self.digest=hashlib.sha256();self.joins=_Joins(self.header)
+        self.header=_header(header,max_rows,max_bytes);self.rows=0;self.bytes=0;self.seq=0;self.digest=hashlib.sha256();self.joins=_Joins(self.header,compact_joins=compact_joins)
         self.max_rows=max_rows;self.max_bytes=max_bytes
         self.reserve=len(canonical(self._record('terminal',self._terminal('complete_fixture','producer_closed_partial',max_rows,max_bytes,dict.fromkeys(EVENTS,max_rows),'f'*64),max_rows)))+64
         head=self._record('header',self.header,0);encoded=canonical(head)
@@ -280,17 +301,20 @@ def _pairs(items):
         out[k]=v
     return out
 
-def validate(path,*,max_file_bytes=268435456):
+def validate(path,*,max_file_bytes=268435456,compact_joins=False):
     """Read independently. Schema/joins do not authenticate stochastic origin.
 
     Partial files retain prefix accounting and pending refs. Malformed complete
     lines are invalid; a missing or truncated terminal is partial, never complete.
+    Opt-in compact joins retain only later join/summary fields after validating
+    each complete payload. Schema, raw log and returned report are unchanged.
     """
     path=Path(path);path=path/'events.jsonl' if path.is_dir() else path
     result=dict(status='partial',structural_complete=False,actual_training_verified=False,credit_correctness='UNVERIFIED_by_schema',source_stochastic_origin='UNVERIFIED',errors=[],pending_updates=[],event_counts={},unique_behavior_rows=0,sample_occurrences=0,synthetic_fixture=None)
     digest=hashlib.sha256();rows_=0;bytes_=0;terminal=None;joins=None;header=None
     try:
         _integer(max_file_bytes,'consumer max_file_bytes',1)
+        if type(compact_joins) is not bool:raise AuditError('compact_joins must be bool')
         with path.open('rb') as f:
             for line in f:
                 bytes_+=len(line)
@@ -307,7 +331,7 @@ def validate(path,*,max_file_bytes=268435456):
                     if record['event_type']!='header':raise AuditError('header first required')
                     h=record['payload'];header=_header(h,h['max_rows'],h['max_bytes'])
                     if header!=h or record['run_uid']!=header['run_uid']:raise AuditError('header identity mismatch')
-                    joins=_Joins(header);result['synthetic_fixture']=header['evidence_kind']=='synthetic_fixture'
+                    joins=_Joins(header,compact_joins=compact_joins);result['synthetic_fixture']=header['evidence_kind']=='synthetic_fixture'
                 else:
                     if record['run_uid']!=header['run_uid']:raise AuditError('cross-run envelope')
                     if record['event_type']=='terminal':

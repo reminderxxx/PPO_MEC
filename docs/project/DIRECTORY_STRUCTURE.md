@@ -1,5 +1,7 @@
 ## 2026-10-22：独立稳定性诊断
 
+`scripts/recover_stream_seed7.py`与`tests/test_recover_stream_seed7.py`：只读部分回收及纯 mock；`scripts/complete_stream_diagnostic.py`与`tests/test_complete_stream_diagnostic.py`：仅原未运行单元的独立入口及纯 mock。新派生回执、合同和补全产物均在独立私有 root，旧失败目录保持，见[回收说明](stream_diagnostic_recovery.md)。
+
 `scripts/train_stream_long.py`：独立prepare/check/run统一长训入口；`tests/test_train_stream_long.py`：纯软件编排/隔离/边界验证。新的私有root存独立protocol与run，不续写原64结果，详情见[长训说明](stream_long_training.md)。
 
 `scripts/diagnose_stream_stability.py`：只消费事前冻结合同的 check/run 入口。`tests/test_diagnose_stream_stability.py`：纯软件边界验证。新的私有 `artifacts/` 目录保存 claim、进度、配对输出和观察日志；既有产物不覆写。见[入口说明](stream_stability_diagnostic.md)。

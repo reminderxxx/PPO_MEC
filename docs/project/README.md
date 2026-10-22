@@ -2,6 +2,8 @@
 
 [稳定性诊断](stream_stability_diagnostic.md)与[统一长训入口](stream_long_training.md)分别执行；真实运行与决策回执留在私有产物中，不以软件交付宣称修复或收敛。
 
+[诊断日志低内存回收](stream_diagnostic_recovery.md)提供原件只读核验和仅未运行 seed 的独立补全；原失败状态不能覆盖为通过。
+
 ## 2026-10-20 5C数值资格有限回收
 
 [预算合同](sa_credit_numerical_contract_20261020.md)、[独立报告](sa_credit_numerical_review_20261020.md)、[补验方案](sa_credit_numerical_followup_20261020.md)：七组数值对照通过，48软件Adam/0环境/0科学新训；缓存自由actor和idle覆盖仍缺，四既有见证仅方案，原版保留。

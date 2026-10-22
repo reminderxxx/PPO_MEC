@@ -4,6 +4,8 @@
 
 [统一长训准备入口](docs/project/stream_long_training.md)独立冻结完整场景轮转与固定评估面板；没有诊断回收决策不得启动，软件交付不等于真实长训已执行。
 
+[低内存日志核验与未运行单元补全](docs/project/stream_diagnostic_recovery.md)分别保留失败原件、局部回收和独立补全，默认算法与原日志校验标准保持。
+
 ## 2026-10-20：5C有限数值对照已回收
 
 [独立报告](docs/project/sa_credit_numerical_review_20261020.md)：7组私有模型日志on/off逐位一致，实际48软件Adam/24backward、环境/科学新训练0，105项软件测试通过。缓存144/144 forced、idle0/21，完整运行资格尚未齐；[下一补验方案](docs/project/sa_credit_numerical_followup_20261020.md)已定位4个既有多选见证，不追加本轮输入、不自动训练。原版SA/优势门禁保留。
