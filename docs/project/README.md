@@ -1,3 +1,5 @@
+> 当前资源检查修复续作入口：fair_reward_resource_continuation_20261022.md；使用独立启动层和新root，旧失败run不恢复或覆盖。
+
 > 独立合同修复入口：`fair_reward_contract_repair_20261021.md`。旧 long_fair v1 已用户暂停，新轮验证后从零重训，不复用旧 cell。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。

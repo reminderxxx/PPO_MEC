@@ -1,3 +1,5 @@
+> 2026-10-22 续作流程：独立分支scripts/continue_fair_reward_training.py prepare --parent-root 原失败root --output-root 新root，核验后run --output-root 新root；均使用PPO_MEC_EXPERIMENT_PROJECT_ROOT主项目路径和现有Python。完成先verify，再原source auditor/plotter；禁止改科学source或旧partial，不重复run。详见fair_reward_resource_continuation_20261022.md。
+
 > 2026-10-21 独立修复流程：仅在 `codex/fair-reward-contract-repair` 运行；使用主工作区 Python 和原数据，设置 `PPO_MEC_EXPERIMENT_PROJECT_ROOT=/Users/howen/Projects/PPO_MEC`。先clean commit，再全10算法小预算prepare/run/audit，通过后用修复配置prepare新root再run；均create-only。旧run不得恢复。完整预算仍32循环/196608step/768调用，启动后复用现有20分钟监控。细节见 `fair_reward_contract_repair_20261021.md`。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。

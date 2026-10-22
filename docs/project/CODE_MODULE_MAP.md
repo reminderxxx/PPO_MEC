@@ -1,3 +1,5 @@
+> 2026-10-22 独立操作启动层continue_fair_reward_training.py仅负责安全资源扫描、继承完整cell验证/只读跳过、pending原参数委托和attempt provenance；原45c8c88 runner/agent/auditor/plotter不改，原生产者消费者合同不变。
+
 > 2026-10-21 独立修复职责：`sa_ghmappo_core.py` 保存sampled base+conditional option真实联合logp并对完整优化步做有限性/KL回退；`main_results_support.py` 提供共用无reward分类函数；runner冻结分类并传入学习，receipt/诊断/绘图消费者核验概率scope、原生reward及分类。生产优化分支不合并本实现。
 
 # Code Module Map

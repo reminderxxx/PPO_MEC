@@ -1,3 +1,5 @@
+> 2026-10-22 独立续作入口scripts/continue_fair_reward_training.py，测试tests/test_fair_reward_continuation.py；新root repaired_fair_reward_continuation_20261022_v1含原样scientific plan、独立continuation_contract、继承cell symlink和新fresh cell，原failed run保留。
+
 > 2026-10-21 独立分支新增：`configs/experiment/repaired_fair_reward_training_v1.json`、`tests/test_repaired_probability_contract.py`、`docs/project/fair_reward_contract_repair_20261021.md`；新root为 `artifacts/analysis/repaired_fair_reward_training_20261021_v1`，旧long root只读保留。
 
 ﻿# Directory Structure
