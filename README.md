@@ -1,3 +1,7 @@
+## 2026-10-22：独立训练稳定性诊断
+
+新增[显式、有界的随机训练诊断入口](docs/project/stream_stability_diagnostic.md)，隔离记录功能的数值影响与实际学习问题。冻结合同和运行回执留在本地私有产物；入口存在不表示已修复不稳或达到收敛。
+
 ## 2026-10-20：5C有限数值对照已回收
 
 [独立报告](docs/project/sa_credit_numerical_review_20261020.md)：7组私有模型日志on/off逐位一致，实际48软件Adam/24backward、环境/科学新训练0，105项软件测试通过。缓存144/144 forced、idle0/21，完整运行资格尚未齐；[下一补验方案](docs/project/sa_credit_numerical_followup_20261020.md)已定位4个既有多选见证，不追加本轮输入、不自动训练。原版SA/优势门禁保留。

@@ -1,3 +1,7 @@
+## 2026-10-22：稳定性解释与诊断边界
+
+OPEN：混合任务规模的原始训练回报包含负载组成变化；平滑、更多回合或参数更新本身均不能证明固定条件下稳定。真实随机信用与记录功能数值影响仍需按[独立诊断合同](stream_stability_diagnostic.md)核验；不存在已验证的通用“单调向上”保证。旧退化、覆盖缺口和失败候选保留。
+
 ## 2026-10-20：日志数值不变性有限通过，free-cache/idle仍OPEN
 
 VERIFIED/finite CPU：7组off/on完整forward、pre/postclip梯度、双Adam参数/状态、controller和三类RNG逐位一致；48私有软件Adam、环境/科学新训练0。不是分组裁剪退化修复。

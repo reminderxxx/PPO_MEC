@@ -1,3 +1,7 @@
+## 2026-10-22：独立稳定性诊断
+
+先完成独立问题审查，再冻结新的私有合同；用 `python scripts/diagnose_stream_stability.py check --contract <frozen.json>` 预检，以同一合同执行 `run` 一次。短诊断仍沿用绑定的原训练预算及退火，不能把截断长度当新预算。源码、输入、上限、独占失败边界和证据解释见[入口说明](stream_stability_diagnostic.md)。禁止以诊断结果挑选 seed 或补跑失败组。
+
 ## 2026-10-20：5C数值资格已执行一次
 
 先读[冻结合同](sa_credit_numerical_contract_20261020.md)及[限定回收](sa_credit_numerical_review_20261020.md)。入口`python scripts/sa_stage5c_numerical_qualification.py bind --contract <fresh_authorized_root>/contract.json --output_root <fresh_authorized_root>`绑定clean commit/源资产；随后`run --output_root <same_root>`独占执行，`status --output_root <same_root>`只读。已完成root `artifacts/joint_stream_learning/sa_credit_numerical_stage5c_20261020`不得再次run/rebind，无resume/覆盖入口；新root本身不构成新预算授权。

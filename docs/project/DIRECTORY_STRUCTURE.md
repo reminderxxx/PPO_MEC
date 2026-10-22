@@ -1,3 +1,7 @@
+## 2026-10-22：独立稳定性诊断
+
+`scripts/diagnose_stream_stability.py`：只消费事前冻结合同的 check/run 入口。`tests/test_diagnose_stream_stability.py`：纯软件边界验证。新的私有 `artifacts/` 目录保存 claim、进度、配对输出和观察日志；既有产物不覆写。见[入口说明](stream_stability_diagnostic.md)。
+
 ## 2026-10-20：5C数值资格入口
 
 `scripts/sa_stage5c_numerical_qualification.py`为独立bind/run/status软件入口，`tests/test_sa_stage5c_numerical.py`仅纯helper测试；合同/回收/后续方案见`sa_credit_numerical_*_20261020.md`。私有`artifacts/joint_stream_learning/sa_credit_numerical_stage5c_20261020/`存binding/独占claim、7pair off/on evidence/日志、审查/helper和Git记录；不纳入版本控制，不作为新训练输出路径。

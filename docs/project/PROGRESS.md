@@ -1,3 +1,7 @@
+## 2026-10-22：稳定性诊断独立推进
+
+用户选择先定位并处理学习不稳，再统一长训。本轮先形成私有独立审查，再增加[显式诊断入口](stream_stability_diagnostic.md)；不预先宣称根因、修复或收敛。冻结源码/合同、执行验证及实际正负结果以私有回执为准；旧预算和负结果保留，正式证据与 canonical 不因入口交付而晋级。
+
 ## 2026-10-20：5C数值矩阵通过，覆盖缺口保留
 
 reviewed_at以[独立回收](sa_credit_numerical_review_20261020.md)为准：clean d16ac10固定7pair，14私有模型/602 evaluate/864 sample/24backward/48双Adam，环境与科学新训练0；105测试、两份raw独立审查及147唯一路径前后SHA通过。缓存全forced、idle0/21，限定LIMITED_PASS_COVERAGE_OPEN；CPU/populatedAdam有限证据，不能称完整运行资格/退化修复。下一[补验方案](sa_credit_numerical_followup_20261020.md)仅定位四既有见证，两个无见证保留，未执行。原版和优势门禁、formal/canonical保持，提醒PAUSED。Git实际同步结果见私有git_sync.json。

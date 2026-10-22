@@ -1,3 +1,7 @@
+## 2026-10-22：稳定性诊断依赖
+
+`diagnose_stream_stability` 单向复用既有训练环境/rollout、被动信用观察器和数值比较 helper。`check` 使用标准库；真实算法和环境只在显式 `run` 内延迟导入。算法、registry及原训练入口不依赖诊断脚本。生产端与独立日志消费者共同遵守冻结的行数/字节上限，详情见[入口说明](stream_stability_diagnostic.md)。
+
 ## 2026-10-20：5C有界数值资格依赖
 
 `sa_stage5c_numerical_qualification`的bind/status只用stdlib，run才延迟导入真实SA及原观察器；RuntimeGuards在私有原调用前计数并封禁环境/CUDA/autograd.grad，合成targets与原科学MC分开。固定on/off在单线程CPU执行原act/update，保存完整forward/梯度/双Adam/RNG供独立消费者。算法/registry不反向依赖该runner；src本轮未修改。七组通过仍缺free-cache/idle，不能把完整日志schema当运行覆盖。
