@@ -184,3 +184,11 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 用户进一步明确：算法结构图应放在具体的算法解析部分，而非仅紧贴第 IV 节标题。此最新要求覆盖 R12 把图直接放到章标题后的决定；本轮将 IV-A 标题由 `A. Why the controls are ordered` 精确改为 `A. Algorithm rationale and architecture`，保持原 IV-A 首段解释“为何先选站点、再重建预约、再决定模型与切换”的文字，再将 Fig. 2 及图注放在该段之后、IV-B 之前。第 III 节系统/问题定义、IV-B/C 解释、实验和文献不改。
 - 基线：R12 `artifacts/manuscript/r12_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R12.docx`，SHA-256 `f2e33a6eb4e1a06cd4eb425099e35b451b25ab2bfa7fb10476acbaa58ea5292b`。新稿：`artifacts/manuscript/r13_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R13.docx`，SHA-256 `5dde382c3c6265892168b33bbd5c736fe9326c7be190bbad0fc775b978d0fba8`；稿件仍在 Git 忽略的 `artifacts/` 内。
 - 核对：除 IV-A 标题措辞和 Fig. 2/图注的顺序外，71 段文字、两张表单元格、两张图媒体字节均与 R12 一致；25 条参考文献仍为 Times New Roman 8 pt。DOCX ZIP 可读，`render_docx.py --emit_pdf` 得 Letter 4 页，逐页及图所在页原尺寸检查无裁切、遮挡或异常留白。未修改算法实现、实验数值和证据结论。
+
+## R14 准备时机主线与传统训练折线图（2026-10-21授权，2026-10-22完成）
+
+- 用户要求按已讨论的研究主线直接修改论文，并按提供的白底、多算法折线、底部图例示例重做奖励图。本轮覆盖标题、摘要、引言与贡献、相关工作过渡、方法解释、结果叙事和结论；新增Fig.3，并同步核对方法术语和Fig.2训练标签。R13已固定的Fig.2位置继续保留于IV-A解析首段之后，未恢复R12章标题后的位置。
+- 基线采用最新R13：`artifacts/manuscript/r13_20261021/SAGH Control for Continuous DAG Requests in Vehicular Edge Networks R13.docx`，SHA-256 `5dde382c3c6265892168b33bbd5c736fe9326c7be190bbad0fc775b978d0fba8`。新稿：`artifacts/manuscript/r14_20261022/SAGH for Coordinated Model Preparation in Continuous Vehicular DAG Requests R14.docx`，SHA-256 `4e6b2a5439fa266e049df1e394a39b1e450aa970298ce3e5a35dc95b4728808b`。此前以R12为基线的临时草稿已移至本轮私有`superseded_r12_based_draft/`，不作交付或后续基线；原R12/R13不覆盖。
+- 目标锚点：Title、Abstract、I节三段、II节两段、III-A/III-B目标说明、IV-A解释、IV-B末段、IV-C、V节及Conclusion。前后变化为分散的组件/边界说明转为准备时机与共享资源约束的连续论证；完整逐段修改前后对照及源码核验只保存在本地`revision_change_log.json`，不向公开仓库上传详细稿件或审查材料。
+- Fig.3取既有真实训练日志，采用三seed、每seed完整8episode trailing mean再平均；主图四方法，另存七个有效方法补充图及PNG/PDF/SVG、原始/平滑CSV、来源hash。没有补点、伸长横轴、改变奖励、追加训练或制造上升形状，也不据绘图风格升级收敛结论。
+- 验证：两张表的全部单元格和25条参考文献原文/编号与R13一致，参考文献仍Times New Roman 8pt；Fig.1媒体字节不变，Fig.2仍在IV-A内。DOCX ZIP可读，bundled `render_docx.py --emit_pdf`得Letter四页，四页及独立图逐页目视通过。曲线逐值独立复算及15个导出hash通过。既有七个算法/测试文件保护diff未改；未训练、未读sealed测试，正式证据边界不变。
