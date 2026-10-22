@@ -1,5 +1,7 @@
 ## 2026-10-22：稳定性诊断依赖
 
+`train_stream_long`单向复用原stream构造/rollout、固定日程及数值比较helper；prepare读取既有可信资产，不拟合模型；run依赖独立诊断回收决策，算法及registry不反向依赖长训入口。训练与评估副本、RNG、完整/窄面板分开验证，见[长训说明](stream_long_training.md)。
+
 `diagnose_stream_stability` 单向复用既有训练环境/rollout、被动信用观察器和数值比较 helper。`check` 使用标准库；真实算法和环境只在显式 `run` 内延迟导入。算法、registry及原训练入口不依赖诊断脚本。生产端与独立日志消费者共同遵守冻结的行数/字节上限，详情见[入口说明](stream_stability_diagnostic.md)。
 
 ## 2026-10-20：5C有界数值资格依赖

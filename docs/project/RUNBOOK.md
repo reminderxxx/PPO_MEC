@@ -1,5 +1,7 @@
 ## 2026-10-22：独立稳定性诊断
 
+后续统一长训须另用[独立入口与合同](stream_long_training.md)：先prepare/check、独立回收诊断并冻结root决策，再run。没有决策receipt拒绝数值导入和claim；旧64不可恢复续接，不因曲线形状重跑或延长。
+
 先完成独立问题审查，再冻结新的私有合同；用 `python scripts/diagnose_stream_stability.py check --contract <frozen.json>` 预检，以同一合同执行 `run` 一次。短诊断仍沿用绑定的原训练预算及退火，不能把截断长度当新预算。源码、输入、上限、独占失败边界和证据解释见[入口说明](stream_stability_diagnostic.md)。禁止以诊断结果挑选 seed 或补跑失败组。
 
 ## 2026-10-20：5C数值资格已执行一次
