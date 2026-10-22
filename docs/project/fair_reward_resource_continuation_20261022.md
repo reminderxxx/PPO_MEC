@@ -1,4 +1,4 @@
-> 当前状态：已通过预检并于2026-10-22 15:21启动续作；文中待执行段落为冻结前记录，以文末启动回执为准。
+> 当前状态：2026-10-23已完成30/30单元，操作合同、原冻结完成审计（990 checkpoints）及真实曲线导出通过；文中启动/待执行段落为历史记录，以文末完成回执为准。
 
 # 公平训练资源检查修复与续作（2026-10-22）
 
@@ -37,3 +37,17 @@ reviewed_at: 2026-10-22；literature_cutoff: 2026-09-28（未新评novelty）；
 ```bash
 PPO_MEC_EXPERIMENT_PROJECT_ROOT=/Users/howen/Projects/PPO_MEC PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /Users/howen/Projects/PPO_MEC/.venv/bin/python -B /Users/howen/.codex/worktrees/fair-reward-resource-guard/PPO_MEC/scripts/continue_fair_reward_training.py run --output-root /Users/howen/Projects/PPO_MEC/artifacts/analysis/repaired_fair_reward_continuation_20261022_v1
 ```
+
+## 完成回执（2026-10-23）
+
+本轮30/30单元完整：10个seed7原样只读继承、20个seed13/29 fresh完成。每cell196608交互、768次learner机会、32循环、33固定验证点；合计5898240交互、23040次learner机会、479461个训练episode、23760个验证unit与990个checkpoint。旧故障38912步/152调用为额外失败开销，partial保留排除，不拼接曲线。
+
+按顺序执行冻结launcher的`verify --output-root`得到`OPERATIONAL_CONTRACT_VERIFIED`；原科学source的`audit_long_fair_reward_training.py --run-root`得到`PASS cells=30 checkpoints=990`（实际reviewed_at见completion_audit.json）；原`plot_long_fair_reward_training.py --run-root`得到`EXPORTED cells=30`。均使用主工作区`.venv/bin/python -B`和已冻结PROJECT/单线程环境；绘图仅增加原指定临时PYTHONPATH/MPLCONFIGDIR。未改两处source HEAD、原数据/plan/checkpoint/预算/奖励或七个用户修改。操作核验还确认继承inventory、旧partial及故障报告/日志hash；审计覆盖原生奖励和执行账本、概率合同、更新KL、窗口真实身份/互斥、分类及fresh初始化。
+
+13张PNG（同步PDF）全部目视检查，原导出hash复核。保留所有原值和seed、100episode trailing mean、33个不平滑验证点；训练周期波动和负向结果均保留。28/30个seed满足事前末5点奖励平台规则；DQN seed7/29未满足，DQN seed7完成率亦低于0.8。SAGH三个seed都有网络和少量同状态执行动作变化，但固定验证reward下降，未显示验证收益，最终也未领先若干基线；平台不能解释为参数/策略收敛。完整逐seed初始/最终、正负结果、有效更新数量及局限只保存在本地报告，不将详细实验包上传公开仓库。
+
+有效Adam步与768次learner机会分开报告。策略方法使用原始接受/拒绝/回退账本；DQN/Dueling DQN/QMIX依据native epoch日志与最终Adam状态计数交叉核验，每seed3072步。它们无KL候选拒绝/回退机制，相关字段标NA；原审计对缺字段聚合出的0不能解释为没有更新。
+
+本地root下`completion_review.md/json`、`seed_result_summary.csv`、`algorithm_result_summary.csv`、`visual_and_postprocessing_check.json`和`delivery_manifest.json`记录完整结果与证据。交付包为`artifacts/analysis/repaired_fair_reward_continuation_20261022_v1_delivery.zip`，包含全部figures/CSV/report、操作contract/provenance及原平线/下降/资源故障诊断说明，不包含checkpoint或原始mobility/workflow数据；CRC与逐member hash核验见`delivery_receipt.json`。
+
+reviewed_at: 2026-10-23（精确时刻见本地报告）；literature_cutoff: 2026-09-28（未新评novelty）；target_venue: CSCWD2027；artifact_run_id: repaired_fair_reward_continuation_20261022_v1；policy_version: tmc_review_policy_v3_20260621；scientific Git: 45c8c88e390f49fc4e66c70871c2318e18883f24；launcher Git: 71ca85dcac7f709bc27fc1c3e115f771f50a4cb4；evidence_level: MATCHED_DEVELOPMENT_CHECKPOINTS_NATIVE_RECEIPTS_AND_ACTION_TRACES_AUDITED。未开启独立formal/holdout，paper-ready与正式优势仍UNVERIFIED；不作新文献评分，不开展后续优化或合并算法主线。完成后移除本次轮询，保留当前聊天。
