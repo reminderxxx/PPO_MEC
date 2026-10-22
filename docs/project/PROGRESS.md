@@ -1,3 +1,5 @@
+> 2026-10-22T08:57:22.290579+08:00 只读故障记录：repaired_fair_reward_training_20261021_v1已退出，10/30cell完整，SAGH seed13停在38912step/152次learner调用。资源检查读取ps文本遇UnicodeDecodeError，非训练更新调用栈；旧RUNNING快照过时。冻结source/plan/后处理及七用户文件保护hash未变，日志/checkpoint保留，未修复或重启；失效轮询已移除，原ETA撤回。证据见artifacts/analysis/repaired_fair_reward_failure_20261021_v1/report.json及fair_reward_contract_repair_20261021.md。
+
 > 2026-10-21 修复后统一重训已启动：旧long v1按用户指令SIGINT退出，360文件hash复核保留；独立分支45c8c88已push，312测试及10算法512step预检/30checkpoints审计/绘图通过。新repaired_fair_reward_training_20261021_v1于14:48:46启动，10算法×3seed各196608step/768learner机会/32循环/33固定验证，全部fresh，奖励和原窗口数据未改。采样路径联合概率、完整更新KL回退、native window_class已贯通；启动检查有有效更新。每20分钟复用ppo-mec-3监控，完整结果未出；详见 fair_reward_contract_repair_20261021.md。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。

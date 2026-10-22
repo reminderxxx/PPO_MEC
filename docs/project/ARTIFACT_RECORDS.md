@@ -1,3 +1,5 @@
+> 2026-10-22T08:57:22.290579+08:00 训练终止记录：repaired_fair_reward_training_20261021_v1因资源进程列表UTF-8解码错误退出，10个seed7 cell完整、SAGH seed13 partial38912steps/152updates，最后checkpoint144。独立证据artifacts/analysis/repaired_fair_reward_failure_20261021_v1/report.json。原run/源码/plan/checkpoint保留，未续跑或覆盖，失效轮询已移除；不是完整30cell实验，不出全量收敛结论。
+
 > 2026-10-21 独立修复重训启动记录：旧long_fair_reward_training_20261021_v1用户停止，360文件hash复核；新repaired_fair_reward_training_20261021_v1，source45c8c88、plan36f019938092eed36bb5bd34e23d88532156db37aae88c2704fa2f689dd4eef4，10×3fresh196608step/32循环、原reward与窗口保持，修复sampled概率/KL保护/window_class。312测试与10算法预检30检查点审计PASS；新轮完整结果UNVERIFIED，matched development非holdout/paper-ready，运行身份在execution_receipt。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。

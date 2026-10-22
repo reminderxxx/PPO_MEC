@@ -1,3 +1,5 @@
+> 最新状态：本轮因资源进程列表解码异常退出并保留现场，10/30 cell完整；旧RUNNING描述为历史，见文末故障记录。未自动重启。
+
 > 当前状态（2026-10-21）：修复和全算法预检通过，新轮已于14:48:46+08:00启动。本文的“待启动”段落保留为冻结前历史记录；启动身份以以下追加和execution_receipt为准。
 
 # 独立公平训练合同修复（2026-10-21）
@@ -57,3 +59,12 @@ PPO_MEC_EXPERIMENT_PROJECT_ROOT=/Users/howen/Projects/PPO_MEC OMP_NUM_THREADS=1 
 ```
 
 此命令已执行，禁止再次启动；后续仅监控。正式结果尚未完成，当前不是收敛、优势或paper-ready证据。
+
+## 资源监控异常退出：独立只读诊断
+
+- recorded_at: 2026-10-22T08:57:22.290579+08:00；diagnosed_at: 2026-10-21T23:22:08.552860+08:00；literature_cutoff: 2026-09-28（未新评novelty）；target_venue: CSCWD2027 matched development；artifact_run_id: repaired_fair_reward_training_20261021_v1；policy_version: tmc_review_policy_v3_20260621；source Git: 45c8c88e390f49fc4e66c70871c2318e18883f24。
+- 状态为FAILED_PROCESS_EXITED_PRESERVED_NO_RESTART。PID83183已不存在；旧status.json的RUNNING是退出前历史快照。10个seed7 cell完整，SAGH seed13在第7循环留下38912交互、152次learner调用、3191个episode，不是完整单元。
+- command.log最后写入2026-10-21T23:13:14.077802+08:00；traceback定位run_long_fair_reward_training.py:194，在下一episode开始前调用资源检查。run_fair_reward_training.py:92通过subprocess.check_output(ps, text=True)解码进程列表，遇UnicodeDecodeError（位置127463-127464，invalid continuation byte）退出。直接失败位于资源监控文本解码；无证据把这次退出归因为奖励或梯度数值故障。无效字节的具体进程/参数来源未定位。
+- 最后保存checkpoint为update_0144.pt（36864交互）；更新145至152的完整network/optimizer/RNG状态未保存，不能声称可从38912步精确续训。未自动重启、覆盖cell、回退重放或修冻结脚本。
+- 独立报告artifacts/analysis/repaired_fair_reward_failure_20261021_v1/report.json保存日志、plan、命令、完成标记、partial数据及7个partial checkpoints的hash。plan/source/postprocessing及七个用户修改保护hash复核未变；全部原日志/checkpoint/cell保留。这不是30cell完成审计或收敛/优势证据。
+- 本轮进程已退出，失效ppo-mec-3轮询已移除，避免重复通知。没有修算法、修runner、调参或启动训练；原完成时间估计不再适用，后续实现和科学实验需另行授权。
