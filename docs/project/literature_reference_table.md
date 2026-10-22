@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-21
+更新日期：2026-10-22
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -10,6 +10,16 @@
 - 正式投稿前需要再次核对 IEEE Xplore、ACM DL、USENIX 或会议官网的最终卷期、页码和 BibTeX。
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
+
+### 2026-10-22：R15 叙事复核中发现的补充近邻
+
+以下条目用于后续 Related Work 和成本校准。它们不自动增加 R15 已固定的 25 条参考文献，也不改变当前开发证据等级。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 分布式 LoRA 放置和路由 | [Serving Heterogeneous LoRA Adapters in Distributed LLM Inference Systems](https://arxiv.org/abs/2511.22880) | arXiv, 2025；正式 venue 待核验 | 作者摘要提出 LoRAServe，按 adapter rank 异质性动态放置与路由，使用远端访问缓解多租户服务偏斜；报告生产 trace 评价。 | 证明 adapter placement/routing 本身已有强系统近邻；PPO_MEC 的候选差异是车辆移动、已释放 DAG、RSU 共享预约和跨请求准备时机，不把数据中心结果当 VEC 验证。 | Discussion / adapter 成本校准；非当前稿新编号。 |
+| 模型加载成本与缓存路由 | [Loading Cost-Aware Model Caching And Request Routing In Edge-enabled Wireless Sensor Networks](https://doi.org/10.1093/comjnl/bxac088) | The Computer Journal, 66(10):2409–2425, 2023；出版社摘要和元数据核验 | 联合 DNN 模型缓存与请求路由，明确加载时间和资源共享对吞吐的作用，并给出近似算法。 | 模型加载成本和缓存路由的联合性不是新概念；PPO_MEC 聚焦连续移动 DAG 下的对象闭包、预约与 handoff 时序。无线传感器网络合同不能直接等同车联网。 | Related Work / problem distinction；如正式引用需全文核对。 |
+| 服务缓存与计算卸载 | [Joint Optimization of Service Caching Placement and Computation Offloading in Mobile Edge Computing Systems](https://ieeexplore.ieee.org/document/9076825) | IEEE Xplore 文档 9076825；具体卷期/页码与全文待核验 | 标题及官方记录确认服务缓存放置与计算卸载联合优化，提供早期问题脉络；本轮未依据正文判断机制或数值。 | 服务缓存与模型/adapter 对象的语义不同；PPO_MEC 需以移动连续 DAG 和共享准备资源界定自己的增量。 | Background / 待核；不据标题声称方法差异。 |
 
 ### 2026-10-21：持续请求论文的准备时机与共享竞争
 
