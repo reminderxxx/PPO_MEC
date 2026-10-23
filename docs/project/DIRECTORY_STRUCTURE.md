@@ -1,3 +1,5 @@
+> 独立实验新增scripts/preflight_sagh_auxiliary_alignment.py与scripts/audit_sagh_auxiliary_alignment.py，分别生产/只读审计辅助监督小预算对照；协议docs/project/sagh_auxiliary_alignment_preflight_20261023.md，详细产物仅本地artifacts/analysis/sagh_auxiliary_alignment_20261023_v1/。
+
 > 2026-10-21 独立分支新增：`configs/experiment/repaired_fair_reward_training_v1.json`、`tests/test_repaired_probability_contract.py`、`docs/project/fair_reward_contract_repair_20261021.md`；新root为 `artifacts/analysis/repaired_fair_reward_training_20261021_v1`，旧long root只读保留。
 
 ﻿# Directory Structure

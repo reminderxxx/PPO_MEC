@@ -89,6 +89,7 @@ def enumerate_executed_distribution(agent, info):
     names = ("_sample_actions", "_sample_shared_option")
     originals = {name: (name in agent.__dict__, getattr(agent, name)) for name in names}
     forced = {"base": None, "option": None}
+    mapper_memory = copy.deepcopy(agent._idle_popularity_adapter_counts)
     def base_selection(output, deterministic, action_mask):
         base = forced["base"]
         selected = agent._head_targets_for_env_action(base)
@@ -109,12 +110,14 @@ def enumerate_executed_distribution(agent, info):
                 if not legal:
                     continue
                 forced.update(base=base, option=None)
+                agent._idle_popularity_adapter_counts = copy.deepcopy(mapper_memory)
                 _, probe = agent.act(None, copy.deepcopy(info))
                 base_mass = float(probe["sampled_base_probs"][base])
                 option = probe["option_gate"]
                 valid_options = [i for i, legal in enumerate(option["option_mask"]) if legal] if option.get("enabled") else [None]
                 for index in valid_options:
                     forced["option"] = index
+                    agent._idle_popularity_adapter_counts = copy.deepcopy(mapper_memory)
                     action, diagnostic = agent.act(None, copy.deepcopy(info))
                     option = diagnostic["option_gate"]
                     conditional_mass = float(option["option_probs"][index]) if index is not None else 1.0
@@ -131,6 +134,7 @@ def enumerate_executed_distribution(agent, info):
                                   "fallback": diagnostic["idle_popularity_fallback"],
                                   "selection_reason": option.get("selection_reason")})
     finally:
+        agent._idle_popularity_adapter_counts = mapper_memory
         for name, (owned, original) in originals.items():
             if owned:
                 setattr(agent, name, original)

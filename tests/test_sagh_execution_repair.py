@@ -158,9 +158,10 @@ def assert_same_state(a,b):
     else:assert a==b
 
 
-def test_gradient_diagnostics_do_not_change_update_or_adam_or_rng():
+@pytest.mark.parametrize("contract",["proposal_labels_v1","executed_marginal_v1"])
+def test_gradient_diagnostics_do_not_change_update_or_adam_or_rng(contract):
     torch.set_num_threads(1)
-    settings=dict(train_epochs=1,batch_size=8,random_seed=13,auxiliary_coef=.22,
+    settings=dict(train_epochs=1,batch_size=8,random_seed=13,auxiliary_coef=.22,auxiliary_action_contract=contract,
         env_action_ppo_enabled=True,env_action_ppo_coef=1.08,net_utility_prd_enabled=True,
         net_utility_cost_dual_enabled=True,net_utility_cost_dual_lr=.07,
         mechanism_credit_prd_enabled=True,mechanism_credit_policy_coef=.5,

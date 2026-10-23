@@ -1242,6 +1242,7 @@ class 分层PPO基类(BaseAgent):
         deterministic_action: bool = False,
         execution_mapping_contract: str = "legacy_deterministic_fallback_v1",
         objective_diagnostics_enabled: bool = False,
+        auxiliary_action_contract: str = "proposal_labels_v1",
         random_seed: int = 7,
         device: str = "cpu",
     ) -> None:
@@ -1250,6 +1251,11 @@ class 分层PPO基类(BaseAgent):
             raise ValueError("Unknown execution mapping contract")
         self._execution_mapping_contract = execution_mapping_contract
         self._objective_diagnostics_enabled = bool(objective_diagnostics_enabled)
+        if auxiliary_action_contract not in {"proposal_labels_v1", "executed_marginal_v1"}:
+            raise ValueError("Unknown auxiliary action contract")
+        if auxiliary_action_contract == "executed_marginal_v1" and execution_mapping_contract != "shared_train_eval_v1":
+            raise ValueError("Executed auxiliary supervision requires shared execution mapping")
+        self._auxiliary_action_contract = auxiliary_action_contract
         self.policy_type = policy_type
         self._encoder_kind = encoder_kind
         self._centralized_critic = bool(centralized_critic)
@@ -2906,6 +2912,278 @@ class 分层PPO基类(BaseAgent):
         return {"accepted": False, "backtracks": 8, "kl": last_kl if math.isfinite(last_kl) else 0.0,
                 "max_kl": 0.0, "gradient_norm_before_clip": norm}
 
+    def _execute_selected_actions(self, *, semantic_state, action_mask, policy_output,
+                                  selected_actions, deterministic, raw_policy_evaluation=False,
+                                  run_metadata=None, forced_option_action=None, enumerate_options=False):
+        """Single production execution mapper, also used for auxiliary pushforward."""
+        selected_actions = dict(selected_actions)
+        head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+            policy_output=policy_output, selected_actions=selected_actions, action_mask=action_mask)
+        guard_info = dict(policy_output.get("continuity_guard_info", {}))
+        if (not raw_policy_evaluation) and self._should_hard_apply_continuity_guard(
+            selected_actions=selected_actions,
+            guard_info=guard_info,
+        ):
+            selected_actions = dict(selected_actions)
+            selected_actions["slow"] = 0
+            selected_actions["event"] = 1
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+            guard_info["hard_override_applied"] = True
+        smoothing_info = (
+            self._apply_deterministic_temporal_smoothing(
+                semantic_state=semantic_state,
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                deterministic=deterministic,
+            )
+            if not raw_policy_evaluation
+            else {"enabled": False, "reason": "raw_policy_evaluation"}
+        )
+        cache_warm_guard_info = (
+            self._apply_cache_warm_start_guard_to_actions(
+                semantic_state=semantic_state,
+                selected_actions=selected_actions,
+            )
+            if not raw_policy_evaluation
+            else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
+        )
+        if cache_warm_guard_info.get("guarded", False):
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+        prefetch_admission_guard_info = (
+            self._apply_predictive_prefetch_admission_guard_to_actions(
+                semantic_state=semantic_state,
+                selected_actions=selected_actions,
+            )
+            if not raw_policy_evaluation
+            else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
+        )
+        if prefetch_admission_guard_info.get("guarded", False):
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+        backhaul_guard_info = (
+            self._apply_backhaul_guard_to_actions(
+                semantic_state=semantic_state,
+                selected_actions=selected_actions,
+                cache_warm_guard_info=cache_warm_guard_info,
+            )
+            if not raw_policy_evaluation
+            else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
+        )
+        if backhaul_guard_info.get("guarded", False):
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+        coverage_recovery_guard_info = (
+            self._apply_coverage_recovery_guard_to_actions(
+                semantic_state=semantic_state,
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+            if not raw_policy_evaluation
+            else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
+        )
+        if coverage_recovery_guard_info.get("guarded", False):
+            selected_actions = self._head_targets_for_env_action(
+                int(coverage_recovery_guard_info["guarded_action"])
+            )
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+        env_action, aggregation_reason = 聚合层级动作(
+            head_actions=selected_actions,
+            use_hierarchy=self._use_hierarchy,
+            event_head_enabled=self._event_head_enabled,
+            adapter_prefetch_enabled=self._adapter_prefetch_enabled,
+        )
+        idle_popularity_fallback_info = (
+            self._maybe_apply_idle_popularity_fallback(
+                semantic_state=semantic_state,
+                action_mask=action_mask,
+                original_env_action=env_action,
+                deterministic=deterministic,
+            )
+            if not raw_policy_evaluation
+            else {"enabled": False, "applied": False, "reason": "raw_policy_evaluation"}
+        )
+        if idle_popularity_fallback_info.get("applied", False):
+            env_action = int(idle_popularity_fallback_info["fallback_action"])
+            selected_actions = self._head_targets_for_env_action(env_action)
+            aggregation_reason = "idle_popularity_fallback"
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+        option_gate_info = (
+            self._maybe_apply_option_gate(
+                semantic_state=semantic_state,
+                action_mask=action_mask,
+                policy_output=policy_output,
+                base_env_action=env_action,
+                deterministic=deterministic,
+                run_metadata=run_metadata,
+                forced_option_action=forced_option_action,
+                enumerate_options=enumerate_options,
+            )
+            if not raw_policy_evaluation
+            else {"enabled": False, "applied": False, "reason": "raw_policy_evaluation"}
+        )
+        sampled_option_log_prob = option_gate_info.pop("_option_log_prob_tensor", None)
+        option_entropy_tensor = option_gate_info.pop("_option_entropy_tensor", None)
+        if option_gate_info.get("applied", False):
+            env_action = int(option_gate_info["option_env_action"])
+            selected_actions = self._head_targets_for_env_action(env_action)
+            aggregation_reason = f"option_gate_{option_gate_info.get('option_label', 'unknown')}"
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+        coverage_recovery_final_guard_info = (
+            self._apply_coverage_recovery_final_guard_to_env_action(
+                semantic_state=semantic_state,
+                policy_output=policy_output,
+                env_action=env_action,
+                action_mask=action_mask,
+                option_gate_info=option_gate_info,
+            )
+            if not raw_policy_evaluation
+            else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
+        )
+        if coverage_recovery_final_guard_info.get("guarded", False):
+            env_action = int(coverage_recovery_final_guard_info["guarded_action"])
+            selected_actions = self._head_targets_for_env_action(env_action)
+            aggregation_reason = "coverage_recovery_final_guard"
+            option_gate_info["post_option_guarded"] = True
+            option_gate_info["post_option_guarded_action"] = int(env_action)
+            option_gate_info["post_option_guard_reason"] = str(
+                coverage_recovery_final_guard_info.get("reason", "unknown")
+            )
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+        return {
+            "selected_actions": selected_actions,
+            "head_log_probs": head_log_probs,
+            "head_entropies": head_entropies,
+            "action_prob_payload": action_prob_payload,
+            "guard_info": guard_info,
+            "smoothing_info": smoothing_info,
+            "cache_warm_guard_info": cache_warm_guard_info,
+            "prefetch_admission_guard_info": prefetch_admission_guard_info,
+            "backhaul_guard_info": backhaul_guard_info,
+            "coverage_recovery_guard_info": coverage_recovery_guard_info,
+            "env_action": env_action,
+            "aggregation_reason": aggregation_reason,
+            "idle_popularity_fallback_info": idle_popularity_fallback_info,
+            "option_gate_info": option_gate_info,
+            "sampled_option_log_prob": sampled_option_log_prob,
+            "option_entropy_tensor": option_entropy_tensor,
+            "coverage_recovery_final_guard_info": coverage_recovery_final_guard_info,
+        }
+
+    def _executed_auxiliary_statistics(self, policy_output, action_mask, row):
+        """Exact categorical pushforward through the current piecewise mapper.
+
+        Discrete guard decisions are not differentiated. Base and conditional
+        option masses retain gradients; aliases are summed with logsumexp.
+        Each path starts with the recorded pre-decision mapper memory. Neither
+        RNG nor live adapter history is advanced by auxiliary enumeration.
+        """
+        cached = policy_output.get("_executed_auxiliary_statistics")
+        if cached is not None:
+            if cached[0] is not row:
+                raise ValueError("Auxiliary output reused with another decision row")
+            return cached[1]
+        memory = row.get("action_info", {}).get("execution_mapping_state")
+        if memory is None:
+            raise ValueError("Executed auxiliary supervision requires pre-decision mapper state")
+        info = row.get("decision_info", {})
+        semantic_state = self._extract_semantic_state(info)
+        metadata = dict(info.get("run_metadata", {}) or {})
+        if metadata.get("policy_evaluation_mode", "safety_projected") != "safety_projected":
+            raise ValueError("Auxiliary execution requires safety-projected mapping")
+        if not self._action_mask_has_valid_action(action_mask):
+            raise ValueError("Executed auxiliary supervision requires legal actions")
+        base_logp = torch.log_softmax(self._masked_flat_logits(
+            self._hierarchical_env_action_scores(policy_output), action_mask), dim=-1)
+        grouped = [[] for _ in range(5)]
+        paths = []
+        live_memory = self._idle_popularity_adapter_counts
+        try:
+            for base, legal in enumerate(action_mask):
+                if not legal:
+                    continue
+                self._idle_popularity_adapter_counts = dict(memory["idle_popularity_adapter_counts"])
+                first = self._execute_selected_actions(
+                    semantic_state=semantic_state, action_mask=action_mask, policy_output=policy_output,
+                    selected_actions=self._head_targets_for_env_action(base), deterministic=False,
+                    run_metadata=metadata, enumerate_options=True)
+                gate = first["option_gate_info"]
+                indices = [i for i, valid in enumerate(gate["option_mask"]) if valid] if gate.get("enabled") else [None]
+                for index in indices:
+                    self._idle_popularity_adapter_counts = dict(memory["idle_popularity_adapter_counts"])
+                    mapped = self._execute_selected_actions(
+                        semantic_state=semantic_state, action_mask=action_mask, policy_output=policy_output,
+                        selected_actions=self._head_targets_for_env_action(base), deterministic=False,
+                        run_metadata=metadata, forced_option_action=index, enumerate_options=True)
+                    action = int(mapped["env_action"])
+                    if not self._is_env_action_valid(action, action_mask):
+                        raise ValueError("Auxiliary mapper produced masked action")
+                    option_logp = mapped["sampled_option_log_prob"]
+                    mass_logp = base_logp[base] + (option_logp if index is not None else 0.0)
+                    grouped[action].append(mass_logp)
+                    paths.append({"base": base, "sampled_option": index,
+                        "executed_option": mapped["option_gate_info"].get("executed_option_action"),
+                        "action": action, "log_mass": float(mass_logp.detach())})
+        finally:
+            self._idle_popularity_adapter_counts = live_memory
+        reachable = [bool(items) for items in grouped]
+        log_probs = torch.stack([torch.logsumexp(torch.stack(items), dim=0) if items
+                                 else base_logp.new_tensor(float("-inf")) for items in grouped])
+        result = {"log_probs": log_probs, "reachable": reachable, "paths": paths}
+        policy_output["_executed_auxiliary_statistics"] = (row, result)
+        return result
+
+    def _auxiliary_action_nll(self, policy_output, action_mask, row, target_action, objective):
+        if self._auxiliary_action_contract == "proposal_labels_v1":
+            scores = self._hierarchical_env_action_scores(policy_output) if self._use_hierarchy else policy_output["flat_logits"]
+            return nn.functional.cross_entropy(self._masked_flat_logits(scores, action_mask).unsqueeze(0),
+                torch.tensor([target_action], device=self._device))
+        statistics = self._executed_auxiliary_statistics(policy_output, action_mask, row)
+        reachable = statistics["reachable"][target_action]
+        row.setdefault("auxiliary_execution_diagnostics", {})[objective] = {
+            "target_action": target_action, "target_reachable": reachable,
+            "reachable_actions": [i for i, valid in enumerate(statistics["reachable"]) if valid],
+            "executed_probs": statistics["log_probs"].detach().exp().cpu().tolist(),
+            "path_count": len(statistics["paths"]),
+            "nontrivial_option_remap_paths": sum(p["sampled_option"] != p["executed_option"] for p in statistics["paths"]),
+            "reason": "executed_target" if reachable else "unreachable_target_zero_contribution",
+        }
+        # Keep the original eligible-row denominator. Impossible targets add zero,
+        # never epsilon pseudo-probability or an invented replacement label.
+        if not reachable:
+            return statistics["log_probs"][statistics["reachable"]].sum() * 0.0
+        return -statistics["log_probs"][target_action]
+
     def _objective_gradient_diagnostics(self, terms, total_loss, native_actor, batch_indices):
         """Observe shared-graph gradients without accumulating .grad or stepping Adam."""
         named = [(name, p) for name, p in self._network.named_parameters() if p.requires_grad]
@@ -2966,6 +3244,7 @@ class 分层PPO基类(BaseAgent):
         raw_policy_evaluation = policy_evaluation_mode == "raw_policy"
         if self._execution_mapping_contract == "shared_train_eval_v1" and raw_policy_evaluation:
             raise ValueError("Raw-policy bypass is outside the shared execution contract")
+        mapping_state = {"idle_popularity_adapter_counts": dict(self._idle_popularity_adapter_counts)}
         deterministic = bool(self._deterministic_action or (info or {}).get("deterministic_policy", False))
         with torch.no_grad():
             policy_output = self._forward_policy(semantic_state, run_metadata=run_metadata)
@@ -3004,165 +3283,28 @@ class 分层PPO基类(BaseAgent):
                 policy_output=policy_output, env_action=sampled_base_action, action_mask=action_mask)
             proposal_scores = self._hierarchical_env_action_scores(policy_output) if self._use_hierarchy else policy_output["flat_logits"]
             sampled_base_probs = torch.softmax(self._masked_flat_logits(proposal_scores, action_mask), dim=-1).tolist()
-            guard_info = dict(policy_output.get("continuity_guard_info", {}))
-            if (not raw_policy_evaluation) and self._should_hard_apply_continuity_guard(
-                selected_actions=selected_actions,
-                guard_info=guard_info,
-            ):
-                selected_actions = dict(selected_actions)
-                selected_actions["slow"] = 0
-                selected_actions["event"] = 1
-                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
-                    policy_output=policy_output,
-                    selected_actions=selected_actions,
-                    action_mask=action_mask,
-                )
-                guard_info["hard_override_applied"] = True
-            smoothing_info = (
-                self._apply_deterministic_temporal_smoothing(
-                    semantic_state=semantic_state,
-                    policy_output=policy_output,
-                    selected_actions=selected_actions,
-                    deterministic=deterministic,
-                )
-                if not raw_policy_evaluation
-                else {"enabled": False, "reason": "raw_policy_evaluation"}
+            execution = self._execute_selected_actions(
+                semantic_state=semantic_state, action_mask=action_mask, policy_output=policy_output,
+                selected_actions=selected_actions, deterministic=deterministic,
+                raw_policy_evaluation=raw_policy_evaluation, run_metadata=run_metadata,
             )
-            cache_warm_guard_info = (
-                self._apply_cache_warm_start_guard_to_actions(
-                    semantic_state=semantic_state,
-                    selected_actions=selected_actions,
-                )
-                if not raw_policy_evaluation
-                else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
-            )
-            if cache_warm_guard_info.get("guarded", False):
-                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
-                    policy_output=policy_output,
-                    selected_actions=selected_actions,
-                    action_mask=action_mask,
-                )
-            prefetch_admission_guard_info = (
-                self._apply_predictive_prefetch_admission_guard_to_actions(
-                    semantic_state=semantic_state,
-                    selected_actions=selected_actions,
-                )
-                if not raw_policy_evaluation
-                else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
-            )
-            if prefetch_admission_guard_info.get("guarded", False):
-                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
-                    policy_output=policy_output,
-                    selected_actions=selected_actions,
-                    action_mask=action_mask,
-                )
-            backhaul_guard_info = (
-                self._apply_backhaul_guard_to_actions(
-                    semantic_state=semantic_state,
-                    selected_actions=selected_actions,
-                    cache_warm_guard_info=cache_warm_guard_info,
-                )
-                if not raw_policy_evaluation
-                else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
-            )
-            if backhaul_guard_info.get("guarded", False):
-                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
-                    policy_output=policy_output,
-                    selected_actions=selected_actions,
-                    action_mask=action_mask,
-                )
-            coverage_recovery_guard_info = (
-                self._apply_coverage_recovery_guard_to_actions(
-                    semantic_state=semantic_state,
-                    policy_output=policy_output,
-                    selected_actions=selected_actions,
-                    action_mask=action_mask,
-                )
-                if not raw_policy_evaluation
-                else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
-            )
-            if coverage_recovery_guard_info.get("guarded", False):
-                selected_actions = self._head_targets_for_env_action(
-                    int(coverage_recovery_guard_info["guarded_action"])
-                )
-                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
-                    policy_output=policy_output,
-                    selected_actions=selected_actions,
-                    action_mask=action_mask,
-                )
-            env_action, aggregation_reason = 聚合层级动作(
-                head_actions=selected_actions,
-                use_hierarchy=self._use_hierarchy,
-                event_head_enabled=self._event_head_enabled,
-                adapter_prefetch_enabled=self._adapter_prefetch_enabled,
-            )
-            idle_popularity_fallback_info = (
-                self._maybe_apply_idle_popularity_fallback(
-                    semantic_state=semantic_state,
-                    action_mask=action_mask,
-                    original_env_action=env_action,
-                    deterministic=deterministic,
-                )
-                if not raw_policy_evaluation
-                else {"enabled": False, "applied": False, "reason": "raw_policy_evaluation"}
-            )
-            if idle_popularity_fallback_info.get("applied", False):
-                env_action = int(idle_popularity_fallback_info["fallback_action"])
-                selected_actions = self._head_targets_for_env_action(env_action)
-                aggregation_reason = "idle_popularity_fallback"
-                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
-                    policy_output=policy_output,
-                    selected_actions=selected_actions,
-                    action_mask=action_mask,
-                )
-            option_gate_info = (
-                self._maybe_apply_option_gate(
-                    semantic_state=semantic_state,
-                    action_mask=action_mask,
-                    policy_output=policy_output,
-                    base_env_action=env_action,
-                    deterministic=deterministic,
-                    run_metadata=run_metadata,
-                )
-                if not raw_policy_evaluation
-                else {"enabled": False, "applied": False, "reason": "raw_policy_evaluation"}
-            )
-            sampled_option_log_prob = option_gate_info.pop("_option_log_prob_tensor", None)
-            option_entropy_tensor = option_gate_info.pop("_option_entropy_tensor", None)
-            if option_gate_info.get("applied", False):
-                env_action = int(option_gate_info["option_env_action"])
-                selected_actions = self._head_targets_for_env_action(env_action)
-                aggregation_reason = f"option_gate_{option_gate_info.get('option_label', 'unknown')}"
-                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
-                    policy_output=policy_output,
-                    selected_actions=selected_actions,
-                    action_mask=action_mask,
-                )
-            coverage_recovery_final_guard_info = (
-                self._apply_coverage_recovery_final_guard_to_env_action(
-                    semantic_state=semantic_state,
-                    policy_output=policy_output,
-                    env_action=env_action,
-                    action_mask=action_mask,
-                    option_gate_info=option_gate_info,
-                )
-                if not raw_policy_evaluation
-                else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
-            )
-            if coverage_recovery_final_guard_info.get("guarded", False):
-                env_action = int(coverage_recovery_final_guard_info["guarded_action"])
-                selected_actions = self._head_targets_for_env_action(env_action)
-                aggregation_reason = "coverage_recovery_final_guard"
-                option_gate_info["post_option_guarded"] = True
-                option_gate_info["post_option_guarded_action"] = int(env_action)
-                option_gate_info["post_option_guard_reason"] = str(
-                    coverage_recovery_final_guard_info.get("reason", "unknown")
-                )
-                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
-                    policy_output=policy_output,
-                    selected_actions=selected_actions,
-                    action_mask=action_mask,
-                )
+            selected_actions = execution["selected_actions"]
+            head_log_probs = execution["head_log_probs"]
+            head_entropies = execution["head_entropies"]
+            action_prob_payload = execution["action_prob_payload"]
+            guard_info = execution["guard_info"]
+            smoothing_info = execution["smoothing_info"]
+            cache_warm_guard_info = execution["cache_warm_guard_info"]
+            prefetch_admission_guard_info = execution["prefetch_admission_guard_info"]
+            backhaul_guard_info = execution["backhaul_guard_info"]
+            coverage_recovery_guard_info = execution["coverage_recovery_guard_info"]
+            env_action = execution["env_action"]
+            aggregation_reason = execution["aggregation_reason"]
+            idle_popularity_fallback_info = execution["idle_popularity_fallback_info"]
+            option_gate_info = execution["option_gate_info"]
+            sampled_option_log_prob = execution["sampled_option_log_prob"]
+            option_entropy_tensor = execution["option_entropy_tensor"]
+            coverage_recovery_final_guard_info = execution["coverage_recovery_final_guard_info"]
             if guard_info:
                 guard_info["guarded_action"] = int(env_action)
             if self._execution_mapping_contract == "shared_train_eval_v1" and not self._is_env_action_valid(env_action, action_mask):
@@ -3211,7 +3353,10 @@ class 分层PPO基类(BaseAgent):
         return env_action, {
             "execution_mapping_contract": self._execution_mapping_contract,
             "action_label_contract": "zero_preserving_v1",
+            "auxiliary_action_contract": self._auxiliary_action_contract,
+            "execution_mapping_state": mapping_state,
             "policy_mode": "deterministic" if deterministic else "sample",
+
             "policy_evaluation_mode": policy_evaluation_mode,
             "raw_policy_evaluation": raw_policy_evaluation,
             "policy_type": self.policy_type,
@@ -4419,6 +4564,9 @@ class 分层PPO基类(BaseAgent):
                         terms, total_loss, native_actor,
                         [int(i) for i in batch_index_list],
                     ))
+                    objective_records[-1]["auxiliary_execution_rows"] = [
+                        {"index": int(i), "diagnostics": deepcopy(row.get("auxiliary_execution_diagnostics", {}))}
+                        for i, row in zip(batch_index_list, batch_rows)]
                 if repaired_probability_contract:
                     step_result = self._guarded_policy_step(total_loss, batch_rows, batch_states, batch_run_metadata, batch_action_masks)
                     guarded_steps.append(step_result)
@@ -4559,7 +4707,13 @@ class 分层PPO基类(BaseAgent):
             "action_label_contract": "zero_preserving_v1",
             "objective_diagnostics": {"enabled": self._objective_diagnostics_enabled,
                 "scope": "first_minibatch_before_optimizer_per_learn", "gradient_batches": objective_records,
-                "credit_rows": objective_credit_rows},
+                "credit_rows": objective_credit_rows,
+                "auxiliary_action_contract": self._auxiliary_action_contract,
+                "auxiliary_execution_last_seen_scope": "last_evaluated_minibatch_per_row_not_update_counts",
+                "auxiliary_execution_last_seen_rows": [
+                    {"index": i, "metadata": run_metadata_by_row[i],
+                     "diagnostics": deepcopy(row.get("auxiliary_execution_diagnostics", {}))}
+                    for i, row in enumerate(rollout)] if self._objective_diagnostics_enabled else []},
             "probability_contract": "sampled_base_and_option_v1" if repaired_probability_contract else "legacy_unverified",
             "initial_log_prob_error_max": initial_log_prob_error,
             "guarded_optimizer_steps": len(guarded_steps),
@@ -6424,6 +6578,8 @@ class 分层PPO基类(BaseAgent):
         base_env_action: int,
         deterministic: bool,
         run_metadata: dict[str, Any] | None = None,
+        forced_option_action: int | None = None,
+        enumerate_options: bool = False,
     ) -> dict[str, Any]:
         if not self._option_gate_enabled or "option_logits" not in policy_output:
             return {"enabled": False, "applied": False}
@@ -6485,7 +6641,14 @@ class 分层PPO基类(BaseAgent):
         executed_option_action = None
         option_remapping = None
         if self._execution_mapping_contract == "shared_train_eval_v1":
-            option_tensor = self._sample_shared_option(distribution, deterministic)
+            if forced_option_action is not None or enumerate_options:
+                chosen = forced_option_action if forced_option_action is not None else next(
+                    i for i, valid in enumerate(candidate_info["option_mask"]) if valid)
+                if not 0 <= chosen < len(candidate_info["option_mask"]) or not candidate_info["option_mask"][chosen]:
+                    raise ValueError("Forced option is masked")
+                option_tensor = torch.tensor(chosen, device=option_logits.device)
+            else:
+                option_tensor = self._sample_shared_option(distribution, deterministic)
             option_remapping, reasons = self._shared_option_remapping(
                 semantic_state=semantic_state, candidate_info=candidate_info,
                 base_env_action=base_env_action, window_class=window_class,
@@ -6621,7 +6784,7 @@ class 分层PPO基类(BaseAgent):
             return {i: 1 for i in mapping}, {i: reason for i in mapping}
         prior = int(candidate_info["prior_target"])
         if (self._option_gate_context_prior_enabled and prior in mapping and top_action != prior
-                and float(option_probs[top_action] - option_probs[prior]) < self._option_gate_deterministic_prior_margin):
+                and float((option_probs[top_action] - option_probs[prior]).detach()) < self._option_gate_deterministic_prior_margin):
             mapping[top_action] = prior
             return mapping, {top_action: "context_prior_margin"}
         return mapping, {}
@@ -8336,6 +8499,11 @@ class 分层PPO基类(BaseAgent):
             ]
             if not valid_actions:
                 continue
+            if self._auxiliary_action_contract == "executed_marginal_v1":
+                statistics = self._executed_auxiliary_statistics(policy_output, action_mask, row)
+                valid_actions = [i for i in valid_actions if statistics["reachable"][i]]
+                if not valid_actions:
+                    raise ValueError("No executable counterfactual action")
             credits = [
                 self._counterfactual_teacher_action_credit(row, action_id)
                 for action_id in valid_actions
@@ -8378,14 +8546,10 @@ class 分层PPO基类(BaseAgent):
             if weight <= 1e-8:
                 continue
 
-            env_scores = self._masked_flat_logits(
-                self._hierarchical_env_action_scores(policy_output),
-                action_mask,
-            )
-            target = torch.tensor([best_action], dtype=torch.long, device=self._device)
-            loss_terms.append(
-                nn.functional.cross_entropy(env_scores.unsqueeze(0), target) * float(weight)
-            )
+            row.setdefault("auxiliary_execution_diagnostics", {})["counterfactual_candidates"] = {
+                "valid_actions": valid_actions, "best_action": best_action, "current_action": current_action}
+            loss_terms.append(self._auxiliary_action_nll(
+                policy_output, action_mask, row, best_action, "counterfactual") * float(weight))
 
         if not loss_terms:
             return torch.tensor(0.0, dtype=torch.float32, device=self._device)
@@ -15452,17 +15616,8 @@ class 分层PPO基类(BaseAgent):
             weight = float(row.get("advantage_weighted_behavior_weight", 0.0) or 0.0)
             if weight <= 1e-8:
                 continue
-            if not self._use_hierarchy:
-                logits = self._masked_flat_logits(policy_output["flat_logits"], action_mask)
-            else:
-                logits = self._masked_flat_logits(
-                    self._hierarchical_env_action_scores(policy_output),
-                    action_mask,
-                )
-            target = torch.tensor([target_action], dtype=torch.long, device=self._device)
-            loss_terms.append(
-                nn.functional.cross_entropy(logits.unsqueeze(0), target) * float(weight)
-            )
+            loss_terms.append(self._auxiliary_action_nll(
+                policy_output, action_mask, row, target_action, "behavior") * float(weight))
         if not loss_terms:
             return torch.tensor(0.0, dtype=torch.float32, device=self._device)
         return torch.stack(loss_terms).mean()
@@ -15536,6 +15691,7 @@ class 分层PPO基类(BaseAgent):
         return {
             "execution_mapping_contract": self._execution_mapping_contract,
             "objective_diagnostics_enabled": self._objective_diagnostics_enabled,
+            "auxiliary_action_contract": self._auxiliary_action_contract,
             "agent_name": self.agent_name,
             "policy_type": self.policy_type,
             "encoder_kind": self._encoder_kind,

@@ -1,3 +1,5 @@
+> 独立实验辅助监督对齐与固定小预算对照：见[协议](docs/project/sagh_auxiliary_alignment_preflight_20261023.md)。无正式训练授权，不改奖励或优化主线。
+
 > 独立修复分支 `codex/fair-reward-contract-repair`：旧长预算轮已按用户要求停止并保留；动作采样路径概率、完整更新保护和原生 window_class 贯通见 [修复方案](docs/project/fair_reward_contract_repair_20261021.md)。算法优化主线不合并本分支。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。

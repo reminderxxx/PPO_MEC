@@ -1,0 +1,23 @@
+# SAGH辅助监督执行映射对齐：固定小预算对照
+
+本轮为用户在只读报告之后另行授权的实现任务，仅在codex/sagh-objective-credit-alignment继续；基线495da56。禁止合并算法优化主线、调辅助权重、改奖励/原曲线、正式训练或formal/holdout。
+
+## 实现边界
+
+显式auxiliary_action_contract=executed_marginal_v1采用categorical base与条件option经真实共同执行mapper得到的最终动作边缘概率。生产act与枚举共用同一guard/fallback/option/final-guard函数；多对一潜变量概率以logsumexp相加，梯度穿过概率质量，离散阈值不求导。旧checkpoint默认proposal_labels_v1，配置保存与inference过滤端同步。
+
+behavior保留原final/teacher标签：不可达目标贡献0且保留原eligible-row分母，不换目标、不加epsilon假概率；counterfactual仅在最终可达动作中按原teacher credit排序，原advantage gate和weight规则保持。其余pseudo/heuristic/argmax/value等目标及所有系数不改，不宣称其已全面对齐。
+
+每条decision记录pre-decision adapter计数；枚举每条路径从相同历史开始并恢复live计数，不消耗RNG或推进历史。原探针也修成passive；新对照两组共同采用该修正，故不把新结果与旧v2的探针污染结果直接当成单因素对照。旧产物保留。
+
+动作0有效监督和非平凡option remap采用预声明匹配见证，包括真实loss梯度/Adam、toy learner、alias概率质量/梯度、不可达目标和final guard collapse；构造见证与自然真实数据覆盖分开报告。不得更换seed、窗口或teacher以强迫真实预检命中分支。
+
+## 冻结预算和运行
+
+仅SAGH两合同proposal_labels_v1/executed_marginal_v1×seed7/13，均fresh网络/空optimizer/replay；每cell768训练交互、3次learner（256/512/768）、4checkpoint、4×6固定验证episode。全部4cell合计3072训练交互，验证上限2112，环境总上限5184；不继承旧权重，不重试或覆盖已有root。
+
+沿用科学plan36f019938092eed36bb5bd34e23d88532156db37aae88c2704fa2f689dd4eef4的每类首个train/validation窗口与j_3/j_8，原生offset0/shaping=false，128步unit/22步episode；三个验证窗口为matched development，不是完整12窗口或独立holdout。两组除auxiliary_action_contract外配置完全一致，必须核对同seed初始tensor和首256训练交互一致。
+
+入口scripts/preflight_sagh_auxiliary_alignment.py只提供execute-preflight，没有full模式；输出create-only。CPU单线程/nice19/顺序单cell，沿用冻结资源检查器让出其他训练资源。源先通过测试并提交冻结，execution_receipt记录完整命令、source/data hashes和预算；audit_sagh_auxiliary_alignment.py检查原生逐步/episode账本、采样logp/KL、fresh/checkpoint/Adam、辅助可达性及两组匹配。审计后离线保留全部seed的奖励分项、动作/门控、首minibatch各目标梯度和自然覆盖，不能以奖励上升作为验收条件。
+
+reviewed_at：2026-10-23（实际时刻见本地回执）；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；policy_version：tmc_review_policy_v3_20260621；artifact_run_id：sagh_auxiliary_alignment_20261023_v1；实际source Git在execution_receipt；evidence：MATCHED_IMPLEMENTATION_AND_BOUNDED_PREFLIGHT_ONLY，收益/收敛/paper-ready UNVERIFIED。详细结果仅本地Git忽略产物，公开仓库不上传checkpoint、数据或详审。

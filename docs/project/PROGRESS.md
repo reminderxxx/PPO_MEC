@@ -1,3 +1,5 @@
+> 2026-10-23 用户授权在独立实验分支继续behavior/counterfactual最终执行监督对齐；固定合同×2seed小预算，奖励/辅助系数/优化主线不改，无正式训练或holdout。协议见sagh_auxiliary_alignment_preflight_20261023.md，完成证据待本地回执。
+
 > 2026-10-23 本独立分支已完成动作0语义与shared_train_eval_v1共同映射修复、奖励/门控/目标梯度诊断；353匹配测试及8cell/32checkpoint有界预检审计PASS。接受6144训练交互（2继承+6fresh）；检查器零target KL口径故障及partial额外开销单列，v1现场不覆盖。原奖励/曲线/产物、冻结源与七用户修改保持；无正式训练、holdout或算法优化主线合并。完整协议/边界见sagh_execution_repair_preflight_20261023.md，详细数值仅本地产物。
 
 > 独立修复验收追加：312测试通过；10算法各512step真实预检、30检查点离线审计及绘图消费者通过，七类策略更新前logp误差均0，SAGH70有效梯度步及2拒绝候选步有记录。完整新轮待冻结启动；不保证效果改善。
