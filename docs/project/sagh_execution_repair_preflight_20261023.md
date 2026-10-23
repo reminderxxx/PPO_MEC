@@ -44,3 +44,15 @@ PPO_MEC_EXPERIMENT_PROJECT_ROOT=/Users/howen/Projects/PPO_MEC PYTHONDONTWRITEBYT
 349项匹配/相关回归测试通过：`PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /Users/howen/Projects/PPO_MEC/.venv/bin/python -B -m pytest tests/test_sagh_execution_repair.py tests/test_repaired_probability_contract.py tests/test_window_selection_contract.py tests/test_env_contract.py tests/test_algo_pool_contract.py tests/test_checkpoint_compat.py tests/test_long_fair_reward_training.py tests/test_fair_reward_training.py tests/test_training_reward_plots.py -q -p no:cacheprovider`。六个实现/测试文件AST及scoped diff检查通过。真实预检尚待候选commit冻结，完整回执将在预检后追加。只检验动作语义、完整采样密度、共同映射、诊断透明性、native账本、fresh初始化、checkpoint/hash与预算，不以短跑reward改善作为通过条件。
 
 reviewed_at：2026-10-23；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；artifact_run_id：sagh_execution_repair_preflight_20261023_v1；policy_version：tmc_review_policy_v3_20260621；Git基线：45c8c88；实际候选Git见execution_receipt；evidence：实现与有界预检待验，正式效果/holdout/paper-ready均UNVERIFIED。
+
+## 完成回执
+
+最新353项匹配/相关回归测试通过。实现Git2eb5263，预检检查器修正/剩余执行Git3325477；所有src及科学runner/observer在两者间逐字节相同。v2只读审计PASS：8cell（2完整SAGH继承+6fresh）、32checkpoint、6144接受训练交互、3624接受验证交互、24次learner机会；所有原生账本、概率/KL、fresh初态与有效Adam状态核验通过。失败额外256训练+132验证交互及1次learner调用另列；该partial实际Adam步未记录，不填0、不假称可恢复。
+
+12个记录真实初末状态的同base/option路径在sample/greedy模式下执行映射完全一致，离线检查不新增环境step或optimizer调用。probe边缘概率使用categorical base+conditional option测度，是随机策略经mapper后的质量；贪心实际行为仍是argmax点质量，不把两模式probe相等写成两种实际行为分布相等。8cell同seed初始tensor与原冻结parent一致，只读比较而不把旧权重加载到训练。
+
+原有3263文件及目录集合、原曲线/zip/旧partial、两处冻结source HEAD和代码、主工作区七用户修改hash全部复核一致；环境reward/metrics/config字节未改。详细报告、输入/输出hash与命令记录仅本地`artifacts/analysis/sagh_objective_credit_repair_20261023_v1/`，预检数据为`sagh_execution_repair_preflight_20261023_v2/`；v1故障现场保持。
+
+实际执行了本文匹配pytest命令（最新353 PASS）、`preflight_sagh_execution_repair.py --execute-preflight --reuse-completed-sagh-from ...v1`和`audit_sagh_execution_preflight.py --run-root ...v2`，以及本地真实状态映射/保护inventory只读核验。辅助目标梯度只记录每次learn第一minibatch，不做全程因果归因；没有改辅助系数、调参、正式训练、formal/holdout、主线算法合并或收益/收敛宣称。
+
+reviewed_at：2026-10-23（实际时刻见本地result/audit）；literature_cutoff：2026-09-28（未新评）；target_venue：CSCWD2027；artifact_run_id：sagh_execution_repair_preflight_20261023_v2；policy_version：tmc_review_policy_v3_20260621；source Git：2eb5263/3325477；evidence_level：BOUNDED_PREFLIGHT_AND_MATCHED_TESTS_ONLY。正式效果与paper-ready仍UNVERIFIED。

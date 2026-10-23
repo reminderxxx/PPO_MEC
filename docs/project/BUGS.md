@@ -1,3 +1,5 @@
+> 2026-10-23 独立分支修复与边界：动作0 truthiness误标及训练/贪心的fallback/option映射差异通过匹配测试和有界真实预检；新checkpoint显式保存mapping合同。未经匹配的可选critic/planner/smoothing模式拒绝，legacy行为合同保留；多目标偏好/更广辅助标签对齐及长期效果仍OPEN。预检零target KL检查器口径错误已独立诊断修复，原生guard与参数未改，失败partial保留。见sagh_execution_repair_preflight_20261023.md。
+
 > 独立修复验收追加：312测试通过；10算法各512step真实预检、30检查点离线审计及绘图消费者通过，七类策略更新前logp误差均0，SAGH70有效梯度步及2拒绝候选步有记录。完整新轮待冻结启动；不保证效果改善。
 
 > 2026-10-21 独立修复进行中：旧 SAGH post-map likelihood 错配、指数ratio平方爆炸及runner漏window_class已定位。修复只在独立实验分支，单测通过不等于长训练稳定或收益改善；辅助目标与原生环境奖励不完全相同的风险仍保留。旧轮已用户暂停，禁止将未完成cell当完整结果。

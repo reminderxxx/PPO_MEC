@@ -1,3 +1,5 @@
+> 2026-10-23 本地有界预检sagh_execution_repair_preflight_20261023_v2：2个完整SAGH只读继承+6fresh，8cell/32checkpoint，353匹配测试/原生账本与来源审计PASS；实现2eb5263、剩余预检3325477，v1故障partial保留、额外开销单列。保护核验与详细报告仅本地sagh_objective_credit_repair_20261023_v1；reviewed_at=2026-10-23、cutoff=2026-09-28（未新评）、CSCWD2027、tmc_review_policy_v3_20260621、evidence=BOUNDED_PREFLIGHT_AND_MATCHED_TESTS_ONLY，非正式训练/holdout/收益证据。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

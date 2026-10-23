@@ -1,3 +1,5 @@
+> 2026-10-23 本独立分支已完成动作0语义与shared_train_eval_v1共同映射修复、奖励/门控/目标梯度诊断；353匹配测试及8cell/32checkpoint有界预检审计PASS。接受6144训练交互（2继承+6fresh）；检查器零target KL口径故障及partial额外开销单列，v1现场不覆盖。原奖励/曲线/产物、冻结源与七用户修改保持；无正式训练、holdout或算法优化主线合并。完整协议/边界见sagh_execution_repair_preflight_20261023.md，详细数值仅本地产物。
+
 > 独立修复验收追加：312测试通过；10算法各512step真实预检、30检查点离线审计及绘图消费者通过，七类策略更新前logp误差均0，SAGH70有效梯度步及2拒绝候选步有记录。完整新轮待冻结启动；不保证效果改善。
 
 > 2026-10-21 用户授权独立合同修复：旧 long_fair v1 已 SIGINT 停止并保留360文件hash，3完整cell及DQN未完成cell不续跑。独立分支修复采样路径概率、总更新KL回退、原生window_class；311回归通过，真实全算法预检及新run待完成。详见 `fair_reward_contract_repair_20261021.md`。
