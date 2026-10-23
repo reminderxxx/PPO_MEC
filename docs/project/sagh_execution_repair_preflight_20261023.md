@@ -9,3 +9,5 @@ v1在PPO单元触发预检检查器零target KL口径错误，独立只读核对
 详细回执和命令仅本地`artifacts/analysis/sagh_objective_credit_repair_20261023_v1/`，预检root为`artifacts/analysis/sagh_execution_repair_preflight_20261023_v2/`；完整实现协议在独立分支同名文档。本轮未启动正式训练、参数搜索、辅助权重优化或formal/holdout，不修改旧曲线，不据预检声称奖励收益/收敛/算法优势。
 
 reviewed_at：2026-10-23（精确时刻见本地result/audit）；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；artifact_run_id：sagh_execution_repair_preflight_20261023_v2；policy_version：tmc_review_policy_v3_20260621；source Git：2eb5263/3325477；evidence_level：BOUNDED_PREFLIGHT_AND_MATCHED_TESTS_ONLY。正式效果与paper-ready均UNVERIFIED。
+
+2026-10-23追加只读分项复核：详细奖励、动作0、门控和首minibatch梯度结果在本地`artifacts/analysis/sagh_preflight_objective_results_20261023_v1/`。共同fallback真实训练触发已核对；合法0的默认target保留不等于0监督实际进入loss，真实该分支覆盖不足。奖励收益未证实，仍有执行门控边界、多目标局部梯度冲突及前置/执行辅助标签对齐问题；不能把修复后预检子集与旧完整验证均值直接比较。83个输入hash、333个source hash、奖励账本和42个分组梯度投影加和独立核验PASS；本轮新增环境/optimizer调用均0。实际reviewed_at见本地result，其他review metadata沿用上文，evidence_level=BOUNDED_MATCHED_DEVELOPMENT_LOG_REDUCTION_ONLY。正式训练继续未启动，奖励、系数、曲线和算法优化主线保持。

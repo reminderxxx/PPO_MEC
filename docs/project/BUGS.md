@@ -1,3 +1,5 @@
+> 2026-10-23预检只读覆盖补充：动作0默认值和共同mapper修复已有匹配测试，但真实预检中保留0的默认监督标签未作为启用behavior目标进入loss，非平凡option remap也未真实命中。不能将工程PASS写成真实全分支覆盖或奖励改善。前置类别辅助监督与执行mapper对齐仍未实施；首minibatch记录观察到局部梯度冲突，因果份额及长期效果UNVERIFIED。详细结果仅本地sagh_preflight_objective_results_20261023_v1，元数据与边界见[sagh_execution_repair_preflight_20261023.md](sagh_execution_repair_preflight_20261023.md)。无新增训练/调参/reward或算法主线改动。
+
 > 2026-10-23 独立分支验证更新：动作0误标与训练/贪心映射差异已在隔离候选修复并通过匹配测试/小预算预检，未合并优化主线。可选critic/planner/smoothing组合仍有明确拒绝边界；多目标偏好、辅助标签更广对齐与长期收益仍OPEN。预检零target KL检查器错误已修，原生KL规则不变，失败partial保留、开销另列。见[sagh_execution_repair_preflight_20261023.md](sagh_execution_repair_preflight_20261023.md)。
 
 > 2026-10-23 OPEN执行/监督语义风险：完成续作的只读审查确认训练/验证fallback启用条件不同、辅助行为目标需保留合法零动作、final动作监督与前置分类语义需核对；多对一option和成本信用/原生reward目标方向差异仍需独立验证。周期图形不能独自证明优化器发散，旧轮分项归因不能套用修复后run。未现场修改算法或新训练；详审/单因素方案本地保留，见[sagh_repaired_objective_audit_20261023.md](sagh_repaired_objective_audit_20261023.md)。

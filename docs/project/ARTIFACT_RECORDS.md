@@ -1,3 +1,5 @@
+> 2026-10-23 `artifacts/analysis/sagh_preflight_objective_results_20261023_v1/`：既有预检离线分项复核，保存result/report、输入hash及独立check。83输入/333 source hash、逐步/episode奖励与42组梯度投影加和PASS；新增环境/optimizer调用0。工程修复、真实覆盖和收益边界分别记录；保留所有seed和负向结果，未修改原产物。详细数据仅本地；source2eb5263/3325477、reviewed_at精确时刻见result，cutoff2026-09-28未新评、CSCWD2027、policy tmc_review_policy_v3_20260621、evidence BOUNDED_MATCHED_DEVELOPMENT_LOG_REDUCTION_ONLY；见[sagh_execution_repair_preflight_20261023.md](sagh_execution_repair_preflight_20261023.md)。
+
 > 2026-10-23 sagh_execution_repair_preflight_20261023_v2：8cell（2继承+6fresh）/32checkpoint审计PASS，353匹配测试及真实状态映射检查通过。独立分支实现2eb5263/3325477，详细报告/保护清单/命令仅本地sagh_objective_credit_repair_20261023_v1；v1技术失败保留，partial和额外开销不冒充接受训练。无正式训练或算法主线合并；metadata与局限见[sagh_execution_repair_preflight_20261023.md](sagh_execution_repair_preflight_20261023.md)。
 
 > 2026-10-23 只读审查产物：`artifacts/analysis/sagh_repaired_objective_audit_20261023_v1/`保存修复后SAGH三seed奖励/动作/辅助目标与周期诊断、输入hash和独立实验分支方案。两份离线归约检查PASS；无新rollout、训练、reward/曲线修改或算法主线合并。详细报告不上传公开仓库；元数据/边界见[sagh_repaired_objective_audit_20261023.md](sagh_repaired_objective_audit_20261023.md)。
