@@ -1,3 +1,5 @@
+> 独立D/E有界实验：仅DT环境动作监督概率对齐，原分母/所有其他目标与reward保持；入口`scripts/preflight_sagh_dt_executed_density.py`，先匹配后一次预检，见[合同](docs/project/sagh_dt_executed_density_contract_20261023.md)。不合并优化主线。
+
 > 独立T/D梯度路由预检（仅有界development）：见[运行合同](docs/project/sagh_value_encoder_routing_preflight_20261023.md)。不合并优化主线。
 
 > 2026-10-23 独立C/T一致性小预算入口scripts/preflight_sagh_cf_consistency.py；固定总真实交互上限5184，保留原分母/系数，无critic消融或正式训练。协议见[本轮记录](docs/project/sagh_cf_consistency_preflight_20261023.md)。

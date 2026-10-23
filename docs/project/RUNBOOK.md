@@ -1,3 +1,5 @@
+> 本分支D/E：先`tests/test_sagh_dt_executed_density.py`与相关回归/逐参数匹配，通过并冻结Git后，仅运行一次`scripts/preflight_sagh_dt_executed_density.py --parent-root <原continuation root> --output-root <新comparison root> --execute-preflight`。总真实交互硬上限5184，无正式训练/重试/追加预算。完整运行与审计边界见`sagh_dt_executed_density_contract_20261023.md`。
+
 > 独立T/D一次性入口：scripts/preflight_sagh_value_encoder_routing.py；先匹配、冻结源码，再显式execute-preflight；create-only、总真实交互硬上限5184。合同见[sagh_value_encoder_routing_preflight_20261023.md](sagh_value_encoder_routing_preflight_20261023.md)。
 
 > 2026-10-23 独立C/T一致性预检：先匹配验证、冻结源码，再用scripts/preflight_sagh_cf_consistency.py --parent-root 原续作root --output-root 新comparison --execute-preflight；同主PROJECT环境/单线程。训练+验证硬上限5184，create-only，失败不重试。协议见sagh_cf_consistency_preflight_20261023.md。

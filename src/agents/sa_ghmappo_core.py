@@ -1262,6 +1262,7 @@ class 分层PPO基类(BaseAgent):
         auxiliary_action_contract: str = "proposal_labels_v1",
         counterfactual_consistency_contract: str = "none_v1",
         value_encoder_gradient_contract: str = "shared_v1",
+        digital_twin_env_supervision_contract: str = "proposal_v1",
         random_seed: int = 7,
         device: str = "cpu",
     ) -> None:
@@ -1283,6 +1284,14 @@ class 分层PPO基类(BaseAgent):
         if value_encoder_gradient_contract not in {"shared_v1", "block_value_to_encoder_v1"}:
             raise ValueError("Unknown value encoder gradient contract")
         self._value_encoder_gradient_contract = value_encoder_gradient_contract
+        if digital_twin_env_supervision_contract not in {"proposal_v1", "executed_marginal_v1"}:
+            raise ValueError("Unknown digital twin environment supervision contract")
+        if digital_twin_env_supervision_contract == "executed_marginal_v1" and (
+            execution_mapping_contract != "shared_train_eval_v1"
+            or auxiliary_action_contract != "executed_marginal_v1"
+        ):
+            raise ValueError("Executed DT supervision requires shared execution and executed auxiliary contracts")
+        self._digital_twin_env_supervision_contract = digital_twin_env_supervision_contract
         self.policy_type = policy_type
         self._encoder_kind = encoder_kind
         self._centralized_critic = bool(centralized_critic)
@@ -3240,6 +3249,11 @@ class 分层PPO基类(BaseAgent):
                         credit_actor_delta_probe=terms["actor_with_credits"]-native_actor)
         if raw_value_loss is not None:
             observed["value_before_routing_probe"] = raw_value_loss
+        dt_probe_names = []
+        for name, loss in getattr(self, "_digital_twin_loss_components", {}).items():
+            probe = "dt_" + name + "_probe"
+            observed[probe] = self._effective_digital_twin_policy_prior_distill_coef() * loss
+            dt_probe_names.append(probe)
         vectors, payload = {}, {}
         for name, loss in observed.items():
             grads = torch.autograd.grad(loss, parameters, retain_graph=True, allow_unused=True) if loss.requires_grad else [None]*len(parameters)
@@ -3260,11 +3274,14 @@ class 分层PPO基类(BaseAgent):
             routing.update(raw_value=payload.pop("value_before_routing_probe"),
                 raw_cosine_to_native=cosine.pop("value_before_routing_probe"),
                 routed_value=payload["value"], routed_cosine_to_native=cosine["value"])
+        dt_components = {name: {**payload.pop(name), "cosine_to_native": cosine.pop(name)}
+                         for name in dt_probe_names}
         term_sum = sum(float(loss.detach()) for loss in terms.values())
         return {"schema": "objective_gradients_v1", "batch_indices": batch_indices,
                 "terms": payload, "cosine_to_native_return_actor": cosine,
                 "weighted_term_sum": term_sum, "total_loss": float(total_loss.detach()),
                 "value_encoder_routing": routing,
+                "digital_twin_components": dt_components,
                 "probe_terms_excluded_from_optimizer": ["native_return_actor_probe", "credit_actor_delta_probe"],
                 "optimizer_mutation": False, "scope": "first_minibatch_only_not_causal_ablation"}
 
@@ -4527,6 +4544,7 @@ class 分层PPO基类(BaseAgent):
                     batch_outputs=batch_outputs,
                     batch_annotations=batch_dt_policy_prior_annotations,
                     batch_advantage=advantage_tensor[batch_indices],
+                    batch_rows=batch_rows, batch_action_masks=batch_action_masks,
                 )
                 (
                     option_gate_loss,
@@ -4764,6 +4782,11 @@ class 分层PPO基类(BaseAgent):
                 "auxiliary_action_contract": self._auxiliary_action_contract,
                 "counterfactual_consistency_contract": self._counterfactual_consistency_contract,
                 "value_encoder_gradient_contract": self._value_encoder_gradient_contract,
+                "digital_twin_env_supervision_contract": self._digital_twin_env_supervision_contract,
+                "dt_coverage_scope": "actual_loss_evaluations_not_optimizer_steps",
+                "dt_coverage_rows": [{"index": i, "metadata": run_metadata_by_row[i],
+                    "coverage": deepcopy(row.get("dt_env_supervision_coverage", {}))}
+                    for i, row in enumerate(rollout)] if self._objective_diagnostics_enabled else [],
                 "cf_coverage_scope": "actual_loss_evaluations_not_optimizer_steps",
                 "cf_coverage_rows": [{"index": i, "metadata": run_metadata_by_row[i],
                     "coverage": deepcopy(row.get("cf_supervision_coverage", {}))}
@@ -15270,14 +15293,23 @@ class 分层PPO基类(BaseAgent):
         batch_outputs: list[dict[str, Any]],
         batch_annotations: list[dict[str, Any]],
         batch_advantage: torch.Tensor,
+        batch_rows: list[dict[str, Any]] | None = None,
+        batch_action_masks: list[list[bool] | None] | None = None,
     ) -> torch.Tensor:
+        self._digital_twin_loss_components = {}
         if (
             not self._digital_twin_policy_prior_enabled
             or self._digital_twin_policy_prior_distill_coef <= 0.0
             or not self._use_hierarchy
         ):
             return torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        if self._digital_twin_env_supervision_contract == "executed_marginal_v1" and (
+            batch_rows is None or batch_action_masks is None
+            or len(batch_rows) != len(batch_outputs) or len(batch_action_masks) != len(batch_outputs)
+        ):
+            raise ValueError("Executed DT supervision requires matched rows and action masks")
         loss_terms: list[torch.Tensor] = []
+        env_terms, head_terms, fast_terms, diagnostic_rows = [], [], [], []
         for row_index, (policy_output, annotation) in enumerate(zip(batch_outputs, batch_annotations)):
             if not bool(annotation.get("apply", False)):
                 continue
@@ -15290,6 +15322,8 @@ class 分层PPO基类(BaseAgent):
             if weight <= 1e-8:
                 continue
             term = torch.tensor(0.0, dtype=torch.float32, device=self._device)
+            fast_term = term
+            env_term = term
             if int(annotation.get("event_target", 0)) == 1:
                 event_target = torch.tensor([1], dtype=torch.long, device=self._device)
                 term = term + self._digital_twin_policy_prior_event_scale * nn.functional.cross_entropy(
@@ -15312,10 +15346,11 @@ class 分层PPO基类(BaseAgent):
             fast_target_value = int(annotation.get("fast_target", 0))
             if bool(annotation.get("pacing_target", False)):
                 fast_target = torch.tensor([fast_target_value], dtype=torch.long, device=self._device)
-                term = term + self._digital_twin_policy_prior_pacing_fast_scale * nn.functional.cross_entropy(
+                fast_term = self._digital_twin_policy_prior_pacing_fast_scale * nn.functional.cross_entropy(
                     policy_output["fast_logits"].unsqueeze(0),
                     fast_target,
                 )
+                term = term + fast_term
                 slow_target = torch.tensor([0], dtype=torch.long, device=self._device)
                 term = term + self._digital_twin_policy_prior_pacing_slow_suppression * nn.functional.cross_entropy(
                     policy_output["slow_logits"].unsqueeze(0),
@@ -15323,10 +15358,12 @@ class 分层PPO基类(BaseAgent):
                 )
             elif self._digital_twin_policy_prior_fast_scale > 0.0:
                 fast_target = torch.tensor([fast_target_value], dtype=torch.long, device=self._device)
-                term = term + 0.25 * self._digital_twin_policy_prior_fast_scale * nn.functional.cross_entropy(
+                fast_term = 0.25 * self._digital_twin_policy_prior_fast_scale * nn.functional.cross_entropy(
                     policy_output["fast_logits"].unsqueeze(0),
                     fast_target,
                 )
+                term = term + fast_term
+            head_term = term
             env_target_value = int(annotation.get("env_target", -1))
             if (
                 self._digital_twin_policy_prior_env_action_bias_enabled
@@ -15341,13 +15378,64 @@ class 分层PPO基类(BaseAgent):
                     if env_target_value == 2
                     else 1.0
                 )
-                term = term + env_scale * nn.functional.cross_entropy(
-                    env_scores.unsqueeze(0),
-                    env_target,
-                )
+                proposal_nll = nn.functional.cross_entropy(env_scores.unsqueeze(0), env_target)
+                row = batch_rows[row_index] if batch_rows is not None else None
+                mask = batch_action_masks[row_index] if batch_action_masks is not None else None
+                statistics = None
+                if row is not None and (self._digital_twin_env_supervision_contract == "executed_marginal_v1"
+                    or (self._objective_diagnostics_enabled and self._auxiliary_action_contract == "executed_marginal_v1")):
+                    statistics = self._executed_auxiliary_statistics(policy_output, mask, row)
+                reachable = bool(statistics["reachable"][env_target_value]) if statistics is not None else None
+                if self._digital_twin_env_supervision_contract == "executed_marginal_v1":
+                    env_nll = self._auxiliary_action_nll(policy_output, mask, row, env_target_value, "digital_twin_env")
+                else:
+                    env_nll = proposal_nll
+                env_term = env_scale * env_nll
+                term = term + env_term
+                if row is not None and statistics is not None:
+                    active = reachable or self._digital_twin_env_supervision_contract == "proposal_v1"
+                    coverage = row.setdefault("dt_env_supervision_coverage", {
+                        "evaluations": 0, "reachable_evaluations": 0, "unreachable_evaluations": 0,
+                        "original_weight_sum": 0.0, "reachable_weight_sum": 0.0,
+                        "active_weight_sum": 0.0, "env_scaled_weight_sum": 0.0,
+                        "active_env_scaled_weight_sum": 0.0})
+                    coverage["evaluations"] += 1
+                    coverage["reachable_evaluations"] += int(reachable)
+                    coverage["unreachable_evaluations"] += int(not reachable)
+                    coverage["original_weight_sum"] += float(weight)
+                    coverage["reachable_weight_sum"] += float(weight) if reachable else 0.0
+                    coverage["active_weight_sum"] += float(weight) if active else 0.0
+                    coverage["env_scaled_weight_sum"] += float(weight) * float(env_scale)
+                    coverage["active_env_scaled_weight_sum"] += float(weight) * float(env_scale) if active else 0.0
+                    coverage["last_target"] = env_target_value
+                    coverage["last_reachable"] = reachable
+                    coverage["last_active"] = bool(active)
+                    diagnostics = row.setdefault("auxiliary_execution_diagnostics", {})
+                    diagnostics["digital_twin_env"] = {**diagnostics.get("digital_twin_env", {}),
+                        "contract": self._digital_twin_env_supervision_contract,
+                        "target_action": env_target_value, "target_reachable": reachable,
+                        "reachable_actions": [i for i, valid in enumerate(statistics["reachable"]) if valid],
+                        "original_weight": float(weight), "env_scale": float(env_scale),
+                        "proposal_nll": float(proposal_nll.detach()), "used_nll": float(env_nll.detach()),
+                        "head_loss_unweighted": float(head_term.detach()),
+                        "fast_head_loss_unweighted": float(fast_term.detach()),
+                        "env_loss_unweighted": float(env_term.detach()),
+                        "active": bool(active), "denominator_policy": "original_dt_eligible_rows_including_unreachable",
+                        "reason": "unreachable_target_zero_contribution" if not active else "active"}
+                    diagnostic_rows.append(row)
             loss_terms.append(term * weight)
+            env_terms.append(env_term * weight)
+            head_terms.append(head_term * weight)
+            fast_terms.append(fast_term * weight)
         if not loss_terms:
             return torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        for row in diagnostic_rows:
+            row["auxiliary_execution_diagnostics"]["digital_twin_env"]["original_eligible_denominator"] = len(loss_terms)
+        if self._objective_diagnostics_enabled:
+            self._digital_twin_loss_components = {
+                "environment": torch.stack(env_terms).mean(),
+                "heads": torch.stack(head_terms).mean(),
+                "fast_head": torch.stack(fast_terms).mean()}
         return torch.stack(loss_terms).mean()
 
     def _effective_heuristic_imitation_coef(self) -> float:
@@ -15790,6 +15878,7 @@ class 分层PPO基类(BaseAgent):
             "auxiliary_action_contract": self._auxiliary_action_contract,
             "counterfactual_consistency_contract": self._counterfactual_consistency_contract,
             "value_encoder_gradient_contract": self._value_encoder_gradient_contract,
+                "digital_twin_env_supervision_contract": self._digital_twin_env_supervision_contract,
             "agent_name": self.agent_name,
             "policy_type": self.policy_type,
             "encoder_kind": self._encoder_kind,
