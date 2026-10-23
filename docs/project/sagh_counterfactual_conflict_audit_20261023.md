@@ -1,0 +1,11 @@
+# SAGH counterfactual冲突只读归因索引（2026-10-23）
+
+用户要求只读复核执行监督对齐后首minibatch冲突计数变化。仅使用独立候选864add6及其既有小预算产物，在内存副本重建checkpoint前向/梯度；没有环境交互、learner/optimizer调用、源码修复、系数调整或新训练。
+
+全部12批的96项原始loss/norm/cos精确复现；384条首batch样本、目标动作、teacher候选credit、门控与最终执行前像及正/负/零贡献完整保留。新增冲突位置已定位，并用同参数/状态/参考梯度的离线算子比较区分概率口径、可达监督集合及训练历史的作用。CF规则teacher、单独digital twin teacher loss与共享value梯度分别判断，未把局部梯度竞争解释为长期性能的因果份额。
+
+详细未公开数值、逐样本清单和下一轮提案仅本地`artifacts/analysis/sagh_counterfactual_conflict_audit_20261023_v1/`，入口report.md、replayed_batches_v2.jsonl、focused_paths.json、independent_check.json、proposed_ablation.md。提案为独立分支的teacher一致性条件与value共享梯度两个分别相对共同对照的单因素比较；仅提出固定预算与匹配判据，未建实现分支或执行。概率语义正确性、有效监督覆盖和实际收益继续分别判断。
+
+372个source/本次输入、80个更早预检文件及旧曲线交付41个磁盘文件/7个zip证据hash核对通过；七用户修改diff hash保持。独立候选HEAD9cb156a、原科学45c8c88、launcher71ca85d和算法优化主线保持。详细artifact不推送public仓库。
+
+reviewed_at：2026-10-23T14:21:58.635536+08:00；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；artifact_run_id：sagh_counterfactual_conflict_audit_20261023_v1；input_run_id：sagh_auxiliary_alignment_20261023_v1；policy_version：tmc_review_policy_v3_20260621；科学候选Git：864add69681d91cb7321df510f2ce73dfd2c691b，独立工作树HEAD9cb156afacc6123367c31db99714350ab5953ba2；evidence_level：E3_FIXED_CHECKPOINT_GRADIENT_REPLAY_OF_MATCHED_DEVELOPMENT_ONLY。formal/holdout、长期因果效果、收益及paper-ready均UNVERIFIED。
