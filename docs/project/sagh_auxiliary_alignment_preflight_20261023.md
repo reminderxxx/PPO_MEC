@@ -1,0 +1,13 @@
+# SAGH辅助监督执行映射对齐与小预算对照索引（2026-10-23）
+
+用户在独立只读复核后授权继续实现。代码只在`codex/sagh-objective-credit-alignment`，候选Git`864add69681d91cb7321df510f2ce73dfd2c691b`；不合并算法优化主线。behavior/counterfactual使用共同mapper后的最终动作概率，潜变量多对一前像相加；behavior不可达标签贡献0并保持原eligible分母，counterfactual仅比较可达动作。保留原目标系数、advantage gate和weight规则，不宣称实际有效监督项数量不变。
+
+同步保存/消费auxiliary_action_contract与pre-decision mapper历史；act和辅助枚举共用执行函数。探针推进adapter历史的副作用修为passive，两组共同采用，旧产物保留。其他pseudo/teacher/argmax/value等目标未顺带修改。
+
+368项匹配与相关回归PASS，覆盖动作0有效监督及Adam、非平凡option remap的概率/梯度、不可达目标、历史/RNG透明性和冻结旧act一致性。固定SAGH两合同×seed7/13对照全部fresh，每cell768步；4cell/16checkpoint审计PASS，共3072训练+1632验证交互。两组除监督合同外配置相同，同seed初态与首256训练步相同；24个真实记录状态的辅助概率与实际执行枚举一致，84组梯度投影加和通过。
+
+本轮没有验证收益；辅助语义正确性、自然样本覆盖和性能分别判断。behavior动作0和实际采样非平凡remap自然覆盖仍不足，构造见证不冒充自然覆盖；局部梯度冲突、其余辅助目标与强门控仍是风险。真实分项、全部seed和负向结果仅本地`artifacts/analysis/sagh_auxiliary_alignment_20261023_v1/`，含report/result、固定执行回执、命令日志和独立检查。
+
+七个主工作区用户修改hash、旧80个预检文件及旧曲线/交付文件hash核验保持；原科学45c8c88与资源launcher71ca85d不改。无正式训练、辅助权重搜索、奖励规则/原曲线修改或formal/holdout开启。
+
+reviewed_at：2026-10-23T11:43:12.639930+08:00；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；artifact_run_id：sagh_auxiliary_alignment_20261023_v1；policy_version：tmc_review_policy_v3_20260621；source Git：864add6；evidence_level：MATCHED_TESTS_AND_BOUNDED_DEVELOPMENT_COMPARISON_ONLY。收益、长期收敛与paper-ready均UNVERIFIED。

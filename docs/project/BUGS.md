@@ -1,3 +1,5 @@
+> 2026-10-23授权实现更新：behavior/counterfactual最终执行监督在独立实验候选864add6对齐并通过匹配/固定小预算对照，未合并优化主线；不再把这两项标为候选中完全未实施。其余辅助目标、不可微门控边界、多对一探索及局部梯度冲突继续OPEN；自然behavior动作0/采样remap覆盖不足，不用构造见证冒充自然覆盖或收益。探针历史副作用修复由新对照两组共同采用，旧结果不覆盖；详见[sagh_auxiliary_alignment_preflight_20261023.md](sagh_auxiliary_alignment_preflight_20261023.md)。未调系数/reward，未正式训练。
+
 > 2026-10-23预检只读覆盖补充：动作0默认值和共同mapper修复已有匹配测试，但真实预检中保留0的默认监督标签未作为启用behavior目标进入loss，非平凡option remap也未真实命中。不能将工程PASS写成真实全分支覆盖或奖励改善。前置类别辅助监督与执行mapper对齐仍未实施；首minibatch记录观察到局部梯度冲突，因果份额及长期效果UNVERIFIED。详细结果仅本地sagh_preflight_objective_results_20261023_v1，元数据与边界见[sagh_execution_repair_preflight_20261023.md](sagh_execution_repair_preflight_20261023.md)。无新增训练/调参/reward或算法主线改动。
 
 > 2026-10-23 独立分支验证更新：动作0误标与训练/贪心映射差异已在隔离候选修复并通过匹配测试/小预算预检，未合并优化主线。可选critic/planner/smoothing组合仍有明确拒绝边界；多目标偏好、辅助标签更广对齐与长期收益仍OPEN。预检零target KL检查器错误已修，原生KL规则不变，失败partial保留、开销另列。见[sagh_execution_repair_preflight_20261023.md](sagh_execution_repair_preflight_20261023.md)。
