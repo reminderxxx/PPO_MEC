@@ -1,3 +1,5 @@
+> 2026-10-23 C/T单因素完成更新：原分母CF暂停门在独立候选1627f96通过匹配并完成一次固定预检；覆盖减少与局部冲突减少需共同解释，不能把暂停产生的零梯度当成同向学习。全部固定验证点未显示收益；其他目标、强门控/多对一探索、真实覆盖与长期因果继续OPEN。原epoch/KL规则下实际Adam数量不同，环境预算相同不等于计算量相同。本轮不追加实验；见[sagh_cf_consistency_preflight_20261023.md](sagh_cf_consistency_preflight_20261023.md)。
+
 > 2026-10-23只读归因更新：执行辅助概率对齐后，局部冲突计数变化不能单独表示修复退步；既有checkpoint逐样本重建确认需分别看teacher规则、最终可达监督与历史参数/轨迹。共享value的梯度幅度不能替代方向证据，CF teacher与独立digital twin teacher loss不能混为一个目标；长期收益/因果份额继续UNVERIFIED。全部正负/零样本、门控路径及下一轮待授权单因素提案仅本地保存，见[sagh_counterfactual_conflict_audit_20261023.md](sagh_counterfactual_conflict_audit_20261023.md)。本轮无源码/权重/reward改动或新训练。
 
 > 2026-10-23授权实现更新：behavior/counterfactual最终执行监督在独立实验候选864add6对齐并通过匹配/固定小预算对照，未合并优化主线；不再把这两项标为候选中完全未实施。其余辅助目标、不可微门控边界、多对一探索及局部梯度冲突继续OPEN；自然behavior动作0/采样remap覆盖不足，不用构造见证冒充自然覆盖或收益。探针历史副作用修复由新对照两组共同采用，旧结果不覆盖；详见[sagh_auxiliary_alignment_preflight_20261023.md](sagh_auxiliary_alignment_preflight_20261023.md)。未调系数/reward，未正式训练。

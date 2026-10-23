@@ -1,3 +1,5 @@
+> 2026-10-23 本地artifacts/analysis/sagh_cf_consistency_preflight_20261023_v1：382匹配/回归、6固定记录批及4fresh cell/16checkpoint审计PASS；3072训练+1632验证，总4704低于5184。CF coverage、全部梯度/奖励分项、固定验证、84组投影核验和两张原值图/CSV保存；旧63/80文件及41曲线文件/7包内证据hash保持。详细结果仅本地，不合并优化主线或上传checkpoint。metadata及限制见[sagh_cf_consistency_preflight_20261023.md](sagh_cf_consistency_preflight_20261023.md)。
+
 > 2026-10-23 `artifacts/analysis/sagh_counterfactual_conflict_audit_20261023_v1/`：既有checkpoint的12批梯度只读重建，96指标精确匹配，384条完整样本及teacher/门控/概率前像和单因素提案保存本地；独立梯度加和/输入hash/历史曲线保护检查PASS。新增环境/learner/optimizer调用0，未实现提案或启动训练；详细结果不上传public仓库，metadata与因果边界见[sagh_counterfactual_conflict_audit_20261023.md](sagh_counterfactual_conflict_audit_20261023.md)。
 
 > 2026-10-23 `artifacts/analysis/sagh_auxiliary_alignment_20261023_v1/`：独立候选864add6的固定两监督合同×2seed对照；368测试、4fresh cell/16checkpoint审计、24真实状态概率及84投影检查PASS，3072训练+1632验证交互。详细reward/梯度/自然覆盖与负向结果只保存在本地report/result，无正式训练/调系数/reward或主线算法合并。metadata、保护hash与限制见[sagh_auxiliary_alignment_preflight_20261023.md](sagh_auxiliary_alignment_preflight_20261023.md)。

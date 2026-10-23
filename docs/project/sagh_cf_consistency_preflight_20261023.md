@@ -1,0 +1,11 @@
+# SAGH C/T一致性门：固定小预算完成索引（2026-10-23）
+
+用户在只读归因后授权一次C/T单因素实现与比较。实现仅在codex/sagh-cf-teacher-consistency-ablation，科学Git 1627f96e4f9780eced89f1f0a8bc0af28cdc2910、基线9cb156a；不合并算法优化主线。T只在冻结的credit前原生归一化GAE为正且目标不同于最终执行动作时暂停该row CF；保留原eligible分母、teacher credit、target和全部辅助数值系数。checkpoint/推理消费端同步合同，critic、奖励、环境及encoder未改。
+
+382匹配及相关回归、6个真实记录批的无环境张量匹配通过；固定4fresh cell/16checkpoint完成审计及84组梯度投影加和通过。3072训练+1632验证=4704真实交互，逐次core env.step前计费，硬上限5184；剩余额度不使用，无继承旧权重、重试、预算扩展或正式训练。C的完整轨迹和checkpoint与上一轮fresh对照一致。
+
+门控生效且CF监督覆盖减少，但不能只用冲突次数下降推断收益；全部固定验证点未显示C/T收益差异，训练分项、真实机制兑现、正负/零梯度和实际Adam计数分别记录。详细未公开数值仅本地artifacts/analysis/sagh_cf_consistency_preflight_20261023_v1，入口report.md、result.json、comparison/preflight_audit.json、independent_check.json及figures。两张新图仅含本轮原值；旧曲线、旧产物和七用户修改hash保持。详细产物/checkpoint不上传public仓库。
+
+初次离线checker字段读取错误已在本地更正并保留原日志，只更正审计工具，没有改科学源码或重跑实验。没有critic消融、辅助权重搜索、reward/曲线加工、formal/holdout或canonical晋级；本轮停止，后续优化另行授权。
+
+reviewed_at：2026-10-23T15:03:48.458184+08:00；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；artifact_run_id：sagh_cf_consistency_preflight_20261023_v1；policy_version：tmc_review_policy_v3_20260621；科学Git：1627f96e4f9780eced89f1f0a8bc0af28cdc2910；evidence_level：MATCHED_TESTS_AND_BOUNDED_DEVELOPMENT_COMPARISON_ONLY。长期效果、正式/holdout、策略收敛及paper-ready均UNVERIFIED。
