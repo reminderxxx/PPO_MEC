@@ -1,3 +1,5 @@
+> 2026-10-23 D/E只改DT环境概率的合同验证完成；不可达目标失去环境项监督而原分母/heads保留，不能把大幅覆盖损失掩盖成无代价去噪。DT整体头竞争、CF/argmax及最终映射低可控性仍OPEN；局部fast total冲突减少未兑现真实服务收益，探索bonus与服务指标分别报告。未调权/改reward/开启正式训练，见[sagh_dt_executed_density_preflight_20261023.md](sagh_dt_executed_density_preflight_20261023.md)，reviewed_at=2026-10-23T23:37:06.051640+08:00。
+
 > 2026-10-23 只读逐样本复核：DT环境动作CE/fast CE与最终映射、argmax合法而不可达目标仍为OPEN；CF执行对齐不保证启发式teacher和共享参数的native方向一致。批次投影与单样本目标、critic直接/下游影响分开，局部方向或探索bonus不等于真实服务收益。未调权/改reward/实施修复/新训练；见[sagh_d_fast_conflict_audit_20261023.md](sagh_d_fast_conflict_audit_20261023.md)，reviewed_at=2026-10-23T17:20:02.428036+08:00。
 
 > 2026-10-23 T/D有界比较完成：指定value→encoder梯度路由通过逐参数匹配，value训练/非encoder梯度保持；局部encoder竞争减少并未解决跨头辅助目标竞争，CF覆盖、teacher的stall/miss资格和DT执行语义风险继续OPEN。验证需区分探索bonus与真实服务/准备兑现，不能把零梯度或局部方向改善写成收益。没有混入teacher/DT修复、调系数或继续训练；见[sagh_value_encoder_routing_preflight_20261023.md](sagh_value_encoder_routing_preflight_20261023.md)，reviewed_at=2026-10-23T16:46:35.005059+08:00。

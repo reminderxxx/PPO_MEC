@@ -1,0 +1,11 @@
+# SAGH D/E环境动作概率单因素预检索引（2026-10-23）
+
+按用户授权在codex/sagh-dt-executed-density-ablation完成一次D/E有界比较，科学Git b5e1796e33d53c5b2f4eae295b2c12853d57c91b、基线c12a27b。只将DT环境动作损失从proposal CE对齐production mapper最终执行概率；不可达目标零贡献仍占原DT eligible分母。DT各头CE、teacher/标签/权重/cap/scales/全部辅助系数、CF门与分母、argmax、value encoder路由、奖励/环境与算法优化主线保持。
+
+397专项/相关回归、12个记录snapshot的冻结D/新D/E逐参数匹配通过；新D与冻结D前向/标量/梯度精确一致，E所有非DT env目标和DT heads梯度保持。4fresh cell/16checkpoint、全交互计费/原账本审计、fresh D全部trace/四checkpoint网络重现旧D、DT分项投影/监督覆盖与旧曲线/七用户修改保护核验PASS。3072训练+1632验证=4704真实交互，未超5184，不使用剩余预算；无正式训练、holdout、科学重试或追加预算。
+
+执行概率合同生效，但环境监督覆盖及有效weight损失很大；局部fast方向改善未转化为真实服务收益，所有seed/固定点的负向与零结果保留。未把不可达置零、可达全alias、局部冲突减少或原探索bonus变化称为有效监督或服务改善；DT头、CF、argmax和低可控性风险仍OPEN。
+
+首次Git推送网络超时后重试已成功；外层补充回执因upstream尚未建立而晚写，真正execution_receipt在交互前绑定已提交科学源码/参数与预算，时间差如实记录。派生CSV字段并集更正不涉及科学数据/源码或训练重跑，初次输出/日志保留。详细未公开结果仅本地artifacts/analysis/sagh_dt_executed_density_preflight_20261023_v1：report.md、augmented_result.json、_v2 CSV、审计与保护记录、三张新原值图和本地delivery zip；checkpoint/原始数据不打包或上传public仓库。旧曲线和产物未覆盖，不合并独立实验代码到优化主线。
+
+reviewed_at：2026-10-23T23:37:06.051640+08:00；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；artifact_run_id：sagh_dt_executed_density_preflight_20261023_v1；policy_version：tmc_review_policy_v3_20260621；scientific_git：b5e1796e33d53c5b2f4eae295b2c12853d57c91b；evidence_level：MATCHED_PER_PARAMETER_DT_DENSITY_CONTRACT_AND_BOUNDED_DEVELOPMENT_COMPARISON_ONLY。matched development非formal/独立holdout/paper-ready，长期因果/稳定收益/收敛UNVERIFIED，novelty与评分N/S。预检完成后停止，后续优化另行授权。
