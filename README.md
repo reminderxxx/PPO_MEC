@@ -7,6 +7,10 @@
 
 # PPO_MEC
 
+本独立分支的动作语义修复仅授权匹配测试与小预算预检：
+[`sagh_execution_repair_preflight_20261023.md`](docs/project/sagh_execution_repair_preflight_20261023.md)。
+入口`preflight_sagh_execution_repair.py`无正式训练模式；原奖励、旧曲线/产物与算法优化主线保持。
+
 本轮扩大预算：`scripts/run_long_fair_reward_training.py`，全部算法32循环/196,608交互/768updates；配对动作诊断与真实episode图方案见 [长预算独立实验](docs/project/long_fair_reward_training_20261021.md)。
 
 独立公平训练与收敛实验：`scripts/run_fair_reward_training.py`，统一窗口/原生奖励/交互预算，从零训练且自动让出其他训练资源；

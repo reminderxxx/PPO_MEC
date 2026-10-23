@@ -7,6 +7,10 @@
 
 # Runbook
 
+## 当前独立分支：仅动作修复测试与小预算预检（2026-10-23）
+
+`codex/sagh-objective-credit-alignment`按`sagh_execution_repair_preflight_20261023.md`执行匹配测试、固定8cell/6144训练交互（另有≤4224验证交互）的预检及只读审计。主`.venv/bin/python -B`、PROJECT/单线程环境、clean候选commit与新create-only root为必要条件；原生reward、旧图/产物不变。本次授权到预检即停止，不执行以下历史条目中的32循环正式run，不恢复20分钟正式训练提醒。
+
 ## 独立公平训练与奖励收敛（2026-10-21）
 
 本轮长预算按`long_fair_reward_training_20261021.md`执行：先完成配对动作诊断和四算法两轮预检，再prepare/run；30cell完整后先`audit_long_fair_reward_training.py`核验，再`plot_long_fair_reward_training.py`create-only导出全部真实episode和固定验证图。当前聊天每20分钟检查，不自动重跑。

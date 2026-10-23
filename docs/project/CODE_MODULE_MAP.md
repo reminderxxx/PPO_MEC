@@ -4,6 +4,8 @@
 
 ## 独立公平训练/奖励曲线
 
+- 本独立分支的`sagh_execution_diagnostics.py`拥有透明gate observer、逐步原生分项账本和固定状态执行边缘概率枚举，不执行环境step/优化器；`preflight_sagh_execution_repair.py`仅拥有冻结小预算调度，`audit_sagh_execution_preflight.py`消费其source/step/update/checkpoint/hash合同。`sa_ghmappo_core.py`保留动作0、执行共同映射并提供可选目标梯度诊断，`real_eval_support.py`贯通checkpoint配置过滤。原环境奖励与优化主线职责不改。
+
 - `scripts/diagnose_sagh_flat_reward.py`：透明observer和配对checkpoint动作诊断，保持算法输出不变。
 - `scripts/run_long_fair_reward_training.py`：复用短预算原生环境与配置，按统一32循环执行；仅拥有隔离实验调度/原始日志/动作证据。
 - `scripts/audit_long_fair_reward_training.py` / `scripts/plot_long_fair_reward_training.py`：只读核验循环/原生reward/执行动作/checkpoint与数据身份，再导出真实episode均值、全部原值和固定验证；不做checkpoint筛选。

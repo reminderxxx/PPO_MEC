@@ -4,6 +4,8 @@
 
 ## 独立公平奖励训练（2026-10-21）
 
+本独立分支2026-10-23新增`scripts/preflight_sagh_execution_repair.py`（固定6144训练交互上限）、`sagh_execution_diagnostics.py`（逐步/同状态门控诊断）和`audit_sagh_execution_preflight.py`（只读审计）；匹配测试`tests/test_sagh_execution_repair.py`。本地新产物`sagh_execution_repair_preflight_20261023_v1/`与保护/结果回执`sagh_objective_credit_repair_20261023_v1/`位于`artifacts/analysis/`，不覆盖下列历史目录。授权和命令见`sagh_execution_repair_preflight_20261023.md`，无正式训练模式。
+
 - `configs/experiment/long_fair_reward_training_v1.json`、`scripts/run_long_fair_reward_training.py` / `audit_long_fair_reward_training.py` / `plot_long_fair_reward_training.py`：32循环独立训练及只读核验/真实episode图；`tests/test_long_fair_reward_training.py`覆盖循环与绘图边界。
 - `artifacts/analysis/long_fair_reward_training_20261021_v1/`：本轮完整独立run；`long_fair_reward_preflight_20261021_v1/`只作预检；`sagh_flat_action_diagnosis_20261021_v1/`为前置只读诊断。
 - `configs/experiment/fair_reward_training_v1.json`：共同窗口、奖励、预算、资源隔离与平台描述规则。

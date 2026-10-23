@@ -97,6 +97,8 @@ def _filter_checkpoint_config(agent_name: str, checkpoint_config: dict[str, Any]
         "hidden_dim",
         "hidden_dims",
         "deterministic_action",
+        "execution_mapping_contract",
+        "objective_diagnostics_enabled",
         "target_kl",
         "kl_early_stop_enabled",
     }

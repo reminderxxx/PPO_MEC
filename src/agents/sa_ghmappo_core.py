@@ -28,6 +28,11 @@ from src.models.uncertainty_transition_ensemble import (
 )
 
 
+def _action_id(value: Any, default: int = 3) -> int:
+    """Only missing/None actions use a default; action zero is valid."""
+    return int(default if value is None else value)
+
+
 控制头动作空间 = {
     "slow": 3,
     "fast": 2,
@@ -1235,10 +1240,16 @@ class 分层PPO基类(BaseAgent):
         hidden_dim: int = 64,
         hidden_dims: tuple[int, int] = (64, 64),
         deterministic_action: bool = False,
+        execution_mapping_contract: str = "legacy_deterministic_fallback_v1",
+        objective_diagnostics_enabled: bool = False,
         random_seed: int = 7,
         device: str = "cpu",
     ) -> None:
         super().__init__(agent_name=agent_name)
+        if execution_mapping_contract not in {"legacy_deterministic_fallback_v1", "shared_train_eval_v1"}:
+            raise ValueError("Unknown execution mapping contract")
+        self._execution_mapping_contract = execution_mapping_contract
+        self._objective_diagnostics_enabled = bool(objective_diagnostics_enabled)
         self.policy_type = policy_type
         self._encoder_kind = encoder_kind
         self._centralized_critic = bool(centralized_critic)
@@ -2895,10 +2906,56 @@ class 分层PPO基类(BaseAgent):
         return {"accepted": False, "backtracks": 8, "kl": last_kl if math.isfinite(last_kl) else 0.0,
                 "max_kl": 0.0, "gradient_norm_before_clip": norm}
 
+    def _objective_gradient_diagnostics(self, terms, total_loss, native_actor, batch_indices):
+        """Observe shared-graph gradients without accumulating .grad or stepping Adam."""
+        named = [(name, p) for name, p in self._network.named_parameters() if p.requires_grad]
+        parameters = [p for _, p in named]
+        def group(name):
+            if name.startswith("encoder."):
+                return "encoder"
+            for head in ("slow", "fast", "event", "option"):
+                if name.startswith(head + "_actor."):
+                    return head + "_head"
+            return "critic" if "critic" in name or "value" in name else "shared_other"
+        groups = {name: [i for i, (key, _) in enumerate(named) if group(key) == name]
+                  for name in {group(key) for key, _ in named}}
+        observed = dict(terms, total=total_loss, native_return_actor_probe=native_actor,
+                        credit_actor_delta_probe=terms["actor_with_credits"]-native_actor)
+        vectors, payload = {}, {}
+        for name, loss in observed.items():
+            grads = torch.autograd.grad(loss, parameters, retain_graph=True, allow_unused=True) if loss.requires_grad else [None]*len(parameters)
+            vector = [torch.zeros_like(p).reshape(-1) if g is None else g.detach().reshape(-1)
+                      for p, g in zip(parameters, grads)]
+            vectors[name] = {key: torch.cat([vector[i] for i in indices]) for key, indices in groups.items()}
+            payload[name] = {"weighted_loss": float(loss.detach()), "gradient_norm": {
+                key: float(torch.linalg.vector_norm(v)) for key, v in vectors[name].items()}}
+        cosine = {}
+        for name, bygroup in vectors.items():
+            cosine[name] = {}
+            for key, vector in bygroup.items():
+                reference = vectors["native_return_actor_probe"][key]
+                denominator = float(torch.linalg.vector_norm(vector)*torch.linalg.vector_norm(reference))
+                cosine[name][key] = float(torch.dot(vector, reference))/denominator if denominator > 1e-12 else None
+        term_sum = sum(float(loss.detach()) for loss in terms.values())
+        return {"schema": "objective_gradients_v1", "batch_indices": batch_indices,
+                "terms": payload, "cosine_to_native_return_actor": cosine,
+                "weighted_term_sum": term_sum, "total_loss": float(total_loss.detach()),
+                "probe_terms_excluded_from_optimizer": ["native_return_actor_probe", "credit_actor_delta_probe"],
+                "optimizer_mutation": False, "scope": "first_minibatch_only_not_causal_ablation"}
+
     def act(self, observation: Any, info: dict[str, Any] | None = None) -> tuple[int, dict[str, Any]]:
         del observation
         semantic_state = self._extract_semantic_state(info)
         action_mask = self._extract_action_mask(info)
+        if self._execution_mapping_contract == "shared_train_eval_v1":
+            unsupported = [name for name in (
+                "_deterministic_temporal_smoothing_enabled", "_env_action_model_critic_enabled",
+                "_option_counterfactual_policy_improvement_enabled", "_learned_transition_model_planner_enabled",
+            ) if getattr(self, name, False)]
+            if unsupported or not self._use_hierarchy:
+                raise ValueError(f"Unsupported shared mapping configuration: {unsupported}")
+            if not self._action_mask_has_valid_action(action_mask):
+                raise ValueError("Shared mapping requires a nonempty legal action mask")
         run_metadata = dict((info or {}).get("run_metadata", {}) or {})
         policy_evaluation_mode = str(
             run_metadata.get("policy_evaluation_mode", "safety_projected")
@@ -2907,6 +2964,8 @@ class 分层PPO基类(BaseAgent):
             policy_evaluation_mode = "safety_projected"
         run_metadata["policy_evaluation_mode"] = policy_evaluation_mode
         raw_policy_evaluation = policy_evaluation_mode == "raw_policy"
+        if self._execution_mapping_contract == "shared_train_eval_v1" and raw_policy_evaluation:
+            raise ValueError("Raw-policy bypass is outside the shared execution contract")
         deterministic = bool(self._deterministic_action or (info or {}).get("deterministic_policy", False))
         with torch.no_grad():
             policy_output = self._forward_policy(semantic_state, run_metadata=run_metadata)
@@ -3106,6 +3165,8 @@ class 分层PPO基类(BaseAgent):
                 )
             if guard_info:
                 guard_info["guarded_action"] = int(env_action)
+            if self._execution_mapping_contract == "shared_train_eval_v1" and not self._is_env_action_valid(env_action, action_mask):
+                raise ValueError("Shared mapping produced a masked action")
             guard_action_delta = bool(
                 int(projected_env_action) != int(env_action)
                 or dict(projected_head_actions) != dict(selected_actions)
@@ -3148,6 +3209,8 @@ class 分层PPO基类(BaseAgent):
             )
 
         return env_action, {
+            "execution_mapping_contract": self._execution_mapping_contract,
+            "action_label_contract": "zero_preserving_v1",
             "policy_mode": "deterministic" if deterministic else "sample",
             "policy_evaluation_mode": policy_evaluation_mode,
             "raw_policy_evaluation": raw_policy_evaluation,
@@ -3585,6 +3648,8 @@ class 分层PPO基类(BaseAgent):
         if any(row.get("action_info", {}).get("probability_contract") == "sampled_base_and_option_v1" for row in rollout) and not repaired_probability_contract:
             raise ValueError("Mixed probability contracts in one rollout")
         guarded_steps = []
+        objective_records = []
+        objective_credit_rows = []
         imitation_rollout_stats = self._annotate_heuristic_imitation_targets(rollout)
         semantic_states = [self._extract_semantic_state(row.get("decision_info")) for row in rollout]
         run_metadata_by_row = [
@@ -3646,6 +3711,7 @@ class 分层PPO基类(BaseAgent):
         advantage_mean = float(advantages.mean()) if len(advantages) > 0 else 0.0
         advantage_std = float(advantages.std()) if len(advantages) > 0 else 0.0
         normalized_advantages = (advantages - advantage_mean) / (advantage_std + 1e-8)
+        native_normalized_advantages = normalized_advantages.copy()
         normalized_advantages = normalized_advantages * mechanism_transition_weights
         event_advantages_raw = np.asarray(
             [
@@ -3917,6 +3983,28 @@ class 分层PPO基类(BaseAgent):
             advantage_values=normalized_advantages,
         )
         normalized_event_advantages = normalized_event_advantages * mechanism_transition_weights
+        if self._objective_diagnostics_enabled:
+            credit_arrays = {
+                "net_utility": net_utility_adjustment_values, "event_prd": event_prd_credit_values,
+                "handoff_risk": handoff_risk_credit_values, "mechanism": mechanism_credit_values,
+                "tail_risk": tail_risk_credit_values, "opportunity": opportunity_credit_values,
+                "idle_execution": idle_execution_credit_values, "delayed_mechanism": delayed_mechanism_credit_values,
+                "net_advantage_prepare_gate": net_advantage_prepare_gate_credit_values,
+                "service_completion_gate": service_completion_gate_credit_values,
+            }
+            objective_credit_rows = [{
+                "index": i, "metadata": run_metadata_by_row[i], "action": actions[i],
+                "reward": float(row.get("reward", 0.0)), "return": float(returns[i]),
+                "native_normalized_advantage": float(native_normalized_advantages[i]),
+                "policy_advantage_after_credits": float(normalized_advantages[i]),
+                "event_advantage_after_credits": float(normalized_event_advantages[i]),
+                "mechanism_transition_weight": float(mechanism_transition_weights[i]),
+                "credits": {key: float(array[i]) for key, array in credit_arrays.items()},
+                "behavior_supervision": {key: value for key, value in row.items()
+                    if key.startswith("advantage_weighted_behavior_") or key.startswith("heuristic_imitation_")},
+                "net_utility_dual_before": net_utility_dual_before,
+                "net_utility_dual_after": net_utility_dual_after,
+            } for i, row in enumerate(rollout)]
         option_return_mean = float(returns.mean()) if len(returns) > 0 else 0.0
         option_return_std = float(returns.std()) if len(returns) > 0 else 0.0
         normalized_option_returns = (
@@ -4301,6 +4389,36 @@ class 分层PPO基类(BaseAgent):
                     * env_action_model_teacher_distillation_loss
                 )
 
+                if self._objective_diagnostics_enabled and not objective_records:
+                    native_adv = torch.as_tensor(native_normalized_advantages[batch_indices], device=self._device)
+                    native_actor = -torch.minimum(ratio * native_adv,
+                        ratio.clamp(1.0-self._clip_ratio, 1.0+self._clip_ratio) * native_adv).mean()
+                    terms = {
+                        "actor_with_credits": actor_loss, "value": self._value_coef * value_loss,
+                        "entropy": -self._entropy_coef * entropy,
+                        "pseudo_auxiliary": self._auxiliary_coef * auxiliary_loss,
+                        "heuristic_imitation": effective_imitation_coef * heuristic_imitation_loss,
+                        "mechanism_auxiliary": effective_mechanism_aux_coef * mechanism_aux_loss,
+                        "mechanism_entropy": -effective_mechanism_entropy_coef * mechanism_entropy_bonus,
+                        "digital_twin_teacher": effective_digital_twin_policy_prior_distill_coef * digital_twin_policy_prior_loss,
+                        "env_action_ppo": self._env_action_ppo_coef * env_action_ppo_loss,
+                        "counterfactual_margin": self._env_action_counterfactual_margin_coef * env_action_counterfactual_margin_loss,
+                        "argmax_margin": self._argmax_margin_coef * argmax_margin_loss,
+                        "behavior_regularizer": self._advantage_weighted_behavior_coef * advantage_weighted_behavior_loss,
+                        "option_actor": self._option_gate_loss_coef * self._option_gate_log_prob_weight * option_gate_loss,
+                        "option_prior": effective_option_prior_coef * option_gate_prior_loss,
+                        "option_entropy": -self._option_gate_entropy_coef * option_gate_entropy,
+                        "option_value": self._option_counterfactual_value_coef * option_counterfactual_value_loss,
+                        "model_critic": self._env_action_model_critic_value_coef * env_action_model_critic_loss,
+                        "model_policy": self._env_action_model_policy_improvement_coef * env_action_model_policy_improvement_loss,
+                        "counterfactual_head_policy": self._counterfactual_head_policy_improvement_coef * counterfactual_head_policy_improvement_loss,
+                        "counterfactual_factorized_policy": self._counterfactual_factorized_policy_improvement_coef * counterfactual_factorized_policy_improvement_loss,
+                        "model_teacher": self._env_action_model_teacher_distillation_coef * env_action_model_teacher_distillation_loss,
+                    }
+                    objective_records.append(self._objective_gradient_diagnostics(
+                        terms, total_loss, native_actor,
+                        [int(i) for i in batch_index_list],
+                    ))
                 if repaired_probability_contract:
                     step_result = self._guarded_policy_step(total_loss, batch_rows, batch_states, batch_run_metadata, batch_action_masks)
                     guarded_steps.append(step_result)
@@ -4437,6 +4555,11 @@ class 分层PPO基类(BaseAgent):
             "agent_name": self.agent_name,
             "policy_type": self.policy_type,
             "policy_update_skipped": bool(repaired_probability_contract and not any(v["accepted"] for v in guarded_steps)),
+            "execution_mapping_contract": self._execution_mapping_contract,
+            "action_label_contract": "zero_preserving_v1",
+            "objective_diagnostics": {"enabled": self._objective_diagnostics_enabled,
+                "scope": "first_minibatch_before_optimizer_per_learn", "gradient_batches": objective_records,
+                "credit_rows": objective_credit_rows},
             "probability_contract": "sampled_base_and_option_v1" if repaired_probability_contract else "legacy_unverified",
             "initial_log_prob_error_max": initial_log_prob_error,
             "guarded_optimizer_steps": len(guarded_steps),
@@ -5708,7 +5831,7 @@ class 分层PPO基类(BaseAgent):
             semantic_state,
             action_mask,
         )
-        if not deterministic:
+        if not deterministic and self._execution_mapping_contract != "shared_train_eval_v1":
             return {
                 "enabled": True,
                 "applied": False,
@@ -6359,7 +6482,19 @@ class 分层PPO基类(BaseAgent):
         top_tensor = torch.argmax(option_logits, dim=-1)
         top_action = int(top_tensor.item())
         selection_reason = "policy_argmax" if deterministic else "policy_sample"
-        if deterministic:
+        executed_option_action = None
+        option_remapping = None
+        if self._execution_mapping_contract == "shared_train_eval_v1":
+            option_tensor = self._sample_shared_option(distribution, deterministic)
+            option_remapping, reasons = self._shared_option_remapping(
+                semantic_state=semantic_state, candidate_info=candidate_info,
+                base_env_action=base_env_action, window_class=window_class,
+                option_probs=option_probs, top_action=top_action,
+                forced_selection_reason=forced_selection_reason,
+            )
+            executed_option_action = option_remapping[int(option_tensor.item())]
+            selection_reason = reasons.get(int(option_tensor.item()), selection_reason)
+        elif deterministic:
             option_tensor = top_tensor
             if forced_selection_reason is not None:
                 option_tensor = torch.tensor(1, dtype=torch.long, device=option_logits.device)
@@ -6401,12 +6536,18 @@ class 分层PPO基类(BaseAgent):
         else:
             option_tensor = distribution.sample()
         option_action = int(option_tensor.item())
-        option_env_action = int(candidate_info["option_actions"].get(option_action, int(base_env_action)))
-        option_label = OPTION_GATE_LABELS.get(option_action, f"option_{option_action}")
+        executed_option_action = option_action if executed_option_action is None else executed_option_action
+        option_env_action = int(candidate_info["option_actions"].get(executed_option_action, int(base_env_action)))
+        option_label = OPTION_GATE_LABELS.get(executed_option_action, f"option_{executed_option_action}")
         return {
             "enabled": True,
             "applied": bool(option_env_action != int(base_env_action)),
             "option_action": int(option_action),
+            "executed_option_action": int(executed_option_action),
+            "option_action_scope": "sampled_latent_option",
+            "option_remapping": option_remapping,
+            "execution_option_actions": ({str(i): int(candidate_info["option_actions"][mapped])
+                for i, mapped in option_remapping.items()} if option_remapping is not None else None),
             "option_label": option_label,
             "option_env_action": option_env_action,
             "base_env_action": int(base_env_action),
@@ -6454,6 +6595,36 @@ class 分层PPO基类(BaseAgent):
             "_option_log_prob_tensor": distribution.log_prob(option_tensor),
             "_option_entropy_tensor": distribution.entropy(),
         }
+
+    def _sample_shared_option(self, distribution: Categorical, deterministic: bool) -> torch.Tensor:
+        """Selection is the sole stochastic/greedy difference in the shared contract."""
+        return distribution.logits.argmax() if deterministic else distribution.sample()
+
+    def _shared_option_remapping(self, *, semantic_state, candidate_info, base_env_action,
+                                window_class, option_probs, top_action, forced_selection_reason=None):
+        mask = candidate_info["option_mask"]
+        mapping = {i: i for i, valid in enumerate(mask) if valid}
+        reason = forced_selection_reason
+        if reason is None and self._should_apply_net_utility_option_termination(
+            semantic_state=semantic_state, candidate_info=candidate_info,
+            base_env_action=base_env_action, window_class=window_class,
+        ):
+            reason = "net_utility_option_termination"
+        if reason is None:
+            reason = self._dag_aware_option_termination_reason(
+                semantic_state=semantic_state, candidate_info=candidate_info,
+                base_env_action=base_env_action, window_class=window_class,
+            )
+        if reason is not None:
+            if 1 not in mapping:
+                raise ValueError("Forced option is masked; refusing unsafe mapping")
+            return {i: 1 for i in mapping}, {i: reason for i in mapping}
+        prior = int(candidate_info["prior_target"])
+        if (self._option_gate_context_prior_enabled and prior in mapping and top_action != prior
+                and float(option_probs[top_action] - option_probs[prior]) < self._option_gate_deterministic_prior_margin):
+            mapping[top_action] = prior
+            return mapping, {top_action: "context_prior_margin"}
+        return mapping, {}
 
     def _is_env_action_valid(self, env_action: int, action_mask: list[bool] | None) -> bool:
         if not self._action_mask_has_valid_action(action_mask):
@@ -8181,7 +8352,7 @@ class 分层PPO基类(BaseAgent):
                 continue
 
             action_info = dict(row.get("action_info", {}))
-            current_action = int(action_info.get("final_env_action", row.get("action", best_action)) or best_action)
+            current_action = _action_id(action_info.get("final_env_action", row.get("action", best_action)), best_action)
             current_credit = self._counterfactual_teacher_action_credit(row, current_action)
             credit_gap = max(best_credit - float(current_credit), 0.0)
             weight = max(best_credit, credit_gap + self._env_action_counterfactual_margin_min_gap)
@@ -8249,7 +8420,7 @@ class 分层PPO基类(BaseAgent):
 
             metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
             action_info = dict(row.get("action_info", {}))
-            final_action = int(action_info.get("final_env_action", row.get("action", 3)) or 3)
+            final_action = _action_id(action_info.get("final_env_action", row.get("action", 3)))
             window_class = self._row_window_class(row)
             mechanism_context = bool(
                 window_class == "mechanism_activating"
@@ -11459,7 +11630,7 @@ class 分层PPO基类(BaseAgent):
         event_action = int(head_actions.get("event", 0) or 0)
         slow_action = int(head_actions.get("slow", 0) or 0)
         fast_action = int(head_actions.get("fast", 0) or 0)
-        target_action = int(gate_info.get("target_action", 3) or 3)
+        target_action = _action_id(gate_info.get("target_action", 3))
         score = _clamp01(float(gate_info.get("service_completion_score", 0.0) or 0.0))
         service_pressure = _clamp01(float(gate_info.get("service_pressure", 0.0) or 0.0))
         terminal_pressure = _clamp01(float(gate_info.get("terminal_pressure", 0.0) or 0.0))
@@ -15136,7 +15307,7 @@ class 分层PPO基类(BaseAgent):
             row["advantage_weighted_behavior_applied"] = False
             row["advantage_weighted_behavior_weight"] = 0.0
             row["advantage_weighted_behavior_mode"] = "none"
-            row["advantage_weighted_behavior_target_action"] = int(row.get("action", 3) or 3)
+            row["advantage_weighted_behavior_target_action"] = _action_id(row.get("action", 3))
 
         if (
             not self._advantage_weighted_behavior_regularization_enabled
@@ -15175,7 +15346,7 @@ class 分层PPO基类(BaseAgent):
                 },
             )
             action_info = dict(row.get("action_info", {}))
-            student_action = int(action_info.get("final_env_action", row.get("action", 3)) or 3)
+            student_action = _action_id(action_info.get("final_env_action", row.get("action", 3)))
             teacher_action = int(teacher_action)
             if not self._is_env_action_valid(teacher_action, action_mask):
                 continue
@@ -15275,7 +15446,7 @@ class 分层PPO基类(BaseAgent):
         for policy_output, action_mask, row in zip(batch_outputs, batch_action_masks, batch_rows):
             if not bool(row.get("advantage_weighted_behavior_applied", False)):
                 continue
-            target_action = int(row.get("advantage_weighted_behavior_target_action", row.get("action", 3)) or 3)
+            target_action = _action_id(row.get("advantage_weighted_behavior_target_action", row.get("action", 3)))
             if not self._is_env_action_valid(target_action, action_mask):
                 continue
             weight = float(row.get("advantage_weighted_behavior_weight", 0.0) or 0.0)
@@ -15363,6 +15534,8 @@ class 分层PPO基类(BaseAgent):
 
     def _checkpoint_config(self) -> dict[str, Any]:
         return {
+            "execution_mapping_contract": self._execution_mapping_contract,
+            "objective_diagnostics_enabled": self._objective_diagnostics_enabled,
             "agent_name": self.agent_name,
             "policy_type": self.policy_type,
             "encoder_kind": self._encoder_kind,
