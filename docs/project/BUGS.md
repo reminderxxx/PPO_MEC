@@ -1,3 +1,5 @@
+> 2026-10-23 T/D有界比较完成：指定value→encoder梯度路由通过逐参数匹配，value训练/非encoder梯度保持；局部encoder竞争减少并未解决跨头辅助目标竞争，CF覆盖、teacher的stall/miss资格和DT执行语义风险继续OPEN。验证需区分探索bonus与真实服务/准备兑现，不能把零梯度或局部方向改善写成收益。没有混入teacher/DT修复、调系数或继续训练；见[sagh_value_encoder_routing_preflight_20261023.md](sagh_value_encoder_routing_preflight_20261023.md)，reviewed_at=2026-10-23T16:46:35.005059+08:00。
+
 > 2026-10-23 T暂停CF只读复核：teacher的adapter-miss proxy可用stall/not-hit触发，而未区分关联/覆盖失败与明确缓存查找缺失；不能把补缓存目标一概当正确监督恢复。CF/behavior执行对齐未使DT env/head目标自动具有同一执行语义；共享value梯度和其余辅助目标仍需分离验证。局部方向、覆盖和验证收益不可互代；本轮不修复、不调权重、不新训练。证据/限制及未实施单因素提案见[sagh_cf_pause_utility_audit_20261023.md](sagh_cf_pause_utility_audit_20261023.md)，reviewed_at=2026-10-23T15:32:55.843959+08:00。
 
 > 2026-10-23 C/T单因素完成更新：原分母CF暂停门在独立候选1627f96通过匹配并完成一次固定预检；覆盖减少与局部冲突减少需共同解释，不能把暂停产生的零梯度当成同向学习。全部固定验证点未显示收益；其他目标、强门控/多对一探索、真实覆盖与长期因果继续OPEN。原epoch/KL规则下实际Adam数量不同，环境预算相同不等于计算量相同。本轮不追加实验；见[sagh_cf_consistency_preflight_20261023.md](sagh_cf_consistency_preflight_20261023.md)。

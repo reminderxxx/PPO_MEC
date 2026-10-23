@@ -1,3 +1,5 @@
+> 2026-10-23 本地artifacts/analysis/sagh_value_encoder_routing_preflight_20261023_v1：独立科学c12a27b的T/D单因素，389测试、12记录snapshot的逐参数合同、4fresh cell/16checkpoint、84投影及旧产物/曲线保护审计PASS；3072训练+1632验证=4704真实交互。报告、全seed正负reward分项、CF coverage、raw/routed梯度、实际Adam/KL、三张原值图/CSV和本地交付zip保存；不含checkpoint/原始数据的交付包不对外发布。原CF门/系数/reward/teacher/DT和优化主线保持；metadata及限制见[sagh_value_encoder_routing_preflight_20261023.md](sagh_value_encoder_routing_preflight_20261023.md)。
+
 > 2026-10-23 本地artifacts/analysis/sagh_cf_pause_utility_audit_20261023_v1：既有C/T checkpoint的12批梯度及6批其他辅助项只读重建、完整暂停样本/目标/门控登记、验证路径配对、输入hash与84组投影检查PASS。全部正负结果、零梯度和checker更正现场保留，无新增环境/learner/optimizer。未公开详数仅本地，单因素方案未实施，不动奖励/旧曲线或主线。metadata与边界见[sagh_cf_pause_utility_audit_20261023.md](sagh_cf_pause_utility_audit_20261023.md)。
 
 > 2026-10-23 本地artifacts/analysis/sagh_cf_consistency_preflight_20261023_v1：382匹配/回归、6固定记录批及4fresh cell/16checkpoint审计PASS；3072训练+1632验证，总4704低于5184。CF coverage、全部梯度/奖励分项、固定验证、84组投影核验和两张原值图/CSV保存；旧63/80文件及41曲线文件/7包内证据hash保持。详细结果仅本地，不合并优化主线或上传checkpoint。metadata及限制见[sagh_cf_consistency_preflight_20261023.md](sagh_cf_consistency_preflight_20261023.md)。
