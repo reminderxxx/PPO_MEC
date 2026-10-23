@@ -95,7 +95,22 @@ def same_identities(left, right):
 
 def check_guard(torch, before, installed, scheduled):
     current = guard_apis(torch, scheduled)
-    same_identities(installed, current)
+    # Optimizer's first cold construction legitimately installs its exact
+    # profiling wrapper around Runtime's Adam guard. No other replacement (or
+    # arbitrary __wrapped__ chain) is allowed, and exit restoration stays exact.
+    same_identities({key: value for key, value in installed.items() if key != 'adam_step'},
+                    {key: value for key, value in current.items() if key != 'adam_step'})
+    step = current['adam_step']
+    guarded_step = installed['adam_step']
+    if step is not guarded_step:
+        expected = torch.optim.Optimizer.profile_hook_step(guarded_step)
+        if (getattr(step, '__wrapped__', None) is not guarded_step
+                or getattr(step, 'hooked', None) is not True
+                or getattr(step, '__code__', None) is not expected.__code__):
+            raise AssertionError('Adam step is not the exact cold Optimizer profiling wrapper')
+        closure = dict(zip(step.__code__.co_freevars, step.__closure__ or ()))
+        if 'func' not in closure or closure['func'].cell_contents is not guarded_step:
+            raise AssertionError('Adam profiling wrapper does not close over the installed guard')
     if any(current[key] is before[key] for key in before):
         raise AssertionError('Production Runtime guard was not installed')
     names = ('cuda_lazy_init', 'tensor_cuda', 'module_cuda', 'autograd_grad')

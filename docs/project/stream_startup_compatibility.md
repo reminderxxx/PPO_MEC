@@ -11,6 +11,8 @@ Dynamo 时，不同 API 的追踪规则在同一函数对象上冲突。修复�
 生产 `Runtime → make_agent` 顺序、空优化器、504 预算、初态参数和 RNG、
 有界 checkpoint 保存及 `from_checkpoint` 加载、守护有效性和退出恢复。
 与无守护的同 seed 初始化独立对照。资格阶段不运行环境、forward、backward 或优化器 step。
+首次 Adam 构造会增加 PyTorch 自身的性能统计包装；验收仅放行该固定包装代码，
+并确认其直接闭包和 `__wrapped__` 仍指向生产守护，其余 API 与退出恢复继续逐对象检查。
 它验证启动与存取接口，不能代替训练后 checkpoint、长期稳定性或收敛证据。
 
 ```text

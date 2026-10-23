@@ -1,5 +1,6 @@
 """Pure orchestration/evidence regressions; the CLI owns real cold processes."""
 import ast
+import functools
 import importlib.util
 from pathlib import Path
 import sys
@@ -190,6 +191,53 @@ def test_guard_probes_require_distinct_stable_callable_rejections(defect):
         M.check_guard(t, before, installed, scheduled)
     else:
         with pytest.raises(AssertionError): M.check_guard(t, before, installed, scheduled)
+
+
+@pytest.mark.parametrize('defect', [None, 'only_wrapped_attribute', 'wrong_code',
+    'wrong_closure', 'double_wrapped', 'hooked_false', 'other_api_replaced'])
+def test_only_exact_cold_optimizer_profile_wrapper_is_accepted(defect):
+    def denial():
+        def guard(*args, **kwargs):
+            raise RuntimeError('Operation forbidden in fixture')
+        return guard
+    def profile_hook_step(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+    names = ('cuda_lazy_init', 'tensor_cuda', 'module_cuda', 'autograd_grad',
+             'tensor_backward', 'adam_step', 'categorical_sample', 'evaluate')
+    before = {key: denial() for key in names}
+    installed = {key: denial() for key in names}
+    current = dict(installed)
+    guarded = installed['adam_step']
+    step = profile_hook_step(guarded)
+    step.hooked = True
+    if defect in ('only_wrapped_attribute', 'wrong_code'):
+        def forged(*args, **kwargs):
+            return guarded(*args, **kwargs)
+        forged.__wrapped__ = guarded
+        if defect == 'wrong_code': forged.hooked = True
+        step = forged
+    elif defect == 'wrong_closure':
+        step = profile_hook_step(denial())
+        step.__wrapped__ = guarded
+        step.hooked = True
+    elif defect == 'double_wrapped':
+        step = profile_hook_step(step)
+        step.hooked = True
+    elif defect == 'hooked_false':
+        step.hooked = False
+    elif defect == 'other_api_replaced':
+        current['evaluate'] = denial()
+    current['adam_step'] = step
+    t = types.SimpleNamespace(optim=types.SimpleNamespace(
+        Optimizer=types.SimpleNamespace(profile_hook_step=profile_hook_step)))
+    with patch.object(M, 'guard_apis', return_value=current):
+        if defect is None:
+            M.check_guard(t, before, installed, None)
+        else:
+            with pytest.raises(AssertionError): M.check_guard(t, before, installed, None)
 
 
 def test_warm_dynamo_check_fails_without_importing_it():
