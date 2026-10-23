@@ -28,6 +28,23 @@ from src.models.uncertainty_transition_ensemble import (
 )
 
 
+class _ValueNonEncoderGradient(torch.autograd.Function):
+    """Exact first-order value gradient on selected parameters, no encoder edge.
+
+    PPO/Adam uses first-order derivatives only. Gradients are recomputed for each
+    minibatch at its current parameters, without accumulating parameter .grad.
+    """
+    @staticmethod
+    def forward(ctx, value, gradients, *parameters):
+        ctx.gradients = gradients
+        return value.clone()
+
+    @staticmethod
+    @torch.autograd.function.once_differentiable
+    def backward(ctx, upstream):
+        return (None, None, *(None if g is None else upstream * g for g in ctx.gradients))
+
+
 def _action_id(value: Any, default: int = 3) -> int:
     """Only missing/None actions use a default; action zero is valid."""
     return int(default if value is None else value)
@@ -1244,6 +1261,7 @@ class 分层PPO基类(BaseAgent):
         objective_diagnostics_enabled: bool = False,
         auxiliary_action_contract: str = "proposal_labels_v1",
         counterfactual_consistency_contract: str = "none_v1",
+        value_encoder_gradient_contract: str = "shared_v1",
         random_seed: int = 7,
         device: str = "cpu",
     ) -> None:
@@ -1262,6 +1280,9 @@ class 分层PPO基类(BaseAgent):
         if counterfactual_consistency_contract != "none_v1" and auxiliary_action_contract != "executed_marginal_v1":
             raise ValueError("Counterfactual consistency requires executed marginal supervision")
         self._counterfactual_consistency_contract = counterfactual_consistency_contract
+        if value_encoder_gradient_contract not in {"shared_v1", "block_value_to_encoder_v1"}:
+            raise ValueError("Unknown value encoder gradient contract")
+        self._value_encoder_gradient_contract = value_encoder_gradient_contract
         self.policy_type = policy_type
         self._encoder_kind = encoder_kind
         self._centralized_critic = bool(centralized_critic)
@@ -2880,6 +2901,18 @@ class 分层PPO基类(BaseAgent):
                 result[index] += kl(old, probs)
         return result
 
+    def _route_value_encoder_gradients(self, value_loss):
+        if self._value_encoder_gradient_contract == "shared_v1" or not value_loss.requires_grad:
+            return value_loss
+        # Preserve all non-encoder gradients, including DT/memory shared_other.
+        # Detaching critic_context would incorrectly remove those paths too.
+        parameters = [p for name, p in self._network.named_parameters()
+                      if p.requires_grad and not name.startswith("encoder.")]
+        gradients = torch.autograd.grad(value_loss, parameters, retain_graph=True,
+                                        allow_unused=True)
+        gradients = tuple(None if g is None else g.detach() for g in gradients)
+        return _ValueNonEncoderGradient.apply(value_loss.detach(), gradients, *parameters)
+
     def _guarded_policy_step(self, total_loss, rows, states, metadata, masks):
         if not bool(torch.isfinite(total_loss).item()):
             raise FloatingPointError("Non-finite loss; refusing optimizer step")
@@ -3190,7 +3223,7 @@ class 分层PPO基类(BaseAgent):
             return statistics["log_probs"][statistics["reachable"]].sum() * 0.0
         return -statistics["log_probs"][target_action]
 
-    def _objective_gradient_diagnostics(self, terms, total_loss, native_actor, batch_indices):
+    def _objective_gradient_diagnostics(self, terms, total_loss, native_actor, batch_indices, raw_value_loss=None):
         """Observe shared-graph gradients without accumulating .grad or stepping Adam."""
         named = [(name, p) for name, p in self._network.named_parameters() if p.requires_grad]
         parameters = [p for _, p in named]
@@ -3205,6 +3238,8 @@ class 分层PPO基类(BaseAgent):
                   for name in {group(key) for key, _ in named}}
         observed = dict(terms, total=total_loss, native_return_actor_probe=native_actor,
                         credit_actor_delta_probe=terms["actor_with_credits"]-native_actor)
+        if raw_value_loss is not None:
+            observed["value_before_routing_probe"] = raw_value_loss
         vectors, payload = {}, {}
         for name, loss in observed.items():
             grads = torch.autograd.grad(loss, parameters, retain_graph=True, allow_unused=True) if loss.requires_grad else [None]*len(parameters)
@@ -3220,10 +3255,16 @@ class 分层PPO基类(BaseAgent):
                 reference = vectors["native_return_actor_probe"][key]
                 denominator = float(torch.linalg.vector_norm(vector)*torch.linalg.vector_norm(reference))
                 cosine[name][key] = float(torch.dot(vector, reference))/denominator if denominator > 1e-12 else None
+        routing = {"contract": self._value_encoder_gradient_contract}
+        if raw_value_loss is not None:
+            routing.update(raw_value=payload.pop("value_before_routing_probe"),
+                raw_cosine_to_native=cosine.pop("value_before_routing_probe"),
+                routed_value=payload["value"], routed_cosine_to_native=cosine["value"])
         term_sum = sum(float(loss.detach()) for loss in terms.values())
         return {"schema": "objective_gradients_v1", "batch_indices": batch_indices,
                 "terms": payload, "cosine_to_native_return_actor": cosine,
                 "weighted_term_sum": term_sum, "total_loss": float(total_loss.detach()),
+                "value_encoder_routing": routing,
                 "probe_terms_excluded_from_optimizer": ["native_return_actor_probe", "credit_actor_delta_probe"],
                 "optimizer_mutation": False, "scope": "first_minibatch_only_not_causal_ablation"}
 
@@ -4465,7 +4506,9 @@ class 分层PPO基类(BaseAgent):
 
                 value_prediction = torch.stack([output["value"] for output in batch_outputs], dim=0)
                 ratio = self._stable_probability_ratio(new_log_prob, old_log_prob_tensor[batch_indices])
-                value_loss = torch.mean((return_tensor[batch_indices] - value_prediction) ** 2)
+                raw_value_loss = torch.mean((return_tensor[batch_indices] - value_prediction) ** 2)
+                value_loss = raw_value_loss
+                weighted_value_loss = self._route_value_encoder_gradients(self._value_coef * raw_value_loss)
                 auxiliary_loss = self._compute_auxiliary_loss(batch_states=batch_states, batch_outputs=batch_outputs)
                 heuristic_imitation_loss = self._compute_heuristic_imitation_loss(
                     batch_outputs=batch_outputs,
@@ -4515,7 +4558,7 @@ class 分层PPO基类(BaseAgent):
                 )
                 total_loss = (
                     actor_loss
-                    + self._value_coef * value_loss
+                    + weighted_value_loss
                     - self._entropy_coef * entropy
                     + self._auxiliary_coef * auxiliary_loss
                     + effective_imitation_coef * heuristic_imitation_loss
@@ -4548,7 +4591,7 @@ class 分层PPO基类(BaseAgent):
                     native_actor = -torch.minimum(ratio * native_adv,
                         ratio.clamp(1.0-self._clip_ratio, 1.0+self._clip_ratio) * native_adv).mean()
                     terms = {
-                        "actor_with_credits": actor_loss, "value": self._value_coef * value_loss,
+                        "actor_with_credits": actor_loss, "value": weighted_value_loss,
                         "entropy": -self._entropy_coef * entropy,
                         "pseudo_auxiliary": self._auxiliary_coef * auxiliary_loss,
                         "heuristic_imitation": effective_imitation_coef * heuristic_imitation_loss,
@@ -4572,6 +4615,7 @@ class 分层PPO基类(BaseAgent):
                     objective_records.append(self._objective_gradient_diagnostics(
                         terms, total_loss, native_actor,
                         [int(i) for i in batch_index_list],
+                        raw_value_loss=self._value_coef * raw_value_loss,
                     ))
                     objective_records[-1]["auxiliary_execution_rows"] = [
                         {"index": int(i), "diagnostics": deepcopy(row.get("auxiliary_execution_diagnostics", {}))}
@@ -4719,6 +4763,7 @@ class 分层PPO基类(BaseAgent):
                 "credit_rows": objective_credit_rows,
                 "auxiliary_action_contract": self._auxiliary_action_contract,
                 "counterfactual_consistency_contract": self._counterfactual_consistency_contract,
+                "value_encoder_gradient_contract": self._value_encoder_gradient_contract,
                 "cf_coverage_scope": "actual_loss_evaluations_not_optimizer_steps",
                 "cf_coverage_rows": [{"index": i, "metadata": run_metadata_by_row[i],
                     "coverage": deepcopy(row.get("cf_supervision_coverage", {}))}
@@ -15744,6 +15789,7 @@ class 分层PPO基类(BaseAgent):
             "objective_diagnostics_enabled": self._objective_diagnostics_enabled,
             "auxiliary_action_contract": self._auxiliary_action_contract,
             "counterfactual_consistency_contract": self._counterfactual_consistency_contract,
+            "value_encoder_gradient_contract": self._value_encoder_gradient_contract,
             "agent_name": self.agent_name,
             "policy_type": self.policy_type,
             "encoder_kind": self._encoder_kind,

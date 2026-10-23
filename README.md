@@ -1,3 +1,5 @@
+> 独立T/D梯度路由预检（仅有界development）：见[运行合同](docs/project/sagh_value_encoder_routing_preflight_20261023.md)。不合并优化主线。
+
 > 2026-10-23 独立C/T一致性小预算入口scripts/preflight_sagh_cf_consistency.py；固定总真实交互上限5184，保留原分母/系数，无critic消融或正式训练。协议见[本轮记录](docs/project/sagh_cf_consistency_preflight_20261023.md)。
 
 > 独立实验辅助监督对齐与固定小预算对照：见[协议](docs/project/sagh_auxiliary_alignment_preflight_20261023.md)。无正式训练授权，不改奖励或优化主线。

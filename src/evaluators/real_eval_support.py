@@ -101,6 +101,7 @@ def _filter_checkpoint_config(agent_name: str, checkpoint_config: dict[str, Any]
         "objective_diagnostics_enabled",
         "auxiliary_action_contract",
         "counterfactual_consistency_contract",
+        "value_encoder_gradient_contract",
         "target_kl",
         "kl_early_stop_enabled",
     }

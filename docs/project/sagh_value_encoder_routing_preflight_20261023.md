@@ -1,0 +1,9 @@
+# T/D value到encoder梯度单因素预检（2026-10-23）
+
+用户授权在独立codex/sagh-value-encoder-routing-ablation分支进行一次匹配后小预算T/D比较，基线1627f96；不合并算法优化主线。T为shared_v1；D为block_value_to_encoder_v1，只阻断weighted value对encoder.*的梯度，保留value前向/训练和全部非encoder梯度，包括DT/memory shared_other。使用显式一阶梯度路由，不支持将其解释为二阶可微优化器；原Adam/clip/KL规则保持。
+
+checkpoint生产/推理消费者均携带value_encoder_gradient_contract。objective诊断另列原value与路由后value，原probe不重复计入优化total。CF门始终native_positive_executed_action_v1，原eligible分母、teacher/DT、所有辅助系数、reward/窗口不变。
+
+scripts/preflight_sagh_value_encoder_routing.py只有显式execute-preflight入口，create-only，不支持resume/retry。4fresh cell、seed7/13，每cell768训练交互/3learn机会/4checkpoint，固定四验证点；3072训练+最多2112验证=5184真实交互硬上限，core step前计费。旧曲线/产物保留，不加载旧训练权重，不打开正式/holdout。先完成逐参数匹配和相关回归，再冻结源码执行一次比较。详细未公开证据仅本地artifacts/analysis/sagh_value_encoder_routing_preflight_20261023_v1。
+
+该轮只验证机制及有限development现象，不据局部冲突或单次小预算判断长期收益、收敛或paper-ready。literature_cutoff=2026-09-28未新评novelty，target_venue=CSCWD2027，policy_version=tmc_review_policy_v3_20260621；最终实际reviewed_at/source Git及证据等级在本地完成回执中记录。
