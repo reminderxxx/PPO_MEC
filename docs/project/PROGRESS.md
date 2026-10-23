@@ -1,3 +1,5 @@
+> 2026-10-23 C/T固定预检完成：382测试及6批张量匹配、4cell/16checkpoint审计与84梯度投影核验通过，4704真实交互未超5184。工程门控生效而监督覆盖减少，无固定验证收益；原分母/系数/reward/旧曲线和算法主线保持。详细数据仅本地，见sagh_cf_consistency_preflight_20261023.md完成回执；本轮停止。
+
 > 2026-10-23 用户授权C/T单因素一致性预检，独立分支实现原分母保留的暂停门；无critic消融/调系数/reward或主线合并。先匹配验证再固定4fresh cell，总交互上限5184；执行结果UNVERIFIED，详见sagh_cf_consistency_preflight_20261023.md。
 
 > 2026-10-23 辅助执行监督候选864add6完成368测试、4cell/16checkpoint固定预检、24真实状态概率与84投影检查。无验证收益，局部冲突与自然覆盖限制保留，详细结果仅本地sagh_auxiliary_alignment_20261023_v1。奖励/系数/主线保持，无正式训练或holdout；元数据和证据边界见sagh_auxiliary_alignment_preflight_20261023.md。

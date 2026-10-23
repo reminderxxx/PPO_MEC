@@ -11,3 +11,11 @@ C为counterfactual_consistency_contract=none_v1；T为native_positive_executed_a
 输出仅本地主工作区artifacts/analysis/sagh_cf_consistency_preflight_20261023_v1/comparison，含逐次交互ledger、identity、原始step/episode/update、checkpoint和completion/failure。CF coverage按实际loss评估次数及last-evaluated row分别保存；不冒充optimizer步或独立样本。必须同时报告监督覆盖/非零梯度、所有分组方向/幅度、reward分项、机制兑现与全部四固定验证点，不仅比较负cos次数。详细数值及未公开产物不推送public仓库。
 
 运行前先过匹配/相关回归及记录状态重放，固定科学源码commit再执行一次；缺依赖、资源扫描失败或运行故障保留现场，不自动修科学规则或重试。当前结果UNVERIFIED，完成回执只更新实际验证结果和限制。
+
+## 完成回执
+
+382匹配/相关回归及6个记录状态张量匹配PASS；4fresh cell/16checkpoint、原分母/覆盖/逐次预算和84梯度投影核验PASS。3072训练+1632验证=4704真实交互；总上限5184未用满，停止且不追加。C完整轨迹及checkpoint复现前轮对照。
+
+门控工程生效但监督覆盖减少，没有固定验证收益；分项、非零/零梯度和实际Adam计数分别保存在本地sagh_cf_consistency_preflight_20261023_v1，详数不推送public仓库。两张新图为本轮原值；旧曲线、旧产物及七用户修改hash保持。初次离线checker字段错误更正后通过，原日志保留，无科学改动或重跑。
+
+reviewed_at=2026-10-23T15:03:48.458184+08:00；literature_cutoff=2026-09-28（未新评novelty）；target_venue=CSCWD2027；artifact_run_id=sagh_cf_consistency_preflight_20261023_v1；policy_version=tmc_review_policy_v3_20260621；科学Git1627f96e4f9780eced89f1f0a8bc0af28cdc2910；evidence_level=MATCHED_TESTS_AND_BOUNDED_DEVELOPMENT_COMPARISON_ONLY。无critic消融、正式训练/holdout或晋级，长期收益未验证。
