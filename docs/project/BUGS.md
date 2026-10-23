@@ -1,3 +1,5 @@
+> 2026-10-24 主体绑定候选诊断/匹配合同f17707f通过并已独立push；它只在旧trace私有预览中识别边界，production跨主体cache/offload/prepare执行仍OPEN。原reward/失败暴露不删不重算，legacy预测身份重建不替代原生provider见证，运行时边界/失败消费与机制暴露协议未验收。零新增交互/学习，见[sagh_subject_binding_contract_20261024.md](sagh_subject_binding_contract_20261024.md)，reviewed_at=2026-10-24T06:20:53.340551+08:00。
+
 > 2026-10-24 服务链风险OPEN：development在mobility推进后允许重选主体，但旧主体decision/prediction仍用于新主体prepare，可能同时填错服务目标并形成当前cache miss。无RSU瓶颈、验证缺少观测transfer、same-step兑现非提前准备因果收益、重复支持状态及截断另列；不通过剔除失败样本或按收益选窗消除blocker。本轮只读，不修算法/环境/reward或新训练。见[sagh_service_chain_audit_20261024.md](sagh_service_chain_audit_20261024.md)，reviewed_at=2026-10-24T06:03:03.536757+08:00。
 
 > 2026-10-23 D/E只改DT环境概率的合同验证完成；不可达目标失去环境项监督而原分母/heads保留，不能把大幅覆盖损失掩盖成无代价去噪。DT整体头竞争、CF/argmax及最终映射低可控性仍OPEN；局部fast total冲突减少未兑现真实服务收益，探索bonus与服务指标分别报告。未调权/改reward/开启正式训练，见[sagh_dt_executed_density_preflight_20261023.md](sagh_dt_executed_density_preflight_20261023.md)，reviewed_at=2026-10-23T23:37:06.051640+08:00。

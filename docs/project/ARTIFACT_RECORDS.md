@@ -1,3 +1,5 @@
+> 2026-10-24 本地artifacts/analysis/sagh_subject_binding_contract_20261024_v1保存独立f17707f零交互测试、全旧trace绑定CSV/原账本匹配、边界尾段保留、独立核验与保护回执。无数据采集/参数更新/新曲线；所有失败保留，不输出candidate收益；空CSV context独立checker首错日志与v2更正保留。详细未公开记录仅本地，metadata/限制见[sagh_subject_binding_contract_20261024.md](sagh_subject_binding_contract_20261024.md)。
+
 > 2026-10-24 本地artifacts/analysis/sagh_service_chain_audit_20261024_v1保存D/E旧step/update的服务链审查：全访问与去重索引、prepare请求到事件、物理服务/主体变化、episode暴露CSV及独立核验。生产记账与原reward重放PASS，零新增真实交互/参数步；详细未公开结果仅本地，旧产物/曲线不覆盖，下一轮只提案未实施。metadata和边界见[sagh_service_chain_audit_20261024.md](sagh_service_chain_audit_20261024.md)。
 
 > 2026-10-23 本地artifacts/analysis/sagh_dt_executed_density_preflight_20261023_v1：独立科学b5e1796的D/E单因素，397测试、12 snapshot三路逐参数匹配、4fresh cell/16checkpoint和168投影/原账本/覆盖审计PASS；4704真实交互、无科学重试。监督覆盖损失、DT环境/heads分解、全部seed正负/零reward分项、真实服务、控制重现、三张原值图/CSV及不含checkpoint/原始数据的本地交付zip保留，未公开详数不上传。原曲线/源码和七用户修改保护；metadata/局限见[sagh_dt_executed_density_preflight_20261023.md](sagh_dt_executed_density_preflight_20261023.md)。

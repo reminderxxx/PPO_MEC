@@ -1,0 +1,9 @@
+# SAGH主体/预测绑定零交互合同测试（2026-10-24）
+
+用户授权下一轮测试后，在独立分支codex/sagh-subject-binding-contract新增纯诊断合同及旧trace检查入口，候选Git f17707ff0adb24ebc271995c3b3392f6261e1a6a，基线b5e1796。合同显式记录episode/decision/prediction/execution主体与时刻，失败边界在原episode内保持，不把新主体尾段自动当成功续段；诊断preview拒绝错误prepare归因。未接入production环境、修改奖励/agent/teacher/辅助目标或算法主线。
+
+专项零交互匹配测试、全部既有trace/原reward及正常路径production ledger精确匹配、独立全记录保留/动作0/边界尾段核验、旧输入/原源码/七用户diff保护检查均PASS。失败和所有分项完整保留，不计算筛掉边界后的reward或候选收益；无环境交互、learner、optimizer或新checkpoint。独立代码分支已push；详细未公开记录仅本地artifacts/analysis/sagh_subject_binding_contract_20261024_v1，不上传trace/checkpoint/data。
+
+运行时主体绑定尚未修复，原跨主体cache/offload/prepare风险仍OPEN；不能把私有ledger诊断拒绝写成线上修复或真实收益。旧prediction来源按原per-vehicle lookup重建，不是新增原生provider身份见证；后续运行时接入/失败暴露消费验收与机制机会协议必须分轮，不丢失败样本、不按reward选窗。未启动训练或增加预算。
+
+reviewed_at=2026-10-24T06:20:53.340551+08:00；literature_cutoff=2026-09-28（未新评novelty）；target_venue=CSCWD2027；artifact_run_id=sagh_subject_binding_contract_20261024_v1；policy_version=tmc_review_policy_v3_20260621；candidate_git=f17707ff0adb24ebc271995c3b3392f6261e1a6a；base_scientific_git=b5e1796e33d53c5b2f4eae295b2c12853d57c91b；evidence_level=ZERO_INTERACTION_CONTRACT_TESTS_AND_ALL_RECORDED_TRACE_MATCHING_ONLY。novelty/评分N/S，零交互测试非formal/holdout/paper-ready，服务收益/因果UNVERIFIED。
