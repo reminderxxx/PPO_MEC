@@ -1,0 +1,11 @@
+# SAGH独立语义修复与预检完成索引（2026-10-23）
+
+用户授权的实现只在`codex/sagh-objective-credit-alignment`，从冻结科学45c8c88建立；本主工作区不合并算法代码。实现2eb5263、预检检查器修正3325477，分支完成回执495da56。动作0的producer/consumer保留合法0；新实验显式使用shared_train_eval_v1共同映射，采样/执行option分记。checkpoint/inference配置消费端同步，奖励、原生KL守卫和辅助目标系数不改。
+
+353项匹配/相关回归测试PASS；有界预检8cell/32checkpoint审计PASS，包含全部2个完整SAGH只读继承和6fresh。逐步原生奖励分项、门控/真实动作、固定状态枚举与首minibatch目标梯度诊断齐备；12个记录真实状态的同采样路径映射检查通过，无新增环境/optimizer调用。枚举以categorical潜变量分布为测度，不能把映射一致性写成随机与贪心实际行为分布相等。
+
+v1在PPO单元触发预检检查器零target KL口径错误，独立只读核对后仅修检查器；原生0.01回退规则不改。v1目录与256步PPO partial保留排除，额外失败开销另列；剩余预检在新v2目录执行，不拼接partial或加载旧训练权重。既有3263文件、曲线/交付包/旧checkpoint和partial、两处冻结source、主工作区七用户修改hash复核一致。
+
+详细回执和命令仅本地`artifacts/analysis/sagh_objective_credit_repair_20261023_v1/`，预检root为`artifacts/analysis/sagh_execution_repair_preflight_20261023_v2/`；完整实现协议在独立分支同名文档。本轮未启动正式训练、参数搜索、辅助权重优化或formal/holdout，不修改旧曲线，不据预检声称奖励收益/收敛/算法优势。
+
+reviewed_at：2026-10-23（精确时刻见本地result/audit）；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；artifact_run_id：sagh_execution_repair_preflight_20261023_v2；policy_version：tmc_review_policy_v3_20260621；source Git：2eb5263/3325477；evidence_level：BOUNDED_PREFLIGHT_AND_MATCHED_TESTS_ONLY。正式效果与paper-ready均UNVERIFIED。

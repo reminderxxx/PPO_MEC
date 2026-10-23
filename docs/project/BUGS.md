@@ -1,3 +1,5 @@
+> 2026-10-23 独立分支验证更新：动作0误标与训练/贪心映射差异已在隔离候选修复并通过匹配测试/小预算预检，未合并优化主线。可选critic/planner/smoothing组合仍有明确拒绝边界；多目标偏好、辅助标签更广对齐与长期收益仍OPEN。预检零target KL检查器错误已修，原生KL规则不变，失败partial保留、开销另列。见[sagh_execution_repair_preflight_20261023.md](sagh_execution_repair_preflight_20261023.md)。
+
 > 2026-10-23 OPEN执行/监督语义风险：完成续作的只读审查确认训练/验证fallback启用条件不同、辅助行为目标需保留合法零动作、final动作监督与前置分类语义需核对；多对一option和成本信用/原生reward目标方向差异仍需独立验证。周期图形不能独自证明优化器发散，旧轮分项归因不能套用修复后run。未现场修改算法或新训练；详审/单因素方案本地保留，见[sagh_repaired_objective_audit_20261023.md](sagh_repaired_objective_audit_20261023.md)。
 
 > 2026-10-23 完成核验：续作30/30与990checkpoints审计PASS，资源检查修复后20个fresh单元完整；旧故障/partial仍保留。SAGH三seed网络及少量同状态执行动作变化未产生验证收益，末段平台不能称学习成功或全局策略收敛；DQN seed7/29未达事前平台规则，seed7质量门槛未达。无独立holdout，未合并优化主线；概率/分类修复不证明收益问题已解决。完整结果和有效Adam计数口径见fair_reward_resource_continuation_20261022.md完成回执及本地completion_review，后续优化另行授权。
