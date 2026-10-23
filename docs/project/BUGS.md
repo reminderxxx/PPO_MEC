@@ -1,3 +1,5 @@
+> 2026-10-23 OPEN执行/监督语义风险：完成续作的只读审查确认训练/验证fallback启用条件不同、辅助行为目标需保留合法零动作、final动作监督与前置分类语义需核对；多对一option和成本信用/原生reward目标方向差异仍需独立验证。周期图形不能独自证明优化器发散，旧轮分项归因不能套用修复后run。未现场修改算法或新训练；详审/单因素方案本地保留，见[sagh_repaired_objective_audit_20261023.md](sagh_repaired_objective_audit_20261023.md)。
+
 > 2026-10-23 完成核验：续作30/30与990checkpoints审计PASS，资源检查修复后20个fresh单元完整；旧故障/partial仍保留。SAGH三seed网络及少量同状态执行动作变化未产生验证收益，末段平台不能称学习成功或全局策略收敛；DQN seed7/29未达事前平台规则，seed7质量门槛未达。无独立holdout，未合并优化主线；概率/分类修复不证明收益问题已解决。完整结果和有效Adam计数口径见fair_reward_resource_continuation_20261022.md完成回执及本地completion_review，后续优化另行授权。
 
 > 2026-10-22 资源进程扫描编码缺陷已在独立启动层71ca85d修复并通过322测试及真实续作预检：无效bytes可见转义，ps失败保守等待；原冻结算法/runner保持。续作已启动，旧故障证据和SAGH seed13 partial保留，10完整单元原样引用，其余fresh。不代表训练收益问题已解决，也不支持partial精确续接。
