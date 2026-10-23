@@ -34,6 +34,38 @@ def json_line(stream, value):
     stream.write(json.dumps(value, ensure_ascii=False, allow_nan=False)+'\n');stream.flush()
 
 
+def policy_kl_limit(target):
+    # Match the unchanged native _guarded_policy_step, including zero-target baselines.
+    return target if target>0 else .01
+
+
+def reuse_completed_sagh(root,plan):
+    previous=json.loads((root/'execution_receipt.json').read_text())
+    if previous['parent_plan_sha256']!=plan['plan_sha256'] or previous['hard_total_interaction_cap']!=6144:
+        raise ValueError('Unmatched preflight inheritance')
+    runtime_paths=[p for p in previous['source_sha256'] if p.startswith('src/') or p in (
+        'scripts/run_fair_reward_training.py','scripts/diagnose_sagh_flat_reward.py','scripts/sagh_execution_diagnostics.py')]
+    if any(fair.sha(SOURCE/p)!=previous['source_sha256'][p] for p in runtime_paths):
+        raise ValueError('Scientific runtime changed; cannot inherit completed cells')
+    complete_paths=sorted(root.glob('cells/*/seed*/complete.json'))
+    if {str(p.parent.relative_to(root)) for p in complete_paths}!={'cells/sa_ghmappo/seed7','cells/sa_ghmappo/seed13'}:
+        raise ValueError('Only the two complete, unselected SAGH cells can be inherited')
+    for path in complete_paths:
+        complete=json.loads(path.read_text())
+        if complete['training_steps']!=768 or complete['learner_opportunities']!=3:
+            raise ValueError('Incomplete inherited SAGH cell')
+        if any(fair.sha(path.parent/name)!=expected for name,expected in complete['files_sha256'].items()):
+            raise ValueError('Inherited file changed')
+    partial=root/'cells/ppo/seed7/steps.jsonl'
+    counts={'train':0,'validation':0}
+    for line in partial.open():counts[json.loads(line)['metadata']['phase']]+=1
+    if counts['train']!=256 or counts['validation']>132:raise ValueError('Unexpected partial preflight budget')
+    inventory={str(p.relative_to(root)):fair.sha(p) for p in sorted(root.rglob('*')) if p.is_file()}
+    return dict(root=str(root),source_commit=previous['source_commit'],complete_cells=['sa_ghmappo/seed7','sa_ghmappo/seed13'],
+        inventory_sha256=inventory,failed_partial_train_steps=counts['train'],failed_partial_validation_steps=counts['validation'],
+        partial_policy='preserve_and_exclude; no weight or optimizer loading; fresh PPO retry')
+
+
 def select_windows(plan, split):
     # Class/offset selection is fixed from data labels, never from outcomes.
     return [next(copy.deepcopy(w) for w in plan['windows']
@@ -136,12 +168,12 @@ def run_cell(out,plan,name,seed,train,validation,workflows,guard):
                 if len(pending)==256:
                     guard.yield_resources(out)
                     info=agent.learn(pending);pending=[];updates+=1
+                    json_line(learning,dict(update=updates,training_steps=training_steps,learn_info=info))
                     if name in ('sa_ghmappo','ppo','mappo'):
-                        if info['initial_log_prob_error_max']>2e-5 or info['accepted_policy_kl_max']>config['target_kl']+1e-7:
+                        if info['initial_log_prob_error_max']>2e-5 or info['accepted_policy_kl_max']>policy_kl_limit(config['target_kl'])+1e-7:
                             raise ValueError('Probability or local KL contract failed')
                     if name=='sa_ghmappo' and not info['objective_diagnostics']['gradient_batches']:
                         raise ValueError('Missing objective gradient diagnostic')
-                    json_line(learning,dict(update=updates,training_steps=training_steps,learn_info=info))
                     agent.save(str(cell/f'update_{updates:04d}.pt'))
                     evaluate()
                 elif len(pending)>256:raise ValueError('Learner budget exceeded')
@@ -154,7 +186,7 @@ def run_cell(out,plan,name,seed,train,validation,workflows,guard):
     print(f'PREFLIGHT {name} seed={seed} steps={training_steps} updates={updates}',flush=True)
 
 
-def execute(parent,out):
+def execute(parent,out,reuse_root=None):
     global _owned_output_root
     if out.exists():raise FileExistsError('Preflight output is create-only; no resume/restart')
     if out==parent or parent in out.parents:raise ValueError('Cannot write within parent artifact')
@@ -162,6 +194,7 @@ def execute(parent,out):
         raise ValueError('Commit validated code before preflight')
     os.nice(max(0,19-os.nice(0)))
     plan,train_records,validation_records=plan_from_parent(parent)
+    inherited=reuse_completed_sagh(reuse_root,plan) if reuse_root is not None else None
     for key,identity in plan['data_files'].items():
         data=Path(plan[key])
         if data.stat().st_size!=identity['size'] or fair.sha(data)!=identity['sha256']:
@@ -174,6 +207,10 @@ def execute(parent,out):
         parent_plan_sha256=plan['plan_sha256'],agents=AGENTS,seeds=SEEDS,steps_per_cell=STEPS_PER_CELL,
         hard_total_interaction_cap=6144,learner_opportunities_per_cell=3,train_windows=train_records,validation_windows=validation_records,
         hard_validation_interaction_cap=4224,hard_total_environment_interaction_cap=10368,data_files=plan['data_files'],
+        read_only_reuse=inherited,fresh_train_interaction_cap=4608 if inherited else 6144,
+        failed_attempt_train_overhead=256 if inherited else 0,
+        lifetime_train_interaction_cap=6400 if inherited else 6144,
+        lifetime_validation_interaction_cap=4224+(inherited['failed_partial_validation_steps'] if inherited else 0),
         config_changes={'sa_ghmappo':{'execution_mapping_contract':'shared_train_eval_v1','objective_diagnostics_enabled':True}},
         reward_changes=False,old_checkpoint_loads=0,original_curve_changes=False,
         runtime=dict(cpu_threads=1,nice=19,concurrent_cells=1,yield_to_foreign_training=True),
@@ -190,13 +227,21 @@ def execute(parent,out):
         workflow_selector='ordered',min_tasks=5,max_tasks=20,random_seed=7)
     if [w.workflow_id for w in workflows]!=plan['workflow_ids']:raise ValueError('Workflow identity mismatch')
     for name in AGENTS:
-        for seed in SEEDS:run_cell(out,plan,name,seed,train,validation,workflows,guard)
+        for seed in SEEDS:
+            if inherited and f'{name}/seed{seed}' in inherited['complete_cells']:
+                target=out/'cells'/name/f'seed{seed}';target.parent.mkdir(parents=True,exist_ok=True)
+                target.symlink_to(reuse_root/'cells'/name/f'seed{seed}',target_is_directory=True)
+                print(f'REUSE_COMPLETED_READ_ONLY {name} seed={seed}',flush=True)
+            else:run_cell(out,plan,name,seed,train,validation,workflows,guard)
     completed=[json.loads(p.read_text()) for p in (out/'cells').glob('*/seed*/complete.json')]
     if len(completed)!=8 or sum(x['training_steps'] for x in completed)!=6144:raise ValueError('Global hard cap failed')
     validation_steps=sum(x['validation_steps'] for x in completed)
     if validation_steps>4224:raise ValueError('Validation interaction cap exceeded')
     write_json(out/'completion.json',dict(status='PREFLIGHT_COMPLETED',cells=8,training_steps=6144,
         validation_steps=validation_steps,total_environment_steps=6144+validation_steps,
+        inherited_cells=2 if inherited else 0,fresh_cells=6 if inherited else 8,
+        failed_attempt_train_overhead=256 if inherited else 0,
+        failed_attempt_validation_overhead=inherited['failed_partial_validation_steps'] if inherited else 0,
         learner_opportunities=24,checkpoints=32,formal_training_started=False))
 
 
@@ -205,8 +250,9 @@ def main():
     parser.add_argument('--parent-root',type=Path,required=True)
     parser.add_argument('--output-root',type=Path,required=True)
     parser.add_argument('--execute-preflight',action='store_true',required=True)
+    parser.add_argument('--reuse-completed-sagh-from',type=Path)
     args=parser.parse_args()
-    try:execute(args.parent_root.resolve(),args.output_root.resolve())
+    try:execute(args.parent_root.resolve(),args.output_root.resolve(),args.reuse_completed_sagh_from.resolve() if args.reuse_completed_sagh_from else None)
     except Exception as error:
         if _owned_output_root==args.output_root.resolve() and not (args.output_root/'failure.json').exists():
             write_json(args.output_root/'failure.json',dict(status='PREFLIGHT_FAILED',error_type=type(error).__name__,error=str(error),automatic_retry=False))

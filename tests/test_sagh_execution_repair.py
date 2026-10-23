@@ -219,3 +219,17 @@ def test_preflight_has_fixed_budget_and_refuses_existing_outputs(tmp_path):
     sentinel=tmp_path/'original.txt';sentinel.write_text('unchanged')
     with pytest.raises(FileExistsError):preflight.execute(tmp_path,tmp_path)
     assert sentinel.read_text()=='unchanged' and not (tmp_path/'failure.json').exists()
+
+
+@pytest.mark.parametrize('target,expected',[(0.,.01),(-1.,.01),(.0014,.0014)])
+def test_preflight_checker_uses_unchanged_native_kl_limit(target,expected):
+    from preflight_sagh_execution_repair import policy_kl_limit
+    assert policy_kl_limit(target)==expected
+
+
+def test_preflight_inheritance_refuses_changed_runtime_or_incomplete_cells(tmp_path):
+    from preflight_sagh_execution_repair import reuse_completed_sagh
+    (tmp_path/'execution_receipt.json').write_text(json.dumps({'parent_plan_sha256':'p','hard_total_interaction_cap':6144,
+        'source_sha256':{'src/agents/sa_ghmappo_core.py':'changed'}}))
+    with pytest.raises(ValueError,match='runtime changed'):
+        reuse_completed_sagh(tmp_path,{'plan_sha256':'p'})

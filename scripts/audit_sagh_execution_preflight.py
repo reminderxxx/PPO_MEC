@@ -10,7 +10,7 @@ from pathlib import Path
 
 import torch
 import run_fair_reward_training as fair
-from preflight_sagh_execution_repair import AGENTS, SEEDS, STEPS_PER_CELL, CLASSES, write_json
+from preflight_sagh_execution_repair import AGENTS, SEEDS, STEPS_PER_CELL, CLASSES, write_json, policy_kl_limit
 
 
 def records(path):
@@ -32,6 +32,10 @@ def audit(root):
     source=Path(receipt['source_root'])
     for path,expected in receipt['source_sha256'].items():
         if fair.sha(source/path)!=expected:raise ValueError(f'Source changed: {path}')
+    inherited=receipt.get('read_only_reuse')
+    if inherited:
+        for path,expected in inherited['inventory_sha256'].items():
+            if fair.sha(Path(inherited['root'])/path)!=expected:raise ValueError('Preserved preflight attempt changed')
     results=[]
     for name in AGENTS:
         for seed in SEEDS:
@@ -69,7 +73,7 @@ def audit(root):
                 info=row['learn_info']
                 if name in ('sa_ghmappo','ppo','mappo'):
                     if info['initial_log_prob_error_max']>2e-5:raise ValueError('Pre-update probability error')
-                    if info['accepted_optimizer_steps']<=0 or info['accepted_policy_kl_max']>info['target_kl']+1e-7:
+                    if info['accepted_optimizer_steps']<=0 or info['accepted_policy_kl_max']>policy_kl_limit(info['target_kl'])+1e-7:
                         raise ValueError('No effective update or invalid local KL')
                 if name=='sa_ghmappo':
                     diagnostic=info['objective_diagnostics']
@@ -112,6 +116,9 @@ def audit(root):
     return dict(status='PASS',reviewed_at=datetime.now().astimezone().isoformat(),scope='non_formal_preflight_only',
         source_commit=receipt['source_commit'],cells=results,total_train_interactions=6144,total_learner_opportunities=24,
         total_validation_interactions=completion['validation_steps'],total_environment_interactions=completion['total_environment_steps'],
+        inherited_cells=completion['inherited_cells'],fresh_cells=completion['fresh_cells'],
+        failed_attempt_train_overhead=completion['failed_attempt_train_overhead'],
+        failed_attempt_validation_overhead=completion['failed_attempt_validation_overhead'],
         total_checkpoints=32,formal_training_started=False,performance_or_convergence_claims='UNVERIFIED')
 
 
