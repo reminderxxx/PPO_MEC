@@ -1,3 +1,5 @@
+> 2026-10-23 本地artifacts/analysis/sagh_cf_pause_utility_audit_20261023_v1：既有C/T checkpoint的12批梯度及6批其他辅助项只读重建、完整暂停样本/目标/门控登记、验证路径配对、输入hash与84组投影检查PASS。全部正负结果、零梯度和checker更正现场保留，无新增环境/learner/optimizer。未公开详数仅本地，单因素方案未实施，不动奖励/旧曲线或主线。metadata与边界见[sagh_cf_pause_utility_audit_20261023.md](sagh_cf_pause_utility_audit_20261023.md)。
+
 > 2026-10-23 本地artifacts/analysis/sagh_cf_consistency_preflight_20261023_v1：382匹配/回归、6固定记录批及4fresh cell/16checkpoint审计PASS；3072训练+1632验证，总4704低于5184。CF coverage、全部梯度/奖励分项、固定验证、84组投影核验和两张原值图/CSV保存；旧63/80文件及41曲线文件/7包内证据hash保持。详细结果仅本地，不合并优化主线或上传checkpoint。metadata及限制见[sagh_cf_consistency_preflight_20261023.md](sagh_cf_consistency_preflight_20261023.md)。
 
 > 2026-10-23 `artifacts/analysis/sagh_counterfactual_conflict_audit_20261023_v1/`：既有checkpoint的12批梯度只读重建，96指标精确匹配，384条完整样本及teacher/门控/概率前像和单因素提案保存本地；独立梯度加和/输入hash/历史曲线保护检查PASS。新增环境/learner/optimizer调用0，未实现提案或启动训练；详细结果不上传public仓库，metadata与因果边界见[sagh_counterfactual_conflict_audit_20261023.md](sagh_counterfactual_conflict_audit_20261023.md)。

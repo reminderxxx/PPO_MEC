@@ -1,0 +1,11 @@
+# SAGH T暂停监督效用：只读审查索引（2026-10-23）
+
+用户要求只读区分暂停CF的监督损失、共享critic、其余辅助目标及验证执行路径。本轮仅对既有C/T预检checkpoint和日志做内存前向/autograd及离线归约；没有源码、系数、奖励或曲线修改，没有新环境/act/learn/optimizer调用、分支实现或训练。
+
+12批native/value/CF的180项标量或范数核对、6批其他辅助项及逐样本加和、全部固定验证配对和84组投影核验通过。梯度范数匹配，value标量浮点舍入单独记录。全部暂停与保留样本/目标/门控均保存，区分整批局部同向、单样本方向和未观察的反事实收益；不把监督覆盖下降等同于有用监督丢失。teacher的stall/miss代理缺口、共享value梯度及DT/head目标的执行语义分开判断，冲突计数相同不代表批次或机制相同。
+
+详细未公开结果仅本地`artifacts/analysis/sagh_cf_pause_utility_audit_20261023_v1/`：入口report.md、result.json、paused_samples.md、first_batch_samples.md、teacher_action_zero_evidence.json、replayed_batches.json、auxiliary_sample_replay.json、validation_mapping.json及independent_check.json。原输入/source与用户修改hash保持，旧产物和曲线未覆盖；详细数据/checkpoint不上传public仓库。本地checker互斥参数组读取更正有日志保留，无科学重跑。
+
+proposed_ablation.md仅提出下一轮独立T/D单因素的value→encoder梯度路由合同、固定预算上限及匹配/分项观察；execution_authorized=false。本轮没有做critic消融，也不把teacher资格或DT映射修复并入该提案实施。后续需另行授权，无权重搜索、正式/holdout、canonical或主线合并。
+
+reviewed_at：2026-10-23T15:32:55.843959+08:00；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；artifact_run_id：sagh_cf_pause_utility_audit_20261023_v1；input_run_id：sagh_cf_consistency_preflight_20261023_v1；policy_version：tmc_review_policy_v3_20260621；scientific_git：1627f96e4f9780eced89f1f0a8bc0af28cdc2910；source_head：7a670ef28c15dff9421c9cc8e129258f1d17c5ce；evidence_level：E3_FIXED_CHECKPOINT_AUTOGRAD_REPLAY_AND_MATCHED_DEVELOPMENT_TRACE_REDUCTION_ONLY。长期因果收益、正式/独立holdout、策略收敛及paper-ready均UNVERIFIED，novelty N/S。
