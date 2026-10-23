@@ -1,3 +1,7 @@
+## 2026-10-23：冷启动资格
+
+`scripts/qualify_stream_startup.py`与独立测试负责冷进程初始化、有界checkpoint保存/加载和无守护初态对照；12格回执、checkpoint、新授权与运行产物位于新的私有ignored root。详见[启动兼容说明](stream_startup_compatibility.md)。
+
 ## 2026-10-22：独立稳定性诊断
 
 `scripts/advance_stream_long.py`与对应测试负责已授权四方法的条件衔接；`scripts/plot_stream_long_convergence.py`与对应测试负责完整结果的只读核验、统计和静态科研图。授权、handoff、运行、曲线分别保存于新的私有根目录，实际指针由本聊天私有continuation记录。

@@ -607,9 +607,16 @@ class Runtime:
         self.patches=Patches();self.patches.__enter__();p=self.patches;t=self.t;b=self.b
         try:
             if t.cuda.is_initialized():raise RuntimeError('CPU-only run refuses initialized CUDA')
-            def forbidden(*a,**k):raise RuntimeError('Operation forbidden in frozen CPU stream run')
-            p.set(t.cuda,'_lazy_init',forbidden);p.set(t.Tensor,'cuda',forbidden);p.set(t.nn.Module,'cuda',forbidden)
-            p.set(t.autograd,'grad',forbidden)
+            # Dynamo keys its lazy trace rules by callable identity. Distinct
+            # APIs must retain distinct guard objects before the first Adam.
+            def forbidden_operation(name):
+                def forbidden(*a,**k):
+                    raise RuntimeError('Operation forbidden in frozen CPU stream run: '+name)
+                return forbidden
+            for owner,name,label in ((t.cuda,'_lazy_init','cuda._lazy_init'),
+                    (t.Tensor,'cuda','Tensor.cuda'),(t.nn.Module,'cuda','Module.cuda'),
+                    (t.autograd,'grad','autograd.grad')):
+                p.set(owner,name,forbidden_operation(label))
             original_eval=ScheduledControlPPO._evaluate
             def evaluate(this,*a,**k):
                 b.charge('evaluate_calls');answer=original_eval(this,*a,**k);b.check();return answer

@@ -24,6 +24,7 @@ METHODS = ['sa_ghmappo', 'mappo', 'ppo', 'dag_offload_drl']
 SEEDS = [7, 17, 27]
 COMPONENTS = ('original_contract', 'original_failure', 'seed7_recovery_contract',
               'seed7_recovery_result', 'remaining_contract', 'remaining_result')
+STARTUP_SCHEMA = 'stream_cold_startup_qualification_v1'
 MAX_METADATA_BYTES = 32 * 1024 ** 2
 MAX_PYTHON_BINARY_BYTES = 128 * 1024 ** 2
 
@@ -107,6 +108,145 @@ def check_python_runtime(authorization):
     return python
 
 
+def check_startup_qualification(authorization, plan):
+    """Optionally bind all twelve cold/reference software qualifications.
+
+    Old authorizations remain readable. A provided qualification is mandatory
+    evidence, never an unchecked annotation or a performance claim.
+    """
+    if 'startup_qualification' not in authorization:
+        return None
+
+    def equal(actual, expected, label):
+        require(json.dumps(actual, sort_keys=True, allow_nan=False) ==
+                json.dumps(expected, sort_keys=True, allow_nan=False),
+                'Startup qualification differs: ' + label)
+
+    def positive(value, label):
+        require(type(value) is int and value > 0, 'Positive startup integer required: ' + label)
+
+    def digest(value, label):
+        require(type(value) is str and len(value) == 64 and
+                all(letter in '0123456789abcdef' for letter in value), 'Invalid startup SHA: ' + label)
+
+    spec = authorization['startup_qualification']
+    path = check_spec(spec)
+    require(path.name == 'result.json' and not (path.parent / 'failure.json').exists(),
+            'Complete nonfailed startup result required')
+    result = read_json(path)
+    expected = dict(schema=STARTUP_SCHEMA, status='pass', methods=METHODS,
+                    seeds=SEEDS, training_budget=504, source_commit=authorization['runtime_commit'])
+    for key, value in expected.items():
+        equal(result.get(key), value, key)
+    equal(plan['source_commit'], authorization['runtime_commit'], 'long source commit')
+    executable = dict(path=authorization['python_executable'], **authorization['python_runtime'])
+    equal(result.get('runtime_executable'), executable, 'Python executable target')
+    source = result.get('source')
+    require(type(source) is dict, 'Startup source identity required')
+    equal(source.get('source_commit'), authorization['runtime_commit'], 'source identity commit')
+    equal(source.get('dirty_status'), [], 'clean qualification source')
+    fingerprints = result.get('source_fingerprints')
+    require(type(fingerprints) is dict, 'Startup source fingerprints required')
+    equal(source.get('source_fingerprints'), fingerprints, 'source fingerprint copy')
+    qualifier = 'scripts/qualify_stream_startup.py'
+    required_sources = {str(item.relative_to(ROOT)) for item in (ROOT / 'src').rglob('*.py')}
+    required_sources |= {'scripts/train_stream_long.py', 'scripts/train_joint_stream_control.py',
+                         'scripts/sa_stage5c_numerical_qualification.py',
+                         'scripts/diagnose_stream_stability.py', qualifier}
+    equal(sorted(fingerprints), sorted(required_sources), 'complete qualifier/Runtime/scientific source inventory')
+    evidence = [dict(spec)]
+    for name, expected_sha in fingerprints.items():
+        digest(expected_sha, name)
+        source_spec = dict(path=str(ROOT / name), sha256=expected_sha)
+        check_spec(source_spec)
+        evidence.append(source_spec)
+    zero = dict(environment_calls=0, forward_calls=0, backward_calls=0,
+                adam_calls=0, autograd_grad_calls=0, scientific_training_sessions=0)
+    expected_counts = dict(zero, cold_learner_instances=12, evaluation_copy_instances=12,
+                           independent_reference_instances=12, cold_processes=12,
+                           reference_processes=12, checkpoints=12)
+    equal(result.get('counts'), expected_counts, 'zero-science twelve-cell totals')
+    cells = result.get('cells')
+    require(type(cells) is list and len(cells) == 12, 'Twelve cold startup cells required')
+    equal([(cell.get('method'), cell.get('seed')) for cell in cells],
+          [(method, seed) for method in METHODS for seed in SEEDS], 'ordered complete startup grid')
+    first_versions = None
+    for cell in cells:
+        method, seed = cell['method'], cell['seed']
+        equal(cell.get('status'), 'pass', 'cell status')
+        pair = []
+        for label, mode in (('cold_result', '_cold'), ('reference_result', '_reference')):
+            child_spec = cell.get(label)
+            child_path = check_spec(child_spec)
+            expected_path = path.parent / (method + '_seed' + str(seed) + mode) / 'result.json'
+            equal(str(child_path), str(expected_path), label + ' path')
+            require(not (child_path.parent / 'failure.json').exists(), 'Startup child has failure')
+            child = read_json(child_path)
+            for key, value in dict(schema=STARTUP_SCHEMA, status='pass', mode=mode,
+                    method=method, seed=seed, source_commit=authorization['runtime_commit'],
+                    source=source, source_fingerprints=fingerprints,
+                    runtime_executable=executable, cpu_threads=1, cpu_interop_threads=1).items():
+                equal(child.get(key), value, label + ' ' + key)
+            equal(child.get('counts'), dict(zero, learner_instances=1,
+                evaluation_copy_instances=int(mode == '_cold'), checkpoints=int(mode == '_cold')),
+                label + ' zero-science counts')
+            versions = child.get('versions')
+            require(type(versions) is dict and set(versions) == {'python', 'executable', 'torch', 'numpy'} and
+                    all(type(value) is str and value for value in versions.values()), 'Startup dependency versions required')
+            equal(versions['executable'], authorization['python_executable'], 'child version executable')
+            if first_versions is None:
+                first_versions = versions
+            equal(versions, first_versions, 'same qualification dependency versions')
+            pair.append(child)
+            evidence.append(dict(child_spec))
+        cold, reference = pair
+        cold_evidence, reference_evidence = cold.get('evidence'), reference.get('evidence')
+        require(type(cold_evidence) is dict and type(reference_evidence) is dict, 'Actual startup evidence required')
+        require(reference_evidence.get('qualification_api_identities_restored') is True,
+                'Reference qualification guard identities were not restored')
+        for key in ('initial_learner_sha256', 'initial_learned_state_sha256', 'initial_rng_sha256'):
+            digest(cold_evidence.get(key), key)
+            equal(cold_evidence[key], reference_evidence.get(key), 'independent reference ' + key)
+        for key in ('initial_learner_sha256', 'initial_rng_sha256'):
+            equal(cell.get(key), cold_evidence[key], 'cell copied ' + key)
+        for key in ('loaded_matches', 'loaded_options_match', 'learner_unchanged', 'three_rng_restored',
+                'forbidden_guard_callables_unique', 'production_guard_stable',
+                'production_api_identities_restored', 'qualification_api_identities_restored',
+                'cold_dynamo_absent_before_runtime',
+                'cold_dynamo_absent_before_first_agent'):
+            require(cold_evidence.get(key) is True, 'Incomplete actual cold evidence: ' + key)
+        checkpoint = cell.get('checkpoint')
+        equal(checkpoint, cold_evidence.get('checkpoint'), 'checkpoint evidence copy')
+        require(type(checkpoint) is dict and
+                set(checkpoint) == {'path', 'sha256', 'actual_bytes', 'write_bytes', 'save_calls'},
+                'Exact startup checkpoint binding required')
+        checkpoint_spec = {key: checkpoint[key] for key in ('path', 'sha256')}
+        checkpoint_path = check_spec(checkpoint_spec)
+        equal(str(checkpoint_path), str(path.parent / (method + '_seed' + str(seed) + '_cold') / 'initial.pt'),
+              'initial checkpoint location')
+        for key in ('actual_bytes', 'write_bytes', 'save_calls'):
+            positive(checkpoint[key], key)
+        require(checkpoint_path.stat().st_size == checkpoint['actual_bytes'] and
+                checkpoint['actual_bytes'] <= checkpoint['write_bytes'] <= 16 * 1024 ** 2,
+                'Startup checkpoint byte accounting differs')
+        evidence.append(checkpoint_spec)
+        budget = cold_evidence.get('budget_counts')
+        keys = ('learner_models', 'evaluation_models', 'predictor_models', 'training_sessions',
+                'evaluation_sessions', 'environments', 'training_frames', 'evaluation_frames',
+                'learner_updates', 'backward_calls', 'main_optimizer_steps', 'surrogate_optimizer_steps',
+                'categorical_sample_calls', 'evaluate_calls', 'checkpoints', 'output_bytes')
+        expected_budget = dict.fromkeys(keys, 0)
+        expected_budget.update(learner_models=1, evaluation_models=1, checkpoints=1,
+                               output_bytes=16 * 1024 ** 2)
+        equal(budget, expected_budget, 'actual production guard counters')
+        peak = cold_evidence.get('peak_rss_bytes')
+        positive(peak, 'qualification peak RSS')
+        require(peak <= 8 * 1024 ** 3, 'Startup qualification RSS limit exceeded')
+    # Bind the same bytes across parsing and all children/source checks.
+    equal(binding(path), spec, 'startup result changed during validation')
+    return dict(spec=dict(spec), validation_evidence=evidence)
+
+
 def check_authorization(path):
     path = Path(path).resolve()
     initial_binding = binding(path)
@@ -138,11 +278,14 @@ def check_authorization(path):
     require(plan.get('schema') == 'joint_stream_long_four_v1' and plan.get('methods') == METHODS and
             plan.get('seeds') == SEEDS and plan.get('episodes') == 504 and
             plan.get('source_commit') == commit, 'Only the frozen four-method504 plan is authorized')
+    startup = check_startup_qualification(authorization, plan)
     run_root = canonical_path(plan['run_root'])
     handoff = canonical_path(authorization['handoff_root'])
     require(handoff.parent.is_dir() and 'artifacts' in handoff.parts, 'Existing private artifact parent required')
     inputs = [path, protocol, review, summary, repo, run_root]
     inputs += [Path(spec['path']) for spec in components.values()]
+    if startup is not None:
+        inputs.append(Path(startup['spec']['path']))
     for protected in inputs:
         require(handoff != protected and handoff not in protected.parents and protected not in handoff.parents,
                 'Handoff root must be separate from runtime, evidence, and scientific run')
@@ -190,7 +333,7 @@ def make_decision(authorization, plan, authorization_binding):
     components = {name: binding(authorization['diagnostic_components'][name]['path']) for name in COMPONENTS}
     diagnostic = binding(authorization['diagnostic_result']['path'])
     review = dict(authorization['independent_review'])
-    return dict(schema=DECISION_SCHEMA, execution_authorized=True,
+    receipt = dict(schema=DECISION_SCHEMA, execution_authorized=True,
                 decision='authorize_frozen_long_run', reviewer_role='root_independent_diagnostic_recovery',
                 protocol_sha256=authorization['protocol']['sha256'], protocol_id=plan['protocol_id'],
                 source_commit=authorization['runtime_commit'], intervention_type='bounded_exposure_budget_test',
@@ -202,6 +345,11 @@ def make_decision(authorization, plan, authorization_binding):
                 conditional_authorization=authorization_binding,
                 decision_origin='root_conditional_authorization_after_complete_diagnostic',
                 evidence_boundary='Observer parity permits the authorized bounded exposure test; no verified algorithmic stability fix or convergence guarantee.')
+    if 'startup_qualification' in authorization:
+        startup = check_startup_qualification(authorization, plan)
+        receipt['startup_qualification'] = startup['spec']
+        receipt['validation_evidence'].extend(startup['validation_evidence'])
+    return receipt
 
 
 def advance(authorization_path, *, launch=False):
@@ -231,6 +379,7 @@ def advance(authorization_path, *, launch=False):
                 'Conditional authorization/protocol/review changed before launch')
         require(not Path(plan['run_root']).exists(), 'Scientific run was claimed before launch')
         check_python_runtime(authorization)
+        check_startup_qualification(authorization, checked_plan)
         command = [authorization['python_executable'], '-u', str(ROOT / 'scripts/train_stream_long.py'),
                    'run', '--protocol', str(protocol_path), '--decision_receipt', str(decision_path)]
         environment = dict(os.environ)

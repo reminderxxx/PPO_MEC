@@ -72,6 +72,79 @@ class Fixture:
         write(self.paths['remaining_result'], {'status': 'complete_unexecuted_seed_observer_parity'})
         write(self.summary, {'status': M.COMPOSITE_STATUS})
 
+    def qualify(self):
+        """Opaque byte/metadata mock only; no interpreter or model executes."""
+        scripts = ('train_stream_long.py', 'train_joint_stream_control.py',
+                   'sa_stage5c_numerical_qualification.py', 'diagnose_stream_stability.py',
+                   'qualify_stream_startup.py')
+        for name in scripts:
+            path = self.repo / 'scripts' / name
+            path.parent.mkdir(exist_ok=True)
+            path.write_text('# software mock source ' + name + '\n')
+        scientific = self.repo / 'src/example.py'
+        scientific.parent.mkdir()
+        scientific.write_text('# software mock algorithm source\n')
+        fingerprints = {str(path.relative_to(self.repo)): M.sha_file(path)
+                        for path in [scientific, *(self.repo / 'scripts' / name for name in scripts)]}
+        source = dict(source_commit=self.commit, dirty_status=[], source_fingerprints=fingerprints)
+        executable = dict(path=str(self.python), **self.authorization['python_runtime'])
+        zero = dict(environment_calls=0, forward_calls=0, backward_calls=0,
+                    adam_calls=0, autograd_grad_calls=0, scientific_training_sessions=0)
+        home = self.artifacts / 'startup'
+        home.mkdir()
+        cells = []
+        for method in M.METHODS:
+            for seed in M.SEEDS:
+                stem = method + '_seed' + str(seed)
+                cold = home / (stem + '_cold')
+                cold.mkdir()
+                checkpoint = cold / 'initial.pt'
+                checkpoint.write_bytes(b'opaque software mock checkpoint; never deserialize')
+                saved = dict(M.binding(checkpoint), actual_bytes=checkpoint.stat().st_size,
+                             write_bytes=checkpoint.stat().st_size, save_calls=1)
+                state = dict(initial_learner_sha256='1' * 64,
+                             initial_learned_state_sha256='2' * 64, initial_rng_sha256='3' * 64,
+                             qualification_api_identities_restored=True)
+                budget = dict.fromkeys(('learner_models', 'evaluation_models', 'predictor_models',
+                    'training_sessions', 'evaluation_sessions', 'environments', 'training_frames',
+                    'evaluation_frames', 'learner_updates', 'backward_calls', 'main_optimizer_steps',
+                    'surrogate_optimizer_steps', 'categorical_sample_calls', 'evaluate_calls',
+                    'checkpoints', 'output_bytes'), 0)
+                budget.update(learner_models=1, evaluation_models=1, checkpoints=1, output_bytes=16 * 1024 ** 2)
+                cold_evidence = dict(state, checkpoint=saved, budget_counts=budget, peak_rss_bytes=1024,
+                    **dict.fromkeys(('loaded_matches', 'loaded_options_match', 'learner_unchanged',
+                        'three_rng_restored', 'forbidden_guard_callables_unique', 'production_guard_stable',
+                        'production_api_identities_restored', 'cold_dynamo_absent_before_runtime',
+                        'cold_dynamo_absent_before_first_agent'), True))
+                for mode in ('_cold', '_reference'):
+                    folder = home / (stem + mode)
+                    folder.mkdir(exist_ok=True)
+                    row = dict(schema=M.STARTUP_SCHEMA, status='pass', mode=mode, method=method,
+                        seed=seed, source_commit=self.commit, source=source, source_fingerprints=fingerprints,
+                        runtime_executable=executable, cpu_threads=1, cpu_interop_threads=1,
+                        versions=dict(python='mock Python', executable=str(self.python), torch='mock Torch', numpy='mock NumPy'),
+                        counts=dict(zero, learner_instances=1, evaluation_copy_instances=int(mode == '_cold'),
+                                    checkpoints=int(mode == '_cold')),
+                        evidence=cold_evidence if mode == '_cold' else state)
+                    write(folder / 'result.json', row)
+                cells.append(dict(method=method, seed=seed, status='pass',
+                    cold_result=M.binding(cold / 'result.json'),
+                    reference_result=M.binding(home / (stem + '_reference') / 'result.json'),
+                    checkpoint=saved, initial_learner_sha256=state['initial_learner_sha256'],
+                    initial_rng_sha256=state['initial_rng_sha256']))
+        self.startup = dict(schema=M.STARTUP_SCHEMA, status='pass', methods=list(M.METHODS),
+            seeds=list(M.SEEDS), training_budget=504, source_commit=self.commit, source=source,
+            source_fingerprints=fingerprints, runtime_executable=executable, cells=cells,
+            counts=dict(zero, cold_learner_instances=12, evaluation_copy_instances=12,
+                independent_reference_instances=12, cold_processes=12, reference_processes=12, checkpoints=12))
+        self.startup_path = home / 'result.json'
+        self.save_startup()
+
+    def save_startup(self):
+        write(self.startup_path, self.startup)
+        self.authorization['startup_qualification'] = M.binding(self.startup_path)
+        self.save()
+
     def mock_gate(self):
         gate = SimpleNamespace()
         gate.check_protocol = Mock(return_value=(self.plan, self.protocol, {}))
@@ -316,6 +389,63 @@ class HandoffTests(unittest.TestCase):
             self.f.path.write_text(raw)
             with self.assertRaises(ValueError):
                 M.advance(self.f.path, launch=True)
+        self.spawn.assert_not_called()
+
+    def test_complete_cold_matrix_is_required_bound_and_carried_into_decision(self):
+        self.f.qualify()
+        self.f.complete()
+        self.allow_gate()
+        M.advance(self.f.path, launch=True)
+        decision = M.read_json(self.f.handoff / 'decision_receipt.json')
+        self.assertEqual(decision['startup_qualification'], self.f.authorization['startup_qualification'])
+        evidence = decision['validation_evidence']
+        self.assertIn(decision['startup_qualification'], evidence)
+        self.assertIn(self.f.startup['cells'][0]['cold_result'], evidence)
+        self.assertIn({key: self.f.startup['cells'][0]['checkpoint'][key] for key in ('path', 'sha256')}, evidence)
+        self.spawn.assert_called_once()
+
+    def test_incomplete_foreign_nonzero_or_unverified_cold_qualification_rejected(self):
+        for mode in ('missing_cell', 'source', 'science', 'guard', 'rng', 'checkpoint_sha'):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as location:
+                f = Fixture(Path(location))
+                f.qualify()
+                if mode == 'missing_cell':
+                    f.startup['cells'].pop()
+                elif mode == 'source':
+                    f.startup['source_commit'] = 'b' * 40
+                elif mode == 'science':
+                    f.startup['counts']['forward_calls'] = 1
+                elif mode == 'checkpoint_sha':
+                    Path(f.startup['cells'][0]['checkpoint']['path']).write_bytes(b'tampered')
+                else:
+                    spec = f.startup['cells'][0]['cold_result']
+                    child = M.read_json(spec['path'])
+                    if mode == 'guard':
+                        child['evidence']['loaded_options_match'] = False
+                    else:
+                        child['evidence']['initial_rng_sha256'] = '4' * 64
+                    write(Path(spec['path']), child)
+                    f.startup['cells'][0]['cold_result'] = M.binding(spec['path'])
+                f.save_startup()
+                with patch.object(M, 'ROOT', f.repo), self.assertRaises(ValueError):
+                    M.advance(f.path, launch=True)
+                self.assertFalse(f.handoff.exists())
+        self.spawn.assert_not_called()
+
+    def test_cold_evidence_changed_after_gate_cannot_spawn(self):
+        self.f.qualify()
+        self.f.complete()
+        gate = self.allow_gate()
+        original = gate.check_decision.side_effect
+        def mutate(path, protocol, plan):
+            value = original(path, protocol, plan)
+            cold_path = Path(self.f.startup['cells'][0]['cold_result']['path'])
+            cold_path.write_text('{}')
+            return value
+        gate.check_decision.side_effect = mutate
+        with self.assertRaisesRegex(ValueError, 'SHA differs'):
+            M.advance(self.f.path, launch=True)
+        self.assertTrue((self.f.handoff / 'failure.json').exists())
         self.spawn.assert_not_called()
 
 

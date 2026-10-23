@@ -1,3 +1,7 @@
+## 2026-10-23：冷启动与checkpoint接口验收
+
+先执行 `python scripts/qualify_stream_startup.py run --output-root <fresh_private_qualification>`；完整四方法×三个seed通过后，以新的源码和manifest重新冻结一次长训，授权内绑定资格回执SHA。旧失败run不可覆盖或恢复。新入口、验收范围与私有状态索引见[启动兼容说明](stream_startup_compatibility.md)。
+
 ## 2026-10-22：独立稳定性诊断
 
 四方法长训使用新 `joint_stream_long_four_v1` 协议，不复用旧七方法manifest。事前授权后用 `advance_stream_long.py check/run --authorization <frozen.json>`核验并条件启动一次；完成后由 `plot_stream_long_convergence.py`消费完整产物并导出真实曲线/CSV/尾稳报告。诊断未齐无claim，失败不自动重试，正式holdout不由此流程开启。预算和命令解释见[长训说明](stream_long_training.md)。
