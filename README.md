@@ -1,3 +1,5 @@
+> 2026-10-23 独立C/T一致性小预算入口scripts/preflight_sagh_cf_consistency.py；固定总真实交互上限5184，保留原分母/系数，无critic消融或正式训练。协议见[本轮记录](docs/project/sagh_cf_consistency_preflight_20261023.md)。
+
 > 独立实验辅助监督对齐与固定小预算对照：见[协议](docs/project/sagh_auxiliary_alignment_preflight_20261023.md)。无正式训练授权，不改奖励或优化主线。
 
 > 独立修复分支 `codex/fair-reward-contract-repair`：旧长预算轮已按用户要求停止并保留；动作采样路径概率、完整更新保护和原生 window_class 贯通见 [修复方案](docs/project/fair_reward_contract_repair_20261021.md)。算法优化主线不合并本分支。

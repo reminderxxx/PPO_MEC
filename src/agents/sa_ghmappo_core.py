@@ -1243,6 +1243,7 @@ class 分层PPO基类(BaseAgent):
         execution_mapping_contract: str = "legacy_deterministic_fallback_v1",
         objective_diagnostics_enabled: bool = False,
         auxiliary_action_contract: str = "proposal_labels_v1",
+        counterfactual_consistency_contract: str = "none_v1",
         random_seed: int = 7,
         device: str = "cpu",
     ) -> None:
@@ -1256,6 +1257,11 @@ class 分层PPO基类(BaseAgent):
         if auxiliary_action_contract == "executed_marginal_v1" and execution_mapping_contract != "shared_train_eval_v1":
             raise ValueError("Executed auxiliary supervision requires shared execution mapping")
         self._auxiliary_action_contract = auxiliary_action_contract
+        if counterfactual_consistency_contract not in {"none_v1", "native_positive_executed_action_v1"}:
+            raise ValueError("Unknown counterfactual consistency contract")
+        if counterfactual_consistency_contract != "none_v1" and auxiliary_action_contract != "executed_marginal_v1":
+            raise ValueError("Counterfactual consistency requires executed marginal supervision")
+        self._counterfactual_consistency_contract = counterfactual_consistency_contract
         self.policy_type = policy_type
         self._encoder_kind = encoder_kind
         self._centralized_critic = bool(centralized_critic)
@@ -3857,6 +3863,9 @@ class 分层PPO基类(BaseAgent):
         advantage_std = float(advantages.std()) if len(advantages) > 0 else 0.0
         normalized_advantages = (advantages - advantage_mean) / (advantage_std + 1e-8)
         native_normalized_advantages = normalized_advantages.copy()
+        for i, row in enumerate(rollout):
+            # Freeze native GAE before mechanism credits; never gate on credited advantages.
+            row["cf_native_normalized_advantage"] = float(native_normalized_advantages[i])
         normalized_advantages = normalized_advantages * mechanism_transition_weights
         event_advantages_raw = np.asarray(
             [
@@ -4709,6 +4718,11 @@ class 分层PPO基类(BaseAgent):
                 "scope": "first_minibatch_before_optimizer_per_learn", "gradient_batches": objective_records,
                 "credit_rows": objective_credit_rows,
                 "auxiliary_action_contract": self._auxiliary_action_contract,
+                "counterfactual_consistency_contract": self._counterfactual_consistency_contract,
+                "cf_coverage_scope": "actual_loss_evaluations_not_optimizer_steps",
+                "cf_coverage_rows": [{"index": i, "metadata": run_metadata_by_row[i],
+                    "coverage": deepcopy(row.get("cf_supervision_coverage", {}))}
+                    for i, row in enumerate(rollout)] if self._objective_diagnostics_enabled else [],
                 "auxiliary_execution_last_seen_scope": "last_evaluated_minibatch_per_row_not_update_counts",
                 "auxiliary_execution_last_seen_rows": [
                     {"index": i, "metadata": run_metadata_by_row[i],
@@ -8481,9 +8495,19 @@ class 分层PPO基类(BaseAgent):
                 )
 
         loss_terms: list[torch.Tensor] = []
+        eligible_rows: list[dict[str, Any]] = []
         for row_index, (policy_output, action_mask, row) in enumerate(
             zip(batch_outputs, batch_action_masks, batch_rows)
         ):
+            coverage = row.setdefault("cf_supervision_coverage", {
+                "evaluations": 0, "eligible_evaluations": 0, "active_evaluations": 0,
+                "paused_evaluations": 0, "eligible_weight_sum": 0.0, "active_weight_sum": 0.0})
+            coverage["evaluations"] += 1
+            coverage["last_evaluation_eligible"] = False
+            coverage["last_skip_reason"] = "original_eligibility_rules"
+            diagnostics = row.setdefault("auxiliary_execution_diagnostics", {})
+            for key in ("counterfactual_candidates", "counterfactual", "counterfactual_consistency"):
+                diagnostics.pop(key, None)
             if (
                 advantage_gate_values is not None
                 and self._env_action_counterfactual_margin_advantage_gate > 0.0
@@ -8548,11 +8572,38 @@ class 分层PPO基类(BaseAgent):
 
             row.setdefault("auxiliary_execution_diagnostics", {})["counterfactual_candidates"] = {
                 "valid_actions": valid_actions, "best_action": best_action, "current_action": current_action}
-            loss_terms.append(self._auxiliary_action_nll(
-                policy_output, action_mask, row, best_action, "counterfactual") * float(weight))
+            nll = self._auxiliary_action_nll(
+                policy_output, action_mask, row, best_action, "counterfactual")
+            native_advantage = row.get("cf_native_normalized_advantage")
+            if self._counterfactual_consistency_contract != "none_v1":
+                if native_advantage is None or not math.isfinite(float(native_advantage)):
+                    raise ValueError("CF consistency requires finite frozen native normalized advantage")
+            paused = bool(self._counterfactual_consistency_contract != "none_v1"
+                and float(native_advantage) > 0.0 and best_action != current_action)
+            coverage["eligible_evaluations"] += 1
+            coverage["active_evaluations"] += int(not paused)
+            coverage["paused_evaluations"] += int(paused)
+            coverage["eligible_weight_sum"] += float(weight)
+            coverage["active_weight_sum"] += 0.0 if paused else float(weight)
+            coverage["last_evaluation_eligible"] = True
+            coverage["last_skip_reason"] = "paused_native_positive_different_executed_action" if paused else "active"
+            diagnostics["counterfactual_consistency"] = {
+                "contract": self._counterfactual_consistency_contract,
+                "native_normalized_advantage": native_advantage,
+                "current_executed_action": current_action, "target_action": best_action,
+                "original_weight": float(weight), "paused": paused,
+                "nll_before_gate": float(nll.detach()),
+                "weighted_loss_before_gate": float(nll.detach()) * float(weight),
+                "denominator_policy": "original_eligible_rows_including_paused"}
+            # A paused row contributes an autograd-connected zero and still occupies
+            # its original denominator slot. No coefficient or teacher score changes.
+            loss_terms.append(nll * float(weight) * (0.0 if paused else 1.0))
+            eligible_rows.append(row)
 
         if not loss_terms:
             return torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        for row in eligible_rows:
+            row["auxiliary_execution_diagnostics"]["counterfactual_consistency"]["original_eligible_denominator"] = len(loss_terms)
         return torch.stack(loss_terms).mean()
 
     def _compute_argmax_margin_regularization_loss(
@@ -15692,6 +15743,7 @@ class 分层PPO基类(BaseAgent):
             "execution_mapping_contract": self._execution_mapping_contract,
             "objective_diagnostics_enabled": self._objective_diagnostics_enabled,
             "auxiliary_action_contract": self._auxiliary_action_contract,
+            "counterfactual_consistency_contract": self._counterfactual_consistency_contract,
             "agent_name": self.agent_name,
             "policy_type": self.policy_type,
             "encoder_kind": self._encoder_kind,

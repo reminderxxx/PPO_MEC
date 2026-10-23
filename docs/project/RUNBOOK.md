@@ -1,3 +1,5 @@
+> 2026-10-23 独立C/T一致性预检：先匹配验证、冻结源码，再用scripts/preflight_sagh_cf_consistency.py --parent-root 原续作root --output-root 新comparison --execute-preflight；同主PROJECT环境/单线程。训练+验证硬上限5184，create-only，失败不重试。协议见sagh_cf_consistency_preflight_20261023.md。
+
 > 独立辅助监督对照入口：scripts/preflight_sagh_auxiliary_alignment.py --parent-root <已完成parent> --output-root <新root> --execute-preflight；完成后audit_sagh_auxiliary_alignment.py --run-root <新root>。仅按[sagh_auxiliary_alignment_preflight_20261023.md](sagh_auxiliary_alignment_preflight_20261023.md)固定4cell上限执行，不提供正式训练或resume模式。
 
 > 2026-10-21 独立修复流程：仅在 `codex/fair-reward-contract-repair` 运行；使用主工作区 Python 和原数据，设置 `PPO_MEC_EXPERIMENT_PROJECT_ROOT=/Users/howen/Projects/PPO_MEC`。先clean commit，再全10算法小预算prepare/run/audit，通过后用修复配置prepare新root再run；均create-only。旧run不得恢复。完整预算仍32循环/196608step/768调用，启动后复用现有20分钟监控。细节见 `fair_reward_contract_repair_20261021.md`。

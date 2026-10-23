@@ -1,3 +1,5 @@
+> 2026-10-23 用户授权C/T单因素一致性预检，独立分支实现原分母保留的暂停门；无critic消融/调系数/reward或主线合并。先匹配验证再固定4fresh cell，总交互上限5184；执行结果UNVERIFIED，详见sagh_cf_consistency_preflight_20261023.md。
+
 > 2026-10-23 辅助执行监督候选864add6完成368测试、4cell/16checkpoint固定预检、24真实状态概率与84投影检查。无验证收益，局部冲突与自然覆盖限制保留，详细结果仅本地sagh_auxiliary_alignment_20261023_v1。奖励/系数/主线保持，无正式训练或holdout；元数据和证据边界见sagh_auxiliary_alignment_preflight_20261023.md。
 
 > 2026-10-23 用户授权在独立实验分支继续behavior/counterfactual最终执行监督对齐；固定合同×2seed小预算，奖励/辅助系数/优化主线不改，无正式训练或holdout。协议见sagh_auxiliary_alignment_preflight_20261023.md，完成证据待本地回执。
