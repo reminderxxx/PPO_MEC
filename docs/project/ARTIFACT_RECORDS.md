@@ -1,3 +1,5 @@
+> 2026-10-24 本地artifacts/analysis/sagh_service_chain_audit_20261024_v1保存D/E旧step/update的服务链审查：全访问与去重索引、prepare请求到事件、物理服务/主体变化、episode暴露CSV及独立核验。生产记账与原reward重放PASS，零新增真实交互/参数步；详细未公开结果仅本地，旧产物/曲线不覆盖，下一轮只提案未实施。metadata和边界见[sagh_service_chain_audit_20261024.md](sagh_service_chain_audit_20261024.md)。
+
 > 2026-10-23 本地artifacts/analysis/sagh_dt_executed_density_preflight_20261023_v1：独立科学b5e1796的D/E单因素，397测试、12 snapshot三路逐参数匹配、4fresh cell/16checkpoint和168投影/原账本/覆盖审计PASS；4704真实交互、无科学重试。监督覆盖损失、DT环境/heads分解、全部seed正负/零reward分项、真实服务、控制重现、三张原值图/CSV及不含checkpoint/原始数据的本地交付zip保留，未公开详数不上传。原曲线/源码和七用户修改保护；metadata/局限见[sagh_dt_executed_density_preflight_20261023.md](sagh_dt_executed_density_preflight_20261023.md)。
 
 > 2026-10-23 本地artifacts/analysis/sagh_d_fast_conflict_audit_20261023_v1保存既有T/D checkpoint的只读目标匹配、全样本CF/DT/argmax/pseudo投影、DT精确分项与完整关键门控路径、服务奖励账本及输入保护核验。零新增真实交互/learner/参数步；下一轮单因素仅提案，未实施。未公开数据/结果只留本地，旧产物和曲线不覆盖，元数据与限制见[sagh_d_fast_conflict_audit_20261023.md](sagh_d_fast_conflict_audit_20261023.md)。

@@ -1,0 +1,9 @@
+# SAGH服务链只读审查索引（2026-10-24）
+
+用户同意继续查服务链后，本轮只读D/E已有全部step/update和冻结生产decoder/prepare记账函数，完成支持行去重、服务条件、主体/预测绑定和prepare事件追踪。详细未公开结果仅在本地artifacts/analysis/sagh_service_chain_audit_20261024_v1；不上传详细trace、checkpoint或数据。
+
+确认不能把DT环境概率合同/局部梯度改善直接解释为服务收益：支持访问高度重复；已服务、无RSU与当前cache miss分开，训练same-step兑现和历史准备因果收益分开，验证缺少观测transfer与策略失效分开。development推进后可重选主体而仍使用旧主体预测，出现跨主体prepare和当前cache miss；这是源码顺序/记录可查问题，未自动改环境或算法。caller cap、主体消失和workflow完成引起的右截断均保留，未把未观测到达一律当预测错误。
+
+生产prepare账本与原奖励逐条重放、独立失败/主体归约、支持行去重及输入保护核验PASS。新增真实环境交互/learner/optimizer均为零；原奖励、DT/CF/teacher/权重、科学分支、旧曲线及七用户修改保持，未动算法优化主线。下一轮仅建议先做主体/预测因果绑定匹配合同；机制暴露协议另轮冻结，禁止删掉失败主体或按结果选窗，暂不追加训练/辅助修复。
+
+reviewed_at=2026-10-24T06:03:03.536757+08:00；literature_cutoff=2026-09-28（未新评novelty）；target_venue=CSCWD2027；artifact_run_id=sagh_service_chain_audit_20261024_v1；policy_version=tmc_review_policy_v3_20260621；scientific_git=b5e1796e33d53c5b2f4eae295b2c12853d57c91b；evidence_level=READ_ONLY_SAVED_TRACE_REDUCTION_AND_PRODUCTION_PREPARE_LEDGER_REPLAY_ONLY。novelty与评分N/S，matched development非formal/独立holdout/paper-ready；长期收益/因果仍UNVERIFIED。
