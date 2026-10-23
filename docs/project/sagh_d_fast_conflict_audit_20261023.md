@@ -1,0 +1,13 @@
+# SAGH D快头只读审查索引（2026-10-23）
+
+本轮只读核对既有T/D预检的checkpoint、完整原配置、原全精度credit/native reference、首minibatch与执行history，重建全部CF、DT、argmax及pseudo目标的逐样本梯度，并拆分DT环境动作与各头监督。没有调用真实环境、learner或optimizer更新，没有创建实现分支或启动新训练。
+
+记录了新增fast冲突、既有CF冲突与另一个encoder argmax问题的不同来源；投影参照整批native actor，不能直接当作单样本反事实收益或长期训练因果。DT的proposal监督与最终执行可达性仍存在不一致，argmax合法目标也未等同最终可达目标。value路由没有直接fast梯度，后续参数、GAE、batch与优化轨迹变化需分开解释。全部正负与零项及样本路径保留，仅在本地未公开审查包中提供。
+
+原生奖励账本、匹配状态最终动作、探索bonus、服务完成和准备兑现分别复核；局部冲突计数或网络变化没有替代真实服务收益证据。固定checkpoint替换概率算子的静态见证包含改善与恶化，不能冒充新训练结果。
+
+下一轮仅提议独立D/E单因素：保持D路由、CF门/原分母/系数、DT标签/权重及各头CE、DT前向bias、argmax和reward不变，仅对齐DT环境动作损失到最终执行概率；不可达目标零贡献但仍占原分母。先逐参数匹配，再另经用户授权考虑一次有总交互硬上限的fresh小预算比较。没有实施该提案，也不混入teacher/argmax修复、调权或正式训练。
+
+本地入口：artifacts/analysis/sagh_d_fast_conflict_audit_20261023_v1/report.md、sample_register.csv、sample_replay.json、gate_paths.json、summary.json、独立核验与输入保护记录。详细样本、未公开结果与checkpoint不上传public仓库。原产物、旧曲线、冻结科学源码及七用户修改均核对保护，未合并算法优化主线。
+
+reviewed_at：2026-10-23T17:20:02.428036+08:00；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；artifact_run_id：sagh_d_fast_conflict_audit_20261023_v1；policy_version：tmc_review_policy_v3_20260621；scientific_git：c12a27b7932410c5c20d3e92c9b49c4ce1e057b3；evidence_level：FIXED_CHECKPOINT_FORWARD_AUTOGRAD_REPLAY_AND_MATCHED_DEVELOPMENT_TRACE_AUDIT_ONLY。matched development非formal/独立holdout/paper-ready，长期因果、稳定收益和收敛UNVERIFIED，novelty/评分N/S。只读审查完成即停止。
