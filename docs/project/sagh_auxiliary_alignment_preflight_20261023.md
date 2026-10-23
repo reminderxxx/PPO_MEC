@@ -21,3 +21,12 @@ behavior保留原final/teacher标签：不可达目标贡献0且保留原eligibl
 入口scripts/preflight_sagh_auxiliary_alignment.py只提供execute-preflight，没有full模式；输出create-only。CPU单线程/nice19/顺序单cell，沿用冻结资源检查器让出其他训练资源。源先通过测试并提交冻结，execution_receipt记录完整命令、source/data hashes和预算；audit_sagh_auxiliary_alignment.py检查原生逐步/episode账本、采样logp/KL、fresh/checkpoint/Adam、辅助可达性及两组匹配。审计后离线保留全部seed的奖励分项、动作/门控、首minibatch各目标梯度和自然覆盖，不能以奖励上升作为验收条件。
 
 reviewed_at：2026-10-23（实际时刻见本地回执）；literature_cutoff：2026-09-28（未新评novelty）；target_venue：CSCWD2027；policy_version：tmc_review_policy_v3_20260621；artifact_run_id：sagh_auxiliary_alignment_20261023_v1；实际source Git在execution_receipt；evidence：MATCHED_IMPLEMENTATION_AND_BOUNDED_PREFLIGHT_ONLY，收益/收敛/paper-ready UNVERIFIED。详细结果仅本地Git忽略产物，公开仓库不上传checkpoint、数据或详审。
+
+
+## 完成回执
+
+候选864add6已完成368项匹配/相关回归测试、固定4fresh cell/16checkpoint审计、24真实状态执行概率独立检查和84组梯度投影加和检查。实际3072训练+1632验证交互，12次learner机会；初态/首256步及两组唯一配置差异核验通过，原生reward/辅助系数未改。
+
+全部seed未显示验证收益，局部梯度冲突没有全面消除；构造动作0有效监督和非平凡remap已覆盖，自然样本覆盖单列保留，不强造真实命中。探针历史副作用修复为两组共同条件，旧曲线、原数据、80旧预检文件和旧交付hash核验保持；七用户修改与两处冻结source保护通过。
+
+详细结果/输入输出hash/命令仅本地artifacts/analysis/sagh_auxiliary_alignment_20261023_v1/，不上传详细实验数据。reviewed_at=2026-10-23T11:43:12.639930+08:00，其他metadata沿用上文，evidence=MATCHED_TESTS_AND_BOUNDED_DEVELOPMENT_COMPARISON_ONLY；无正式训练、权重搜索、奖励/曲线修改、主线算法合并或paper-ready晋级。
