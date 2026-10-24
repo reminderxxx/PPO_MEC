@@ -1,0 +1,9 @@
+# SAGH主体绑定运行时接入验收（2026-10-24）
+
+用户授权继续下一轮后，独立分支codex/sagh-subject-binding-runtime在core/Gym实际入口实现显式严格模式，候选585d8cb（基线f17707f）；默认legacy及训练入口不启用。环境生成预测查询身份/时间witness并校验control主体，原主体消失时在旧cache/offload/prepare/reward生效前失败并锁存，禁止用新主体接续旧control。失败有无reward的明确回执，保留冻结exposure ID分母；遗漏失败、重复/冲突回执或过滤均值均不接受。formal组合拒绝。
+
+合成provider下运行时/消费者测试、冻结默认完整step与严格同主体匹配、全旧记录入口与原账本保护、AST/原奖励后缀及算法配置文件核验均PASS。真实数据交互/learner/optimizer为0，没有训练、窗口选择或新收益曲线。合成与已记录身份stub调用不是新真实rollout；失败与尾段不删不重算。详细未公开结果仅本地artifacts/analysis/sagh_subject_binding_runtime_20261024_v1。旧分支/旧产物/七用户修改与算法优化主线保持。
+
+严格模式只在独立候选接入，真实provider、所有encoder/checkpoint和训练/benchmark失败消费仍未全面验收；环境witness不证明预测准确性或真实服务收益。机制机会/观察长度协议须另轮冻结，不筛reward、不改奖励、不将暴露协议更换当算法收益。
+
+reviewed_at=2026-10-24T15:02:21.133054+08:00；literature_cutoff=2026-09-28（未新评novelty）；target_venue=CSCWD2027；artifact_run_id=sagh_subject_binding_runtime_20261024_v1；policy_version=tmc_review_policy_v3_20260621；candidate_git=585d8cb6bc5e7f41e1b64532a6f5eedc21e8859e；base_git=f17707ff0adb24ebc271995c3b3392f6261e1a6a；evidence_level=SYNTHETIC_RUNTIME_BOUNDARY_AND_SAVED_RECORD_GUARD_MATCHING_ONLY。novelty/评分N/S，非formal/holdout/paper-ready，真实收益与收敛UNVERIFIED。

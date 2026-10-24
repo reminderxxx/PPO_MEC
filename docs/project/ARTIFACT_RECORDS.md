@@ -1,3 +1,5 @@
+> 2026-10-24 本地artifacts/analysis/sagh_subject_binding_runtime_20261024_v1保存独立585d8cb合成core/Gym入口/失败消费测试、默认与冻结版step匹配、全旧记录入口保护CSV、原奖励与源码/旧产物保护及独立回执。所有旧失败/尾段保留，无新真实rollout/训练/曲线。夹具初错、历次测试和push超时记录保留；metadata及未覆盖风险见[sagh_subject_binding_runtime_20261024.md](sagh_subject_binding_runtime_20261024.md)。
+
 > 2026-10-24 本地artifacts/analysis/sagh_subject_binding_contract_20261024_v1保存独立f17707f零交互测试、全旧trace绑定CSV/原账本匹配、边界尾段保留、独立核验与保护回执。无数据采集/参数更新/新曲线；所有失败保留，不输出candidate收益；空CSV context独立checker首错日志与v2更正保留。详细未公开记录仅本地，metadata/限制见[sagh_subject_binding_contract_20261024.md](sagh_subject_binding_contract_20261024.md)。
 
 > 2026-10-24 本地artifacts/analysis/sagh_service_chain_audit_20261024_v1保存D/E旧step/update的服务链审查：全访问与去重索引、prepare请求到事件、物理服务/主体变化、episode暴露CSV及独立核验。生产记账与原reward重放PASS，零新增真实交互/参数步；详细未公开结果仅本地，旧产物/曲线不覆盖，下一轮只提案未实施。metadata和边界见[sagh_service_chain_audit_20261024.md](sagh_service_chain_audit_20261024.md)。
