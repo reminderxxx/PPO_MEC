@@ -159,6 +159,11 @@ def yield_to_foreign_training(root):
         time.sleep(5)
 
 
+def training_chunk_budget(remaining,buffered,batch_size=256):
+    if remaining<1 or not 0<=buffered<batch_size:raise ValueError('Invalid on-policy collection boundary')
+    return min(95,remaining,batch_size-buffered)
+
+
 def train(root):
     p=json.loads((root/'frozen_inputs.json').read_text());q=json.loads((root/'qualification.json').read_text())
     if not q['passed']:raise ValueError('Qualification failed; no learning authorized by phase gate')
@@ -183,19 +188,24 @@ def train(root):
             evaluate();buffer=[];next_eval=1024;episode_index=0
             while collected<p['interactions_per_cell']:
                 unit=p['units'][episode_index%8]
-                budget=min(95,p['interactions_per_cell']-collected)
+                budget=training_chunk_budget(p['interactions_per_cell']-collected,len(buffer))
                 result,rollout=episode(root,p,unit,method,seed,agent,f'train_{episode_index}',budget)
                 if not rollout:raise RuntimeError('Empty episode')
                 collected+=len(rollout);totals+=len(rollout);buffer.extend(rollout)
-                train_rows.append(dict(episode=episode_index,training_steps=collected,**result));episode_index+=1
+                train_rows.append(dict(episode=episode_index,training_steps=collected,**result))
+                dump(cell/'train_episodes.json',train_rows)
+                dump(cell/f'train_trace_{episode_index}.json',[dict(action=x['action'],reward=x['reward'],log_prob=x['log_prob'],terminated=x['terminated'],truncated=x['truncated'],persistent_stream=x['env_info']['persistent_stream']) for x in rollout])
+                episode_index+=1
                 while len(buffer)>=256:
                     yield_to_foreign_training(root)
-                    agent.learn(buffer[:256]);buffer=buffer[256:];updates+=1
+                    stats=agent.learn(buffer[:256]);buffer=buffer[256:];updates+=1
+                    dump(cell/f'update_{updates}.json',stats)
                 if collected>=next_eval or collected==p['interactions_per_cell']:
                     evaluate();next_eval+=1024
                     dump(out/'validation.json',rows)
+                    agent.save(str(cell/f'checkpoint_{collected}.pt'))
                 dump(root/'status.json',dict(status='PILOT_RUNNING',method=method,seed=seed,cell_steps=collected,total_learning_steps=totals))
-            if buffer or updates!=16:raise ValueError('Pilot update budget mismatch')
+            if buffer or updates!=p['interactions_per_cell']//256:raise ValueError('Pilot update budget mismatch')
             agent.save(str(cell/'final.pt'))
             dump(cell/'train_episodes.json',train_rows)
             dump(cell/'completion.json',dict(method=method,seed=seed,interactions=collected,learn_calls=updates,

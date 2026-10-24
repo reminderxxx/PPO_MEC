@@ -114,3 +114,24 @@ def test_direct_policy_learns_from_new_reward_and_checkpoint_roundtrips(tmp_path
     assert any(not torch.equal(v,before[k]) for k,v in a._network.state_dict().items())
     path=tmp_path/'new.pt';a.save(str(path));b=DirectWorkflowGraphPPOAgent(use_graph=graph,random_seed=7);b.load(str(path))
     assert all(torch.equal(v,b._network.state_dict()[k]) for k,v in a._network.state_dict().items())
+
+
+def test_two_updates_never_reuse_pre_update_policy_samples(tmp_path):
+    import torch
+    from scripts.run_persistent_workflow_learning import training_chunk_budget
+    from src.agents.sa_ghmappo_agent import DirectWorkflowGraphPPOAgent
+    from src.envs.wrappers.gym_vec_env import GymVecEnv
+    from src.metrics.recorder import EpisodeRecorder
+    from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
+    a=DirectWorkflowGraphPPOAgent(random_seed=7);buffer=[];n=0;updates=0
+    while n<64:
+        steps=training_chunk_budget(64-n,len(buffer),32)
+        recorder=EpisodeRecorder();wrapped=GymVecEnv(env(),recorder,
+            subject_boundary_receipt_path=str(tmp_path/f'b{n}.json'),subject_boundary_exposure_id=f'e{n}')
+        _,rows=MARLOnPolicyTrainer(wrapped,a,recorder,max_steps=steps).collect_episode(
+            run_metadata=dict(policy_evaluation_mode='raw_policy'),collect_model_targets=False)
+        n+=len(rows);buffer.extend(rows)
+        assert len(buffer)<=32
+        if len(buffer)==32:
+            a.learn(buffer);updates+=1;buffer=[]
+    assert updates==2 and not buffer
