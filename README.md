@@ -9,6 +9,8 @@
 
 # PPO_MEC
 
+长训练曲线差异的只读调查：`scripts/audit_reward_curve_identifiability.py`；确认本次独立奖励实验未启用缓存容量约束、使用短episode重置，不能据此声称主方法整体优势。见[调查与下一轮验收条件](docs/project/reward_curve_identifiability_audit_20261024.md)。未启动新训练。
+
 本轮扩大预算：`scripts/run_long_fair_reward_training.py`，全部算法32循环/196,608交互/768updates；配对动作诊断与真实episode图方案见 [长预算独立实验](docs/project/long_fair_reward_training_20261021.md)。
 
 独立公平训练与收敛实验：`scripts/run_fair_reward_training.py`，统一窗口/原生奖励/交互预算，从零训练且自动让出其他训练资源；

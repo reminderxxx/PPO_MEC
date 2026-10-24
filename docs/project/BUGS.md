@@ -1,3 +1,5 @@
+> 2026-10-24 奖励曲线可识别性风险OPEN：独立公平长训练45c8c88入口未传cache_capacity_profile，冻结默认constructor确认容量关闭；每episode重新clone帧/缓存/workflow，短观察长度与固定support重复不能验证持续容量竞争优势。多个基线行为相同不等于网络或算法实现相同，主方法动作不同也未产生整体服务收益；单独小预检的零验证transfer不得推广到完整长训练。不按奖励选窗/延长到赢/重画制造分离；真实主体绑定、机制机会与执行可控性须另轮验收。该限制仅针对该独立奖励实验，不推广到正式容量benchmark。见[reward_curve_identifiability_audit_20261024.md](reward_curve_identifiability_audit_20261024.md)，reviewed_at=2026-10-24T19:11:55.674181+08:00。
+
 > 2026-10-24 独立585d8cb显式严格模式已通过主体消失前后入口保护和失败回执消费验收；不能再把此候选仅称作私有ledger诊断。主线/default仍legacy，真实provider及完整训练/benchmark/encoder消费者的严格失败协议未验收，机制机会与真实收益风险OPEN；不删失败、不伪造reward、不新训练。见[sagh_subject_binding_runtime_20261024.md](sagh_subject_binding_runtime_20261024.md)，reviewed_at=2026-10-24T15:02:21.133054+08:00。
 
 > 2026-10-24 主体绑定候选诊断/匹配合同f17707f通过并已独立push；它只在旧trace私有预览中识别边界，production跨主体cache/offload/prepare执行仍OPEN。原reward/失败暴露不删不重算，legacy预测身份重建不替代原生provider见证，运行时边界/失败消费与机制暴露协议未验收。零新增交互/学习，见[sagh_subject_binding_contract_20261024.md](sagh_subject_binding_contract_20261024.md)，reviewed_at=2026-10-24T06:20:53.340551+08:00。

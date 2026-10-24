@@ -13,6 +13,8 @@
 
 ## Live 文档
 
+- `reward_curve_identifiability_audit_20261024.md`：全长训练奖励/执行趋同、默认容量关闭与短episode重置的只读核验；小预检服务机会单独归约，主方法优势仍未证实，下一轮验收条件尚未实施。
+
 - 本地审查与曲线索引：`artifacts/analysis/paper_gap_convergence_20261021/`；包含顶刊差距、叙事建议及状态图。详细材料在Git忽略目录保留，不随公开文档提交上传。
 
 - `sagh_reward_decline_audit_20261021.md`：长预算seed7下降的原生分项、目标差异、门控动作概率、loss尖峰及window_class缺口只读审查；不修改运行中的实验。
