@@ -43,6 +43,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-25：文献迁移与奖励图证据边界（OPEN）
+
+- 新文献对照不证明算法已实现或优胜；示意奖励图、实测loss/latency及本项目native reward须区分。reward变体不能依照曲线外观挑选，完成事件代价移植时须审查停滞/失败/截断是否漏记。
+- 新协议的有限容量实际绑定、跨时段准备兑现、真实provider主体和失败consumer尚须独立验收。图/critic/teacher改进先作同信息有界消融，不能以局部梯度改善替代服务收益。
+- 本轮审查及下一轮任务见本地`artifacts/analysis/literature_guided_reward_plan_20261025_v1/`；不修改旧artifact，不晋级canonical。元数据与证据范围见同日PROGRESS记录。
+
 ## 2026-10-21：跨合同引用与公开仓库保密边界（持续生效）
 
 - 不同场景、动作、来源commit和训练合同的奖励曲线或缺陷诊断不能直接拼接；开发证据、奖励平台和正式独立验证继续分别判断。详审保存在本地`artifacts/analysis/paper_gap_convergence_20261021/`，不在公开仓库发布本轮详细审稿材料。

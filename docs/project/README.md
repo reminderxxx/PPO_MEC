@@ -13,6 +13,8 @@
 
 ## Live 文档
 
+- `literature_reference_table.md`：2026-10-25补充长期训练、移动依赖卸载和调度方法近邻；详细文献审查与下一轮改进任务在本地`artifacts/analysis/literature_guided_reward_plan_20261025_v1/`，本轮没有新训练或优势结论。
+
 - `reward_curve_identifiability_audit_20261024.md`：全长训练奖励/执行趋同、默认容量关闭与短episode重置的只读核验；小预检服务机会单独归约，主方法优势仍未证实，下一轮验收条件尚未实施。
 
   2026-10-25追加：`plot_reward_difference_parts.py`合并严格重复的奖励历史，并保留正负差异、覆盖率、完整分母与初始固定cohort；不以差异子集曲线证明整体优势。
