@@ -45,6 +45,8 @@
 
 ## 2026-10-25：文献迁移与奖励图证据边界（OPEN）
 
+- 独立优化已完成有限资源/加载链路及固定试训，仍未形成稳定服务收益和结构归因。当前五动作不能显式选择未来已释放节点的adapter，技术机会通过不等于强学习优势；下一轮按匹配合同验证，不直接堆长训练。执行与证据元数据见[persistent_workflow_optimization_20261025.md](persistent_workflow_optimization_20261025.md)。
+
 - 新文献对照不证明算法已实现或优胜；示意奖励图、实测loss/latency及本项目native reward须区分。reward变体不能依照曲线外观挑选，完成事件代价移植时须审查停滞/失败/截断是否漏记。
 - 新协议的有限容量实际绑定、跨时段准备兑现、真实provider主体和失败consumer尚须独立验收。图/critic/teacher改进先作同信息有界消融，不能以局部梯度改善替代服务收益。
 - 本轮审查及下一轮任务见本地`artifacts/analysis/literature_guided_reward_plan_20261025_v1/`；不修改旧artifact，不晋级canonical。元数据与证据范围见同日PROGRESS记录。
