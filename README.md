@@ -556,3 +556,5 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 `docs/project/formal_request_subject_lifecycle_contract.md`、
 `docs/project/formal_exogenous_request_execution_contract.md` 与
 `docs/project/formal_environment_identity_projection_contract.md`。
+
+Persistent FIFO batch development entry: `scripts/run_persistent_workflow_learning.py`; contract and boundaries: [implementation](docs/project/persistent_workflow_learning_20261025.md).

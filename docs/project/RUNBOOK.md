@@ -1597,3 +1597,7 @@ XML 必须包含 `test_benchmark_main_executes_full_envelope_gate` 的全部 16 
 supervisor 固定启动 continuous、source、target 三个进程，计划 4 次 generate、每进程 300 秒、累计 900 秒，
 不自动重试。该入口仅用于 technical workflow calibration；不得用于训练、formal/holdout、算法比较或 action 4
 真实迁移声明。
+
+## Persistent workflow development (2026-10-25)
+
+Use the primary project Python with `PYTHONDONTWRITEBYTECODE=1`. In the isolated source checkout, run `scripts/run_persistent_workflow_learning.py prepare --root <new-root> --old-plan <existing-plan>`; then `qualify --root <prepared-root>`. Only a passing qualification permits `train --root <prepared-root>`. Outputs are create-only; do not reuse the zero-interaction failed preparation. Source, fixed inputs and checkpoint consumer are versioned within this experimental entry, not the formal benchmark.

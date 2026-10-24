@@ -2077,3 +2077,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - `docs/project/literature_reference_table.md` 新增 10 篇相关近邻，包含 TMC delay-reliability/cache-assisted offloading、TITS multi-edge/multi-vehicle orchestration、IoTJ DAG meta-RL、FGCS DT dual-timescale cache/offload、JSA agentic workflow scheduling 等；查重审计为 119 entries、title/DOI/URL duplicate 均为 0。
 - 新增 `docs/project/top_journal_paper_structure_gap_review_20260928.md`，逐段拆解 Introduction、全文论证链、可模仿写法和 PPO_MEC 缺口，并给出 9 段 Introduction 模板。
 - 当前 TMC-ready verdict 仍为 `Unverifiable / E1_DOCUMENTED`：G14C v16 formal/holdout/support 未闭环，仓库未发现 integrated manuscript；本轮没有修改算法、配置或实验结果。
+
+2026-10-25 implementation round: isolated opt-in persistent typed-cache FIFO batch and direct graph variant implemented. Matched environment/subject/cache tests pass86 checks; real-provider preparation and scripted qualification follow. No learning result or superiority at this entry.

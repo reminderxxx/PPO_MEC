@@ -745,3 +745,5 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
   claim-to-artifact 映射，故 TMC-ready 只能判为 `Unverifiable`。
 - 后续必须保持 controller-level MARL、`semantic_discrete_5`、受控 adapter mapping、policy guard 和 learned predictor
   的归因边界；不得把 `NGSIM + Alibaba` 写成真实 adapter request trace，或把 readiness/checkpoint inventory 写成性能证据。
+
+2026-10-25 OPEN: new FIFO batch is a controlled single-subject development protocol; AI assignments, load/link costs and state handling are modeled. Qualification, multi-method learning, holdout and formal superiority remain unverified.

@@ -1,4 +1,4 @@
-﻿"""SA-GHMAPPO 主算法。"""
+"""SA-GHMAPPO 主算法。"""
 
 from __future__ import annotations
 
@@ -444,3 +444,14 @@ class SAGHMAPPOAgent(SAGHMAPPOBaseAgent):
         ):
             if field_name in kwargs:
                 self.ablation_config[field_name] = kwargs[field_name]
+
+
+class DirectWorkflowGraphPPOAgent(SAGHMAPPOBaseAgent):
+    """Experimental direct graph PPO; legacy hierarchy/teachers are excluded."""
+    def __init__(self, *, use_graph=True, **kwargs):
+        super().__init__(agent_name="sa_direct_graph_ppo" if use_graph else "matched_flat_ppo",
+            policy_type="persistent_direct_ppo_v1",encoder_kind="graph" if use_graph else "flat",
+            centralized_critic=False,hierarchical_conditioning=False,use_hierarchy=False,
+            use_prediction_features=True,use_uncertainty_signal=False,use_dependency_aware=True,
+            event_head_enabled=False,adapter_prefetch_enabled=True,auxiliary_coef=0.,
+            temporal_consistency_coef=0.,mechanism_logit_bias_strength=0.,prepare_action_prior_weight=0.,**kwargs)

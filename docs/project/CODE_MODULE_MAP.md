@@ -752,3 +752,5 @@
 - `configs/acceptance/two_node_workflow_suffix_recovery_v1.json`：DAG、prompt、模型资源 hash、生成参数、判据、
   目标读取白名单与 4-generate 预算。
 - `tests/test_workflow_suffix_recovery.py`：状态依赖、篡改/冲突拒绝、旧 PEFT 回执字段与汇总负例。
+
+2026-10-25: `persistent_workflow_env.py` subclasses the native core for an opt-in released FIFO batch and simulated loading readiness. `DirectWorkflowGraphPPOAgent` stays in the main algorithm file; only the experimental runner consumes it, without live registry changes.

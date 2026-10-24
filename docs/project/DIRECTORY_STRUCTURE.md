@@ -366,3 +366,5 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
   run-root 创建和模型加载前失败并记录于 companion review，旧 adapter 验收目录和原始 FAIL 回执不覆盖、不改写。
 - `artifacts/analysis/two_node_workflow_suffix_recovery_20261003_review_v1/`：pre-execution 失败、main 七文件保护、
   旧证据 hash 和独立完整性复算。
+
+2026-10-25 additions: `src/envs/core/persistent_workflow_env.py`, `scripts/run_persistent_workflow_learning.py`, `tests/test_persistent_workflow_env.py`; development artifacts stay under `artifacts/analysis/persistent_workflow_learning_20261025_v1/` in the primary project.

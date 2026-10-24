@@ -1173,3 +1173,5 @@ claim map 必须报告 `UNAVAILABLE`。
 ## 2026-09-08 G14R20-A
 
 固定提交 continuation 被定义为独立待批准的新规则；新 run 发布门禁不变。proposal/结构/资格/批准/执行分离，本轮真实执行权限恒为 false。保护快照是验收基线而非原始授权凭据。 详见 `fixed_commit_continuation_contract.md`。
+
+2026-10-25: implement a minimal direct graph policy and finite-resource batch in isolation after literature review. Keep all requests released and model assumptions explicit; do not reuse a stopped reward-retuning study or infer that longer training guarantees an advantage.
