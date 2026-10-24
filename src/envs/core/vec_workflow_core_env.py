@@ -44,6 +44,12 @@ from src.runtime.formal_exogenous_request_execution import (
 )
 
 
+from src.runtime.subject_binding import (
+    LEGACY_SUBJECT_CONTRACT, STRICT_SUBJECT_CONTRACT, RUNTIME_SNAPSHOT_ORIGIN,
+    SubjectBindingBoundaryError, bind_subject_transition,
+)
+
+
 PRIMARY_VEHICLE_SELECTION_CHOICES = {"stable_first", "handoff_pressure"}
 CACHE_CAPACITY_UNITS = {"adapter_slots", "mb"}
 CACHE_CAPACITY_EPSILON = 1.0e-9
@@ -67,7 +73,15 @@ class VecWorkflowCoreEnv:
         cache_capacity_profile: dict[str, Any] | None = None,
         primary_vehicle_selection: str = "stable_first",
         formal_request_exposure_trace: dict[str, Any] | None = None,
+        subject_binding_contract: str = LEGACY_SUBJECT_CONTRACT,
     ) -> None:
+        if subject_binding_contract not in {LEGACY_SUBJECT_CONTRACT, STRICT_SUBJECT_CONTRACT}:
+            raise ValueError('Unknown subject_binding_contract')
+        if subject_binding_contract == STRICT_SUBJECT_CONTRACT and formal_request_exposure_trace is not None:
+            raise ValueError('Experimental strict subject binding is not a formal request protocol')
+        self._subject_binding_contract = subject_binding_contract
+        self._subject_binding_episode_vehicle_id = None
+        self._subject_binding_failure = None
         self._mobility_provider = mobility_provider or ReplayProvider()
         self._mobility_source = str(mobility_source or "ngsim").strip().lower()
         self._primary_vehicle_selection = self._normalize_primary_vehicle_selection(
@@ -184,6 +198,8 @@ class VecWorkflowCoreEnv:
 
     def reset(self) -> tuple[dict[str, Any], dict[str, Any]]:
         """重置环境并返回语义状态字典。"""
+        self._subject_binding_failure = None
+        self._subject_binding_episode_vehicle_id = None
         self._episode_steps = 0
         self.workflow_state = deepcopy(self._workflow_template)
         self.adapter_catalog = deepcopy(self._catalog_template)
@@ -215,6 +231,7 @@ class VecWorkflowCoreEnv:
             self._initialize_formal_request_exposure()
         else:
             self._initialize_primary_vehicle_id(vehicles)
+        self._subject_binding_episode_vehicle_id = self._primary_vehicle_id
         associations = self._mapper.associate(vehicles)
         self._apply_associations(vehicles, associations)
         predictions = self._build_predictions(vehicles, associations)
@@ -260,8 +277,25 @@ class VecWorkflowCoreEnv:
         control: ControlAction,
     ) -> tuple[dict[str, Any], RewardBreakdown, bool, bool, dict[str, Any]]:
         """推进环境一个时间步。"""
+        strict_subject = self._subject_binding_contract == STRICT_SUBJECT_CONTRACT
+        if strict_subject:
+            if self._subject_binding_failure is not None:
+                raise SubjectBindingBoundaryError(self._subject_binding_failure)
+            decision_binding = self._check_runtime_subject_binding(None, stage='before_mobility')
+            if control.metadata.get('primary_vehicle_id') != self._subject_binding_episode_vehicle_id:
+                binding_record = decision_binding.to_dict()
+                binding_record.update(bound=False, reason='control_subject_mismatch')
+                self._subject_binding_failure = dict(
+                    contract=STRICT_SUBJECT_CONTRACT, stage='before_mobility',
+                    attempted_episode_step=self._episode_steps,
+                    binding=binding_record, control_applied=False, reward_available=False,
+                    control_vehicle_id=control.metadata.get('primary_vehicle_id'),
+                    exposure_status='EXPOSURE_FAILED',
+                )
+                raise SubjectBindingBoundaryError(self._subject_binding_failure)
         self._episode_steps += 1
-        self._prune_prepare_history()
+        if not strict_subject:
+            self._prune_prepare_history()
 
         pre_action_vehicle = self._extract_primary_vehicle_from_state(self._last_state)
         pre_action_vehicle_id = pre_action_vehicle.get("vehicle_id") or self._primary_vehicle_id
@@ -272,6 +306,9 @@ class VecWorkflowCoreEnv:
         )
 
         vehicles = self._mobility_provider.step()
+        if strict_subject:
+            self._check_runtime_subject_binding(vehicles, stage='after_mobility_before_control')
+            self._prune_prepare_history()
         self._ensure_primary_vehicle_id(vehicles)
         if self._formal_request_exposure_trace is not None:
             current_subject = next(
@@ -843,7 +880,7 @@ class VecWorkflowCoreEnv:
         vehicles: list[VehicleState],
         associations: dict[str, str | None],
     ) -> dict[str, Any]:
-        return self._predictor_manager.build_predictions(
+        predictions = self._predictor_manager.build_predictions(
             time_index=self._mobility_provider.get_time(),
             vehicles=vehicles,
             rsu_states=self.rsu_states,
@@ -851,6 +888,52 @@ class VecWorkflowCoreEnv:
             adapter_catalog=self.adapter_catalog,
             current_associations=associations,
         )
+        if self._subject_binding_contract == STRICT_SUBJECT_CONTRACT:
+            predictions['subject_binding_snapshot'] = {
+                'origin': RUNTIME_SNAPSHOT_ORIGIN,
+                'decision_vehicle_id': self._primary_vehicle_id,
+                'prediction_vehicle_id': self._primary_vehicle_id,
+                'prediction_time_index': predictions.get('prediction_time'),
+            }
+        return predictions
+
+    def _check_runtime_subject_binding(self, vehicles, *, stage):
+        state = self._last_state
+        subject = state.get('primary_vehicle_id')
+        snapshot = state.get('predictions', {}).get('subject_binding_snapshot', {})
+        present = any(v.get('vehicle_id') == subject for v in state.get('vehicles', []))
+        execution_present = present if vehicles is None else any(
+            v.vehicle_id == self._subject_binding_episode_vehicle_id for v in vehicles
+        )
+        execution_id = subject if vehicles is None else (
+            self._subject_binding_episode_vehicle_id if execution_present else None
+        )
+        origin = snapshot.get('origin', '')
+        # Never infer a native witness for an old or unrelated snapshot.
+        if origin != RUNTIME_SNAPSHOT_ORIGIN or snapshot.get('decision_vehicle_id') != subject:
+            origin = ''
+        binding = bind_subject_transition(
+            episode_vehicle_id=self._subject_binding_episode_vehicle_id,
+            decision_vehicle_id=subject,
+            prediction_vehicle_id=snapshot.get('prediction_vehicle_id'),
+            execution_vehicle_id=execution_id,
+            decision_time_index=state.get('time_index'),
+            prediction_time_index=snapshot.get('prediction_time_index'),
+            execution_time_index=state.get('time_index') if vehicles is None else self._mobility_provider.get_time(),
+            prediction_origin=origin, decision_subject_present=present,
+            execution_subject_present=execution_present,
+        )
+        if not binding.bound:
+            self._subject_binding_failure = dict(
+                contract=STRICT_SUBJECT_CONTRACT, stage=stage,
+                attempted_episode_step=self._episode_steps,
+                binding=binding.to_dict(),
+                available_execution_vehicle_ids=[] if vehicles is None else [v.vehicle_id for v in vehicles],
+                control_applied=False, reward_available=False,
+                exposure_status='EXPOSURE_FAILED',
+            )
+            raise SubjectBindingBoundaryError(self._subject_binding_failure)
+        return binding
 
     def _apply_associations(
         self,

@@ -1,3 +1,5 @@
+> Experimental opt-in dependency: core environment and Gym wrapper import `src/runtime/subject_binding.py` for identity checks, typed boundary failure and receipt/denominator consumption. Diagnostic scripts re-export the pure helper from this module; runtime does not depend on scripts. Agent/encoder/reward dependencies are unchanged. See [runtime contract](sagh_subject_binding_runtime_20261024.md).
+
 > 2026-10-21 独立修复职责：`sa_ghmappo_core.py` 保存sampled base+conditional option真实联合logp并对完整优化步做有限性/KL回退；`main_results_support.py` 提供共用无reward分类函数；runner冻结分类并传入学习，receipt/诊断/绘图消费者核验概率scope、原生reward及分类。生产优化分支不合并本实现。
 
 # Code Module Map

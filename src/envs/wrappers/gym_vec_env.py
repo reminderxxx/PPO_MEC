@@ -6,6 +6,9 @@ from copy import deepcopy
 import numpy as np
 from typing import Any
 
+from src.runtime.subject_binding import (
+    STRICT_SUBJECT_CONTRACT, SubjectBindingBoundaryError, write_subject_boundary_receipt,
+)
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
 from src.envs.specs import ActionAdapter, ActionMaskBuilder, ActionSchema, ControlAction
 from src.envs.wrappers.observation_normalizer import ObservationNormalizer
@@ -71,9 +74,16 @@ class GymVecEnv(gym.Env):
         self,
         core_env: VecWorkflowCoreEnv | None = None,
         recorder: Any | None = None,
+        subject_boundary_receipt_path: str | None = None,
+        subject_boundary_exposure_id: str | None = None,
     ) -> None:
         super().__init__()
         self._core_env = core_env or VecWorkflowCoreEnv()
+        self._subject_boundary_receipt_path = subject_boundary_receipt_path
+        self._subject_boundary_exposure_id = subject_boundary_exposure_id
+        if (getattr(self._core_env, '_subject_binding_contract', None) == STRICT_SUBJECT_CONTRACT
+                and (subject_boundary_receipt_path is None or not subject_boundary_exposure_id)):
+            raise ValueError('Strict subject binding requires an explicit per-exposure failure receipt path and frozen exposure ID')
         self._recorder = recorder
         self._normalizer = ObservationNormalizer()
         self._action_schema = 默认动作规范
@@ -118,6 +128,10 @@ class GymVecEnv(gym.Env):
         seed: int | None = None,
         options: dict[str, Any] | None = None,
     ) -> tuple[list[float], dict[str, Any]]:
+        if self._subject_boundary_receipt_path is not None:
+            from pathlib import Path
+            if Path(self._subject_boundary_receipt_path).exists():
+                raise FileExistsError('A failed exposure needs a new receipt path; refusing implicit retry')
         # 使用 seed 参数初始化随机状态生成器，确保可复现性
         if seed is not None:
             self._np_random = np.random.RandomState(seed)
@@ -157,7 +171,16 @@ class GymVecEnv(gym.Env):
         pre_action_trace_record = self._build_decision_observation_trace_record(action)
         control = self._decode_action(action)
         action_name = 动作语义表.get(action, "unknown_action")
-        state, reward, terminated, truncated, info = self._core_env.step(control)
+        try:
+            state, reward, terminated, truncated, info = self._core_env.step(control)
+        except SubjectBindingBoundaryError as error:
+            if self._subject_boundary_receipt_path is not None:
+                write_subject_boundary_receipt(
+                    self._subject_boundary_receipt_path, error,
+                    exposure_id=self._subject_boundary_exposure_id,
+                    action=action, decision_trace=pre_action_trace_record,
+                )
+            raise
         self._last_state = state
         self._episode_step_index += 1
         semantic_state = self._build_compatible_semantic_state(state)

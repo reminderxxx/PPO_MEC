@@ -1,3 +1,5 @@
+> Experimental strict subject binding: see [sagh_subject_binding_runtime_20261024.md](sagh_subject_binding_runtime_20261024.md). Run only the documented synthetic matching tests in this round. Strict Gym use requires a new per-exposure receipt path and frozen exposure ID; boundary exceptions stop control, preserve the failed exposure and invalidate a filtered mean. No training or real-data execution is authorized by this entry.
+
 > 本分支D/E：先`tests/test_sagh_dt_executed_density.py`与相关回归/逐参数匹配，通过并冻结Git后，仅运行一次`scripts/preflight_sagh_dt_executed_density.py --parent-root <原continuation root> --output-root <新comparison root> --execute-preflight`。总真实交互硬上限5184，无正式训练/重试/追加预算。完整运行与审计边界见`sagh_dt_executed_density_contract_20261023.md`。
 
 > 独立T/D一次性入口：scripts/preflight_sagh_value_encoder_routing.py；先匹配、冻结源码，再显式execute-preflight；create-only、总真实交互硬上限5184。合同见[sagh_value_encoder_routing_preflight_20261023.md](sagh_value_encoder_routing_preflight_20261023.md)。

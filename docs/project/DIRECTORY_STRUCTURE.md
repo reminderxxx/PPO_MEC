@@ -1,3 +1,5 @@
+> Experimental runtime binding helper: `src/runtime/subject_binding.py`; compatibility diagnostic exports: `scripts/sagh_subject_binding.py`; integration tests: `tests/test_sagh_subject_binding_runtime.py`. Failure receipts use caller-chosen new local per-exposure paths and are not formal result artifacts. See [runtime contract](sagh_subject_binding_runtime_20261024.md).
+
 > 本独立分支D/E入口`scripts/preflight_sagh_dt_executed_density.py`；合同`docs/project/sagh_dt_executed_density_contract_20261023.md`，产物仅本地`artifacts/analysis/sagh_dt_executed_density_preflight_20261023_v1/`，create-only，不复用历史cell或覆盖曲线。
 
 > 独立有界预检入口scripts/preflight_sagh_value_encoder_routing.py，结果仅本地artifacts/analysis/sagh_value_encoder_routing_preflight_20261023_v1；合同见[sagh_value_encoder_routing_preflight_20261023.md](sagh_value_encoder_routing_preflight_20261023.md)。

@@ -1,3 +1,5 @@
+> Experimental opt-in runtime subject boundaries are documented in [the runtime contract](docs/project/sagh_subject_binding_runtime_20261024.md). Legacy defaults and training entry points stay unchanged; strict failures are explicit failed exposures, never filtered reward improvements.
+
 > 独立D/E有界实验：仅DT环境动作监督概率对齐，原分母/所有其他目标与reward保持；入口`scripts/preflight_sagh_dt_executed_density.py`，先匹配后一次预检，见[合同](docs/project/sagh_dt_executed_density_contract_20261023.md)。不合并优化主线。
 
 > 独立T/D梯度路由预检（仅有界development）：见[运行合同](docs/project/sagh_value_encoder_routing_preflight_20261023.md)。不合并优化主线。

@@ -1,3 +1,5 @@
+> 2026-10-24 experimental runtime subject binding: preserve legacy defaults; opt-in strict mode fixes the episode subject and fails before old control can affect a replacement vehicle. Failures have no invented reward, remain in the frozen exposure denominator and prevent filtered reward publication. Native lookup identity/time witnesses, explicit per-exposure receipts and latched failure are required; formal protocol mixing and implicit retry are rejected. This is synthetic/recorded-data acceptance, not a reward change or service-gain promotion. See [runtime contract](sagh_subject_binding_runtime_20261024.md).
+
 ﻿# Decision Log
 
 ## 2026-10-05：机制证据优先，不晋级 RL
