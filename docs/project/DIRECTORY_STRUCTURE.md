@@ -7,6 +7,7 @@
 ## 独立公平奖励训练（2026-10-21）
 
 - `scripts/audit_reward_curve_identifiability.py`：只读归约已完成长训练的CSV/trace，核验冻结producer及默认容量设置；create-only输出在 `artifacts/analysis/reward_curve_identifiability_20261024_v2/`，说明见 `docs/project/reward_curve_identifiability_audit_20261024.md`。不启动训练。
+- `scripts/plot_reward_difference_parts.py` / `tests/test_reward_difference_parts.py`：hash绑定的全检查点正负差值分解与严格重复回报历史分组；create-only输出在 `artifacts/analysis/reward_difference_parts_20261025_v3/`。不修改冻结source或替代正式统计。
 - `configs/experiment/long_fair_reward_training_v1.json`、`scripts/run_long_fair_reward_training.py` / `audit_long_fair_reward_training.py` / `plot_long_fair_reward_training.py`：32循环独立训练及只读核验/真实episode图；`tests/test_long_fair_reward_training.py`覆盖循环与绘图边界。
 - `artifacts/analysis/long_fair_reward_training_20261021_v1/`：本轮完整独立run；`long_fair_reward_preflight_20261021_v1/`只作预检；`sagh_flat_action_diagnosis_20261021_v1/`为前置只读诊断。
 - `configs/experiment/fair_reward_training_v1.json`：共同窗口、奖励、预算、资源隔离与平台描述规则。

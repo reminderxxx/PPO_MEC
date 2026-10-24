@@ -1,3 +1,5 @@
+> 2026-10-25 差异子集展示风险OPEN：不同动作序列大量对应相同reward，动作多样性不能替代收益。去除持平回报会改变分母并放大条件差值，动态成员变化不能当作学习改善；必须保留覆盖率/符号、加权总体贡献与全部baseline。回报历史合并不表示实现或网络相同，负向差距扩大或奖励平台不证明主方法优秀。该轮只读提取不修机制机会/执行可控性，见[调查追加](reward_curve_identifiability_audit_20261024.md)，reviewed_at=2026-10-25T00:41:00.741578+08:00。
+
 > 2026-10-24 奖励曲线可识别性风险OPEN：独立公平长训练45c8c88入口未传cache_capacity_profile，冻结默认constructor确认容量关闭；每episode重新clone帧/缓存/workflow，短观察长度与固定support重复不能验证持续容量竞争优势。多个基线行为相同不等于网络或算法实现相同，主方法动作不同也未产生整体服务收益；单独小预检的零验证transfer不得推广到完整长训练。不按奖励选窗/延长到赢/重画制造分离；真实主体绑定、机制机会与执行可控性须另轮验收。该限制仅针对该独立奖励实验，不推广到正式容量benchmark。见[reward_curve_identifiability_audit_20261024.md](reward_curve_identifiability_audit_20261024.md)，reviewed_at=2026-10-24T19:11:55.674181+08:00。
 
 > 2026-10-24 独立585d8cb显式严格模式已通过主体消失前后入口保护和失败回执消费验收；不能再把此候选仅称作私有ledger诊断。主线/default仍legacy，真实provider及完整训练/benchmark/encoder消费者的严格失败协议未验收，机制机会与真实收益风险OPEN；不删失败、不伪造reward、不新训练。见[sagh_subject_binding_runtime_20261024.md](sagh_subject_binding_runtime_20261024.md)，reviewed_at=2026-10-24T15:02:21.133054+08:00。

@@ -11,6 +11,8 @@
 
 长训练曲线差异的只读调查：`scripts/audit_reward_curve_identifiability.py`；确认本次独立奖励实验未启用缓存容量约束、使用短episode重置，不能据此声称主方法整体优势。见[调查与下一轮验收条件](docs/project/reward_curve_identifiability_audit_20261024.md)。未启动新训练。
 
+差异部分独立展示：`scripts/plot_reward_difference_parts.py`；严格相同回报历史合并、动作/回报差异覆盖率和带完整分母的正负差值曲线，保留所有算法与检查点。2026-10-25追加结果与边界见同一调查记录；条件差值图不能替代整体优势验证。
+
 本轮扩大预算：`scripts/run_long_fair_reward_training.py`，全部算法32循环/196,608交互/768updates；配对动作诊断与真实episode图方案见 [长预算独立实验](docs/project/long_fair_reward_training_20261021.md)。
 
 独立公平训练与收敛实验：`scripts/run_fair_reward_training.py`，统一窗口/原生奖励/交互预算，从零训练且自动让出其他训练资源；

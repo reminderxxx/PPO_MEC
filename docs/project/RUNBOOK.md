@@ -13,6 +13,16 @@
 
 2026-10-24补充只读调查入口：`scripts/audit_reward_curve_identifiability.py --run-root <completed_run> --output-root <new_analysis_root> [--service-chain-root <audited_de_preflight>]`，使用主工作区`.venv/bin/python -B`。输出必须不存在；核验冻结科学source、完整CSV/trace和默认constructor，未reset/step/训练。已完成命令、范围和后续待验收条件见 `reward_curve_identifiability_audit_20261024.md`，不得覆盖原调查输出或据此自动重新长训。
 
+2026-10-25差异部分消费者（输出路径必须不存在；已交付的v3禁止覆盖）：
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/ppo_mec_reward_plot_deps MPLCONFIGDIR=/private/tmp/ppo_mec_matplotlib .venv/bin/python -B scripts/plot_reward_difference_parts.py --run-root artifacts/analysis/repaired_fair_reward_continuation_20261022_v1 --audit-report artifacts/analysis/reward_curve_identifiability_20261024_v2/report.json --output-root <new_analysis_root>
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -B -m pytest tests/test_reward_difference_parts.py -q
+```
+
+临时绘图库同本文件原奖励绘图入口；该脚本严格核验输入hash，保留所有算法/seed/checkpoint、
+动态子集分母及正负结果。空子集不填0，固定初始cohort与动态reward子集分开，不修改reward或新训练。
+
 本轮长预算按`long_fair_reward_training_20261021.md`执行：先完成配对动作诊断和四算法两轮预检，再prepare/run；30cell完整后先`audit_long_fair_reward_training.py`核验，再`plot_long_fair_reward_training.py`create-only导出全部真实episode和固定验证图。当前聊天每20分钟检查，不自动重跑。
 
 旧独立短预算见 `fair_reward_training_20261021.md`。先 `run_fair_reward_training.py prepare` 冻结配置/共同窗口并通过预检，

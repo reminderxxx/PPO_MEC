@@ -74,3 +74,43 @@ policy_version: tmc_review_policy_v3_20260621；scientific Git: 45c8c88e390f49fc
 workspace baseline Git: 068fd0ca0c42499dc20b8dd7a8e316f4b172a6e8；
 evidence_level: READ_ONLY_NATIVE_CSV_TRACE_REDUCTION_FROZEN_SOURCE_AND_DEFAULT_CONSTRUCTOR_PROBE；
 正式优势/策略收敛/formal/holdout: UNVERIFIED；novelty/评分: N/S。
+
+## 2026-10-25：重复曲线合并与差异部分提取
+
+用户进一步要求减少重复行为展示，单独看差异是否随训练扩大并趋稳。本轮新增独立消费者
+`scripts/plot_reward_difference_parts.py`，只消费原完整run与上述v2只读审计的hash清单。
+全部9baseline、3seed、33checkpoint与正负结果保留，未改算法/奖励、曲线原值或训练协议。
+
+三个展示视角分别是：
+
+- 只有当每个seed、检查点和窗口/workflow的回报都完全相同时才合并曲线；保留所有算法名。
+  回报相同不等于网络/行为/实现相同，最终值相同但中途不同的曲线不合并。
+- 按完整episode动作序列是否不同、原生reward是否不同分别统计覆盖率。不同动作但reward相同
+  的样本保留；相同动作但reward不同也不能被动作筛选过滤掉。
+- 显示全体平均差值、所有非零reward差值的条件均值，以及按初始动作差异固定的cohort曲线。
+  动态非零子集保留正负两种符号，并同时导出分母、覆盖率、加权贡献与容差剩余项；未用累计
+  差值、绝对值或单边筛选制造持续拉大的正向优势。空子集为null，绘图断开，不填0。
+
+精确分解是：`全体差值 = 非零差异覆盖率 × 非零差异条件均值 + 容差内剩余项`。
+动态子集成员随训练改变，其条件均值不能直接作为学习进步；初始动作cohort也是事后诊断，
+不构成预注册独立评价。seed/workflow在相同窗口上的重复不充当独立统计cluster。
+
+实际输出确认：重复曲线可以减少，动作差异与奖励差异的覆盖率显著不同；过滤持平回报不会
+自动得到主方法优势。部分较弱基线的正向最终差距也未满足从初始持续扩大的描述。
+详细数值、全部条件/全体曲线和21,384条配对记录仅留在本地
+`artifacts/analysis/reward_difference_parts_20261025_v3/`；v1/v2为图形排版检查前版本，保留。
+这仍然不能证明主方法长期优秀、策略收敛或formal优势；不通过降低基线能力或奖励动作多样性
+来强行分开曲线。下一轮须按上文机制机会/可控性验收条件进入实际修复与独立比较。
+
+专项验证：`PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -B -m pytest tests/test_reward_difference_parts.py -q`
+通过10项，覆盖选择分母放大、正负混合、行为差异无收益、相同行为异回报、空子集、非有限输入、
+容差分解和负向差距/平台不得变成优势结论。完整导出校验990份trace/365498步记录，三张PNG
+完成目视检查并同步生成PDF；完整命令、原汇总匹配、输出hash及拒绝覆盖检查见本地`verification.json`。
+新增环境/learner/optimizer均0，旧artifact与七个用户修改保持。
+
+reviewed_at: 2026-10-25T00:41:00.741578+08:00；literature_cutoff: 2026-09-28（未新评）；
+target_venue: CSCWD2027 development；artifact_run_id: repaired_fair_reward_continuation_20261022_v1；
+policy_version: tmc_review_policy_v3_20260621；scientific Git: 45c8c88e390f49fc4e66c70871c2318e18883f24；
+workspace baseline Git: 6fb623d1c31c97dcfb1a54f7232d90ba6fb2b40f；
+evidence_level: HASH_BOUND_ALL_CHECKPOINT_PAIRED_DIFFERENCE_DECOMPOSITION_ONLY；
+正式优势/策略收敛/formal/holdout: UNVERIFIED；novelty/评分: N/S。
