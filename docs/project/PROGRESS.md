@@ -2079,3 +2079,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 当前 TMC-ready verdict 仍为 `Unverifiable / E1_DOCUMENTED`：G14C v16 formal/holdout/support 未闭环，仓库未发现 integrated manuscript；本轮没有修改算法、配置或实验结果。
 
 2026-10-25 implementation round: isolated opt-in persistent typed-cache FIFO batch and direct graph variant implemented. Matched environment/subject/cache tests pass86 checks; real-provider preparation and scripted qualification follow. No learning result or superiority at this entry.
+
+2026-10-25 completion:89 matched tests pass;72 fixed technical exposures use6840 steps; repaired fresh pilot completes12cells/46080 training steps/180learn calls and240 validation rows. Scientific source c9c98b4; initial faulty attempt retained and budget reserved. Actual learning curves and independent result review remain local in the primary project `artifacts/analysis/persistent_workflow_learning_20261025_v1/`. No long training, holdout or formal promotion. Within-method mean service improvement and structure attribution remain unverified; do not interpret pilot ranking as established excellence.

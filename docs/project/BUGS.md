@@ -747,3 +747,5 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
   的归因边界；不得把 `NGSIM + Alibaba` 写成真实 adapter request trace，或把 readiness/checkpoint inventory 写成性能证据。
 
 2026-10-25 OPEN: new FIFO batch is a controlled single-subject development protocol; AI assignments, load/link costs and state handling are modeled. Qualification, multi-method learning, holdout and formal superiority remain unverified.
+
+2026-10-25 pilot follow-up: seed instability, low batch completion, missing matched structure ablations and current-adapter-only preparation prevent a long-run superiority claim. Actual probability/interaction/reward checks pass; full details remain in local result review.
