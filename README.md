@@ -1,3 +1,5 @@
+> 本轮独立恢复入口：`scripts/run_workflow_recovery.py`，仅在`codex/workflow-recovery`分支。released FIFO准备五动作、共享加载/剩余时域特征、匹配图/集合编码与PPO/MAPPO/QMIX；产物在本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`，非formal、无holdout。
+
 > Experimental opt-in runtime subject boundaries are documented in [the runtime contract](docs/project/sagh_subject_binding_runtime_20261024.md). Legacy defaults and training entry points stay unchanged; strict failures are explicit failed exposures, never filtered reward improvements.
 
 > 独立D/E有界实验：仅DT环境动作监督概率对齐，原分母/所有其他目标与reward保持；入口`scripts/preflight_sagh_dt_executed_density.py`，先匹配后一次预检，见[合同](docs/project/sagh_dt_executed_density_contract_20261023.md)。不合并优化主线。

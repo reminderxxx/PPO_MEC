@@ -1,3 +1,5 @@
+> 独立恢复依赖：`persistent_workflow_control.py`封装既有持续环境/Gym，显式把已释放未来adapter传入typed事务；`persistent_workflow_encoder.py`消费相同因果候选/加载/剩余时域特征并可关闭DAG边；`run_workflow_recovery.py`在实验工厂装配既有PPO/MAPPO/QMIX、checkpoint envelope和匹配消费端。默认registry/旧入口不变。
+
 > Experimental opt-in dependency: core environment and Gym wrapper import `src/runtime/subject_binding.py` for identity checks, typed boundary failure and receipt/denominator consumption. Diagnostic scripts re-export the pure helper from this module; runtime does not depend on scripts. Agent/encoder/reward dependencies are unchanged. See [runtime contract](sagh_subject_binding_runtime_20261024.md).
 
 > 2026-10-21 独立修复职责：`sa_ghmappo_core.py` 保存sampled base+conditional option真实联合logp并对完整优化步做有限性/KL回退；`main_results_support.py` 提供共用无reward分类函数；runner冻结分类并传入学习，receipt/诊断/绘图消费者核验概率scope、原生reward及分类。生产优化分支不合并本实现。

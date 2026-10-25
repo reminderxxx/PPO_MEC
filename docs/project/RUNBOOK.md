@@ -1,3 +1,13 @@
+## 2026-10-25 独立恢复入口（非formal）
+
+在独立分支的已提交干净源码目录使用共享Python。ROOT为不存在的新子目录，INPUTS为上一轮冻结开发输入；入口拒绝覆盖，CLI日志保存在本地analysis目录。顺序为qualify、diagnostic、train，各用不同ROOT：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -B scripts/run_workflow_recovery.py qualify --root <new-root> --inputs <frozen-inputs>
+```
+
+第二阶段显式启用released_fifo_prepare_5_v1，不能用默认ActionAdapter解码；模型须经本脚本`save_agent/load_agent`匹配envelope、方法与encoder。原始奖励和逐步gzip trace保留，gamma=1；默认registry、formal/holdout协议不变。训练前须验收准备服务机会和小任务学习，具体预算/全部尝试由本地execution_plan与阶段回执约束。
+
 > Experimental strict subject binding: see [sagh_subject_binding_runtime_20261024.md](sagh_subject_binding_runtime_20261024.md). Run only the documented synthetic matching tests in this round. Strict Gym use requires a new per-exposure receipt path and frozen exposure ID; boundary exceptions stop control, preserve the failed exposure and invalidate a filtered mean. No training or real-data execution is authorized by this entry.
 
 > 本分支D/E：先`tests/test_sagh_dt_executed_density.py`与相关回归/逐参数匹配，通过并冻结Git后，仅运行一次`scripts/preflight_sagh_dt_executed_density.py --parent-root <原continuation root> --output-root <新comparison root> --execute-preflight`。总真实交互硬上限5184，无正式训练/重试/追加预算。完整运行与审计边界见`sagh_dt_executed_density_contract_20261023.md`。

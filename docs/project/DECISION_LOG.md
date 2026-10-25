@@ -1,3 +1,5 @@
+> 2026-10-25 独立恢复：先保留可执行先验与失败，不对原奖励添加准备奖励；finite-horizon训练gamma=1与原始累计评价对齐。实验五动作替换无本地adapter能力的vehicle fallback及重复操作，允许两种已释放后续adapter准备；全部方法共享同一候选、mask和成本。384 MB按可容纳base+任意两种兼容adapter但不能容纳全部五种的结构条件设定，同时保留288 MB资格对照；不是按算法得分选择容量。图/集合参数初始化相同，仅DAG边开关不同。
+
 > 2026-10-24 experimental runtime subject binding: preserve legacy defaults; opt-in strict mode fixes the episode subject and fails before old control can affect a replacement vehicle. Failures have no invented reward, remain in the frozen exposure denominator and prevent filtered reward publication. Native lookup identity/time witnesses, explicit per-exposure receipts and latched failure are required; formal protocol mixing and implicit retry are rejected. This is synthetic/recorded-data acceptance, not a reward change or service-gain promotion. See [runtime contract](sagh_subject_binding_runtime_20261024.md).
 
 ﻿# Decision Log

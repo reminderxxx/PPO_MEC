@@ -1,3 +1,5 @@
+> 独立恢复新增`scripts/run_workflow_recovery.py`、`src/envs/wrappers/persistent_workflow_control.py`、`src/encoders/persistent_workflow_encoder.py`与`tests/test_workflow_recovery.py`；本地产物`artifacts/analysis/workflow_recovery_execution_20261025_v1/`，不覆盖旧实验。
+
 > Experimental runtime binding helper: `src/runtime/subject_binding.py`; compatibility diagnostic exports: `scripts/sagh_subject_binding.py`; integration tests: `tests/test_sagh_subject_binding_runtime.py`. Failure receipts use caller-chosen new local per-exposure paths and are not formal result artifacts. See [runtime contract](sagh_subject_binding_runtime_20261024.md).
 
 > 本独立分支D/E入口`scripts/preflight_sagh_dt_executed_density.py`；合同`docs/project/sagh_dt_executed_density_contract_20261023.md`，产物仅本地`artifacts/analysis/sagh_dt_executed_density_preflight_20261023_v1/`，create-only，不复用历史cell或覆盖曲线。
