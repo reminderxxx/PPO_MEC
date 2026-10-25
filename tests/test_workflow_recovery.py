@@ -93,3 +93,16 @@ def test_reward_capacity_and_true_terminal_are_preserved(tmp_path):
         if done:break
     assert done and not truncated and row['terminal_reason']
     assert info['control_action']['metadata']['action_contract']==CONTROL_CONTRACT
+
+
+def test_positive_reward_scaling_preserves_business_return_and_actions(tmp_path):
+    a=fixture_env(tmp_path/'a',horizon=8);b=fixture_env(tmp_path/'b',horizon=8)
+    b.training_reward_scale=20.
+    _,ia=a.reset(seed=7);_,ib=b.reset(seed=7)
+    for _ in range(8):
+        action=expert(ia)
+        _,ra,da,_,ia=a.step(action);_,rb,db,_,ib=b.step(action)
+        assert ra==pytest.approx(rb*20.)
+        assert ib['original_business_reward']==pytest.approx(ra)
+        assert ia['semantic_state']==ib['semantic_state'] and da==db
+        if da:break

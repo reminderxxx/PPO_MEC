@@ -82,7 +82,9 @@ class PreparationAdapter:
 
 
 class PreparationGymEnv(GymVecEnv):
-    def __init__(self,*args,**kwargs):
+    def __init__(self,*args,training_reward_scale=1.,**kwargs):
+        self.training_reward_scale=float(training_reward_scale)
+        if not self.training_reward_scale>0:raise ValueError("Reward scale must be positive")
         super().__init__(*args,**kwargs)
         self._action_schema=ActionSchema([DiscreteActionSpec(i,n,n) for i,n in enumerate(ACTION_NAMES)])
         self._action_mask_builder=PreparationMask()
@@ -97,4 +99,6 @@ class PreparationGymEnv(GymVecEnv):
     def step(self,action):
         obs,reward,done,truncated,info=super().step(action)
         info["action_name"]=ACTION_NAMES[action]
-        return obs,reward,done,truncated,info
+        info["original_business_reward"]=reward
+        info["training_reward_scale"]=self.training_reward_scale
+        return obs,reward/self.training_reward_scale,done,truncated,info

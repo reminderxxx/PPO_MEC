@@ -30,7 +30,7 @@ from src.agents.qmix_agent import QMIXAgent
 
 METHODS=['graph_ppo','set_ppo','mappo','qmix']
 
-def make_env(unit,wfs,sink,seed=7,count=8,capacity=384.,horizon=95):
+def make_env(unit,wfs,sink,seed=7,count=8,capacity=384.,horizon=95,reward_scale=1.):
     core=ReleasedPreparationEnv(workflows=wfs,subject_id=unit['subject_id'],request_count=count,
         mobility_provider=ReplayProvider(deepcopy(unit['frames'])),rsu_states=[RSUState(**r) for r in unit['rsus']],
         adapter_catalog=AdapterCatalog.from_json(ROOT/'src/data/model_catalog/typed_model_cache_controlled.json'),
@@ -38,7 +38,7 @@ def make_env(unit,wfs,sink,seed=7,count=8,capacity=384.,horizon=95):
         cache_capacity_profile=dict(model_cache_profile_id='typed_base_adapter_state_v1',enabled=True,unit='mb',capacity_mb=capacity,
             count_base_model_separately=True,eviction_policy='lru',typed_eviction_semantics='sequential_dependency_recompute_lru_v1'))
     recorder=EpisodeRecorder()
-    return PreparationGymEnv(core,recorder,subject_boundary_receipt_path=str(sink),subject_boundary_exposure_id=str(sink)),recorder
+    return PreparationGymEnv(core,recorder,training_reward_scale=reward_scale,subject_boundary_receipt_path=str(sink),subject_boundary_exposure_id=str(sink)),recorder
 
 
 def agent_for(method,seed,deterministic=False):
@@ -62,14 +62,14 @@ def save_agent(a,path):
     a.save(str(path))
     checkpoint=torch.load(path,map_location='cpu')
     checkpoint['recovery_contract']=dict(action=CONTROL_CONTRACT,observation=OBSERVATION_CONTRACT,method=a._recovery_method,
-        graph=a._recovery_method=='graph_ppo',gamma=1.,native_family=a.agent_name)
+        graph=a._recovery_method=='graph_ppo',gamma=1.,training_reward_scale=20.,native_family=a.agent_name)
     checkpoint['config']['experimental_encoder']=OBSERVATION_CONTRACT
     torch.save(checkpoint,path)
 
 
 def load_agent(path,method,seed,deterministic=True):
     checkpoint=torch.load(path,map_location='cpu')
-    expected=dict(action=CONTROL_CONTRACT,observation=OBSERVATION_CONTRACT,method=method,graph=method=='graph_ppo',gamma=1.,native_family={'graph_ppo':'ppo','set_ppo':'ppo','mappo':'mappo','qmix':'qmix'}[method])
+    expected=dict(action=CONTROL_CONTRACT,observation=OBSERVATION_CONTRACT,method=method,graph=method=='graph_ppo',gamma=1.,training_reward_scale=20.,native_family={'graph_ppo':'ppo','set_ppo':'ppo','mappo':'mappo','qmix':'qmix'}[method])
     if checkpoint.get('recovery_contract')!=expected:raise ValueError('Recovery checkpoint contract mismatch')
     a=agent_for(method,seed,deterministic);a.load(str(path));a._network.eval()
     return a
@@ -126,12 +126,12 @@ def qualification(out,p):
 
 
 def collect(out,p,unit,count,seed,agent,label,budget=95):
-    env,recorder=make_env(unit,workflows(p['workflows']),out/f'boundary_{label}.json',seed,count)
+    env,recorder=make_env(unit,workflows(p['workflows']),out/f'boundary_{label}.json',seed,count,reward_scale=20. if label.startswith("train_") else 1.)
     _,rollout=MARLOnPolicyTrainer(env,agent,recorder,max_steps=budget,gamma=1.,gae_lambda=.95).collect_episode(
         run_metadata=dict(policy_evaluation_mode='raw_policy',phase=label),collect_model_targets=False)
     result=result_from(env)
-    if abs(result['reward']-sum(x['reward'] for x in rollout))>1e-8:raise ValueError('Reward-accounting mismatch')
-    trace=[dict(action=x['action'],reward=x['reward'],log_prob=x['log_prob'],value=x['value'],terminated=x['terminated'],truncated=x['truncated'],
+    if abs(result['reward']-sum(x['env_info']['original_business_reward'] for x in rollout))>1e-8:raise ValueError('Reward-accounting mismatch')
+    trace=[dict(action=x['action'],reward=x['env_info']['original_business_reward'],training_reward=x['reward'],log_prob=x['log_prob'],value=x['value'],terminated=x['terminated'],truncated=x['truncated'],
         state=x['decision_info']['semantic_state'],mask=x['decision_info']['action_mask'],stream=x['env_info']['persistent_stream']) for x in rollout]
     write_trace(out/f'{label}.json.gz',trace)
     return result,rollout

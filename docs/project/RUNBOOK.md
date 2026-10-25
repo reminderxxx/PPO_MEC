@@ -1,3 +1,5 @@
+> 恢复诊断v2：仅训练回报除以固定正数20，所有方法一致；物理成本、原始业务reward和评价不变。逐步trace同时保存original与training reward，checkpoint记录尺度；该操作不增加探索/准备奖励，不声称解决退化，需独立同预算诊断。
+
 ## 2026-10-25 独立恢复入口（非formal）
 
 在独立分支的已提交干净源码目录使用共享Python。ROOT为不存在的新子目录，INPUTS为上一轮冻结开发输入；入口拒绝覆盖，CLI日志保存在本地analysis目录。顺序为qualify、diagnostic、train，各用不同ROOT：
