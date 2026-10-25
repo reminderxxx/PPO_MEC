@@ -1,3 +1,5 @@
+> 事件联合控制确认/出图：`finalize_event_joint_study.py --root ... --wait` 只等候既定九单元，不训练；先校验固定最终 checkpoint、共同初始化及 source/input hash，再记录确认开启。原确认组与事前完整组合支持组分别保留，分析/图脚本消费全部结果。完整参数见专项合同。
+
 > 事件联合控制长程入口 `run_event_joint_study.py --plan configs/experiment/event_joint_learning_v1.json --inputs ... --output ... --method ...`；三方法各三 seed、固定 256 episodes/final-only。评估入口 `evaluate_event_joint.py`；confirmation 必须匹配冻结 hash。匹配 episode 暴露、实际交互/梯度 minibatch 差异单列，详见专项合同。
 
 > 联合控制新合同使用 `run_event_joint_learning.py --eviction-aware 1`，显式采用成功服务 hit-LRU 和 v2 淘汰影响观测；同一比较的所有方法必须一致使用。`prepare_event_joint_inputs.py` 只按输入冻结数据并核验原始时间；完整参数与版本兼容见专项说明。

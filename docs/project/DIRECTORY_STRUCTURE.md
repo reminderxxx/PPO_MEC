@@ -1,3 +1,5 @@
+> 事件联合控制只读消费端：`prepare_event_joint_support.py`、`finalize_event_joint_study.py`、`analyze_event_joint_study.py`、`plot_event_joint_study.py`、`audit_event_joint_replay.py`；确认、组合矩阵、统计、图与重放均存本地专项 artifact，不写入 canonical。
+
 > 独立联合控制新增固定配置 `configs/experiment/event_joint_learning_v1.json`、`run_event_joint_study.py`、`evaluate_event_joint.py` 及匹配评估测试；均属 opt-in 开发链路，确认/原始结果仅本地保存。
 
 > 2026-10-26 本独立分支新增 `joint_workflow_control.py`、`event_joint_encoder.py`、`run_joint_workflow_probe.py`、`run_event_joint_learning.py` 与两组测试；本地产物根为 `artifacts/analysis/event_joint_control_20261026_v1/`，见 [合同](event_joint_control_20261026.md)。

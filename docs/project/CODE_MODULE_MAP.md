@@ -1,3 +1,5 @@
+> 事件联合证据链：支持组合生产端只读冻结输入；finalizer 验证九个训练单元并冻结开启确认；统计消费端做 window/workload/seed 层级配对及输入等价类敏感性；绘图仅消费统计/原始固定检查点；重放审计不调用环境。训练算法模块保持固定科学版本。
+
 > 事件联合 study 由固定配置驱动 `run_event_joint_study.py` 调用训练 runner；`evaluate_event_joint.py` 仅消费 v2 物理合同与匹配 checkpoint/冻结 manifest。逐步/event 决策时钟保存在 checkpoint，不通过 agent 名称猜测。
 
 > 2026-10-26 独立联合控制依赖：`JointWorkflowEnv` 继承 `ReadyWorkflowEnv` 物理模型；`event_joint_encoder.py` 提供真实 DAG/候选特征；`ppo_agent.py::EventJointPPOAgent` 消费特征，runner 负责因果事件与固定快速执行器。旧 ready 工厂仅增加显式可选 env class；默认不变。见 [合同](event_joint_control_20261026.md)。

@@ -45,7 +45,7 @@ def evaluate(args):
     if any(u['split']=='confirmation' for u in units):
         if not args.freeze:raise ValueError('Confirmation requires a frozen manifest')
         freeze=json.loads(Path(args.freeze).read_text())
-        if freeze['inputs_sha256']!=sha(args.inputs):raise ValueError('Confirmation input freeze mismatch')
+        if sha(args.inputs) not in freeze.get('input_sha256s',[freeze.get('inputs_sha256')]):raise ValueError('Confirmation input freeze mismatch')
         if args.checkpoint and sha(args.checkpoint) not in freeze['checkpoint_sha256']:raise ValueError('Unfrozen checkpoint')
         if not args.checkpoint and args.rule not in freeze['rules']:raise ValueError('Unfrozen baseline')
     if args.checkpoint:
@@ -60,7 +60,7 @@ def evaluate(args):
     for unit in units:
         result,decisions,trace=episode(unit,p,agent,90000+unit['index'],True)
         name_trace=f'w{unit["index"]}.json.gz';write_trace(out/name_trace,trace)
-        rows.append(dict(method=name,seed=seed,window=unit['index'],split=unit['split'],decisions=len(decisions),trace=name_trace,trace_sha256=sha(out/name_trace),**result))
+        rows.append(dict(method=name,seed=seed,window=unit['index'],outer_window=unit.get('outer_window_index',unit['index']),case_index=unit.get('case_index',unit['index']),workflow_ids=[w['workflow_id'] for w in unit.get('workflows',p['workflows'])],split=unit['split'],decisions=len(decisions),trace=name_trace,trace_sha256=sha(out/name_trace),**result))
         dump(out/'rows.json',rows)
         print(json.dumps(dict(method=name,window=unit['index'],reward=result['reward'],completed=result['completed_requests'])),flush=True)
     dump(out/'completion.json',dict(status='complete',rows=len(rows),native_steps=sum(x['steps'] for x in rows),wall_seconds=time.monotonic()-start,provenance=provenance))

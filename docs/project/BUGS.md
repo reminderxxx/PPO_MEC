@@ -1,3 +1,5 @@
+> 2026-10-26 联合控制统计风险追加：不同原始时间窗口可能共享相同 DAG 与 RSU 关联序列，不能只用窗口数代表有效场景多样性。确认前审查保留原组，并以输入等价类敏感性及完整组合、窗口外层嵌套统计防止伪重复；详细分类仅本地审查。
+
 > 2026-10-26 独立原型风险：旧 ready/persistent 链路成功服务未刷新 typed 对象 recency，因此不能把原型入库 recency 当作完整 service-hit LRU 机制。新 joint 合同通过显式 opt-in 修复，对所有新 baseline 一致应用；旧默认与历史产物不改写。确认集的项目级历史暴露尚未穷尽排除，不能称 strict project-wide holdout。详见 event_joint_control_20261026.md 与本地审查。
 
 > 2026-10-25 新增长期风险：FIFO 固定执行和逐帧请求碎片化会掩盖机制价值；候选节点图消息改变动作不等于增加回报。请求级承诺虽产生有限学习信号，也限制跨请求缓存复用，强规则仍占优。当前四个开发评价主体无跨 RSU 切换、NGSIM 节点统一一步服务、仅两个受控 DAG；不能由该原型推出原算法优势。详见本地 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/final_review.json`；seed29 的重复扩展已中止且全部部分产物保留。

@@ -97,3 +97,31 @@ input hash, checkpoint hash and baseline list. The statistical plan fixes raw
 time windows as outer clusters, seed replication within windows, 9,999 bootstrap
 resamples, percentile/BCa intervals and sign tests with global Holm correction.
 A descriptive late reward plateau does not prove parameter/policy convergence.
+
+## Prospective confirmation diversity amendment
+
+Input-equivalence auditing is performed before outcome opening. Raw-time
+non-overlap does not by itself make repeated workflow/RSU association inputs
+independent controlled configurations. The original frozen primary cohort and
+its nominal raw-window statistics are retained; conservative inference also
+collapses identical input-effect projections. Detailed class membership remains
+in the private artifact review.
+
+A separate prospective supporting package enumerates all 36 combinations with
+replacement of the eight unseen source-ordered DAG identities, with three
+compositions nested in each of the original 12 time windows. It is produced by
+`prepare_event_joint_support.py` without performance access and reproduced by
+exact input SHA-256. No primary input, checkpoint, training budget or seed is
+replaced. Supporting inference resamples window/workload/paired-seed levels;
+36 compositions are never presented as 36 independent time windows. The joint
+conservative primary/supporting family uses 56 Holm-corrected comparisons.
+
+`finalize_event_joint_study.py` waits for all nine fixed cells, validates initial
+parameter matching and the training-source/input contracts, then freezes final
+checkpoint and consumer hashes before any confirmation command. Its sealed
+input-opening record is separate and append-only. It does not resume, retune,
+select a successful subset, or retry a failed confirmation automatically.
+`analyze_event_joint_study.py` and `plot_event_joint_study.py` consume all fixed
+results. `audit_event_joint_replay.py` reconstructs every stochastic decision and
+PPO update from saved states, comparing checkpoint parameters exactly without
+new environment interactions.
