@@ -61,12 +61,12 @@ class ReadyWorkflowPPOAgent:
     No expert, action guard, shaping or graph-specific reward. The set ablation
     has identical parameters, features and PPO updates; it skips edge messages.
     """
-    def __init__(self, random_seed=7, use_graph=True):
+    def __init__(self, random_seed=7, use_graph=True, architecture=None):
         import torch
-        from src.encoders.ready_workflow_encoder import ReadyWorkflowActorCritic
+        from src.encoders.ready_workflow_encoder import ReadyWorkflowActorCritic, MODEL_VERSION
         self.seed=int(random_seed);self.use_graph=bool(use_graph)
         torch.manual_seed(self.seed)
-        self.network=ReadyWorkflowActorCritic(use_graph=self.use_graph)
+        self.network=ReadyWorkflowActorCritic(use_graph=self.use_graph,architecture=architecture or MODEL_VERSION)
         self.optimizer=torch.optim.Adam(self.network.parameters(),lr=3e-4)
         self.updates=0
 
@@ -108,7 +108,7 @@ class ReadyWorkflowPPOAgent:
         from src.envs.wrappers.ready_workflow_control import READY_CONTRACT
         from src.encoders.ready_workflow_encoder import FEATURE_VERSION
         if Path(path).exists():raise FileExistsError(path)
-        torch.save(dict(contract=READY_CONTRACT,features=FEATURE_VERSION,seed=self.seed,use_graph=self.use_graph,
+        torch.save(dict(contract=READY_CONTRACT,features=FEATURE_VERSION,architecture=self.network.architecture,seed=self.seed,use_graph=self.use_graph,
             network=self.network.state_dict(),optimizer=self.optimizer.state_dict(),updates=self.updates,
             rng=torch.random.get_rng_state(),provenance=provenance),path)
 
@@ -120,5 +120,5 @@ class ReadyWorkflowPPOAgent:
         p=torch.load(path,map_location='cpu')
         if p.get('contract')!=READY_CONTRACT or p.get('features')!=FEATURE_VERSION:
             raise ValueError('Ready-node checkpoint contract mismatch')
-        a=cls(p['seed'],p['use_graph']);a.network.load_state_dict(p['network']);a.optimizer.load_state_dict(p['optimizer']);a.updates=p['updates']
+        a=cls(p['seed'],p['use_graph'],p.get('architecture','ready_propagated_actor_v1'));a.network.load_state_dict(p['network']);a.optimizer.load_state_dict(p['optimizer']);a.updates=p['updates']
         return a,p

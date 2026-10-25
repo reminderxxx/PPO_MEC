@@ -42,7 +42,9 @@ def test_edge_swap_preserves_local_features_but_changes_directed_messages():
     _,a=fixture();_,b=fixture(True);fa,fb=ready_features(a),ready_features(b)
     assert torch.equal(fa['x'],fb['x']) and torch.equal(fa['mask'],fb['mask'])
     assert not torch.equal(fa['succ'],fb['succ'])
-    torch.manual_seed(7);graph=ReadyWorkflowActorCritic(True);flat=deepcopy(graph);flat.use_graph=False
+    torch.manual_seed(7);graph=ReadyWorkflowActorCritic(True)
+    with torch.no_grad():graph.message_gate.fill_(1.)
+    flat=deepcopy(graph);flat.use_graph=False
     ga,_=graph(batch_ready_features([fa]));gb,_=graph(batch_ready_features([fb]))
     sa,_=flat(batch_ready_features([fa]));sb,_=flat(batch_ready_features([fb]))
     assert torch.equal(sa,sb) and sa[0,0]==sa[0,1]
@@ -77,3 +79,19 @@ def test_actual_ppo_update_and_checkpoint_roundtrip(tmp_path,graph):
 def test_graph_set_initial_parameters_and_information_match():
     graph=ReadyWorkflowPPOAgent(13,True);flat=ReadyWorkflowPPOAgent(13,False)
     assert all(torch.equal(v,flat.network.state_dict()[k]) for k,v in graph.network.state_dict().items())
+
+
+def test_zero_gate_starts_graph_and_set_at_exactly_same_policy():
+    _,state=fixture();features=batch_ready_features([ready_features(state)])
+    graph=ReadyWorkflowPPOAgent(7,True);flat=ReadyWorkflowPPOAgent(7,False)
+    g,v=graph.network(features);s,w=flat.network(features)
+    assert torch.equal(g,s) and torch.equal(v,w)
+
+
+def test_legacy_pilot_checkpoint_remains_loadable(tmp_path):
+    a=ReadyWorkflowPPOAgent(7,True,architecture='ready_propagated_actor_v1')
+    p=tmp_path/'v1.pt';a.save(p,{})
+    payload=torch.load(p);payload.pop('architecture');torch.save(payload,p)
+    b,_=ReadyWorkflowPPOAgent.load(p)
+    assert b.network.architecture=='ready_propagated_actor_v1'
+    assert all(torch.equal(v,b.network.state_dict()[k]) for k,v in a.network.state_dict().items())

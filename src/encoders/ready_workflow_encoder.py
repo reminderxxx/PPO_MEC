@@ -5,6 +5,8 @@ from src.envs.core.persistent_workflow_env import ADAPTERS
 from src.envs.wrappers.ready_workflow_control import READY_CONTRACT
 
 FEATURE_VERSION = 'ready_node_features_v1'
+MODEL_VERSION = 'ready_residual_actor_v2'
+LEGACY_MODEL_VERSION = 'ready_propagated_actor_v1'
 NODE_DIM = 17
 GLOBAL_DIM = 8
 
@@ -54,26 +56,31 @@ def batch_ready_features(items):
 
 
 class ReadyWorkflowActorCritic(nn.Module):
-    def __init__(self,use_graph=True,hidden_dim=48):
-        super().__init__();self.use_graph=bool(use_graph)
+    def __init__(self,use_graph=True,hidden_dim=48,architecture=MODEL_VERSION):
+        super().__init__();self.use_graph=bool(use_graph);self.architecture=architecture
+        if architecture not in [MODEL_VERSION,LEGACY_MODEL_VERSION]:raise ValueError('Unknown ready-node architecture')
+        if architecture==MODEL_VERSION:self.message_gate=nn.Parameter(torch.zeros(()))
         self.node=nn.Sequential(nn.Linear(NODE_DIM,hidden_dim),nn.Tanh(),nn.Linear(hidden_dim,hidden_dim),nn.Tanh())
         self.self_update=nn.Linear(hidden_dim,hidden_dim)
         self.succ_update=nn.Linear(hidden_dim,hidden_dim,bias=False)
         self.pred_update=nn.Linear(hidden_dim,hidden_dim,bias=False)
-        self.actor=nn.Sequential(nn.Linear(hidden_dim*3+GLOBAL_DIM,hidden_dim),nn.Tanh(),nn.Linear(hidden_dim,1))
+        self.actor=nn.Sequential(nn.Linear(hidden_dim*(4 if architecture==MODEL_VERSION else 3)+GLOBAL_DIM,hidden_dim),nn.Tanh(),nn.Linear(hidden_dim,1))
         self.critic=nn.Sequential(nn.Linear(hidden_dim+GLOBAL_DIM,hidden_dim),nn.Tanh(),nn.Linear(hidden_dim,1))
 
     def forward(self,batch):
-        h=self.node(batch['x'])
+        local=self.node(batch['x']);h=local
         for _ in range(2):
             update=self.self_update(h)
             if self.use_graph:
-                update=update+self.succ_update(torch.bmm(batch['succ'],h))+self.pred_update(torch.bmm(batch['pred'],h))
+                message=self.succ_update(torch.bmm(batch['succ'],h))+self.pred_update(torch.bmm(batch['pred'],h))
+                update=update+(self.message_gate.tanh()*message if self.architecture==MODEL_VERSION else message)
             h=torch.tanh(h+update)
         weights=batch['present'].unsqueeze(-1)
         pooled=(h*weights).sum(1)/weights.sum(1).clamp_min(1)
         global_context=torch.cat([pooled,batch['context']],-1)
         request_h=torch.bmm(batch['request'],h)
-        candidates=torch.cat([h,request_h,global_context.unsqueeze(1).expand(-1,h.shape[1],-1)],-1)
+        parts=[h,request_h,global_context.unsqueeze(1).expand(-1,h.shape[1],-1)]
+        if self.architecture==MODEL_VERSION:parts.insert(0,local)
+        candidates=torch.cat(parts,-1)
         logits=self.actor(candidates).squeeze(-1).masked_fill(~batch['mask'],-1e9)
         return logits,self.critic(global_context).squeeze(-1)
