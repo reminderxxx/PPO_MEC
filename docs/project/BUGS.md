@@ -1,3 +1,5 @@
+> 2026-10-26 联合控制剩余风险：新原型尚不支持对强启发式的整体优越性、图结构增益或严格收敛。贪心评估低完成不能等同随机训练没有学习。成功服务 hit-LRU 修复仅显式 opt-in，不代表旧 live/G14 语义已修复；跨 RSU/真实 AI 与项目全历史暴露仍需独立协议审计。完整受控证据和边界见本地 final_review 及 [索引](event_joint_control_evidence_20261026.md)。
+
 > 2026-10-26 学习式预测输入风险OPEN：现有九维包装投影用缓存数量概括对象驻留，零交互构造例确认等数量的所需/非所需adapter输入相同；该分支的真实状态覆盖、运行profile与收益影响尚未验证。此限制不等于graph actor也缺少对象信息，不得将补输入或加世界模型直接宣称主方法优势。方案见 `main_method_optimization_plan_20261026.md`；本轮无算法/reward修改或训练，formal readiness=Unverifiable，reviewed_at=2026-10-26T02:25:16+08:00。
 
 > 2026-10-25 决策瓶颈风险已核验：固定 FIFO 与逐帧请求碎片化会掩盖机制收益；请求级原型尚弱于全局缓存优先规则。当前四个开发评价主体未跨 RSU、节点统一一步服务、只有两个受控 DAG，不能据此证明图/迁移必要性。完整负结果、seed29 中止记录和 claim 边界仅本地保存在 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`；科学实现独立于当前用户修改。
