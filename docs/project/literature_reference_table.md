@@ -11,6 +11,14 @@
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
+### 2026-10-25：请求级决策之后的可中断时间抽象基础
+
+本条为经典方法基础，不作为近年新颖性证据，也不表示本项目已实现可学习终止或已获得收益。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 可中断 options / SMDP | [Between MDPs and semi-MDPs: A framework for temporal abstraction in reinforcement learning](https://www.sciencedirect.com/science/article/pii/S0004370299000521) | Artificial Intelligence, 112(1–2):181–211, 1999；DOI 10.1016/S0004-3702(99)00052-1；出版社检索摘要与作者目录核验；本轮全文访问403，未取得全文 | 将持续多步的闭环 option 纳入 SMDP；出版社摘要明确讨论执行中中断 option，以及利用执行片段学习。可支撑“时间抽象不等于必须完成整个请求才允许重选”。 | 候选为请求完成、加载/缓存状态变化和真实RSU转移下的因果重选；须把 active option/持续时间纳入状态并累计原始物理成本。当前请求级原型与可学习中断仍有区别；不能把经典 options 或事件触发本身当新颖性或本项目优势证据。 | Method motivation / 时间合同与终止消融；方案待实现验证。 |
+
 ### 2026-10-25：试训停滞后的恢复方法补充
 
 检索截止2026-10-25。以下为通用方法基础，不能替代本项目机制与服务收益验证；近年直接调度对照仍见下节GOODRL和RESCHED。本轮只读核查、独立修复任务及零交互编码敏感性回执保存在Git忽略的`artifacts/analysis/literature_guided_recovery_20261025_v1/`；未修改算法、奖励、文稿或启动新训练。
