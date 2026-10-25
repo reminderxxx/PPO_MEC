@@ -1,3 +1,5 @@
+> 2026-10-25三阶段自主恢复已执行：独立`codex/workflow-recovery`分支完成可达机会检查、准备/观测合同及固定四方法三seed比较，真实曲线、原始trace与全部负结果仅本地保存于`artifacts/analysis/workflow_recovery_execution_20261025_v1/`。共有专家初始化与RL增量分别报告；不据奖励平台晋级图结构优势或策略收敛。详见项目PROGRESS与ARTIFACT_RECORDS。
+
 > 本轮独立恢复入口：`scripts/run_workflow_recovery.py`，仅在`codex/workflow-recovery`分支。released FIFO准备五动作、共享加载/剩余时域特征、匹配图/集合编码与PPO/MAPPO/QMIX；产物在本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`，非formal、无holdout。
 
 > Experimental opt-in runtime subject boundaries are documented in [the runtime contract](docs/project/sagh_subject_binding_runtime_20261024.md). Legacy defaults and training entry points stay unchanged; strict failures are explicit failed exposures, never filtered reward improvements.

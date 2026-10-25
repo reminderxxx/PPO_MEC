@@ -1,3 +1,5 @@
+> 2026-10-25自主恢复入口：独立`codex/workflow-recovery`，科学版本36bc755；本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`含完整结果、验证与图，图结构特定增量和formal/holdout结论仍须独立证据。主工作区已有代码修改未覆盖，默认registry/canonical未更新。
+
 > 独立合同修复入口：`fair_reward_contract_repair_20261021.md`。旧 long_fair v1 已用户暂停，新轮验证后从零重训，不复用旧 cell。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。

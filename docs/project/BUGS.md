@@ -1,3 +1,5 @@
+> 2026-10-25自主恢复后的研究边界OPEN：小任务完成稳定性与显式准备链路已有开发证据，原SA-GHMAPPO完整方法、图结构增量与独立泛化仍未证实。共享专家未覆盖全部动作，有限FIFO/单主体/受控加载及实际训练暴露差异须保留；稳定回报和低模仿loss不能替代最优性或机制归因。完整负结果与审查仅本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`。reviewed_at=2026-10-25T16:03:26.689669+08:00；literature_cutoff=2026-10-25；target_venue=IEEE TMC methodology / CSCWD2027 development；artifact_run_id=workflow_recovery_execution_20261025_v1；policy_version=tmc_review_policy_v3_20260621；scientific_git=36bc755；evidence_level=RAW_DEVELOPMENT_AND_CHECKPOINT_TRACE_REPLAY_ONLY；formal readiness=Unverifiable。
+
 > 2026-10-23 独立候选864add6的behavior/counterfactual执行监督已对齐；其余辅助目标、不可微门控、多对一探索和自然覆盖不足继续OPEN。匹配测试及小预算完成不证明奖励收益，未调辅助系数或奖励、不合并优化主线。详见sagh_auxiliary_alignment_preflight_20261023.md及本地report。
 
 > 2026-10-23 独立分支修复与边界：动作0 truthiness误标及训练/贪心的fallback/option映射差异通过匹配测试和有界真实预检；新checkpoint显式保存mapping合同。未经匹配的可选critic/planner/smoothing模式拒绝，legacy行为合同保留；多目标偏好/更广辅助标签对齐及长期效果仍OPEN。预检零target KL检查器口径错误已独立诊断修复，原生guard与参数未改，失败partial保留。见sagh_execution_repair_preflight_20261023.md。

@@ -1,3 +1,15 @@
+## 完整恢复流程复现（科学版本36bc755，非formal）
+
+使用三个互不覆盖的新root，依次采集训练专家、验收小任务、执行固定比较；所有原始结果仍留本地。INPUTS为该轮冻结输入，TEACHER为teacher子目录的dataset.json.gz：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -B scripts/run_workflow_recovery.py teacher --root <new-teacher-root> --inputs <frozen-inputs>
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -B scripts/run_workflow_recovery.py diagnostic --root <new-diagnostic-root> --inputs <frozen-inputs> --teacher <teacher-dataset>
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -B scripts/run_workflow_recovery.py train --training-steps 16384 --root <new-main-root> --inputs <frozen-inputs> --teacher <teacher-dataset>
+```
+
+诊断门验收后才能启动main；本轮使用原始业务回报、gamma=1、GAE lambda=1、完整episode优先收集，固定尺度20的负诊断保留而未用于主比较。checkpoint须经实验factory核对action/encoder envelope；默认live registry拒绝该实验模型。共有专家起点与RL增量分别报告，运行时并发wall-clock不作算法速度证据。完整证据索引在本地analysis root；未启动formal/holdout。
+
 > 专家恢复阶段：所有方法共享因果专家训练数据与20轮按动作频次平衡的模仿，随机起点、模仿后起点和RL过程分别记录，专家成本计入。收集优先完整episode，达到至少256条后整批更新且不遗留旧策略样本；仅在固定2048步评价边界或总预算末尾允许外部截断并bootstrap，减少每次凑256条造成的提前重置。实际learner/optimizer次数单列，不再假设每cell恰好64次learn。
 
 > 恢复诊断v3：固定缩放v2未通过末期小任务门；恢复原始回报尺度，仅将GAE lambda从0.95改为1，使有限episode的完成收益进入全部早期动作的Monte Carlo信用。与v1同预算单因素比较，v2负结果保留；未引入专家/塑形，尚不声称有效。
