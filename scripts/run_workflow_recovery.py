@@ -62,14 +62,14 @@ def save_agent(a,path):
     a.save(str(path))
     checkpoint=torch.load(path,map_location='cpu')
     checkpoint['recovery_contract']=dict(action=CONTROL_CONTRACT,observation=OBSERVATION_CONTRACT,method=a._recovery_method,
-        graph=a._recovery_method=='graph_ppo',gamma=1.,training_reward_scale=20.,native_family=a.agent_name)
+        graph=a._recovery_method=='graph_ppo',gamma=1.,training_reward_scale=1.,native_family=a.agent_name)
     checkpoint['config']['experimental_encoder']=OBSERVATION_CONTRACT
     torch.save(checkpoint,path)
 
 
 def load_agent(path,method,seed,deterministic=True):
     checkpoint=torch.load(path,map_location='cpu')
-    expected=dict(action=CONTROL_CONTRACT,observation=OBSERVATION_CONTRACT,method=method,graph=method=='graph_ppo',gamma=1.,training_reward_scale=20.,native_family={'graph_ppo':'ppo','set_ppo':'ppo','mappo':'mappo','qmix':'qmix'}[method])
+    expected=dict(action=CONTROL_CONTRACT,observation=OBSERVATION_CONTRACT,method=method,graph=method=='graph_ppo',gamma=1.,training_reward_scale=1.,native_family={'graph_ppo':'ppo','set_ppo':'ppo','mappo':'mappo','qmix':'qmix'}[method])
     if checkpoint.get('recovery_contract')!=expected:raise ValueError('Recovery checkpoint contract mismatch')
     a=agent_for(method,seed,deterministic);a.load(str(path));a._network.eval()
     return a
@@ -126,8 +126,8 @@ def qualification(out,p):
 
 
 def collect(out,p,unit,count,seed,agent,label,budget=95):
-    env,recorder=make_env(unit,workflows(p['workflows']),out/f'boundary_{label}.json',seed,count,reward_scale=20. if label.startswith("train_") else 1.)
-    _,rollout=MARLOnPolicyTrainer(env,agent,recorder,max_steps=budget,gamma=1.,gae_lambda=.95).collect_episode(
+    env,recorder=make_env(unit,workflows(p['workflows']),out/f'boundary_{label}.json',seed,count,reward_scale=1.)
+    _,rollout=MARLOnPolicyTrainer(env,agent,recorder,max_steps=budget,gamma=1.,gae_lambda=1.).collect_episode(
         run_metadata=dict(policy_evaluation_mode='raw_policy',phase=label),collect_model_targets=False)
     result=result_from(env)
     if abs(result['reward']-sum(x['env_info']['original_business_reward'] for x in rollout))>1e-8:raise ValueError('Reward-accounting mismatch')
