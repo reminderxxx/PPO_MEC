@@ -11,6 +11,16 @@
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
+### 2026-10-25：试训停滞后的恢复方法补充
+
+检索截止2026-10-25。以下为通用方法基础，不能替代本项目机制与服务收益验证；近年直接调度对照仍见下节GOODRL和RESCHED。本轮只读核查、独立修复任务及零交互编码敏感性回执保存在Git忽略的`artifacts/analysis/literature_guided_recovery_20261025_v1/`；未修改算法、奖励、文稿或启动新训练。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| DAG调度与训练难度 | [Learning Scheduling Algorithms for Data Processing Clusters](https://people.csail.mit.edu/malte/pub/papers/2019-sigcomm-decima.pdf) | ACM SIGCOMM, 2019；DOI 10.1145/3341302.3342080；作者全文§5.1–5.3、附录C核验；早期方法基础 | Decima联合设计图状态与stage/parallelism动作；短到长episode课程缓解初始积压，同到达序列的回报基线降低外生随机性。 | Spark并行调度不同于移动FIFO/cache；先核验可达服务空间，再设计相同权限的因果候选动作。其随机终止针对持续到达，不能照搬到真实车辆离开/有限任务边界；同窗口配对评价也不等于已实现其训练梯度基线。 | Method foundation / 状态动作闭环与课程消融。 |
+| 策略不变奖励塑形 | [Policy invariance under reward transformations: Theory and application to reward shaping](https://people.eecs.berkeley.edu/~russell/papers/icml99-shaping.pdf) | ICML, 1999；作者全文定理1核验；venue/year由作者publication list核验；DOI不填 | Potential-based shaping使用gamma×后继势函数减当前势函数，在定理条件下保留所选折扣目标的最优策略。 | 若采用有限时域时间增广势函数，全部真实终止状态须处理终端势；外部截断与bootstrap另核。不能直接保证未折扣评价目标不变，也不保证有限预算PPO学得更好；评估保留原始业务奖励，所有匹配对照有同等塑形预算。 | Reward方法基础 / 非本项目原创。 |
+| 课程训练综述 | [Curriculum Learning for Reinforcement Learning Domains: A Framework and Survey](https://www.jmlr.org/papers/v21/20-212.html) | JMLR, 21(181):1–50, 2020；出版社摘要/元数据核验，全文未通读 | 系统整理任务/经验排序与知识迁移，讨论从易到难学习复杂目标任务的假设、能力及评价。 | 可预先固定少请求到多请求、弱到强缓存竞争的训练课程；最终统一混合负载测试，保留困难和负向结果，并计入全部课程交互与专家成本。课程不构成adapter/VEC特定创新。 | Training protocol / curriculum背景。 |
+
 ### 2026-10-25：长期训练奖励与场景决策价值对照
 
 检索截止2026-10-25。前三类证据分开登记：已读全文、官方/作者摘要、待核线索。新增记录不自动修改已固定文稿参考文献。详细审查和拟定改进保存在本地Git忽略的`artifacts/analysis/literature_guided_reward_plan_20261025_v1/`；不构成算法实现、训练执行或优势证明。
