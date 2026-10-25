@@ -1,3 +1,5 @@
+> 事件联合 study 由固定配置驱动 `run_event_joint_study.py` 调用训练 runner；`evaluate_event_joint.py` 仅消费 v2 物理合同与匹配 checkpoint/冻结 manifest。逐步/event 决策时钟保存在 checkpoint，不通过 agent 名称猜测。
+
 > 2026-10-26 独立联合控制依赖：`JointWorkflowEnv` 继承 `ReadyWorkflowEnv` 物理模型；`event_joint_encoder.py` 提供真实 DAG/候选特征；`ppo_agent.py::EventJointPPOAgent` 消费特征，runner 负责因果事件与固定快速执行器。旧 ready 工厂仅增加显式可选 env class；默认不变。见 [合同](event_joint_control_20261026.md)。
 
 > 独立恢复依赖：`persistent_workflow_control.py`封装既有持续环境/Gym，显式把已释放未来adapter传入typed事务；`persistent_workflow_encoder.py`消费相同因果候选/加载/剩余时域特征并可关闭DAG边；`run_workflow_recovery.py`在实验工厂装配既有PPO/MAPPO/QMIX、checkpoint envelope和匹配消费端。默认registry/旧入口不变。

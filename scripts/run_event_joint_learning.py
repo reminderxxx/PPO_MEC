@@ -28,7 +28,8 @@ def episode(unit,p,agent,seed,deterministic=False,rule=None,keep_states=True):
     while True:
         aware=getattr(agent,'eviction_aware',p.get('eviction_aware',False))
         if aware:state=observe_joint_effects(env,state)
-        event=event_available(state,aware);action=None
+        primitive=getattr(agent,'controller','event')=='primitive'
+        event=primitive or event_available(state,aware);action=None
         if event:
             f=event_features(state,aware)
             if rule=='uniform':action=int(torch.distributions.Categorical(probs=f['mask'].float()).sample());lp=v=0.
@@ -68,12 +69,12 @@ def evaluate(out,p,agent,seed,ep,rule=None):
     finally:torch.random.set_rng_state(rng)
 
 
-def train(out,p,seed,graph,episodes,cadence,eviction_aware=False):
-    out.mkdir();torch.set_num_threads(1);agent=EventJointPPOAgent(seed,graph,eviction_aware);evaluation=[];training=[];updates=[];pending=[];steps=0
+def train(out,p,seed,graph,episodes,cadence,eviction_aware=False,controller="event"):
+    out.mkdir();torch.set_num_threads(1);agent=EventJointPPOAgent(seed,graph,eviction_aware,controller);evaluation=[];training=[];updates=[];pending=[];steps=0
     units=[u for u in p['units'] if u['split']=='train']
     provenance=dict(source_git=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),input_sha256=p['_sha'],seed=seed,
-        episodes=episodes,use_graph=graph,eviction_aware=eviction_aware,service_hit_lru=eviction_aware,expert_steps=0,reward='native business reward summed over holding time /20 for numerical scale only',gamma=1.,gae_lambda=1.,
-        fast_executor='global cache-first service with no cancellation of in-flight loading',optimizer='Adam1e-3,4epochs,batch128,clip.2,entropy.02,separate actor/value norm clipping.5',
+        episodes=episodes,use_graph=graph,eviction_aware=eviction_aware,controller=controller,service_hit_lru=eviction_aware,expert_steps=0,reward='native business reward summed over holding time /20 for numerical scale only',gamma=1.,gae_lambda=1.,
+        fast_executor='global cache-first service; event mode additionally commits to in-flight loads and automatically fills unavoidable cold tasks',optimizer='Adam1e-3,4epochs,batch128,clip.2,entropy.02,separate actor/value norm clipping.5',
         evaluation='greedy on all fixed dev windows at episode0 and prespecified cadence; final checkpoint, no best selection',formal=False,holdout=False)
     dump(out/'command.json',dict(argv=sys.argv,cwd=str(ROOT),provenance=provenance));agent.save(out/'checkpoint_0.pt',provenance)
     evaluation+=evaluate(out,p,agent,seed,0);dump(out/'validation.json',evaluation)
@@ -90,8 +91,8 @@ def train(out,p,seed,graph,episodes,cadence,eviction_aware=False):
 
 
 def main():
-    a=argparse.ArgumentParser();a.add_argument('--inputs',required=True);a.add_argument('--output',required=True);a.add_argument('--seed',type=int,default=7);a.add_argument('--graph',type=int,default=1);a.add_argument('--episodes',type=int,default=32);a.add_argument('--cadence',type=int,default=16);a.add_argument('--eviction-aware',type=int,default=0);args=a.parse_args()
+    a=argparse.ArgumentParser();a.add_argument('--inputs',required=True);a.add_argument('--output',required=True);a.add_argument('--seed',type=int,default=7);a.add_argument('--graph',type=int,default=1);a.add_argument('--episodes',type=int,default=32);a.add_argument('--cadence',type=int,default=16);a.add_argument('--eviction-aware',type=int,default=0);a.add_argument('--controller',choices=['event','primitive'],default='event');args=a.parse_args()
     p=json.loads(Path(args.inputs).read_text());p['_sha']=sha(args.inputs)
-    train(Path(args.output),p,args.seed,bool(args.graph),args.episodes,args.cadence,bool(args.eviction_aware))
+    train(Path(args.output),p,args.seed,bool(args.graph),args.episodes,args.cadence,bool(args.eviction_aware),args.controller)
 
 if __name__=='__main__':main()

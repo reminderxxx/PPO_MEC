@@ -1,0 +1,39 @@
+{
+  "protocol": "event_joint_learning_v1",
+  "methods": {
+    "event_set_ppo": {"graph": false, "controller": "event"},
+    "event_graph_ppo": {"graph": true, "controller": "event"},
+    "primitive_ppo": {"graph": false, "controller": "primitive"}
+  },
+  "seeds": [7, 13, 29],
+  "episodes_per_cell": 256,
+  "checkpoint_cadence": 16,
+  "update_cadence": 4,
+  "max_native_steps_per_episode": 95,
+  "physical_contract": "joint_service_hit_lru_v1",
+  "feature_contract": "event_joint_eviction_features_v2",
+  "expert_steps": 0,
+  "primary_method": "event_set_ppo",
+  "primary_comparators": ["primitive_ppo", "shortest_frontier"],
+  "causal_rules": ["no_prefetch", "shortest_frontier", "ready_demand", "min_transfer", "eviction_cost"],
+  "checkpoint_selection": "final episode 256 only; no best-checkpoint selection",
+  "confirmation": "12 disjoint raw-time windows, unseen DAG identities; outcomes unopened until all final checkpoints and statistics frozen",
+  "statistics": {
+    "outer_cluster": "raw time window",
+    "inner_replication": "training seed; deterministic rules repeated only for pairing, never independent samples",
+    "bootstrap_replicates": 9999,
+    "bootstrap_seed": 20261026,
+    "intervals": ["percentile95", "BCa95"],
+    "test": "two-sided paired sign test on per-window seed mean differences",
+    "multiplicity": "Holm across all 4 metrics and all 7 primary-method comparisons",
+    "metrics": ["reward", "completed_requests", "waiting_seconds", "transfer_mb"]
+  },
+  "late_reward_stability": {
+    "checkpoints": [192, 208, 224, 240, 256],
+    "mean_range_max": 2.0,
+    "first_last_gap_max": 1.0,
+    "meaning": "descriptive late reward stability; never proof of parameter/policy convergence"
+  },
+  "limits": ["modeled adapter loads and unit service steps", "single controlled vehicle per episode", "3 seeds", "project-wide prior exposure not exhaustively excluded", "not formal or canonical evidence"],
+  "stop_rule": "No performance-based extra budget, seed exclusion, reward alteration, or confirmation retuning"
+}

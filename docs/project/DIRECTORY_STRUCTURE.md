@@ -1,3 +1,5 @@
+> 独立联合控制新增固定配置 `configs/experiment/event_joint_learning_v1.json`、`run_event_joint_study.py`、`evaluate_event_joint.py` 及匹配评估测试；均属 opt-in 开发链路，确认/原始结果仅本地保存。
+
 > 2026-10-26 本独立分支新增 `joint_workflow_control.py`、`event_joint_encoder.py`、`run_joint_workflow_probe.py`、`run_event_joint_learning.py` 与两组测试；本地产物根为 `artifacts/analysis/event_joint_control_20261026_v1/`，见 [合同](event_joint_control_20261026.md)。
 
 > 独立恢复新增`scripts/run_workflow_recovery.py`、`src/envs/wrappers/persistent_workflow_control.py`、`src/encoders/persistent_workflow_encoder.py`与`tests/test_workflow_recovery.py`；本地产物`artifacts/analysis/workflow_recovery_execution_20261025_v1/`，不覆盖旧实验。

@@ -85,3 +85,24 @@ def test_physical_contract_cannot_silently_change(tmp_path):
     a=EventJointPPOAgent(7,True,True);p=tmp_path/'v2.pt';a.save(p,{})
     data=torch.load(p);data['physical_contract']='legacy_admission_recency_v1';torch.save(data,p)
     with pytest.raises(ValueError,match='physical contract'):EventJointPPOAgent.load(p)
+
+
+def test_decision_clock_is_saved_and_unknown_clock_is_rejected(tmp_path):
+    for clock in ['event','primitive']:
+        a=EventJointPPOAgent(7,False,True,clock);path=tmp_path/f'{clock}.pt';a.save(path,{})
+        b,_=EventJointPPOAgent.load(path);assert b.controller==clock
+    with pytest.raises(ValueError,match='decision clock'):EventJointPPOAgent(7,False,True,'unknown')
+
+
+def test_primitive_clock_has_actual_one_step_rows_and_exact_rewards(monkeypatch):
+    import scripts.run_event_joint_learning as runner
+    env,s=joint_fixture();env.service_hit_lru=True
+    serialized=env._workflow_template.to_dict()
+    monkeypatch.setattr(runner,'joint_env',lambda *args,**kwargs:env)
+    a=EventJointPPOAgent(7,False,True,'primitive')
+    result,rows,trace=runner.episode({},dict(workflows=[serialized]),a,7,True)
+    assert len(rows)==len(trace)==result['steps']
+    assert all(r['holding_steps']==1 for r in rows)
+    assert sum(r['raw_reward'] for r in rows)==pytest.approx(result['reward'])
+    assert sum(r['reward'] for r in rows)*20.==pytest.approx(result['reward'])
+    assert all(t['event'] for t in trace)

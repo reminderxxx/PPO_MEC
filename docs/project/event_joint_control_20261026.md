@@ -75,3 +75,25 @@ Confirmation has unseen DAG identities and is outcome-sealed until a final
 freeze. This is not a claim of exhaustive project-wide hidden-holdout novelty.
 Failed data preparation attempts are retained, and no performance rows were
 produced from their incomplete inputs.
+
+## Fixed long comparison
+
+`configs/experiment/event_joint_learning_v1.json` freezes event set-PPO as the
+primary method, graph-PPO as the edge ablation, and primitive-step PPO as a
+temporal-control comparator. Three seeds, 256 episodes per cell, 16-episode
+checkpoint/evaluation cadence and final-only selection are fixed before the
+long run. The ordered input sequence and episode cap match; realized native
+steps and gradient minibatches may differ and must be reported rather than
+called exactly equal interaction/compute budgets. The primitive controller
+receives the same network, observable information, legal preparation proposals,
+physical service/cache model and native reward, but chooses a preparation action
+every physical step without the event executor's loading commitment/automatic
+unavoidable fill. This tests temporal abstraction and the fixed execution prior.
+
+`run_event_joint_study.py` executes one method group without resume or budget
+extension. `evaluate_event_joint.py` evaluates five causal baselines or a saved
+checkpoint under the identical v2 contract. Confirmation requires the frozen
+input hash, checkpoint hash and baseline list. The statistical plan fixes raw
+time windows as outer clusters, seed replication within windows, 9,999 bootstrap
+resamples, percentile/BCa intervals and sign tests with global Holm correction.
+A descriptive late reward plateau does not prove parameter/policy convergence.
