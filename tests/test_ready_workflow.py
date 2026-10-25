@@ -8,12 +8,12 @@ from src.encoders.ready_workflow_encoder import ready_features,batch_ready_featu
 from src.agents.ppo_agent import ReadyWorkflowPPOAgent
 
 
-def fixture(swapped=False):
+def fixture(swapped=False,count=1):
     edges=[('b' if swapped else 'a','c'),('a' if swapped else 'b','d'),('d','e')]
     nodes=[WorkflowNode(n,n,'veh_base_v1','adapter_perception',1,1,[a for a,b in edges if b==n],[b for a,b in edges if a==n]) for n in 'abcde']
     workflow=WorkflowGraphState('edge_test',nodes,edges,list('abcde'),current_node_id='a')
     unit=dict(subject_id='fixed',frames=[dict(time_index=i*100,vehicles=[dict(vehicle_id='fixed',position_x=0.,position_y=0.,speed=0.,base_model_id='veh_base_v1')]) for i in range(10)],rsus=[dict(rsu_id='rsu_a',position_x=0.,position_y=0.,coverage_radius=100.)])
-    env=make_env(unit,[workflow],count=1,horizon=8)
+    env=make_env(unit,[workflow],count=count,horizon=8)
     for n in env._workflow_template.nodes:n.required_adapter={'a':'adapter_perception','b':'adapter_perception','c':'adapter_fusion','d':'adapter_tracking','e':'adapter_tracking'}[n.node_id.split(':')[1]]
     state,_=env.reset();return env,state
 
