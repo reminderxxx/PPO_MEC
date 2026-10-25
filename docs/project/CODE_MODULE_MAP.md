@@ -756,3 +756,16 @@
 - `tests/test_workflow_suffix_recovery.py`：状态依赖、篡改/冲突拒绝、旧 PEFT 回执字段与汇总负例。
 
 2026-10-25: `persistent_workflow_env.py` subclasses the native core for an opt-in released FIFO batch and simulated loading readiness. `DirectWorkflowGraphPPOAgent` stays in the main algorithm file; only the experimental runner consumes it, without live registry changes.
+
+
+## 2026-10-25 opt-in decision timescale prototypes
+
+- `src/envs/wrappers/ready_workflow_control.py`：`ReadyWorkflowEnv` 继承既有持续缓存/加载物理模型，校验 DAG 一致性并显式选择 dependency-ready 节点；不改默认 FIFO core。
+- `src/encoders/ready_workflow_encoder.py`：动作条件节点特征、局部通道、受门控方向消息；v1/v2/v3 与 checkpoint 生产/消费同步。
+- `src/encoders/request_option_encoder.py`：工程化请求/依赖摘要和独立 actor/value 表示；不是 learned-GNN contribution。
+- `src/agents/ppo_agent.py`：新增 `ReadyWorkflowPPOAgent` 与 `RequestOptionPPOAgent` 实验类，PPO 原有类和 registry 映射不变。
+- `scripts/run_ready_workflow_learning.py`：机会检查、无专家短训和固定边界干预。
+- `scripts/run_request_option_learning.py`：RL 选择请求，固定因果缓存规则选择内部就绪节点，原始物理步 reward 精确汇总为 option return；终止事件后重新决策。
+- `tests/test_ready_workflow.py`、`tests/test_request_option_learning.py`：依赖安全、原始成本、局部/图信息、真实 PPO 更新、时间聚合和跨版本拒绝/读回。
+
+全部为独立开发合同，不接入 full vehicle/RSU-level MARL、formal/canonical 或论文主表。

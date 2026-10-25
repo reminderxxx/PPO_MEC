@@ -1,3 +1,5 @@
+> 2026-10-25 新增长期风险：FIFO 固定执行和逐帧请求碎片化会掩盖机制价值；候选节点图消息改变动作不等于增加回报。请求级承诺虽产生有限学习信号，也限制跨请求缓存复用，强规则仍占优。当前四个开发评价主体无跨 RSU 切换、NGSIM 节点统一一步服务、仅两个受控 DAG；不能由该原型推出原算法优势。详见本地 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/final_review.json`；seed29 的重复扩展已中止且全部部分产物保留。
+
 > 2026-10-25自主恢复后的研究边界OPEN：小任务完成稳定性与显式准备链路已有开发证据，原SA-GHMAPPO完整方法、图结构增量与独立泛化仍未证实。共享专家未覆盖全部动作，有限FIFO/单主体/受控加载及实际训练暴露差异须保留；稳定回报和低模仿loss不能替代最优性或机制归因。完整负结果与审查仅本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`。reviewed_at=2026-10-25T16:03:26.689669+08:00；literature_cutoff=2026-10-25；target_venue=IEEE TMC methodology / CSCWD2027 development；artifact_run_id=workflow_recovery_execution_20261025_v1；policy_version=tmc_review_policy_v3_20260621；scientific_git=36bc755；evidence_level=RAW_DEVELOPMENT_AND_CHECKPOINT_TRACE_REPLAY_ONLY；formal readiness=Unverifiable。
 
 > 2026-10-23 独立候选864add6的behavior/counterfactual执行监督已对齐；其余辅助目标、不可微门控、多对一探索和自然覆盖不足继续OPEN。匹配测试及小预算完成不证明奖励收益，未调辅助系数或奖励、不合并优化主线。详见sagh_auxiliary_alignment_preflight_20261023.md及本地report。

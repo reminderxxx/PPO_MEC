@@ -1629,3 +1629,20 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 ## Persistent workflow development (2026-10-25)
 
 Use the primary project Python with `PYTHONDONTWRITEBYTECODE=1`. In the isolated source checkout, run `scripts/run_persistent_workflow_learning.py prepare --root <new-root> --old-plan <existing-plan>`; then `qualify --root <prepared-root>`. Only a passing qualification permits `train --root <prepared-root>`. Outputs are create-only; do not reuse the zero-interaction failed preparation. Source, fixed inputs and checkpoint consumer are versioned within this experimental entry, not the formal benchmark.
+
+
+## 2026-10-25 decision bottleneck diagnostics (independent branch)
+
+仅在 `codex/decision-bottleneck` 分支使用；默认训练/评估 registry 和历史 checkpoint 不改。
+本轮已执行的索引是 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`。
+输入为既有冻结文件的绝对路径，输出必须是不存在的新目录。原始数据不下载、不覆盖。
+
+- `scripts/run_ready_workflow_learning.py --phase qualify --inputs <absolute_frozen_inputs> --output <absolute_new_output>`：就绪调度的固定规则机会检查。
+- 同入口的 `pilot` / `train` 是历史有界诊断；长扩展退化后停止，不因仍有未完成 seed 自动重试。
+- `--phase continue --checkpoint <v2_checkpoint_2048> [--detach-critic]`：预定课程边界的梯度干预；两臂均重置 Adam，不能当最终最佳 checkpoint 选择。
+- `scripts/run_request_option_learning.py --inputs <absolute_frozen_inputs> --output <absolute_new_output> --seed 7`：32 回合固定请求级 PPO 信号检查；统计原始物理步、精确 option reward sum，遇完成/实际handoff/有限H结束 option。
+- 匹配验证：`python -B -m pytest tests/test_request_option_learning.py tests/test_ready_workflow.py tests/test_workflow_recovery.py tests/test_persistent_workflow_env.py tests/test_env_contract.py tests/test_cache_capacity_mb.py tests/test_sagh_subject_binding_runtime.py -q -p no:cacheprovider`。
+
+Ready checkpoint 的 `contract` / `features` / `architecture` 明确区分 v1/v2/v3；旧原型仍可读。
+Request-option checkpoint 为独立 `released_request_option_v1` / `request_option_features_v1`，消费者不得用 ready-node 或 native registry 加载。
+绘图和审查必须保留全部失败、随机评价、强规则与中止 endpoint；下一次长训练先满足本地 `final_report.json` 的机制价值条件。

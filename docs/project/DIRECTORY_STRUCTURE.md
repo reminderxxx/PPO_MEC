@@ -370,3 +370,9 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
   旧证据 hash 和独立完整性复算。
 
 2026-10-25 additions: `src/envs/core/persistent_workflow_env.py`, `scripts/run_persistent_workflow_learning.py`, `tests/test_persistent_workflow_env.py`; development artifacts stay under `artifacts/analysis/persistent_workflow_learning_20261025_v1/` in the primary project.
+
+
+## 2026-10-25 decision bottleneck branch
+
+`codex/decision-bottleneck` 新增 `scripts/run_ready_workflow_learning.py`、`scripts/run_request_option_learning.py`，编码器位于 `src/encoders/ready_workflow_encoder.py` / `request_option_encoder.py`，显式调度 wrapper 位于 `src/envs/wrappers/ready_workflow_control.py`。算法类仍直接置于 `src/agents/ppo_agent.py`。
+本轮结果索引 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/` 仅本地保存，含检查点、原始轨迹、图、全部负结果和审查；不随公开 Git 提交。

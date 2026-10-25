@@ -1,3 +1,5 @@
+> 2026-10-25 决策瓶颈续查：独立 `codex/decision-bottleneck` 分支已完成就绪调度、图消息消融、梯度干预和请求级 PPO 的有界验证。源码科学版本依次为 `62030d6`、`3c143a8`、`0f64c5f`、`a5686e2`；详细结果、负例、中止记录和真实图仅本地保存于 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`。请求级原型只有有限学习信号，仍弱于强缓存规则；不晋级图结构优势、长期收敛、完整 SA-GHMAPPO 或 formal/canonical。默认 registry 不变。
+
 > 2026-10-25自主恢复入口：独立`codex/workflow-recovery`，科学版本36bc755；本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`含完整结果、验证与图，图结构特定增量和formal/holdout结论仍须独立证据。主工作区已有代码修改未覆盖，默认registry/canonical未更新。
 
 > 独立合同修复入口：`fair_reward_contract_repair_20261021.md`。旧 long_fair v1 已用户暂停，新轮验证后从零重训，不复用旧 cell。

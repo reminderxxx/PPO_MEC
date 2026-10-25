@@ -1183,3 +1183,9 @@ claim map 必须报告 `UNAVAILABLE`。
 固定提交 continuation 被定义为独立待批准的新规则；新 run 发布门禁不变。proposal/结构/资格/批准/执行分离，本轮真实执行权限恒为 false。保护快照是验收基线而非原始授权凭据。 详见 `fixed_commit_continuation_contract.md`。
 
 2026-10-25: implement a minimal direct graph policy and finite-resource batch in isolation after literature review. Keep all requests released and model assumptions explicit; do not reuse a stopped reward-retuning study or infer that longer training guarantees an advantage.
+
+
+## 2026-10-25: qualify temporal decisions before further graph training
+
+依据本地 `workflow_decision_bottleneck_20261025_v1` 的源代码/固定策略干预，保留显式就绪调度、原始成本和请求边界 PPO 为 opt-in 实验。图消息能改变选择，但当前实际开发目标未显示增量；不通过增加轮次、选择最佳 checkpoint 或缩放图轴晋级图优势。
+原子级随机执行的请求碎片化和加载淘汰是已观察到的问题；价值梯度干预未单独解决退化。请求级原型与强规则的差距仍保留，后续应先验证请求推进与跨请求缓存复用的事件决策机会，再决定是否值得长训练。没有改变 live registry、原始数据、既有正式协议、sealed holdout 或 manuscript。
