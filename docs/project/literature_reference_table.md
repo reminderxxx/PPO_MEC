@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-25
+更新日期：2026-10-26
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -10,6 +10,14 @@
 - 正式投稿前需要再次核对 IEEE Xplore、ACM DL、USENIX 或会议官网的最终卷期、页码和 BibTeX。
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
+
+### 2026-10-26：主方法预测分支优化的方法基础
+
+本轮只作方法筛选和零交互输入见证，未实施新算法或训练；具体适配及验收见 `main_method_optimization_plan_20261026.md`。既有 MBPO、DAgger、策略不变塑形与 GOODRL 条目不重复登记。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 辅助学习与奖励相关表征 | [Reinforcement Learning with Unsupervised Auxiliary Tasks](https://arxiv.org/abs/1611.05397) | 作者预印本, 2016；作者摘要与 DeepMind 官方说明核验；正式 venue/year 本轮待核验 | UNREAL 在共享表征上引入辅助任务；作者说明包括 pixel control、reward prediction 和 value replay，以额外学习信号提高原任务学习效率。 | 项目可检验已观测轨迹上的服务完成/对象需求预测，但没有原始图像 pixel-control 合同，且现有辅助损失可能竞争。训练标签与在线未来信息隔离，所有新增目标须单独消融，不能把辅助任务加成当已证实优势。 | Training foundation / 辅助预测动机；不直接复现为 baseline。 |
 
 ### 2026-10-25：请求级决策之后的可中断时间抽象基础
 

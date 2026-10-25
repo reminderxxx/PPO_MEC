@@ -17,6 +17,8 @@
 
 ## Live 文档
 
+- `main_method_optimization_plan_20261026.md`：主方法优化筛选；九维学习式模型输入的构造缓存身份别名见证通过，先补机制状态再独立检验短视野预测，未实施或训练，收益仍未验证。
+
 - `persistent_workflow_optimization_20261025.md`：独立优化实现、真实机会验证和四方法三seed试训已执行；实际图与完整结果本地保留，稳定服务优势及长期收敛未证实。
 
 - `literature_reference_table.md`：2026-10-25补充长期训练、移动依赖卸载和调度方法近邻；详细文献审查与下一轮改进任务在本地`artifacts/analysis/literature_guided_reward_plan_20261025_v1/`，本轮没有新训练或优势结论。

@@ -1,3 +1,5 @@
+> 2026-10-26 学习式预测输入风险OPEN：现有九维包装投影用缓存数量概括对象驻留，零交互构造例确认等数量的所需/非所需adapter输入相同；该分支的真实状态覆盖、运行profile与收益影响尚未验证。此限制不等于graph actor也缺少对象信息，不得将补输入或加世界模型直接宣称主方法优势。方案见 `main_method_optimization_plan_20261026.md`；本轮无算法/reward修改或训练，formal readiness=Unverifiable，reviewed_at=2026-10-26T02:25:16+08:00。
+
 > 2026-10-25 决策瓶颈风险已核验：固定 FIFO 与逐帧请求碎片化会掩盖机制收益；请求级原型尚弱于全局缓存优先规则。当前四个开发评价主体未跨 RSU、节点统一一步服务、只有两个受控 DAG，不能据此证明图/迁移必要性。完整负结果、seed29 中止记录和 claim 边界仅本地保存在 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`；科学实现独立于当前用户修改。
 
 > 2026-10-25自主恢复后的研究边界OPEN：小任务完成稳定性与显式准备链路已有开发证据，原SA-GHMAPPO完整方法、图结构增量与独立泛化仍未证实。共享专家未覆盖全部动作，有限FIFO/单主体/受控加载及实际训练暴露差异须保留；稳定回报和低模仿loss不能替代最优性或机制归因。完整负结果与审查仅本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`。reviewed_at=2026-10-25T16:03:26.689669+08:00；literature_cutoff=2026-10-25；target_venue=IEEE TMC methodology / CSCWD2027 development；artifact_run_id=workflow_recovery_execution_20261025_v1；policy_version=tmc_review_policy_v3_20260621；scientific_git=36bc755；evidence_level=RAW_DEVELOPMENT_AND_CHECKPOINT_TRACE_REPLAY_ONLY；formal readiness=Unverifiable。
