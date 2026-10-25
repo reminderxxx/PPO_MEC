@@ -248,6 +248,7 @@ def train(out,p,methods=METHODS,seeds=(7,13,29),budget=8192,diagnostic=False,tea
                 dump(out/'status.json',dict(method=method,seed=seed,training_steps=steps,total=total))
             if buffer:raise RuntimeError('Unconsumed on-policy samples')
             if not diagnostic:evaluate(cell,p,a,method,seed,steps,validation,loads=(4,))
+            dump(out/'validation.json',validation)  # publish endpoint rows before exposing cell completion
             dump(cell/'completion.json',dict(method=method,seed=seed,training_steps=steps,learn_calls=len(updates),curriculum=not diagnostic,
                 observation_contract=OBSERVATION_CONTRACT,action_contract=CONTROL_CONTRACT,teacher_steps=json.loads((Path(teacher_path).parent/'manifest.json').read_text())['environment_steps'] if teacher_path else 0))
     dump(out/'validation.json',validation)

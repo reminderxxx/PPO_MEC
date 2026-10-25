@@ -120,3 +120,24 @@ def test_shared_imitation_objective_reaches_native_actor_parameters(tmp_path,met
     row=dict(state=info['semantic_state'],mask=info['action_mask'],action=expert(info))
     a=agent_for(method,7);loss=imitation_loss(a,row);loss.backward()
     assert torch.isfinite(loss) and any(p.grad is not None and p.grad.abs().sum()>0 for p in a._network.parameters())
+
+
+def test_cell_completion_never_precedes_endpoint_aggregate_publication(tmp_path,monkeypatch):
+    import json
+    from scripts import run_workflow_recovery as runner
+    out=tmp_path/'comparison'
+    monkeypatch.setattr(runner,'yield_to_foreign_training',lambda _:None)
+    def evaluation(cell,p,a,method,seed,steps,rows,loads=(2,8),**kwargs):
+        rows.extend(dict(method=method,request_count=n) for n in loads)
+    monkeypatch.setattr(runner,'evaluate',evaluation)
+    original_dump=runner.dump
+    class BoundaryStop(Exception):pass
+    def stop_at_completed_cell(path,value):
+        if Path(path).name=='completion.json':
+            published=json.loads((out/'validation.json').read_text())
+            assert {row['request_count'] for row in published}=={2,4,8}
+            raise BoundaryStop()
+        original_dump(path,value)
+    monkeypatch.setattr(runner,'dump',stop_at_completed_cell)
+    with pytest.raises(BoundaryStop):
+        runner.train(out,{'units':[]},methods=['graph_ppo'],seeds=[7],budget=0)
