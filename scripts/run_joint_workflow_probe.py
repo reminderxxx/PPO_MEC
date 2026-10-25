@@ -14,9 +14,9 @@ from src.envs.wrappers.joint_workflow_control import JointWorkflowEnv,JOINT_CONT
 RULES=('cache_first','shortest_request','joint_ready','joint_successor','joint_demand','joint_request')
 
 
-def joint_env(unit,wfs,count=8,seed=7,horizon=95,capacity=384.):
+def joint_env(unit,wfs,count=8,seed=7,horizon=95,capacity=384.,service_hit_lru=False):
     # Match the tested physical factory exactly; only expose another control method.
-    return make_env(unit,wfs,count,seed,horizon,capacity,env_class=JointWorkflowEnv)
+    return make_env(unit,wfs,count,seed,horizon,capacity,env_class=lambda **kwargs:JointWorkflowEnv(service_hit_lru=service_hit_lru,**kwargs))
 
 
 def joint_action(state,rule):

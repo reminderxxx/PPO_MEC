@@ -161,30 +161,33 @@ class RequestOptionPPOAgent(ReadyWorkflowPPOAgent):
 
 class EventJointPPOAgent(ReadyWorkflowPPOAgent):
     """Opt-in event-driven adapter preparation; separate from original SA-GHMAPPO."""
-    def __init__(self,random_seed=7,use_graph=True):
+    def __init__(self,random_seed=7,use_graph=True,eviction_aware=False):
         import torch
         from src.encoders.event_joint_encoder import EventJointActorCritic,batch_event_features
         self.seed=int(random_seed);self.use_graph=bool(use_graph);torch.manual_seed(self.seed)
-        self.network=EventJointActorCritic(self.use_graph)
+        self.eviction_aware=bool(eviction_aware)
+        self.network=EventJointActorCritic(self.use_graph,12 if self.eviction_aware else 6)
         self.optimizer=torch.optim.Adam(self.network.parameters(),lr=1e-3)
         self.updates=0;self._batch_features=batch_event_features;self._separate_value_clip=True
 
     def save(self,path,provenance):
         import torch
         from pathlib import Path
-        from src.encoders.event_joint_encoder import EVENT_FEATURE_VERSION
+        from src.encoders.event_joint_encoder import EVENT_FEATURE_VERSION,EVICTION_FEATURE_VERSION
         from src.envs.wrappers.joint_workflow_control import JOINT_CONTRACT
         if Path(path).exists():raise FileExistsError(path)
-        torch.save(dict(contract=JOINT_CONTRACT,features=EVENT_FEATURE_VERSION,seed=self.seed,use_graph=self.use_graph,
+        torch.save(dict(contract=JOINT_CONTRACT,features=EVICTION_FEATURE_VERSION if self.eviction_aware else EVENT_FEATURE_VERSION,physical_contract='joint_service_hit_lru_v1' if self.eviction_aware else 'legacy_admission_recency_v1',seed=self.seed,use_graph=self.use_graph,
             network=self.network.state_dict(),optimizer=self.optimizer.state_dict(),updates=self.updates,
             rng=torch.random.get_rng_state(),provenance=provenance),path)
 
     @classmethod
     def load(cls,path):
         import torch
-        from src.encoders.event_joint_encoder import EVENT_FEATURE_VERSION
+        from src.encoders.event_joint_encoder import EVENT_FEATURE_VERSION,EVICTION_FEATURE_VERSION
         from src.envs.wrappers.joint_workflow_control import JOINT_CONTRACT
         p=torch.load(path,map_location='cpu')
-        if p.get('contract')!=JOINT_CONTRACT or p.get('features')!=EVENT_FEATURE_VERSION:raise ValueError('Event-joint checkpoint contract mismatch')
-        a=cls(p['seed'],p['use_graph']);a.network.load_state_dict(p['network']);a.optimizer.load_state_dict(p['optimizer']);a.updates=p['updates']
+        if p.get('contract')!=JOINT_CONTRACT or p.get('features') not in [EVENT_FEATURE_VERSION,EVICTION_FEATURE_VERSION]:raise ValueError('Event-joint checkpoint contract mismatch')
+        expected_physical='joint_service_hit_lru_v1' if p['features']==EVICTION_FEATURE_VERSION else 'legacy_admission_recency_v1'
+        if p.get('physical_contract','legacy_admission_recency_v1')!=expected_physical:raise ValueError('Event-joint physical contract mismatch')
+        a=cls(p['seed'],p['use_graph'],p['features']==EVICTION_FEATURE_VERSION);a.network.load_state_dict(p['network']);a.optimizer.load_state_dict(p['optimizer']);a.updates=p['updates']
         return a,p

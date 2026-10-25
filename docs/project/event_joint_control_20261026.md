@@ -48,3 +48,30 @@ attempts and final checkpoints must be retained. Performance on the old four
 validation windows is exposed development evidence only. A paper claim requires
 new frozen confirmation, honest time-interval independence, fair strong baselines,
 physical metrics, variability and a separate readonly final audit.
+
+## Observable eviction and successful-service LRU (v2)
+
+The first event-policy pilot is retained with no demonstrated greedy learning
+improvement. Independent investigation found that its view omitted recency and
+that successful service did not refresh native typed object recency. New
+`--eviction-aware 1` runs therefore use an explicit, equally shared opt-in
+`service_hit_lru=True` physical contract for every baseline and learned policy.
+Legacy defaults/checkpoints retain their original semantics. Successful service
+refreshes the actual served base/adapter; blocked/loading requests do not.
+
+A read-only native cache transaction forecast exposes current resident sizes,
+LRU order, transfer cost and predicted victims. The common candidate proposal
+set excludes preloads that would evict the selected warm task's adapter at the
+observed RSU. This is an explicit constrained action set, not silent cache
+shielding or action substitution. Future mobility is not queried. All methods
+receive the same features and proposal constraints. Feature version v2 uses
+12 candidate fields; the matching loader preserves v1 and v2 envelopes.
+
+`prepare_event_joint_inputs.py` freezes outcome-blind disjoint raw-time windows
+and 16 source-ordered Alibaba DAGs. It excludes raw interval overlap rather
+than frame-rank overlap because extending a CSV prefix can change frame ranks.
+A maximum-coverage persistent subject (>=80%) is selected using input data only.
+Confirmation has unseen DAG identities and is outcome-sealed until a final
+freeze. This is not a claim of exhaustive project-wide hidden-holdout novelty.
+Failed data preparation attempts are retained, and no performance rows were
+produced from their incomplete inputs.

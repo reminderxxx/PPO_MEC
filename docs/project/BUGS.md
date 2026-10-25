@@ -1,3 +1,5 @@
+> 2026-10-26 独立原型风险：旧 ready/persistent 链路成功服务未刷新 typed 对象 recency，因此不能把原型入库 recency 当作完整 service-hit LRU 机制。新 joint 合同通过显式 opt-in 修复，对所有新 baseline 一致应用；旧默认与历史产物不改写。确认集的项目级历史暴露尚未穷尽排除，不能称 strict project-wide holdout。详见 event_joint_control_20261026.md 与本地审查。
+
 > 2026-10-25 新增长期风险：FIFO 固定执行和逐帧请求碎片化会掩盖机制价值；候选节点图消息改变动作不等于增加回报。请求级承诺虽产生有限学习信号，也限制跨请求缓存复用，强规则仍占优。当前四个开发评价主体无跨 RSU 切换、NGSIM 节点统一一步服务、仅两个受控 DAG；不能由该原型推出原算法优势。详见本地 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/final_review.json`；seed29 的重复扩展已中止且全部部分产物保留。
 
 > 2026-10-25自主恢复后的研究边界OPEN：小任务完成稳定性与显式准备链路已有开发证据，原SA-GHMAPPO完整方法、图结构增量与独立泛化仍未证实。共享专家未覆盖全部动作，有限FIFO/单主体/受控加载及实际训练暴露差异须保留；稳定回报和低模仿loss不能替代最优性或机制归因。完整负结果与审查仅本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`。reviewed_at=2026-10-25T16:03:26.689669+08:00；literature_cutoff=2026-10-25；target_venue=IEEE TMC methodology / CSCWD2027 development；artifact_run_id=workflow_recovery_execution_20261025_v1；policy_version=tmc_review_policy_v3_20260621；scientific_git=36bc755；evidence_level=RAW_DEVELOPMENT_AND_CHECKPOINT_TRACE_REPLAY_ONLY；formal readiness=Unverifiable。

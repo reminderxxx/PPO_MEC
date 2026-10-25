@@ -67,4 +67,7 @@ class ReadyWorkflowEnv(ReleasedPreparationEnv):
         state, reward, terminated, truncated, info = super().step(control)
         info['ready_scheduling'] = dict(contract=READY_CONTRACT, selected_node_id=node_id,
             ready_before=before['ready_node_ids'], admission_requested=admission)
+        return self._after_selected_step(state, reward, terminated, truncated, info)
+
+    def _after_selected_step(self, state, reward, terminated, truncated, info):
         return state, reward, terminated, truncated, info

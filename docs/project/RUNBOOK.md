@@ -1,3 +1,5 @@
+> 联合控制新合同使用 `run_event_joint_learning.py --eviction-aware 1`，显式采用成功服务 hit-LRU 和 v2 淘汰影响观测；同一比较的所有方法必须一致使用。`prepare_event_joint_inputs.py` 只按输入冻结数据并核验原始时间；完整参数与版本兼容见专项说明。
+
 > 2026-10-26 独立联合控制入口及验证见 [event_joint_control_20261026.md](event_joint_control_20261026.md)：先完整规则机会检查，再短学习测试。使用新 create-only 本地产物目录；不读取封存 holdout、不复用历史失败 run、不自动扩大预算。
 
 ## 完整恢复流程复现（科学版本36bc755，非formal）

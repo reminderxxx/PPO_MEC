@@ -7,6 +7,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 import torch
 from scripts.run_joint_workflow_probe import joint_env
+from src.envs.wrappers.joint_workflow_control import observe_joint_effects
 from scripts.run_ready_workflow_learning import rule_action,node_runtime,workflows,result_from
 from scripts.run_workflow_recovery import write_trace
 from scripts.run_persistent_workflow_learning import dump,sha
@@ -14,20 +15,22 @@ from src.agents.ppo_agent import EventJointPPOAgent
 from src.encoders.event_joint_encoder import event_features
 
 
-def event_available(state):
+def event_available(state,eviction_aware=False):
     vehicle=next(v for v in state['vehicles'] if v['vehicle_id']==state['primary_vehicle_id']);rsu=vehicle.get('associated_rsu_id')
     if not rsu or any(x['rsu_id']==rsu and x['remaining_seconds']>0 for x in state['model_loading']):return False
     by_id={n['node_id']:n for n in state['workflow']['nodes']}
     node=rule_action(state,'cache_first')
-    return node_runtime(state,by_id[node])['ready'] and bool(event_features(state)['mask'][:-1].any())
+    return node_runtime(state,by_id[node])['ready'] and bool(event_features(state,eviction_aware)['mask'][:-1].any())
 
 
 def episode(unit,p,agent,seed,deterministic=False,rule=None,keep_states=True):
-    env=joint_env(unit,workflows(unit.get('workflows',p['workflows'])));state,_=env.reset();rows=[];trace=[];torch.manual_seed(seed)
+    env=joint_env(unit,workflows(unit.get('workflows',p['workflows'])),service_hit_lru=getattr(agent,'eviction_aware',p.get('eviction_aware',False)));state,_=env.reset();rows=[];trace=[];torch.manual_seed(seed)
     while True:
-        event=event_available(state);action=None
+        aware=getattr(agent,'eviction_aware',p.get('eviction_aware',False))
+        if aware:state=observe_joint_effects(env,state)
+        event=event_available(state,aware);action=None
         if event:
-            f=event_features(state)
+            f=event_features(state,aware)
             if rule=='uniform':action=int(torch.distributions.Categorical(probs=f['mask'].float()).sample());lp=v=0.
             elif rule=='no_prefetch':action=5;lp=v=0.
             elif rule=='shortest_frontier':
@@ -65,11 +68,11 @@ def evaluate(out,p,agent,seed,ep,rule=None):
     finally:torch.random.set_rng_state(rng)
 
 
-def train(out,p,seed,graph,episodes,cadence):
-    out.mkdir();torch.set_num_threads(1);agent=EventJointPPOAgent(seed,graph);evaluation=[];training=[];updates=[];pending=[];steps=0
+def train(out,p,seed,graph,episodes,cadence,eviction_aware=False):
+    out.mkdir();torch.set_num_threads(1);agent=EventJointPPOAgent(seed,graph,eviction_aware);evaluation=[];training=[];updates=[];pending=[];steps=0
     units=[u for u in p['units'] if u['split']=='train']
     provenance=dict(source_git=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),input_sha256=p['_sha'],seed=seed,
-        episodes=episodes,use_graph=graph,expert_steps=0,reward='native business reward summed over holding time /20 for numerical scale only',gamma=1.,gae_lambda=1.,
+        episodes=episodes,use_graph=graph,eviction_aware=eviction_aware,service_hit_lru=eviction_aware,expert_steps=0,reward='native business reward summed over holding time /20 for numerical scale only',gamma=1.,gae_lambda=1.,
         fast_executor='global cache-first service with no cancellation of in-flight loading',optimizer='Adam1e-3,4epochs,batch128,clip.2,entropy.02,separate actor/value norm clipping.5',
         evaluation='greedy on all fixed dev windows at episode0 and prespecified cadence; final checkpoint, no best selection',formal=False,holdout=False)
     dump(out/'command.json',dict(argv=sys.argv,cwd=str(ROOT),provenance=provenance));agent.save(out/'checkpoint_0.pt',provenance)
@@ -87,8 +90,8 @@ def train(out,p,seed,graph,episodes,cadence):
 
 
 def main():
-    a=argparse.ArgumentParser();a.add_argument('--inputs',required=True);a.add_argument('--output',required=True);a.add_argument('--seed',type=int,default=7);a.add_argument('--graph',type=int,default=1);a.add_argument('--episodes',type=int,default=32);a.add_argument('--cadence',type=int,default=16);args=a.parse_args()
+    a=argparse.ArgumentParser();a.add_argument('--inputs',required=True);a.add_argument('--output',required=True);a.add_argument('--seed',type=int,default=7);a.add_argument('--graph',type=int,default=1);a.add_argument('--episodes',type=int,default=32);a.add_argument('--cadence',type=int,default=16);a.add_argument('--eviction-aware',type=int,default=0);args=a.parse_args()
     p=json.loads(Path(args.inputs).read_text());p['_sha']=sha(args.inputs)
-    train(Path(args.output),p,args.seed,bool(args.graph),args.episodes,args.cadence)
+    train(Path(args.output),p,args.seed,bool(args.graph),args.episodes,args.cadence,bool(args.eviction_aware))
 
 if __name__=='__main__':main()

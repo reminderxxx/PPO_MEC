@@ -8,9 +8,10 @@ from src.encoders.ready_workflow_encoder import ready_features,batch_ready_featu
 from src.envs.core.persistent_workflow_env import ADAPTERS
 
 EVENT_FEATURE_VERSION='event_joint_adapter_features_v1'
+EVICTION_FEATURE_VERSION='event_joint_eviction_features_v2'
 
 
-def event_features(state):
+def event_features(state,eviction_aware=False):
     graph=ready_features(state);nodes=state['workflow']['nodes'];done=set(state['workflow']['completed_node_ids']);ready=set(state['ready_node_ids'])
     remaining={r['request_id']:len(set(r['node_ids'])-done) for r in state['request_stream']['requests']}
     vehicle=next(v for v in state['vehicles'] if v['vehicle_id']==state['primary_vehicle_id'])
@@ -23,7 +24,27 @@ def event_features(state):
         aux.append([len(unfinished)/20.,len(frontier)/8.,min((remaining[n['node_id'].split(':')[0]] for n in frontier),default=20)/20.,
             min((len(set(n['predecessors'])-done) for n in unfinished),default=8)/8.,float(adapter in cached),float(not unfinished)])
         mask.append(bool(frontier and adapter not in cached and vehicle.get('associated_rsu_id')))
-    aux.append([0.,0.,1.,1.,0.,1.]);mask.append(True)
+    if eviction_aware:
+        observation=state.get('joint_cache_observation',{})
+        if observation.get('version')!='observable_lru_effects_v1':raise ValueError('Missing observable eviction contract')
+        by_id={n['node_id']:n for n in nodes}
+        rank={n:i for i,n in enumerate(state['workflow']['execution_order'])}
+        def service_key(n):
+            loading=max((x['remaining_seconds'] for x in state['model_loading'] if x['rsu_id']==vehicle.get('associated_rsu_id') and x['object_id'] in ['base:veh_base_v1','adapter:'+n['required_adapter'].removeprefix('adapter_')]),default=0.)
+            present=n['required_adapter'] in cached
+            return (not(present and loading<=1e-9),not present,loading,remaining[n['node_id'].split(':')[0]],rank[n['node_id']])
+        selected=min([by_id[n] for n in ready],key=service_key)
+        protected='adapter:'+selected['required_adapter'].removeprefix('adapter_')
+        for i,adapter in enumerate(ADAPTERS):
+            effect=observation['candidate_effects'].get(adapter,dict(victims=[],sufficient=False,transfer_mb=0.,required_free_mb=0.))
+            victims=set(effect['victims'])
+            affected=[n for n in nodes if n['node_id'] not in done and 'adapter:'+n['required_adapter'].removeprefix('adapter_') in victims]
+            destroys_current=protected in victims
+            aux[i]+=[effect['transfer_mb']/100.,effect['required_free_mb']/100.,len(victims)/5.,
+                sum(n['node_id'] in ready for n in affected)/8.,len(affected)/20.,float(destroys_current)]
+            # Explicit shared proposal constraint, never a silent action rewrite.
+            mask[i]=mask[i] and effect['sufficient'] and not destroys_current
+    aux.append([0.,0.,1.,1.,0.,1.]+([0.]*6 if eviction_aware else []));mask.append(True)
     return dict(graph=graph,pool=pool,aux=torch.tensor(aux,dtype=torch.float32),mask=torch.tensor(mask,dtype=torch.bool),ids=list(ADAPTERS)+[None])
 
 
@@ -35,12 +56,12 @@ def batch_event_features(items):
 
 
 class EventJointActorCritic(nn.Module):
-    def __init__(self,use_graph=True):
+    def __init__(self,use_graph=True,aux_dim=6):
         super().__init__();self.use_graph=bool(use_graph)
         self.node=nn.Sequential(nn.Linear(17,32),nn.Tanh(),nn.Linear(32,32),nn.Tanh())
         self.succ=nn.Linear(32,32,bias=False);self.pred=nn.Linear(32,32,bias=False)
         self.message_gate=nn.Parameter(torch.zeros(()))
-        self.actor=nn.Sequential(nn.Linear(78,32),nn.Tanh(),nn.Linear(32,1))
+        self.actor=nn.Sequential(nn.Linear(72+aux_dim,32),nn.Tanh(),nn.Linear(32,1))
         self.critic=nn.Sequential(nn.Linear(25,32),nn.Tanh(),nn.Linear(32,1))
 
     def forward(self,b):
