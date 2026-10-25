@@ -238,7 +238,7 @@ def train(out,p,methods=METHODS,seeds=(7,13,29),budget=8192,diagnostic=False,tea
                     start=time.monotonic();stats=a.learn(buffer);buffer=[]
                     updates.append(dict(training_steps=steps,seconds=time.monotonic()-start,stats=stats))
                     dump(cell/'updates.json',updates)
-                
+
                 if steps==next_eval or steps==budget:
                     next_eval+=2048
                     save_agent(a,cell/f'checkpoint_{steps}.pt')

@@ -63,8 +63,13 @@ def test_new_fields_reach_encoder_and_raw_logits(tmp_path,field):
 def test_real_two_update_chain_and_checkpoint_contract(tmp_path,method):
     a=agent_for(method,7)
     for j in range(2):
-        d=tmp_path/str(j);d.mkdir();e=fixture_env(d)
-        _,rows=MARLOnPolicyTrainer(e,a,e._recorder,max_steps=12,gamma=1.).collect_episode(run_metadata={'policy_evaluation_mode':'raw_policy'},collect_model_targets=False)
+        rows=[]
+        for episode in range(2):
+            d=tmp_path/f'{j}_{episode}';d.mkdir();e=fixture_env(d)
+            _,part=MARLOnPolicyTrainer(e,a,e._recorder,max_steps=20,gamma=1.,gae_lambda=1.).collect_episode(run_metadata={'policy_evaluation_mode':'raw_policy'},collect_model_targets=False)
+            assert part[-1]['terminated']
+            rows.extend(part)
+        assert len(rows)>32
         assert all(x['decision_info']['action_mask'][x['action']] for x in rows)
         before={k:v.clone() for k,v in a._network.state_dict().items()}
         a.learn(rows)
