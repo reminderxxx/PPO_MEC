@@ -1,3 +1,5 @@
+> 2026-10-25三阶段自主恢复已执行：独立`codex/workflow-recovery`分支完成可达机会检查、准备/观测合同及固定四方法三seed比较，真实曲线、原始trace与全部负结果仅本地保存于`artifacts/analysis/workflow_recovery_execution_20261025_v1/`。共有专家初始化与RL增量分别报告；不据奖励平台晋级图结构优势或策略收敛。详见项目PROGRESS与ARTIFACT_RECORDS。
+
 > 2026-10-22 15:21 已启动原公平训练续作：资源检查修复独立于科学算法，保留10个完整seed7单元，其余20个fresh运行。见 [续作记录](docs/project/fair_reward_resource_continuation_20261022.md)，不重复运行旧失败root。
 
 > 2026-10-21：旧长预算轮按用户要求停止保留；独立修复分支通过312测试和10算法真实预检后，已启动同条件全新重训。见 [本轮记录](docs/project/fair_reward_contract_repair_20261021.md)。算法优化主线未合并修复。

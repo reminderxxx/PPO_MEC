@@ -1,3 +1,5 @@
+> 2026-10-25自主恢复入口：独立`codex/workflow-recovery`，科学版本36bc755；本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`含完整结果、验证与图，图结构特定增量和formal/holdout结论仍须独立证据。主工作区已有代码修改未覆盖，默认registry/canonical未更新。
+
 > 当前公平训练续作入口：fair_reward_resource_continuation_20261022.md；新root运行中，旧failed run和partial保留。
 
 > 当前独立实验入口：`fair_reward_contract_repair_20261021.md`；修复后新run已启动，旧long v1用户暂停，勿将旧status快照当live。
