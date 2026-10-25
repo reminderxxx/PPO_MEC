@@ -1,3 +1,5 @@
+> 2026-10-25 决策瓶颈续查已完成：代码位于独立 `codex/decision-bottleneck` 分支（科学版本 `a5686e2`），主工作区原有修改未覆盖。就绪调度、图消息同权重对照、梯度干预与请求级 PPO 的完整本地证据见 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`。请求级原型仅有有限学习信号，强缓存规则仍更优，不能晋级图结构、长期收敛、原 SA-GHMAPPO 或 formal/canonical 结论。新入口与合同说明在该独立分支的 RUNBOOK。
+
 > 2026-10-25三阶段自主恢复已执行：独立`codex/workflow-recovery`分支完成可达机会检查、准备/观测合同及固定四方法三seed比较，真实曲线、原始trace与全部负结果仅本地保存于`artifacts/analysis/workflow_recovery_execution_20261025_v1/`。共有专家初始化与RL增量分别报告；不据奖励平台晋级图结构优势或策略收敛。详见项目PROGRESS与ARTIFACT_RECORDS。
 
 > 2026-10-22 15:21 已启动原公平训练续作：资源检查修复独立于科学算法，保留10个完整seed7单元，其余20个fresh运行。见 [续作记录](docs/project/fair_reward_resource_continuation_20261022.md)，不重复运行旧失败root。

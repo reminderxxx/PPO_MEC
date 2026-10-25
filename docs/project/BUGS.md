@@ -1,3 +1,5 @@
+> 2026-10-25 决策瓶颈风险已核验：固定 FIFO 与逐帧请求碎片化会掩盖机制收益；请求级原型尚弱于全局缓存优先规则。当前四个开发评价主体未跨 RSU、节点统一一步服务、只有两个受控 DAG，不能据此证明图/迁移必要性。完整负结果、seed29 中止记录和 claim 边界仅本地保存在 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`；科学实现独立于当前用户修改。
+
 > 2026-10-25自主恢复后的研究边界OPEN：小任务完成稳定性与显式准备链路已有开发证据，原SA-GHMAPPO完整方法、图结构增量与独立泛化仍未证实。共享专家未覆盖全部动作，有限FIFO/单主体/受控加载及实际训练暴露差异须保留；稳定回报和低模仿loss不能替代最优性或机制归因。完整负结果与审查仅本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`。reviewed_at=2026-10-25T16:03:26.689669+08:00；literature_cutoff=2026-10-25；target_venue=IEEE TMC methodology / CSCWD2027 development；artifact_run_id=workflow_recovery_execution_20261025_v1；policy_version=tmc_review_policy_v3_20260621；scientific_git=36bc755；evidence_level=RAW_DEVELOPMENT_AND_CHECKPOINT_TRACE_REPLAY_ONLY；formal readiness=Unverifiable。
 
 > 2026-10-25 独立持续工作流候选的观测/动作闭环风险OPEN：只读消费者检查记录于本地`artifacts/analysis/literature_guided_recovery_20261025_v1/`；新增字段存在不等于进入策略，机制有事件也不等于有足够可学服务差距。需先作可达机会与输入/动作合同验证，再分别测试信用分配和训练课程；不能把检查结果当成失败的唯一因果解释或算法根本无效。本轮无算法/reward/训练修改，不覆盖主线既有用户改动。reviewed_at=2026-10-25T14:06:21.110305+08:00；scientific_git=c9c98b4。
