@@ -95,3 +95,24 @@ def test_legacy_pilot_checkpoint_remains_loadable(tmp_path):
     b,_=ReadyWorkflowPPOAgent.load(p)
     assert b.network.architecture=='ready_propagated_actor_v1'
     assert all(torch.equal(v,b.network.state_dict()[k]) for k,v in a.network.state_dict().items())
+
+
+def test_value_loss_cannot_modify_actor_representation_in_detached_variant():
+    from src.encoders.ready_workflow_encoder import MODEL_VERSION, RESIDUAL_MODEL_VERSION
+    _,s=fixture();features=batch_ready_features([ready_features(s)])
+    for architecture,should_receive in [(MODEL_VERSION,False),(RESIDUAL_MODEL_VERSION,True)]:
+        a=ReadyWorkflowPPOAgent(7,True,architecture)
+        logits,value=a.network(features);value.square().mean().backward()
+        assert any(p.grad is not None and p.grad.abs().sum()>0 for p in a.network.critic.parameters())
+        assert any(p.grad is not None and p.grad.abs().sum()>0 for p in a.network.node.parameters())==should_receive
+        a.network.zero_grad();logits,_=a.network(features)
+        loss=-torch.distributions.Categorical(logits=logits).log_prob(torch.tensor([0])).mean();loss.backward()
+        assert any(p.grad is not None and p.grad.abs().sum()>0 for p in a.network.node.parameters())
+
+
+def test_v2_boundary_weights_upgrade_without_policy_change():
+    from src.encoders.ready_workflow_encoder import MODEL_VERSION, RESIDUAL_MODEL_VERSION
+    _,s=fixture();f=batch_ready_features([ready_features(s)])
+    a=ReadyWorkflowPPOAgent(7,True,RESIDUAL_MODEL_VERSION);x,v=a.network(f)
+    a.network.architecture=MODEL_VERSION;y,w=a.network(f)
+    assert torch.equal(x,y) and torch.equal(v,w)

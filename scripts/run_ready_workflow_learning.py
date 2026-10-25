@@ -169,12 +169,67 @@ def train_cell(out, p, method, seed, budget=2048, pilot=False):
         validation_rows=len(validation),provenance=provenance))
 
 
+def continue_cell(out,p,checkpoint,detach_critic=False):
+    import torch
+    from src.encoders.ready_workflow_encoder import ready_features,MODEL_VERSION
+    from src.agents.ppo_agent import ReadyWorkflowPPOAgent
+    torch.set_num_threads(1);out.mkdir();checkpoint=Path(checkpoint)
+    agent,payload=ReadyWorkflowPPOAgent.load(checkpoint)
+    if payload.get('architecture')!='ready_residual_actor_v2':raise ValueError('Continuation requires pinned v2 boundary checkpoint')
+    method='graph_ppo' if agent.use_graph else 'set_ppo';seed=agent.seed
+    if detach_critic:agent.network.architecture=MODEL_VERSION
+    # Fresh Adam is shared by both arms; only the critic gradient boundary differs.
+    agent.optimizer=torch.optim.Adam(agent.network.parameters(),lr=3e-4)
+    history=json.loads((checkpoint.parent/'training.json').read_text())
+    boundary=next(r for r in history if r['training_steps']==2048)
+    episode=boundary['episode'];steps=2048;updates=[];training=[];validation=[];pending=[]
+    torch.random.set_rng_state(payload['rng'])
+    provenance=dict(source_git=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+        starting_checkpoint=str(checkpoint),starting_sha256=sha(checkpoint),starting_source=payload['provenance']['source_git'],
+        starting_steps=2048,final_steps=4096,seed=seed,method=method,expert_initialization=False,
+        detach_critic=detach_critic,optimizer_reset_in_both_arms=True,starting_episode=episode,
+        input_sha256=p['_input_sha256'],gamma=1.,gae_lambda=.95,training_reward_divisor=20.)
+    dump(out/'command.json',dict(argv=sys.argv,cwd=str(ROOT),provenance=provenance))
+    agent.save(out/'checkpoint_2048.pt',provenance)
+    validation+=evaluate_policy(out,p,agent,method,seed,2048,p['units'][8:],(8,))
+    dump(out/'validation.json',validation)
+    while steps<4096:
+        unit=p['units'][episode%8];count=[2,4,8][episode%3]
+        env=make_env(unit,workflows(p['workflows']),count,seed);state,_=env.reset();rows=[];trace=[]
+        while steps<4096:
+            features=ready_features(state);action,logp,value=agent.act(features);node=features['ids'][action];before=state
+            state,reward,done,truncated,info=env.step_node(node);steps+=1
+            rows.append(dict(features=features,action=action,log_prob=logp,value=value,reward=reward.total/20.,done=bool(done or truncated)))
+            trace.append(dict(state=before,node_id=node,reward=reward.total,stream=info['persistent_stream'],log_prob=logp,value=value))
+            if done or truncated:break
+        bootstrap=0. if rows[-1]['done'] else agent.act(ready_features(state),True)[2]
+        gae=0.;next_value=bootstrap
+        for row in reversed(rows):
+            delta=row['reward']+(0. if row['done'] else next_value)-row['value'];gae=delta+(0. if row['done'] else .95*gae)
+            row['advantage']=gae;row['return']=gae+row['value'];next_value=row['value']
+        pending+=rows;episode+=1;write_trace(out/f'train_{episode}.json.gz',trace)
+        training.append(dict(episode=episode,training_steps=steps,window=unit['index'],request_count=count,actual_terminal=rows[-1]['done'],reward=sum(x['reward'] for x in trace),completed=trace[-1]['stream']['completed_requests']))
+        if len(pending)>=256 or steps==4096:
+            updates.append(agent.learn(pending));pending=[]
+            dump(out/'updates.json',updates);dump(out/'training.json',training)
+        dump(out/'status.json',dict(status='running',steps=steps,additional_steps=steps-2048,episodes=episode,updates=len(updates)))
+    agent.save(out/'checkpoint_4096.pt',provenance)
+    validation+=evaluate_policy(out,p,agent,method,seed,4096,p['units'][8:],(8,))
+    dump(out/'validation.json',validation)
+    dump(out/'completion.json',dict(status='complete',additional_steps=2048,steps=steps,episodes=episode,updates=len(updates),validation_rows=len(validation),provenance=provenance))
+    print(json.dumps(dict(intervention='detached' if detach_critic else 'shared',seed=seed,steps=steps,updates=len(updates))),flush=True)
+
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--inputs',required=True);parser.add_argument('--output',required=True)
-    parser.add_argument('--phase',choices=['qualify','pilot','train'],default='qualify')
+    parser.add_argument('--phase',choices=['qualify','pilot','train','continue'],default='qualify')
     parser.add_argument('--method',choices=['graph_ppo','set_ppo'],default='graph_ppo');parser.add_argument('--seed',type=int,default=7)
+    parser.add_argument('--checkpoint');parser.add_argument('--detach-critic',action='store_true')
     a=parser.parse_args();p=json.loads(Path(a.inputs).read_text());p['_input_sha256']=sha(a.inputs);out=Path(a.output)
     if a.phase=='qualify':qualify(out,p)
+    elif a.phase=='continue':
+        if not a.checkpoint:parser.error('--checkpoint required for continuation')
+        continue_cell(out,p,a.checkpoint,a.detach_critic)
     else:train_cell(out,p,a.method,a.seed,2048 if a.phase=='pilot' else 8192,a.phase=='pilot')
 
 if __name__=='__main__':main()
