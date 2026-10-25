@@ -137,11 +137,11 @@ def collect(out,p,unit,count,seed,agent,label,budget=95):
     return result,rollout
 
 
-def evaluate(cell,p,a,method,seed,steps,rows,loads=(2,8)):
+def evaluate(cell,p,a,method,seed,steps,rows,loads=(2,8),units=None):
     rng=(random.getstate(),np.random.get_state(),torch.random.get_rng_state())
     try:
         ev=load_agent(cell/f'checkpoint_{steps}.pt',method,seed)
-        for u in p['units'][8:]:
+        for u in (p['units'][8:] if units is None else units):
             for count in loads:
                 result,_=collect(cell,p,u,count,seed,ev,f'validation_{steps}_w{u["index"]}_n{count}')
                 rows.append(dict(method=method,seed=seed,training_steps=steps,window=u['index'],**result))
@@ -161,7 +161,7 @@ def train(out,p,methods=METHODS,seeds=(7,13,29),budget=8192,diagnostic=False):
             yield_to_foreign_training(out)
             cell=out/f'{method}_{seed}';cell.mkdir();a=agent_for(method,seed);steps=0;episode=0;buffer=[];updates=[]
             save_agent(a,cell/'checkpoint_0.pt')
-            evaluate(cell,p,a,method,seed,0,validation)
+            evaluate(cell,p,a,method,seed,0,validation,loads=(1,) if diagnostic else (2,8),units=p['units'][:1] if diagnostic else None)
             while steps<budget:
                 count=1 if diagnostic else curriculum_count(steps,episode)
                 unit=p['units'][0 if diagnostic else episode%8]
@@ -177,7 +177,7 @@ def train(out,p,methods=METHODS,seeds=(7,13,29),budget=8192,diagnostic=False):
                 elif len(buffer)>256:raise RuntimeError('Mixed-policy buffer')
                 if steps%2048==0:
                     save_agent(a,cell/f'checkpoint_{steps}.pt')
-                    evaluate(cell,p,a,method,seed,steps,validation)
+                    evaluate(cell,p,a,method,seed,steps,validation,loads=(1,) if diagnostic else (2,8),units=p['units'][:1] if diagnostic else None)
                     dump(out/'validation.json',validation)
                     print(json.dumps(dict(method=method,seed=seed,training_steps=steps,total=total)),flush=True)
                 dump(out/'status.json',dict(method=method,seed=seed,training_steps=steps,total=total))
