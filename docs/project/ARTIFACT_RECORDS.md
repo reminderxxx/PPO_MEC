@@ -1,3 +1,5 @@
+> 2026-10-26 本地完成包：`artifacts/analysis/event_joint_control_20261026_v1/`。固定实验、输入/检查点冻结、原确认与完整组合支持组、全部负例、真实训练/固定评估图、重放/物理/统计复现及顶刊规则只读审查均保留。只发布源码和维护索引；详细结果与 artifact 不推送。入口 [证据索引](event_joint_control_evidence_20261026.md)。
+
 > 2026-10-26 独立联合控制产物：`artifacts/analysis/event_joint_control_20261026_v1/` 保存先行只读审查、规则机会检查、v1 短学习负例、失败数据准备和 v4 冻结输入；源分支 `codex/event-joint-control`，133 项匹配验证。训练、确认和最终图状态以本地回执为准，不据本索引宣称算法优势。
 
 > 2026-10-25 决策瓶颈续查：独立 `codex/decision-bottleneck` 分支已完成就绪调度、图消息消融、梯度干预和请求级 PPO 的有界验证。源码科学版本依次为 `62030d6`、`3c143a8`、`0f64c5f`、`a5686e2`；详细结果、负例、中止记录和真实图仅本地保存于 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`。请求级原型只有有限学习信号，仍弱于强缓存规则；不晋级图结构优势、长期收敛、完整 SA-GHMAPPO 或 formal/canonical。默认 registry 不变。

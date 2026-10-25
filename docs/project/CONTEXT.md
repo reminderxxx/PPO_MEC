@@ -1,3 +1,5 @@
+> 2026-10-26 最新续查完成：独立事件联合控制已有完整固定训练、确认和复现证据，详细结果只在本地 `event_joint_control_20261026_v1`。原 SA-GHMAPPO 与默认主线未改；训练采样和贪心部署必须分开解释，强启发式/图机制/收敛缺口未关闭。见 [证据索引](event_joint_control_evidence_20261026.md)。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

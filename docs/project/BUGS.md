@@ -1,3 +1,5 @@
+> 2026-10-26 联合控制剩余风险：新原型尚不支持对强启发式的整体优越性、图结构增益或严格收敛。贪心评估低完成不能等同随机训练没有学习。成功服务 hit-LRU 修复仅显式 opt-in，不代表旧 live/G14 语义已修复；跨 RSU/真实 AI 与项目全历史暴露仍需独立协议审计。完整受控证据和边界见本地 final_review 及 [索引](event_joint_control_evidence_20261026.md)。
+
 > 2026-10-26 联合控制统计风险追加：不同原始时间窗口可能共享相同 DAG 与 RSU 关联序列，不能只用窗口数代表有效场景多样性。确认前审查保留原组，并以输入等价类敏感性及完整组合、窗口外层嵌套统计防止伪重复；详细分类仅本地审查。
 
 > 2026-10-26 独立原型风险：旧 ready/persistent 链路成功服务未刷新 typed 对象 recency，因此不能把原型入库 recency 当作完整 service-hit LRU 机制。新 joint 合同通过显式 opt-in 修复，对所有新 baseline 一致应用；旧默认与历史产物不改写。确认集的项目级历史暴露尚未穷尽排除，不能称 strict project-wide holdout。详见 event_joint_control_20261026.md 与本地审查。
