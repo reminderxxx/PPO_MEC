@@ -106,3 +106,12 @@ def test_positive_reward_scaling_preserves_business_return_and_actions(tmp_path)
         assert ib['original_business_reward']==pytest.approx(ra)
         assert ia['semantic_state']==ib['semantic_state'] and da==db
         if da:break
+
+
+@pytest.mark.parametrize('method',['graph_ppo','set_ppo','mappo','qmix'])
+def test_shared_imitation_objective_reaches_native_actor_parameters(tmp_path,method):
+    from scripts.run_workflow_recovery import imitation_loss
+    e=fixture_env(tmp_path);_,info=e.reset(seed=7)
+    row=dict(state=info['semantic_state'],mask=info['action_mask'],action=expert(info))
+    a=agent_for(method,7);loss=imitation_loss(a,row);loss.backward()
+    assert torch.isfinite(loss) and any(p.grad is not None and p.grad.abs().sum()>0 for p in a._network.parameters())

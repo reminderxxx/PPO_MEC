@@ -26,7 +26,7 @@ from src.metrics.recorder import EpisodeRecorder
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 from src.agents.ppo_agent import PPOAgent
 from src.agents.mappo_agent import MAPPOAgent
-from src.agents.qmix_agent import QMIXAgent
+from src.agents.qmix_agent import QMIXAgent, _aggregate_controller_actions
 
 METHODS=['graph_ppo','set_ppo','mappo','qmix']
 
@@ -64,6 +64,7 @@ def save_agent(a,path):
     checkpoint['recovery_contract']=dict(action=CONTROL_CONTRACT,observation=OBSERVATION_CONTRACT,method=a._recovery_method,
         graph=a._recovery_method=='graph_ppo',gamma=1.,training_reward_scale=1.,native_family=a.agent_name)
     checkpoint['config']['experimental_encoder']=OBSERVATION_CONTRACT
+    checkpoint['initialization_provenance']=getattr(a,'_recovery_initialization',None)
     torch.save(checkpoint,path)
 
 
@@ -72,6 +73,7 @@ def load_agent(path,method,seed,deterministic=True):
     expected=dict(action=CONTROL_CONTRACT,observation=OBSERVATION_CONTRACT,method=method,graph=method=='graph_ppo',gamma=1.,training_reward_scale=1.,native_family={'graph_ppo':'ppo','set_ppo':'ppo','mappo':'mappo','qmix':'qmix'}[method])
     if checkpoint.get('recovery_contract')!=expected:raise ValueError('Recovery checkpoint contract mismatch')
     a=agent_for(method,seed,deterministic);a.load(str(path));a._network.eval()
+    a._recovery_initialization=checkpoint.get('initialization_provenance')
     return a
 
 
@@ -125,6 +127,63 @@ def qualification(out,p):
     dump(out/'results.json',dict(rows=rows,pairs=pairs,environment_steps=steps,formal=False))
 
 
+def make_teacher(out,p):
+    out.mkdir();data=[];steps=0
+    for u in p['units'][:8]:
+        for count in [1,2,4]:
+            env,_=make_env(u,workflows(p['workflows']),out/f'boundary_{u["index"]}_{count}.json',count=count)
+            _,info=env.reset(seed=7);episode=[]
+            while True:
+                action=expert(info)
+                state=info['semantic_state'];mask=info['action_mask']
+                _,r,done,truncated,info=env.step(action);steps+=1
+                if steps>4096:raise RuntimeError('Expert environment-step cap exceeded')
+                episode.append(dict(state=state,mask=mask,action=action,reward=r,window=u['index'],request_count=count,terminal=bool(done or truncated)))
+                if done or truncated:break
+            value=0.
+            for row in reversed(episode):
+                value+=row['reward'];row['return']=value
+            data.extend(episode)
+    write_trace(out/'dataset.json.gz',data)
+    dump(out/'manifest.json',dict(environment_steps=steps,samples=len(data),choice_samples=sum(sum(r['mask'])>1 for r in data),windows=list(range(8)),loads=[1,2,4],seed=7,rule='causal current-first then first-future preparation',dataset_sha256=sha(out/'dataset.json.gz'),formal=False,holdout=False))
+    print(json.dumps(dict(teacher_environment_steps=steps,samples=len(data))),flush=True)
+
+
+def imitation_loss(a,row):
+    if a._recovery_method!='qmix':
+        output=a._forward_policy(row['state'],run_metadata={'policy_evaluation_mode':'raw_policy'})
+        logp,_,_=a._env_action_distribution_statistics(policy_output=output,env_action=row['action'],action_mask=row['mask'])
+        return -logp
+    output=a._network.forward_single(row['state']);groups=[[] for _ in range(5)]
+    for heads in a._candidate_head_actions():
+        action,_=_aggregate_controller_actions(heads)
+        if row['mask'][action]:groups[action].append(a._joint_q_for_heads(a._network,output,heads).squeeze())
+    scores=torch.stack([torch.stack(values).max() if values else torch.tensor(-1e9) for values in groups])
+    return torch.nn.functional.cross_entropy(scores.unsqueeze(0),torch.tensor([row['action']]))
+
+
+def pretrain_agent(a,dataset_path,epochs=20):
+    with gzip.open(dataset_path,'rt') as f:all_rows=json.load(f)
+    data=[r for r in all_rows if sum(r['mask'])>1]
+    counts={i:sum(r['action']==i for r in data) for i in range(5)}
+    weights={i:len(data)/max(count,1)/sum(v>0 for v in counts.values()) for i,count in counts.items()}
+    optimizer=torch.optim.Adam(a._network.parameters(),lr=1e-3)
+    updates=0;losses=[];start=time.monotonic()
+    for epoch in range(epochs):
+        order=np.random.permutation(len(data))
+        for begin in range(0,len(data),64):
+            batch=[data[int(i)] for i in order[begin:begin+64]]
+            loss=torch.stack([imitation_loss(a,r)*weights[r['action']] for r in batch]).mean()
+            optimizer.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(a._network.parameters(),1.);optimizer.step();updates+=1
+        losses.append(float(loss.detach()))
+    a._optimizer=torch.optim.Adam(a._network.parameters(),lr=a._learning_rate)
+    if hasattr(a,'_target_network'):a._target_network.load_state_dict(a._network.state_dict())
+    provenance=dict(dataset_sha256=sha(dataset_path),samples=len(all_rows),choice_samples=len(data),class_counts=counts,
+        class_balancing='inverse frequency on choice states; forced states require no classification',epochs=epochs,optimizer_updates=updates,seconds=time.monotonic()-start,teacher='shared causal released-workflow rule',loss_tail=losses[-5:])
+    a._recovery_initialization=provenance
+    return provenance
+
+
 def collect(out,p,unit,count,seed,agent,label,budget=95):
     env,recorder=make_env(unit,workflows(p['workflows']),out/f'boundary_{label}.json',seed,count,reward_scale=1.)
     _,rollout=MARLOnPolicyTrainer(env,agent,recorder,max_steps=budget,gamma=1.,gae_lambda=1.).collect_episode(
@@ -137,14 +196,14 @@ def collect(out,p,unit,count,seed,agent,label,budget=95):
     return result,rollout
 
 
-def evaluate(cell,p,a,method,seed,steps,rows,loads=(2,8),units=None):
+def evaluate(cell,p,a,method,seed,steps,rows,loads=(2,8),units=None,checkpoint_name=None,snapshot="rl"):
     rng=(random.getstate(),np.random.get_state(),torch.random.get_rng_state())
     try:
-        ev=load_agent(cell/f'checkpoint_{steps}.pt',method,seed)
+        ev=load_agent(cell/(checkpoint_name or f'checkpoint_{steps}.pt'),method,seed)
         for u in (p['units'][8:] if units is None else units):
             for count in loads:
-                result,_=collect(cell,p,u,count,seed,ev,f'validation_{steps}_w{u["index"]}_n{count}')
-                rows.append(dict(method=method,seed=seed,training_steps=steps,window=u['index'],**result))
+                result,_=collect(cell,p,u,count,seed,ev,f'validation_{snapshot}_{steps}_w{u["index"]}_n{count}')
+                rows.append(dict(method=method,seed=seed,training_steps=steps,snapshot=snapshot,window=u['index'],**result))
     finally:random.setstate(rng[0]);np.random.set_state(rng[1]);torch.random.set_rng_state(rng[2])
 
 
@@ -154,28 +213,34 @@ def curriculum_count(steps,episode):
     return [2,4,8][episode%3]
 
 
-def train(out,p,methods=METHODS,seeds=(7,13,29),budget=8192,diagnostic=False):
+def train(out,p,methods=METHODS,seeds=(7,13,29),budget=8192,diagnostic=False,teacher_path=None):
     out.mkdir();validation=[];total=0
     for method in methods:
         for seed in seeds:
             yield_to_foreign_training(out)
-            cell=out/f'{method}_{seed}';cell.mkdir();a=agent_for(method,seed);steps=0;episode=0;buffer=[];updates=[]
+            cell=out/f'{method}_{seed}';cell.mkdir();a=agent_for(method,seed);steps=0;episode=0;buffer=[];updates=[];next_eval=2048
+            if teacher_path is not None:
+                save_agent(a,cell/'random_initial.pt')
+                evaluate(cell,p,a,method,seed,0,validation,loads=(1,) if diagnostic else (2,8),units=p['units'][:1] if diagnostic else None,checkpoint_name='random_initial.pt',snapshot='random_initial')
+                provenance=pretrain_agent(a,teacher_path)
+                dump(cell/'imitation.json',provenance)
             save_agent(a,cell/'checkpoint_0.pt')
             evaluate(cell,p,a,method,seed,0,validation,loads=(1,) if diagnostic else (2,8),units=p['units'][:1] if diagnostic else None)
             while steps<budget:
                 count=1 if diagnostic else curriculum_count(steps,episode)
                 unit=p['units'][0 if diagnostic else episode%8]
-                chunk=training_chunk_budget(budget-steps,len(buffer),256)
+                chunk=min(95,budget-steps,next_eval-steps)
                 result,rollout=collect(cell,p,unit,count,seed,a,f'train_{episode}',chunk)
                 steps+=len(rollout);total+=len(rollout);buffer.extend(rollout);episode+=1
                 if not rollout:raise RuntimeError('Empty rollout')
-                if len(buffer)==256:
+                if buffer and (len(buffer)>=256 or steps==next_eval or steps==budget):
                     yield_to_foreign_training(out)
                     start=time.monotonic();stats=a.learn(buffer);buffer=[]
                     updates.append(dict(training_steps=steps,seconds=time.monotonic()-start,stats=stats))
                     dump(cell/'updates.json',updates)
-                elif len(buffer)>256:raise RuntimeError('Mixed-policy buffer')
-                if steps%2048==0:
+                
+                if steps==next_eval or steps==budget:
+                    next_eval+=2048
                     save_agent(a,cell/f'checkpoint_{steps}.pt')
                     evaluate(cell,p,a,method,seed,steps,validation,loads=(1,) if diagnostic else (2,8),units=p['units'][:1] if diagnostic else None)
                     dump(out/'validation.json',validation)
@@ -184,7 +249,7 @@ def train(out,p,methods=METHODS,seeds=(7,13,29),budget=8192,diagnostic=False):
             if buffer:raise RuntimeError('Unconsumed on-policy samples')
             if not diagnostic:evaluate(cell,p,a,method,seed,steps,validation,loads=(4,))
             dump(cell/'completion.json',dict(method=method,seed=seed,training_steps=steps,learn_calls=len(updates),curriculum=not diagnostic,
-                observation_contract=OBSERVATION_CONTRACT,action_contract=CONTROL_CONTRACT,teacher_steps=0))
+                observation_contract=OBSERVATION_CONTRACT,action_contract=CONTROL_CONTRACT,teacher_steps=json.loads((Path(teacher_path).parent/'manifest.json').read_text())['environment_steps'] if teacher_path else 0))
     dump(out/'validation.json',validation)
     dump(out/'status.json',dict(status='COMPLETE',training_steps=total,cells=len(methods)*len(seeds)))
 
@@ -197,14 +262,15 @@ def source_identity(out,input_path):
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('phase',choices=['qualify','diagnostic','train'])
-    parser.add_argument('--root',type=Path,required=True);parser.add_argument('--inputs',type=Path,required=True)
+    parser=argparse.ArgumentParser();parser.add_argument('phase',choices=['qualify','diagnostic','teacher','train'])
+    parser.add_argument('--root',type=Path,required=True);parser.add_argument('--inputs',type=Path,required=True);parser.add_argument('--teacher',type=Path);parser.add_argument('--training-steps',type=int,default=8192)
     args=parser.parse_args();torch.set_num_threads(1);torch.set_num_interop_threads(1);os.nice(19)
     p=json.loads(args.inputs.read_text());args.root.mkdir()
     source_identity(args.root,args.inputs)
-    dump(args.root/'command.json',dict(argv=sys.argv,formal=False,holdout=False,methods=METHODS,gamma=1.,capacity_mb=384.,training_budget=8192,validation_loads=[2,8]))
+    dump(args.root/'command.json',dict(argv=sys.argv,formal=False,holdout=False,methods=METHODS,gamma=1.,capacity_mb=384.,training_budget=4096 if args.phase=="diagnostic" else args.training_steps,validation_loads=[2,8],teacher_path=str(args.teacher),gae_lambda=1.,training_reward_scale=1.))
     if args.phase=='qualify':qualification(args.root/'qualification',p)
-    elif args.phase=='diagnostic':train(args.root/'learning',p,methods=['graph_ppo','set_ppo'],seeds=[7],budget=4096,diagnostic=True)
-    else:train(args.root/'learning',p)
+    elif args.phase=='teacher':make_teacher(args.root/'teacher',p)
+    elif args.phase=='diagnostic':train(args.root/'learning',p,methods=['graph_ppo','set_ppo'],seeds=[7],budget=4096,diagnostic=True,teacher_path=args.teacher)
+    else:train(args.root/'learning',p,budget=args.training_steps,teacher_path=args.teacher)
 
 if __name__=='__main__':main()
