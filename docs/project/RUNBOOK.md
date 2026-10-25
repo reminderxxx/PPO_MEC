@@ -1,3 +1,5 @@
+> 2026-10-26 独立联合控制入口及验证见 [event_joint_control_20261026.md](event_joint_control_20261026.md)：先完整规则机会检查，再短学习测试。使用新 create-only 本地产物目录；不读取封存 holdout、不复用历史失败 run、不自动扩大预算。
+
 ## 完整恢复流程复现（科学版本36bc755，非formal）
 
 使用三个互不覆盖的新root，依次采集训练专家、验收小任务、执行固定比较；所有原始结果仍留本地。INPUTS为该轮冻结输入，TEACHER为teacher子目录的dataset.json.gz：

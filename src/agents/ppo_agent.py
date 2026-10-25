@@ -157,3 +157,34 @@ class RequestOptionPPOAgent(ReadyWorkflowPPOAgent):
         if p.get('contract')!=OPTION_CONTRACT or p.get('features')!=OPTION_FEATURE_VERSION:raise ValueError('Request-option checkpoint contract mismatch')
         a=cls(p['seed']);a.network.load_state_dict(p['network']);a.optimizer.load_state_dict(p['optimizer']);a.updates=p['updates']
         return a,p
+
+
+class EventJointPPOAgent(ReadyWorkflowPPOAgent):
+    """Opt-in event-driven adapter preparation; separate from original SA-GHMAPPO."""
+    def __init__(self,random_seed=7,use_graph=True):
+        import torch
+        from src.encoders.event_joint_encoder import EventJointActorCritic,batch_event_features
+        self.seed=int(random_seed);self.use_graph=bool(use_graph);torch.manual_seed(self.seed)
+        self.network=EventJointActorCritic(self.use_graph)
+        self.optimizer=torch.optim.Adam(self.network.parameters(),lr=1e-3)
+        self.updates=0;self._batch_features=batch_event_features;self._separate_value_clip=True
+
+    def save(self,path,provenance):
+        import torch
+        from pathlib import Path
+        from src.encoders.event_joint_encoder import EVENT_FEATURE_VERSION
+        from src.envs.wrappers.joint_workflow_control import JOINT_CONTRACT
+        if Path(path).exists():raise FileExistsError(path)
+        torch.save(dict(contract=JOINT_CONTRACT,features=EVENT_FEATURE_VERSION,seed=self.seed,use_graph=self.use_graph,
+            network=self.network.state_dict(),optimizer=self.optimizer.state_dict(),updates=self.updates,
+            rng=torch.random.get_rng_state(),provenance=provenance),path)
+
+    @classmethod
+    def load(cls,path):
+        import torch
+        from src.encoders.event_joint_encoder import EVENT_FEATURE_VERSION
+        from src.envs.wrappers.joint_workflow_control import JOINT_CONTRACT
+        p=torch.load(path,map_location='cpu')
+        if p.get('contract')!=JOINT_CONTRACT or p.get('features')!=EVENT_FEATURE_VERSION:raise ValueError('Event-joint checkpoint contract mismatch')
+        a=cls(p['seed'],p['use_graph']);a.network.load_state_dict(p['network']);a.optimizer.load_state_dict(p['optimizer']);a.updates=p['updates']
+        return a,p

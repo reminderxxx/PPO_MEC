@@ -1,3 +1,5 @@
+> 2026-10-26 独立事件联合控制：就绪任务执行与已释放模型预加载解耦，事件 PPO/匹配图消融仅在 `codex/event-joint-control` 分支。合同、命令与边界见 [说明](docs/project/event_joint_control_20261026.md)；详细实验仅本地 `artifacts/analysis/event_joint_control_20261026_v1/`。默认 registry 和正式协议不变。
+
 > 2026-10-25 决策瓶颈续查：独立 `codex/decision-bottleneck` 分支已完成就绪调度、图消息消融、梯度干预和请求级 PPO 的有界验证。源码科学版本依次为 `62030d6`、`3c143a8`、`0f64c5f`、`a5686e2`；详细结果、负例、中止记录和真实图仅本地保存于 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`。请求级原型只有有限学习信号，仍弱于强缓存规则；不晋级图结构优势、长期收敛、完整 SA-GHMAPPO 或 formal/canonical。默认 registry 不变。
 
 > 2026-10-25三阶段自主恢复已执行：独立`codex/workflow-recovery`分支完成可达机会检查、准备/观测合同及固定四方法三seed比较，真实曲线、原始trace与全部负结果仅本地保存于`artifacts/analysis/workflow_recovery_execution_20261025_v1/`。共有专家初始化与RL增量分别报告；不据奖励平台晋级图结构优势或策略收敛。详见项目PROGRESS与ARTIFACT_RECORDS。

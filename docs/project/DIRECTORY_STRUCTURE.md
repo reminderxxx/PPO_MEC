@@ -1,3 +1,5 @@
+> 2026-10-26 本独立分支新增 `joint_workflow_control.py`、`event_joint_encoder.py`、`run_joint_workflow_probe.py`、`run_event_joint_learning.py` 与两组测试；本地产物根为 `artifacts/analysis/event_joint_control_20261026_v1/`，见 [合同](event_joint_control_20261026.md)。
+
 > 独立恢复新增`scripts/run_workflow_recovery.py`、`src/envs/wrappers/persistent_workflow_control.py`、`src/encoders/persistent_workflow_encoder.py`与`tests/test_workflow_recovery.py`；本地产物`artifacts/analysis/workflow_recovery_execution_20261025_v1/`，不覆盖旧实验。
 
 > Experimental runtime binding helper: `src/runtime/subject_binding.py`; compatibility diagnostic exports: `scripts/sagh_subject_binding.py`; integration tests: `tests/test_sagh_subject_binding_runtime.py`. Failure receipts use caller-chosen new local per-exposure paths and are not formal result artifacts. See [runtime contract](sagh_subject_binding_runtime_20261024.md).

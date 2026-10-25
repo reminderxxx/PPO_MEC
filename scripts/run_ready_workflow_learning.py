@@ -19,8 +19,8 @@ from src.envs.core.predictor_manager import PredictorManager
 from src.envs.specs import RSUState
 
 
-def make_env(unit, wfs, count=8, seed=7, horizon=95, capacity=384.):
-    return ReadyWorkflowEnv(workflows=wfs, subject_id=unit['subject_id'], request_count=count,
+def make_env(unit, wfs, count=8, seed=7, horizon=95, capacity=384., env_class=ReadyWorkflowEnv):
+    return env_class(workflows=wfs, subject_id=unit['subject_id'], request_count=count,
         mobility_provider=ReplayProvider(deepcopy(unit['frames'])), rsu_states=[RSUState(**r) for r in unit['rsus']],
         adapter_catalog=AdapterCatalog.from_json(ROOT/'src/data/model_catalog/typed_model_cache_controlled.json'),
         predictor_manager=PredictorManager(horizon=32, random_seed=seed), max_steps=horizon, mobility_source='ngsim',
