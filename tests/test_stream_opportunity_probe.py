@@ -30,3 +30,19 @@ def test_probe_retains_all_native_costs_and_frame_receipts(tmp_path):
     assert abs(sum(f['reward'] for f in frames) - row['reward']) < 1e-8
     assert abs(sum(row['components'].values()) - row['reward']) < 1e-8
     assert sum(len(f['events']) for f in frames) == sum(row['statuses'].values())
+
+
+def test_comparison_uses_one_training_rule_not_per_cell_oracle():
+    from scripts.audit_stream_main_opportunity import compare
+    rows=[]
+    for method,values in {'reactive':[10,0], 'naive_prefetch':[0,8],
+            'gain_prefetch':[4,4], 'sa_seed7':[6,6]}.items():
+        for i,value in enumerate(values):
+            rows.append(dict(method=method,case_id=str(i),reward=value,
+                completed_requests=1,components={'completed_nodes':value},statuses={}))
+    result=compare(rows)
+    assert result['strongest_compatible_rule']=='reactive'
+    assert result['mean_main_minus_rule']==1
+    import pytest
+    with pytest.raises(ValueError,match='unmatched'):
+        compare(rows[:-1])
