@@ -19,6 +19,8 @@ Opt-in native handoff/state execution acceptance: see
 [runtime contract](docs/project/handoff_state_runtime_20261026.md). The backend
 measures real local inference and localhost TCP under accelerated trace replay;
 it does not replace the default simulator or formal benchmark protocol.
+Completed local evidence and the closed training gate:
+[handoff evidence index](docs/project/handoff_mainline_evidence_20261026.md).
 
 持续工作流独立优化已执行：见[实现、试训与结果索引](docs/project/persistent_workflow_optimization_20261025.md)。代码在`codex/persistent-workflow-learning`分支，未覆盖当前工作区；实际学习曲线本地保留，尚不支持稳定优秀或长期收敛结论。
 

@@ -1,3 +1,5 @@
+> 2026-10-26 本地handoff/state完成包：主工作区artifacts/analysis/handoff_state_runtime_20261026_v1/，含固定输入、真实模型/原生事件/实际TCP原件、加速与真实时钟分列结果、独立源端转发诊断、所有负例、图、source archive与逐字节重建回执。仅源码与维护索引推送；组件E2不代表主方法formal/holdout或整体优势。见[证据索引](handoff_mainline_evidence_20261026.md)。
+
 > 2026-10-26 本地完成包：`artifacts/analysis/event_joint_control_20261026_v1/`。固定实验、输入/检查点冻结、原确认与完整组合支持组、全部负例、真实训练/固定评估图、重放/物理/统计复现及顶刊规则只读审查均保留。只发布源码和维护索引；详细结果与 artifact 不推送。入口 [证据索引](event_joint_control_evidence_20261026.md)。
 
 > 2026-10-25 决策瓶颈续查已完成：代码位于独立 `codex/decision-bottleneck` 分支（科学版本 `a5686e2`），主工作区原有修改未覆盖。就绪调度、图消息同权重对照、梯度干预与请求级 PPO 的完整本地证据见 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`。请求级原型仅有有限学习信号，强缓存规则仍更优，不能晋级图结构、长期收敛、原 SA-GHMAPPO 或 formal/canonical 结论。新入口与合同说明在该独立分支的 RUNBOOK。

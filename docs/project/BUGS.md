@@ -1,3 +1,5 @@
+> 2026-10-26 handoff执行链剩余风险：共享主机的准备并行/负载漂移不能外推独立RSU；实时开发事件重叠，不能作独立显著性证据；完成节点状态不含在途n1 KV；源端可用性与keep/forward动作尚未进入统一正式合同，默认NGSIM一步服务也未改为实测时钟。当前可选后端非默认formal修复，训练门禁关闭。见[证据索引](handoff_mainline_evidence_20261026.md)。
+
 > 2026-10-26 联合控制剩余风险：新原型尚不支持对强启发式的整体优越性、图结构增益或严格收敛。贪心评估低完成不能等同随机训练没有学习。成功服务 hit-LRU 修复仅显式 opt-in，不代表旧 live/G14 语义已修复；跨 RSU/真实 AI 与项目全历史暴露仍需独立协议审计。完整受控证据和边界见本地 final_review 及 [索引](event_joint_control_evidence_20261026.md)。
 
 > 2026-10-26 学习式预测输入风险OPEN：现有九维包装投影用缓存数量概括对象驻留，零交互构造例确认等数量的所需/非所需adapter输入相同；该分支的真实状态覆盖、运行profile与收益影响尚未验证。此限制不等于graph actor也缺少对象信息，不得将补输入或加世界模型直接宣称主方法优势。方案见 `main_method_optimization_plan_20261026.md`；本轮无算法/reward修改或训练，formal readiness=Unverifiable，reviewed_at=2026-10-26T02:25:16+08:00。
