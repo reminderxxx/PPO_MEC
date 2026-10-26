@@ -4,10 +4,16 @@
 独立实现依据只在本地 `paper_main_opportunity_20261026_v1` 与对应 audit 包。
 `RelocationAwareStreamSAGHMAPPOAgent` 是 main-only opt-in 候选，默认 registry、
 规则、其他算法与原生物理奖励不变。固定六变体三 seed 等帧预算研究合同已形成，
-软件与两变体真实预检通过，科学收益尚待完整 pilot。
+软件与两变体真实预检通过；六变体三 seed 固定训练和原12条件支持评价现已完成。
+18单元/36科学checkpoint/55296实际训练帧通过预算、父参数、原生收据与来源核验，
+81项匹配测试通过；18条完整评价episode在独立进程逐帧一致。
+仅在训练分区支持恢复成本 prior 干预的有界收益；图、预测、surrogate 必要性、
+可选预准备浪费、完整独立验证与收敛均未晋级。详细结果与全部负例仅本地保存于
+`paper_main_ablation_audit_20261026_v1`、`paper_main_full_cohort_audit_20261026_v1`。
 reviewed_at/literature_cutoff=2026-10-26；target_venue=IEEE TMC methodology / development；
 artifact_run_id=paper_main_opportunity_20261026_v1；policy_version=tmc_review_policy_v3_20260621；
-diagnosis_git=fb45cdc；evidence_level=HASH_VERIFIED_TRAINING_DIAGNOSIS_ONLY；
+diagnosis_git=fb45cdc；scientific_git=239329e/439ce7d（main hash与training-unit AST一致）；
+evidence_level=HASH_VERIFIED_TRAINING_DIAGNOSIS_AND_MATCHED_BUDGET_WARM_START_ONLY；
 full formal readiness=Unverifiable，score=N/S。详见研究合同，未改论文或 canonical。
 
 ## 2026-10-17：Stream v2软件修复通过，待有界确认

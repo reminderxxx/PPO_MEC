@@ -10,6 +10,14 @@ pilot；不重跑原确认入口，不开启 formal/holdout，不复用或覆盖
 固定帧片段的 critic bootstrap、重复 terminal fragment 与完整评价 episode
 分别记录，不能把该新训练口径称为原完整 episode MC 的精确续训。
 
+完整执行只允许既定一次固定预算；`--seeds` 可独立调度不同seed，不能重复一个
+已完成单元。用 `collect_stream_main_ablation.py --shards <roots...> --output <fresh>`
+按引用合并全部18个单元，再用 `audit_stream_main_ablation.py` 核验；其参数为
+`--run <combined> --opportunity <probe-root> --output <fresh>`。
+原12条件复核必须先冻结追加方案，然后调用 `eval_stream_main_full_cohort.py`；
+全部支持结果由对应 auditor 和 `audit_stream_cache_receipts.py` 只读消费。
+不因开发收益正向追加训练、选peak或开启holdout。
+
 ## 持续请求 v2确认入口（2026-10-17）
 
 先读`joint_stream_results_review_20261017.md`及`joint_stream_refinement_contract_20261017.md`。共同入口`python scripts/launch_joint_stream_learning.py --output_root artifacts/joint_stream_learning/<fresh_UTC>_confirmation`，必须清洁提交且使用全新root；push失败时按冻结合同记录网络例外并保留本地commit/SHA，稍后同步；`--smoke`为32帧软件验收。v2拒绝v1 protocol/checkpoint，不用当前源码重跑或改写旧audit；旧归档需其冻结提交。此入口只允许已授权的一轮1536session/737280帧上限确认，不能重复启动。

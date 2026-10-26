@@ -55,3 +55,33 @@ episodes in three score-blind train cases (short/medium/long across three time
 sessions). These three evaluation cells confound stratum and time and cannot
 support independent formal inference. No peak selection, extra tuning cycle,
 holdout access or baseline improvement is authorized by this script.
+
+## Completed bounded evidence and consumers
+
+The fixed study completed 18 scientific cells, 36 initial/final checkpoints and
+55296 actual training interactions. All variants share the same parent tensors
+within each seed. The two execution revisions (`239329e`, `439ce7d`) have the
+same main-method file and training-unit AST; the latter only enables independent
+seed dispatch. The original dispatcher stops after its six seed-7 cells; its
+partial next-cell initialization is preserved and excluded explicitly, with no
+completed scientific cell repeated or selected.
+
+`collect_stream_main_ablation.py` joins all predeclared cells by reference;
+`audit_stream_main_ablation.py` checks budget, checkpoints and native traces.
+`eval_stream_main_full_cohort.py` evaluates the two primary fixed-final variants
+on all 12 original train conditions, under an append-only plan frozen before
+candidate final outcomes existed. `audit_stream_main_full_cohort.py` checks all
+72 supporting evaluations. These do not replace the three-condition ablation
+panel or create new independent time windows.
+
+`audit_stream_cache_receipts.py` independently reconstructs allocated/pending
+bytes, dependency readiness and actual service from final support receipts,
+separating base and adapter use. Observed object use is not causal net benefit.
+`plot_stream_main_evidence.py` exports PNG/PDF/SVG (optional matplotlib dependency)
+and shows seed means without pretending that they are independent time clusters.
+
+Private reports record the positive intervention, all negative cells, weak/null
+module effects, preparation waste and the split between prior-only and later
+learning increments. No whole-architecture, convergence or formal/canonical
+promotion follows. Detailed review, statistics, real source references and raw
+artifacts stay local under the ignored analysis roots; no manuscript is changed.

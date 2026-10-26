@@ -3,6 +3,10 @@
 - `scripts/probe_stream_main_opportunity.py`：冻结父版本的训练集机会诊断。
 - `scripts/audit_stream_main_opportunity.py`：逐帧原生奖励、文件 hash 与公平配对核验。
 - `scripts/run_stream_main_ablation.py`：主方法单因素候选及固定帧预算的重训消融。
+- `scripts/collect_stream_main_ablation.py`、`scripts/audit_stream_main_ablation.py`：独立seed合并与核验。
+- `scripts/eval_stream_main_full_cohort.py`、`scripts/audit_stream_main_full_cohort.py`：原12训练条件完整复核。
+- `scripts/audit_stream_cache_receipts.py`：加载、字节容量、依赖就绪与实际服务重建。
+- `scripts/plot_stream_main_evidence.py`：标准科学图导出，保留所有seed与负结果。
 - `artifacts/analysis/paper_main_*_20261026_*`：本地开发产物，Git 忽略，不作 formal。
 
 ## 2026-10-17 Stream v2增量
