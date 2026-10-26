@@ -1,3 +1,11 @@
+## 2026-10-26 主方法 opt-in 候选
+
+`sa_ghmappo_agent.py::RelocationAwareStreamSAGHMAPPOAgent` 复用冻结论文
+`StreamControlPPO` 的物理观测/动作/学习实现，只对主方法开放恢复成本归一化与
+消融开关；不更改 PPO/MAPPO 类或默认 registry。新 checkpoint contract 与旧父
+checkpoint 显式区分；warm start 保留相同参数并统一重置优化器和学习日程。
+诊断、重训和审计脚本分别生产和消费本地 manifest、checkpoint 与逐帧收据。
+
 ## 2026-10-17 Stream v2
 
 `joint_stream_refinement.py`只消费公开已发布DAG、延迟RSU状态、因果预测与声明意图，提供使用时间/恢复帧/可选cache净交付代理和均衡日程；`StreamControlPPO`共同消费，DT独立context在`dt_handoff_agent.py`；环境执行当前依赖保护，auditor独立消费原始事件、value metadata和checkpoint，拒绝DT/DAG tensor alias。代理不是reward或未来标签，surrogate观察团队MC监督不变。

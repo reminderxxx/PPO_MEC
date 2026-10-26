@@ -1,3 +1,10 @@
+## 2026-10-26 主方法独立机会诊断与消融
+
+- `scripts/probe_stream_main_opportunity.py`：冻结父版本的训练集机会诊断。
+- `scripts/audit_stream_main_opportunity.py`：逐帧原生奖励、文件 hash 与公平配对核验。
+- `scripts/run_stream_main_ablation.py`：主方法单因素候选及固定帧预算的重训消融。
+- `artifacts/analysis/paper_main_*_20261026_*`：本地开发产物，Git 忽略，不作 formal。
+
 ## 2026-10-17 Stream v2增量
 
 `src/envs/core/joint_stream_refinement.py`提供公共因果规划代理/均衡训练日程；`tests/test_stream_refinement.py`覆盖已定位反例。独立审查与确认合同分别为`joint_stream_results_review_20261017.md`和`joint_stream_refinement_contract_20261017.md`。新运行写`artifacts/joint_stream_learning/<UTC>_confirmation/`，旧`20261015T181642Z_development`永久保留为历史回收，不续写。

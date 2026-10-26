@@ -1,3 +1,15 @@
+## 2026-10-26 独立主方法优化入口
+
+先读 `paper_main_opportunity_20261026.md`。使用冻结的
+`joint_stream_learning_v2` protocol manifest 和三个最终主方法 checkpoint，依次执行
+`probe_stream_main_opportunity.py`、`audit_stream_main_opportunity.py`，再将诊断
+JSON 传入 `run_stream_main_ablation.py --diagnosis <analysis.json>`。
+三个脚本均使用 `--output` 指定全新目录；训练脚本另需 `--protocol` 与
+`--checkpoint_root`，`--preflight` 只做软件验证。必须从清洁提交启动正式开发
+pilot；不重跑原确认入口，不开启 formal/holdout，不复用或覆盖旧输出。
+固定帧片段的 critic bootstrap、重复 terminal fragment 与完整评价 episode
+分别记录，不能把该新训练口径称为原完整 episode MC 的精确续训。
+
 ## 持续请求 v2确认入口（2026-10-17）
 
 先读`joint_stream_results_review_20261017.md`及`joint_stream_refinement_contract_20261017.md`。共同入口`python scripts/launch_joint_stream_learning.py --output_root artifacts/joint_stream_learning/<fresh_UTC>_confirmation`，必须清洁提交且使用全新root；push失败时按冻结合同记录网络例外并保留本地commit/SHA，稍后同步；`--smoke`为32帧软件验收。v2拒绝v1 protocol/checkpoint，不用当前源码重跑或改写旧audit；旧归档需其冻结提交。此入口只允许已授权的一轮1536session/737280帧上限确认，不能重复启动。

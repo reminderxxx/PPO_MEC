@@ -9,6 +9,10 @@
 
 # PPO_MEC
 
+八车辆论文主方法的训练集机会诊断与等交互预算消融入口见
+[研究合同](docs/project/paper_main_opportunity_20261026.md)。这是独立 opt-in
+开发研究；不改变默认算法、规则、环境奖励或正式结果。
+
 2026-10-16 持续请求共同学习适配：七算法及SA去预测版现消费request-bound新合同，已发布queue图/异构模型费用、请求记忆切换与含空闲期的团队tail已接入；DQN跨空闲/请求连接。GRU按新train分区重新固定拟合，旧checkpoint拒绝。八配置×3seed×64会话（上限737280训练帧）合同已冻结，正式运行/结果以`artifacts/joint_stream_learning/continuation.json`指针为准；未回收前不报告算法优势。 [共同学习合同](docs/project/joint_stream_learning_contract_20261016.md)。
 
 2026-10-16 持续工作负载工程已完成：外生FIFO请求、跨请求typed-cache、已发布队列预取和异构多base已接入；v3冻结216单元、416940事件/71757收据/6次完整重放通过，411项回归及旧11模型兼容重放通过。gain规则预取对象使用1012/1079（93.79%），相对reactive配对奖励+1.222289、完整请求差0；长任务完成数−0.083333且c070负例保留。新增RL训练0，SA/MAPPO新合同尚待适配，不能称算法优势。 [完整结果](docs/project/joint_stream_workload_results_review_20261016.md)。

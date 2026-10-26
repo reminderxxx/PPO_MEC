@@ -27,3 +27,31 @@ under the ignored `artifacts/analysis/` directory. These do not enter public Git
 No component or development finding promotes full-system formal/canonical or
 paper-ready claims. Remaining independent-window, strongest-baseline, physical
 calibration and module-causality requirements continue to apply.
+
+## Fixed follow-up implementation contract
+
+The independently saved train-only diagnosis justifies a single intervention:
+rescale the existing state-restoration prior from remaining-session frames to
+remaining current-node compute frames. Its old term is removed before inserting
+the new term; there is no additional reward charge or removed legal execution
+action. The candidate is explicitly instantiated from `sa_ghmappo_agent.py` and
+does not change the shared PPO implementation, physical environment or rules.
+
+`run_stream_main_ablation.py` freezes six variants: original prior, new prior,
+new prior without DAG edges, without prediction, without surrogate, and without
+optional cache admission. Every variant uses three identical parent seeds,
+exactly 256 actual interactions for each of 12 input-selected train conditions
+(3072 per cell), three update calls and four epochs per update (KL early stopping
+and actual gradient-step counts remain visible). Node features, network size
+and the 73940 parameters are retained in the DAG-edge deletion control.
+
+All variants use a fresh optimizer and a reset learning schedule. Fixed-frame
+cuts bootstrap the native team tail with the existing central critic. Physical
+termination restarts the same condition if its frame budget is not exhausted;
+all repeated fragments and costs are counted. This is a shared bounded pilot
+training contract, not exact continuation or the old full-episode MC trainer.
+Before and fixed-final greedy evaluation uses complete original physical
+episodes in three score-blind train cases (short/medium/long across three time
+sessions). These three evaluation cells confound stratum and time and cannot
+support independent formal inference. No peak selection, extra tuning cycle,
+holdout access or baseline improvement is authorized by this script.

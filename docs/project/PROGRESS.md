@@ -1,3 +1,15 @@
+## 2026-10-26：论文主方法机会诊断与独立候选
+
+训练分区的冻结规则/三 seed 原方法机会诊断及逐帧审计已完成；详细正负结果、
+独立实现依据只在本地 `paper_main_opportunity_20261026_v1` 与对应 audit 包。
+`RelocationAwareStreamSAGHMAPPOAgent` 是 main-only opt-in 候选，默认 registry、
+规则、其他算法与原生物理奖励不变。固定六变体三 seed 等帧预算研究合同已形成，
+软件与两变体真实预检通过，科学收益尚待完整 pilot。
+reviewed_at/literature_cutoff=2026-10-26；target_venue=IEEE TMC methodology / development；
+artifact_run_id=paper_main_opportunity_20261026_v1；policy_version=tmc_review_policy_v3_20260621；
+diagnosis_git=fb45cdc；evidence_level=HASH_VERIFIED_TRAINING_DIAGNOSIS_ONLY；
+full formal readiness=Unverifiable，score=N/S。详见研究合同，未改论文或 canonical。
+
 ## 2026-10-17：Stream v2软件修复通过，待有界确认
 
 432 tests passed；八算法软件全链32session/1024frame、8最终/8checkpoint逐事件重放audit pass，DT/DAG tensor已分离。公共保护/均衡日程/冷模型恢复成本/按需预取均落地，物理reward和数据不改。仅软件正确性，性能尚待新冻结确认；合同joint_stream_refinement_contract_20261017.md。

@@ -505,3 +505,71 @@ class StreamSAGHMAPPOAgent(StreamControlPPO):
     def __init__(self, **kwargs):
         kwargs.pop('method',None)
         super().__init__(method='sa_ghmappo',**kwargs)
+
+
+class RelocationAwareStreamSAGHMAPPOAgent(StreamSAGHMAPPOAgent):
+    """Opt-in paper stream candidate; physical action/reward contracts are unchanged.
+
+    Only the existing state-restoration prior is rescaled to the remaining
+    current-node compute horizon. The actor can still choose every originally
+    legal site. Module flags support explicitly retrained, matched ablations.
+    """
+    checkpoint_contract = 'stream_main_relocation_prior_v1'
+
+    def __init__(self, *, relocation_cost_mode='node', dag_topology_enabled=True,
+                 optional_cache_enabled=True, **kwargs):
+        if relocation_cost_mode not in ('episode', 'node'):
+            raise ValueError('unknown relocation cost normalization')
+        if kwargs.get('method', 'sa_ghmappo') != 'sa_ghmappo':
+            raise ValueError('relocation candidate is main-method only')
+        super().__init__(**kwargs)
+        self.relocation_cost_mode = relocation_cost_mode
+        self.dag_topology_enabled = bool(dag_topology_enabled)
+        self.optional_cache_enabled = bool(optional_cache_enabled)
+        self.options.update(relocation_cost_mode=relocation_cost_mode,
+            dag_topology_enabled=dag_topology_enabled, optional_cache_enabled=optional_cache_enabled)
+
+    def _coordinated_features(self, decision, frame, reservations):
+        from math import ceil
+        from src.envs.core.joint_stream_refinement import state_restore_frames
+        data, candidates, vid, node, work = super()._coordinated_features(decision, frame, reservations)
+        s = decision['semantic_state']
+        if self.relocation_cost_mode == 'node':
+            remaining = max(0., s['current_node_work_units_required'] - s['current_node_work_units_progress'])
+            local_horizon = max(1, ceil(remaining / s['control_cost_parameters']['rsu_work_units_per_frame']))
+            session_horizon = max(4, s['episode_frames_remaining']) / 4
+            for i, site in enumerate(candidates[0]):
+                if site not in s['reachable_execution_rsu_ids']:
+                    continue
+                relocation = state_restore_frames(s, site)
+                # Remove the old cost term before inserting its new scaling.
+                # No reward shaping and no double charge of restoration cost.
+                data['prior0'][i] += relocation / session_horizon - relocation / local_horizon
+        if not self.dag_topology_enabled:
+            # Same node features, tensors and parameter count; delete edges only.
+            data['adjacency'] = data['adjacency'] * 0
+        if not self.optional_cache_enabled:
+            for i, (site, nid, kind) in enumerate(candidates[1]):
+                reactive = (site is not None and nid == node and
+                    site == getattr(self, '_team_targets', {}).get(vid) and not s['output_pending'])
+                data['m1'][i] &= i == 0 or reactive
+        return data, candidates, vid, node, work
+
+    @classmethod
+    def from_parent_checkpoint(cls, path, *, training_budget, **overrides):
+        """Matched warm start, deliberately fresh optimizers for every variant.
+
+        This is a new learning experiment, not exact continuation of an old run.
+        Parent parameters and predictor calibration are retained; the learning
+        schedule resets uniformly and parent optimizer moments are not reused.
+        """
+        import torch
+        saved = torch.load(path, map_location='cpu', weights_only=False)
+        if saved.get('contract') != StreamControlPPO.checkpoint_contract:
+            raise ValueError('warm start requires the frozen paper stream checkpoint')
+        options = dict(saved['options'], training_budget=training_budget)
+        options.update(overrides)
+        obj = cls(**options)
+        obj.load_state_dict(saved['state_dict'], strict=True)
+        obj.completed_updates.zero_()
+        return obj

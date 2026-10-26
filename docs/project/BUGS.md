@@ -1,3 +1,13 @@
+## 2026-10-26：主方法恢复成本与新 pilot 边界
+
+训练轨迹与冻结源码支持检查“session 尺度恢复成本较弱、节点边界反复换站”
+这一主方法优化假设；尚不能仅凭账本差值认定因果。新候选只改原 prior 的
+恢复成本归一化，须由固定干预和匹配重训消融验收。
+新 pilot 的固定帧 cut 使用共同 critic bootstrap，不是原 complete-episode MC
+的精确续训；三个训练时间单元、兼容规则池与模型代理成本限制继续保留。
+不得把单车组件规则排名、图零增益或原五动作分支结论直接套用八车辆合同。
+更新日期 2026-10-26；正式收益/整体结构必要性仍未验证。
+
 ## 2026-10-17：Stream v2修复边界
 
 FIXED/software：remote-current环境及两个auditor谓词；DT预测context alias；每seed后半程无long的课程缺口；恢复minimum slot和冷模型成本漏项；无使用时域/净交付代理的可选预取。432 tests和软件八组audit通过，不证明实际优势。OPEN：seed7family thrash/seed27late退化/PPOseed17及DAG负例是否改善，需唯一有界确认；surrogate仍observational，LRU仍共同自动策略，未获得因果action信用或formal证据。
