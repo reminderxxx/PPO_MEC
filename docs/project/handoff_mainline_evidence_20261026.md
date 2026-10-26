@@ -37,6 +37,9 @@ table, no new novelty assessment), `target_venue=IEEE TMC methodology/developmen
 additional scientific sources above, `evidence_level=E2_ARTIFACT_AUDITED` for
 this bounded component only. Full-method readiness: `Unverifiable`; score `N/S`.
 
-Automatic approval review rejected fast-forward integration into `main` because
-explicit main-merge authorization was missing. All implementation and validation
-remain reviewable on the pushed branch; primary-checkout user edits are intact.
+On 2026-10-26, the user explicitly authorized merging and pushing `main`.
+Branch `codex/handoff-state-runtime` at `c6fabdf` was fast-forward integrated
+into `main`; the seven pre-existing user modifications remain intact.
+The earlier merge-pending evidence records are preserved as historical receipts;
+the append-only `main_merge_receipt_20261026.json` in the private evidence
+directory records the subsequent integration and push verification.
