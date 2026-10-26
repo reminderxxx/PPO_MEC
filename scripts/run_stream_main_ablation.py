@@ -90,6 +90,8 @@ def main():
     p.add_argument('--diagnosis',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--preflight',action='store_true')
+    p.add_argument('--seeds',type=int,nargs='+',choices=[7,17,27],
+        help='Execution-only independent seed shard; all scientific settings stay fixed')
     a=p.parse_args();torch.set_num_threads(1)
     dirty=bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip())
     if dirty and not a.preflight:
@@ -108,6 +110,10 @@ def main():
     evaluations=[next(c for c in cases if c['case_id']==cid) for cid in eval_ids]
     variants=VARIANTS if not a.preflight else {k:VARIANTS[k] for k in ['original','relocation']}
     seeds=[7,17,27] if not a.preflight else [7]
+    if a.seeds is not None:
+        if a.preflight or len(set(a.seeds))!=len(a.seeds):
+            raise ValueError('seed shards require unique scientific seeds, not preflight')
+        seeds=list(a.seeds)
     budget=256 if not a.preflight else 8
     if a.preflight:cases=cases[:1];evaluations=evaluations[:1]
     a.output.mkdir(parents=True,exist_ok=False)
