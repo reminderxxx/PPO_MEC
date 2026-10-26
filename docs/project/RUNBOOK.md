@@ -22,6 +22,14 @@ Use the private `plan.json`, command receipts and raw outputs for reproduction.
 Actual TCP listening requires local network permission. See
 `handoff_state_runtime_20261026.md` for clocks, scope and stage gates.
 
+The separate wall-paced development entry is `scripts/run_realtime_handoff_recovery.py`:
+prepare with `--prepare-inputs --base-study <accelerated_root> --eligibility
+<input_only_dwell_audit.json> --output <new_root>`, then execute with `--execute
+--output <same_root> --expected-commit <clean_source>`. It uses raw observation
+timing, actual process interruption and checkpoint-or-restart fallback.
+`scripts/analyze_handoff_state_runtime.py --study <complete_accelerated_root>
+--output <new_analysis_root>` only reduces and validates preserved evidence.
+
 ## 独立公平训练与奖励收敛（2026-10-21）
 
 2026-10-24补充只读调查入口：`scripts/audit_reward_curve_identifiability.py --run-root <completed_run> --output-root <new_analysis_root> [--service-chain-root <audited_de_preflight>]`，使用主工作区`.venv/bin/python -B`。输出必须不存在；核验冻结科学source、完整CSV/trace和默认constructor，未reset/step/训练。已完成命令、范围和后续待验收条件见 `reward_curve_identifiability_audit_20261024.md`，不得覆盖原调查输出或据此自动重新长训。

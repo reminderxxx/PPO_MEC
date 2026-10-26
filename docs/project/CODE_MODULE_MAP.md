@@ -14,6 +14,13 @@
 - `scripts/run_handoff_state_runtime.py` owns input-only case freezing, causal
   history extrapolation, local model workers, matched arms and create-only raw
   receipts. Existing suffix serialization/identity validation is reused.
+- `scripts/run_realtime_handoff_recovery.py` owns a separate wall-paced
+  technical experiment: native association events, observed process interruption,
+  committed-checkpoint-only recovery and causal preparation. It does not change
+  the accelerated producer or claim a general workflow scheduler.
+- `scripts/analyze_handoff_state_runtime.py` checks frozen inputs, event and
+  process identity, state/transport conservation, token fidelity and generation
+  accounting, then exports descriptive matched timing/cost tables.
 
 ## 独立公平训练/奖励曲线
 

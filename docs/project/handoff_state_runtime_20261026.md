@@ -30,3 +30,21 @@ Stage 3 trains only if a reproducible controllable opportunity survives stage 2.
 Otherwise report the negative gate and the specific missing mainline evidence.
 These technical results do not establish full SA-GHMAPPO/GNN superiority,
 application task correctness, NGSIM+Alibaba end-to-end deployment or convergence.
+
+## Separate real-time development gate
+
+The accelerated test cannot establish that preparation fits a 0.2-second raw
+lead. A second, separately frozen development test therefore uses wall-paced
+100-ms observations. Input-only dwell qualification on the same known prefix
+finds two eligible events (overlapping intervals, one effective cluster).
+Release is fixed 24 seconds before handoff; suffix generation allows 32 tokens.
+Use all two events and all three arms once, plus an independent continuous
+reference, with at most 22 generation attempts. No outcome-based retries.
+
+`scripts/run_realtime_handoff_recovery.py` extrapolates only past positions by
+six seconds. At observed handoff it terminates an unfinished source process.
+Only an actually completed n0 can produce a checkpoint. Otherwise recovery falls
+back to raw-input restart. Already completed workflows are retained as such;
+they are not artificially migrated. Actual target dwell is checked separately.
+This is a local two-node technical test, still not wireless/application accuracy
+or a main-method algorithm comparison. Both positive and negative paths remain.
