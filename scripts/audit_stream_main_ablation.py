@@ -93,6 +93,8 @@ def main():
         for f,sha in meta['output_sha256'].items():assert file_hash(home/f)==sha
         for cp in meta['checkpoints']:
             f=home/cp['path'];assert file_hash(f)==cp['sha256'];q=Main.from_checkpoint(f)
+            for flag,value in plan['variants'][cell['variant']].items():
+                assert q.options[flag]==value,(cell['variant'],flag)
             expected=meta['initial_tensor_sha256'] if cp['phase']=='initial' else meta['final_tensor_sha256']
             assert tensor_hash(q)==expected;checkpoints+=1
         train=[json.loads(s) for s in (home/'training.jsonl').read_text().splitlines()]

@@ -31,6 +31,7 @@ def main():
     for shard,plan in zip(a.shards,plans):
         assert not plan['preflight']
         assert all(plan[k]==reference[k] for k in keys)
+        assert all(reference['parents'][seed]==parent for seed,parent in plan['parents'].items())
         assert train_unit_hash(plan['source_commit'])==train_unit_hash(reference['source_commit'])
         paths={f.parent for f in shard.glob('*/manifest.json')}
         for home in sorted(paths):
