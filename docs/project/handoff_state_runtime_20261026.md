@@ -37,7 +37,11 @@ The accelerated test cannot establish that preparation fits a 0.2-second raw
 lead. A second, separately frozen development test therefore uses wall-paced
 100-ms observations. Input-only dwell qualification on the same known prefix
 finds two eligible events (overlapping intervals, one effective cluster).
-Release is fixed 24 seconds before handoff; suffix generation allows 32 tokens.
+An unexecuted 24-second-release input preparation is retained as v1. Kernel
+calibration showed it may lack a committed prefix. Before any wall-paced model
+execution, v2 instead binds request release to the second observed frame in the
+source association, a causal arrival rule independent of future handoff time.
+Both eligible events remain. Suffix generation allows 32 tokens.
 Use all two events and all three arms once, plus an independent continuous
 reference, with at most 22 generation attempts. No outcome-based retries.
 

@@ -31,8 +31,9 @@ def prepare(args):
     cases=[]
     # Use every event meeting the input-only dwell rule. No performance access.
     for event in qualification["qualified"]:
-        h=event["handoff_index"];start=h-240
-        if start<event["source_start_index"]:raise ValueError("24-second release does not fit source dwell")
+        # Release at the second observed point in the source association. This
+        # rule needs no handoff time or kernel duration at online execution.
+        h=event["handoff_index"];start=event["source_start_index"]+1
         selected=[]
         for frame in frames[start-1:h+1]:
             vehicle=next(v for v in frame["vehicles"] if v.vehicle_id==event["vehicle_id"])
@@ -40,9 +41,9 @@ def prepare(args):
         if any(b["time_index"]-a["time_index"]!=100 for a,b in zip(selected,selected[1:])):
             raise ValueError("realtime subject trajectory is not contiguous")
         cases.append({**event,"case_id":f"realtime_{len(cases):02d}","frames":selected,
-            "release_lead_seconds":24.0})
+            "release_lead_seconds":(event["handoff_time"]-frames[start]["time_index"])/1000})
     if len(cases)!=2:raise ValueError("this fixed development test expects exactly two eligible events")
-    base.update(plan_id="realtime_handoff_recovery_20261026_v1",
+    base.update(plan_id="realtime_handoff_recovery_20261026_v2",
         classification="wall-paced local technical workflow interruption; not wireless or Alibaba execution",
         causal_prepare_horizon_seconds=6.0,repetitions=1,case_count=len(cases),
         scientific_budget={"cells":6,"generate_attempt_ceiling":22,"automatic_retry":False,"training_calls":0})
@@ -52,7 +53,7 @@ def prepare(args):
     write_json(root/"plan.json",base)
     write_json(root/"inputs.json",{"cases":cases,"rsus":base["mobility"]["rsus"],
         "eligibility_sha256":sha256_file(Path(args.eligibility)),
-        "selection":"all two events satisfying source>=20s and target>=25s; each also fits fixed 24s release",
+        "selection":"all two events satisfying source>=20s and target>=25s; release at second observed source-associated frame",
         "independence":"overlapping intervals; a single development time cluster; no inferential CI",
         "model_calls":0})
     print(json.dumps({"status":"INPUTS_FROZEN","cases":len(cases),"cells":6}))
