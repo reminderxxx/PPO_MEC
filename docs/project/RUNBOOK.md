@@ -9,6 +9,19 @@
 
 # Runbook
 
+## Native handoff state execution (opt-in, non-formal)
+
+`scripts/run_handoff_state_runtime.py --prepare-inputs --plan <local_plan.json>
+--output <new_absolute_run_root>` freezes input-only NGSIM boundaries. Then use
+`--execute --output <same_root> --expected-commit <clean_committed_source>`.
+The plan follows the existing two-node reexecution resource/generation identity
+and adds `python`, `mobility` (CSV, row limit, fixed RSUs), `case_count`,
+`minimum_gap_ms`, `repetitions`, `link` and an explicit scientific `budget`.
+Local resources must already exist. No downloads, automatic retries or training.
+Use the private `plan.json`, command receipts and raw outputs for reproduction.
+Actual TCP listening requires local network permission. See
+`handoff_state_runtime_20261026.md` for clocks, scope and stage gates.
+
 ## 独立公平训练与奖励收敛（2026-10-21）
 
 2026-10-24补充只读调查入口：`scripts/audit_reward_curve_identifiability.py --run-root <completed_run> --output-root <new_analysis_root> [--service-chain-root <audited_de_preflight>]`，使用主工作区`.venv/bin/python -B`。输出必须不存在；核验冻结科学source、完整CSV/trace和默认constructor，未reset/step/训练。已完成命令、范围和后续待验收条件见 `reward_curve_identifiability_audit_20261024.md`，不得覆盖原调查输出或据此自动重新长训。

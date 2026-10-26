@@ -67,7 +67,13 @@ class VecWorkflowCoreEnv:
         cache_capacity_profile: dict[str, Any] | None = None,
         primary_vehicle_selection: str = "stable_first",
         formal_request_exposure_trace: dict[str, Any] | None = None,
+        execution_backend: Any | None = None,
     ) -> None:
+        if execution_backend is not None and formal_request_exposure_trace is not None:
+            raise ValueError("measured execution backend is not a formal request replay backend")
+        if execution_backend is not None and mobility_source != "ngsim":
+            raise ValueError("measured execution backend currently requires single-step NGSIM node service")
+        self._execution_backend = execution_backend
         self._mobility_provider = mobility_provider or ReplayProvider()
         self._mobility_source = str(mobility_source or "ngsim").strip().lower()
         self._primary_vehicle_selection = self._normalize_primary_vehicle_selection(
@@ -217,6 +223,13 @@ class VecWorkflowCoreEnv:
             self._initialize_primary_vehicle_id(vehicles)
         associations = self._mapper.associate(vehicles)
         self._apply_associations(vehicles, associations)
+        if self._execution_backend is not None:
+            subject = self._select_primary_vehicle(vehicles)
+            self._execution_backend.reset(
+                workflow=self.workflow_state.to_dict(),
+                vehicle_id=subject.vehicle_id if subject else None,
+                rsu_id=subject.associated_rsu_id if subject else None,
+            )
         predictions = self._build_predictions(vehicles, associations)
         handoff_events: list[dict[str, Any]] = []
         self._last_associations = associations
@@ -263,6 +276,9 @@ class VecWorkflowCoreEnv:
         self._episode_steps += 1
         self._prune_prepare_history()
 
+        if self._execution_backend is not None:
+            self._execution_backend.prepare(control=control, state=deepcopy(self._last_state))
+
         pre_action_vehicle = self._extract_primary_vehicle_from_state(self._last_state)
         pre_action_vehicle_id = pre_action_vehicle.get("vehicle_id") or self._primary_vehicle_id
         pre_action_associated_rsu_id = pre_action_vehicle.get("associated_rsu_id")
@@ -302,6 +318,10 @@ class VecWorkflowCoreEnv:
             )
         ]
         self._apply_associations(vehicles, associations)
+
+        if self._execution_backend is not None:
+            for handoff_event in handoff_events:
+                self._execution_backend.on_handoff(handoff_event)
 
         primary_vehicle = self._select_primary_vehicle(vehicles)
         current_node = self.workflow_state.current_node()
@@ -540,6 +560,10 @@ class VecWorkflowCoreEnv:
             if self._formal_request_exposure_trace is not None:
                 service_completed = True
             else:
+                if self._execution_backend is not None:
+                    self._execution_backend.execute_node(
+                        node_id=current_node.node_id, rsu_id=offload_target_rsu_id
+                    )
                 service_completed = self._advance_current_node_service(current_node)
             if service_completed:
                 service_reward += 1.15
@@ -663,6 +687,8 @@ class VecWorkflowCoreEnv:
             realized_prepare=realized_prepare,
             pre_execution_cache_hit=pre_execution_cache_hit,
         )
+        if self._execution_backend is not None:
+            info["measured_execution"] = self._execution_backend.snapshot()
         return deepcopy(self._last_state), reward, terminated, truncated, info
 
     def _initialize_formal_request_exposure(self) -> None:

@@ -2,6 +2,19 @@
 
 # Code Module Map
 
+## Native handoff measured execution backend
+
+- `VecWorkflowCoreEnv` accepts optional `execution_backend`: binds on reset,
+  forwards preparation controls and native handoff events, executes a physical
+  node before marking logical completion, and adds separate measured receipts.
+  Default simulation/reward and formal request replay remain independent.
+- `src/runtime/handoff_state_runtime.py` owns the bounded two-node lifecycle,
+  isolated RSU worker commands and paced localhost TCP transport. It does not
+  select mobility windows or optimize/train an agent.
+- `scripts/run_handoff_state_runtime.py` owns input-only case freezing, causal
+  history extrapolation, local model workers, matched arms and create-only raw
+  receipts. Existing suffix serialization/identity validation is reused.
+
 ## 独立公平训练/奖励曲线
 
 - `scripts/diagnose_sagh_flat_reward.py`：透明observer和配对checkpoint动作诊断，保持算法输出不变。

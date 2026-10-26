@@ -1,5 +1,14 @@
 ﻿# Decision Log
 
+## 2026-10-26: optional measured handoff execution
+
+Use an explicitly injected, single-episode backend to connect native association
+events with real technical-node execution and TCP state recovery. Keep measured
+wall/transport receipts separate from raw mobility time and legacy reward.
+The first backend is restricted to the declared two-node workflow and single-step
+NGSIM service; reject formal request replay and incompatible workflow bindings.
+Algorithm optimization waits for a demonstrated gap beyond strong rules.
+
 ## 2026-10-05：机制证据优先，不晋级 RL
 
 - 决定：保留原生 typed-cache candidate 作为 opt-in bounded mechanism，正式协议不静默切换。

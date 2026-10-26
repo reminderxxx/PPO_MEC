@@ -15,6 +15,11 @@
 
 # PPO_MEC
 
+Opt-in native handoff/state execution acceptance: see
+[runtime contract](docs/project/handoff_state_runtime_20261026.md). The backend
+measures real local inference and localhost TCP under accelerated trace replay;
+it does not replace the default simulator or formal benchmark protocol.
+
 持续工作流独立优化已执行：见[实现、试训与结果索引](docs/project/persistent_workflow_optimization_20261025.md)。代码在`codex/persistent-workflow-learning`分支，未覆盖当前工作区；实际学习曲线本地保留，尚不支持稳定优秀或长期收敛结论。
 
 长训练曲线差异的只读调查：`scripts/audit_reward_curve_identifiability.py`；确认本次独立奖励实验未启用缓存容量约束、使用短episode重置，不能据此声称主方法整体优势。见[调查与下一轮验收条件](docs/project/reward_curve_identifiability_audit_20261024.md)。未启动新训练。

@@ -4,6 +4,13 @@
 
 ﻿# Directory Structure
 
+## Native handoff technical acceptance (2026-10-26)
+
+`src/runtime/handoff_state_runtime.py`, `scripts/run_handoff_state_runtime.py`
+and `tests/test_handoff_state_runtime.py` own the optional measured path.
+Private runs stay under `artifacts/analysis/handoff_state_runtime_<date>_v*/`;
+source/target process files and received packages belong to each isolated cell.
+
 ## 独立公平奖励训练（2026-10-21）
 
 - `scripts/audit_reward_curve_identifiability.py`：只读归约已完成长训练的CSV/trace，核验冻结producer及默认容量设置；create-only输出在 `artifacts/analysis/reward_curve_identifiability_20261024_v2/`，说明见 `docs/project/reward_curve_identifiability_audit_20261024.md`。不启动训练。
