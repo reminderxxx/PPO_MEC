@@ -8,6 +8,9 @@ wall/transport receipts separate from raw mobility time and legacy reward.
 The first backend is restricted to the declared two-node workflow and single-step
 NGSIM service; reject formal request replay and incompatible workflow bindings.
 Algorithm optimization waits for a demonstrated gap beyond strong rules.
+Distinguish vehicle handoff from source-RSU failure. Compare a separately
+declared keep-source/forward option before claiming migration is necessary;
+availability and competing-load assumptions must be explicit.
 
 ## 2026-10-05：机制证据优先，不晋级 RL
 

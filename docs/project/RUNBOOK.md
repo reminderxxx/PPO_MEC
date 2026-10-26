@@ -27,6 +27,10 @@ prepare with `--prepare-inputs --base-study <accelerated_root> --eligibility
 <input_only_dwell_audit.json> --output <new_root>`, then execute with `--execute
 --output <same_root> --expected-commit <clean_source>`. It uses raw observation
 timing, actual process interruption and checkpoint-or-restart fallback.
+Use `scripts/run_realtime_source_forwarding.py --base-study <complete_wall_paced_root>
+--output <new_root> --expected-commit <clean_source>` for the separate
+keep-source/forward deployment diagnostic. Do not mix its different source
+availability assumption into the legacy five-action algorithm ranking.
 `scripts/analyze_handoff_state_runtime.py --study <complete_accelerated_root>
 --output <new_analysis_root>` only reduces and validates preserved evidence.
 

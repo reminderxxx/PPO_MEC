@@ -12,6 +12,8 @@ Private runs stay under `artifacts/analysis/handoff_state_runtime_<date>_v*/`;
 source/target process files and received packages belong to each isolated cell.
 The separate wall-paced test uses `scripts/run_realtime_handoff_recovery.py`;
 the read-only consumer is `scripts/analyze_handoff_state_runtime.py`.
+`scripts/run_realtime_source_forwarding.py` is a separate keep-source/forward
+deployment diagnostic using the frozen wall-paced inputs.
 
 ## 独立公平奖励训练（2026-10-21）
 

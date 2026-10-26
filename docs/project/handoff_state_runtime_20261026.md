@@ -52,3 +52,15 @@ back to raw-input restart. Already completed workflows are retained as such;
 they are not artificially migrated. Actual target dwell is checked separately.
 This is a local two-node technical test, still not wireless/application accuracy
 or a main-method algorithm comparison. Both positive and negative paths remain.
+
+## Separate keep-source/forward deployment diagnostic
+
+Vehicle handoff alone does not imply source-RSU failure. The interruption test
+therefore cannot prove migration is preferable to continuing on the source.
+`run_realtime_source_forwarding.py` uses the same two fixed wall-paced inputs,
+one trial each and at most four generation calls. Source execution continues
+after handoff; only its final result is transferred over the same paced TCP
+link to a separate lightweight target process. Source availability, permitted
+backhaul forwarding and absence of competing load are explicit assumptions.
+This is outside the legacy five-action contract and remains a development
+problem-formulation diagnostic, not a new formal algorithm baseline ranking.

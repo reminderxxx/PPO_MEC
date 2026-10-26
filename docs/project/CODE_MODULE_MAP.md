@@ -21,6 +21,9 @@
 - `scripts/analyze_handoff_state_runtime.py` checks frozen inputs, event and
   process identity, state/transport conservation, token fidelity and generation
   accounting, then exports descriptive matched timing/cost tables.
+- `scripts/run_realtime_source_forwarding.py` separately checks a source that
+  remains available after handoff, forwarding final outputs over the same TCP
+  profile. This adds a deployment diagnostic, not a registered algorithm.
 
 ## 独立公平训练/奖励曲线
 
