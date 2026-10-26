@@ -59,3 +59,18 @@ is preserved and diagnosed before any separately versioned repair.
 The full paper remains `Unverifiable` until the required formal/holdout/support
 artifacts, fairness, mechanism, novelty and physical-calibration evidence exist.
 No number of training-only improvements satisfies that requirement by itself.
+
+## 2026-10-27 collection and independent next task
+
+The18432-frame intent study is complete and failed its unchanged development
+gate. All12 cells/24checkpoints/180 evaluations were audited; nine predeclared
+final episodes and nine initial-parent trace comparisons reproduce exactly.
+It is not promoted. Private results, negative seeds and the new temporal-exposure
+diagnosis are saved in the local `paper_goal_review_20261027_v1` package.
+The independent next task is `paper_complete_session_confirmation_20261027.md`:
+one complete-session MC confirmation, hard maximum69120 training frames, with
+the same four main-only variants and unchanged physical/reward contracts.
+This new contract supersedes the immediate-budget paragraph only for that new
+task; it never extends or rewrites the completed fixed-prefix experiment.
+New input/geometry/topology candidates are qualified locally; global historical
+exposure closure is pending, so no new hidden/formal split is asserted.
