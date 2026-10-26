@@ -1,3 +1,16 @@
+## 2026-10-26 主方法准备意图研究
+
+先用 `diagnose_stream_preparation.py --runs <three final-cohort runs> --output <fresh diagnosis>`
+只读重建准备浪费，再冻结独立实现。
+`run_stream_intent_study.py --parent_runs <three final-cohort runs> --diagnosis <diagnosis.json>`
+要求另传 `--seed 7|17|27 --output <fresh run>`；`--preflight` 为两变体局部联调。
+完整运行须 clean committed source。四变体同父参数、每条件128实际训练帧，
+初始三条件/最终12条件完整评价；不读取formal或holdout。
+完成三seed后用 `audit_stream_intent_study.py --runs <three runs> --opportunity <frozen probe> --output <fresh audit>`
+独立核查训练、checkpoint、完整物理奖励与缓存账本。软件预检审计需加`--preflight`。
+门槛、预算与后续证据顺序见 `paper_goal_continuation_20261026.md`。
+后台每20分钟按 continuation 检查；运行中不改tracked源码，不按得分续跑。
+
 ## 2026-10-26 独立主方法优化入口
 
 先读 `paper_main_opportunity_20261026.md`。使用冻结的

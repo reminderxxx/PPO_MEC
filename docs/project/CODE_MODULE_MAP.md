@@ -1,3 +1,12 @@
+## 2026-10-26 主方法准备意图候选
+
+`sa_ghmappo_agent.py::IntentAwareStreamSAGHMAPPOAgent` 只限制主方法的可选准备，
+保留自己已选执行站、确有匹配已发布对象需求的peer站或既有可行预测handoff。
+不扩大原掩码，不改变反应式加载、共享规划器、环境或其他算法。
+新checkpoint contract `stream_main_cache_intent_v1`；父级为冻结relocation模型，
+各变体统一fresh optimizer，旧/新加载器显式拒绝错误版本。
+诊断脚本的后验实际使用标签只用于离线审计，不进入策略输入。
+
 ## 2026-10-26 主方法 opt-in 候选
 
 `sa_ghmappo_agent.py::RelocationAwareStreamSAGHMAPPOAgent` 复用冻结论文

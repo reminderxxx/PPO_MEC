@@ -1,3 +1,11 @@
+## 2026-10-26 主方法准备意图研究
+
+- `scripts/diagnose_stream_preparation.py`：历史物理账本的独立只读浪费诊断。
+- `scripts/run_stream_intent_study.py`：四变体三seed固定预算学习入口。
+- `scripts/audit_stream_intent_study.py`：预算、checkpoint、奖励与加载/使用独立审计。
+- `docs/project/paper_goal_continuation_20261026.md`：自主后续顺序与开发门槛。
+- `artifacts/analysis/paper_intent_*`、`paper_preparation_*`：本地私有研究与continuation，不提交。
+
 ## 2026-10-26 主方法独立机会诊断与消融
 
 - `scripts/probe_stream_main_opportunity.py`：冻结父版本的训练集机会诊断。

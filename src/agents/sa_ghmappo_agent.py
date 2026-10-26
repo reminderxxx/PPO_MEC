@@ -573,3 +573,78 @@ class RelocationAwareStreamSAGHMAPPOAgent(StreamSAGHMAPPOAgent):
         obj.load_state_dict(saved['state_dict'], strict=True)
         obj.completed_updates.zero_()
         return obj
+
+
+class IntentAwareStreamSAGHMAPPOAgent(RelocationAwareStreamSAGHMAPPOAgent):
+    """Main-only optional preparation tied to released execution intent.
+
+    This restricts policy choices, not physical feasibility. The original
+    reactive loading, calendar, costs, predictor and network are retained.
+    """
+    checkpoint_contract = 'stream_main_cache_intent_v1'
+
+    def __init__(self, *, cache_intent_enabled=True, **kwargs):
+        super().__init__(**kwargs)
+        self.cache_intent_enabled = bool(cache_intent_enabled)
+        self.options.update(cache_intent_enabled=self.cache_intent_enabled)
+
+    def _cache_intent_support(self, decision, site, node_id, kind):
+        from src.envs.core.joint_stream_refinement import visible_delivery_timeline
+        state = decision['semantic_state']
+        owner = state['primary_vehicle_id']
+        targets = getattr(self, '_team_targets', {})
+        if site == targets.get(owner):
+            return 'own_target'
+        graphs = [state['workflow'], *[q['workflow'] for q in state['queued_workflows']]]
+        node = next(n for w in graphs for n in w['nodes'] if n['node_id'] == node_id)
+        field = 'required_base_model' if kind == 'base_model' else 'required_adapter'
+        for peer, decision in getattr(self, '_delivery_decisions', {}).items():
+            if peer == owner or targets.get(peer) != site:
+                continue
+            other = decision['semantic_state']
+            uses, _, _ = visible_delivery_timeline(other, site)
+            released = [other['workflow'], *[q['workflow'] for q in other['queued_workflows']]]
+            if any(n[field] == node[field] and uses.get(n['node_id'], float('inf')) <= self.planning_horizon
+                   for w in released for n in w['nodes']):
+                return 'peer_released_demand'
+        # A route prediction alone does not announce an execution-site change.
+        # Keep remote preparation only for an existing feasible handoff plan.
+        plan = self._feature_opportunities.get(site, {})
+        value = self._cache_values.get((site, node_id, kind), {})
+        use = value.get('use_after_frames')
+        if (plan.get('prepare_feasible', False) and plan.get('cache_net_reward_proxy', 0.) > 0.
+                and use is not None and plan.get('eta_frames', float('inf')) <= use):
+            return 'feasible_handoff'
+        return None
+
+    def _coordinated_features(self, decision, frame, reservations):
+        data, candidates, owner, node, work = super()._coordinated_features(decision, frame, reservations)
+        if self.cache_intent_enabled:
+            state = decision['semantic_state']
+            for i, (site, nid, kind) in enumerate(candidates[1]):
+                if i == 0 or not data['m1'][i]:
+                    continue
+                reactive = (site == getattr(self, '_team_targets', {}).get(owner)
+                    and nid == node and not state['output_pending'])
+                if reactive:
+                    continue
+                support = self._cache_intent_support(decision, site, nid, kind)
+                self._cache_values[site, nid, kind]['intent_support'] = support
+                if support is None:
+                    data['m1'][i] = False
+                    data['f1'][i] = 0.
+        return data, candidates, owner, node, work
+
+    @classmethod
+    def from_relocation_checkpoint(cls, path, *, training_budget, **overrides):
+        """Fresh, matched warm start of the frozen relocated parent only."""
+        import torch
+        saved = torch.load(path, map_location='cpu', weights_only=False)
+        if saved.get('contract') != RelocationAwareStreamSAGHMAPPOAgent.checkpoint_contract:
+            raise ValueError('intent study requires a frozen relocation checkpoint')
+        options = dict(saved['options'], training_budget=training_budget)
+        options.update(overrides)
+        obj = cls(**options)
+        obj.load_state_dict(saved['state_dict'], strict=True)
+        obj.completed_updates.zero_()
+        return obj
