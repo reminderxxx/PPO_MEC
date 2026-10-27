@@ -23,7 +23,8 @@ TGSIM首轮bulk输入任务已失败封存。人工另行批准的[分页范围]
 使用 `scripts/prepare_tgsim_paged_input.py`，独立消费者为 `scripts/audit_tgsim_paged_input.py`。
 固定同两源/16附件、create-only、512MiB新增body/累计2GiB存储/45分钟/600万索引行/144请求，
 失败停止不重试；原失败前缀不续写或作为完整输入。具体流程见[RUNBOOK](docs/project/RUNBOOK.md)。
-34项纯软件验证通过，真实API能力尚未验证；这些入口不授予provider兼容、formal/hidden或训练评价资格。
+34项纯软件验证通过；该任务已单次停止并审计：前置版本/count通过，首个轨迹页HTTP400，
+完整新输入仍为0。原两套任务均封存，不再执行；这些入口不授予provider兼容、formal/hidden或训练评价资格。
 
 2026-10-16 持续请求共同学习适配：七算法及SA去预测版现消费request-bound新合同，已发布queue图/异构模型费用、请求记忆切换与含空闲期的团队tail已接入；DQN跨空闲/请求连接。GRU按新train分区重新固定拟合，旧checkpoint拒绝。八配置×3seed×64会话（上限737280训练帧）合同已冻结，正式运行/结果以`artifacts/joint_stream_learning/continuation.json`指针为准；未回收前不报告算法优势。 [共同学习合同](docs/project/joint_stream_learning_contract_20261016.md)。
 

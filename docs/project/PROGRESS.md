@@ -1,4 +1,20 @@
-## 2026-10-27：分页新范围已获人工授权，软件资格通过
+## 2026-10-27：分页输入任务HTTP400停止，单次审计完成
+
+34项软件资格通过且5198b85推送成功后，按新授权单次执行。两源前置metadata及匿名count匹配，
+记录4023022/1024281行；首个轨迹页返回HTTP400，11.815119秒内停止于第5次请求。
+有效轨迹页/原生行/几何均为0，仅有native表头与空页面占位，未做后置版本核验。
+独立消费者核对原件hash、5份收据、返回payload67100字节及累计磁盘账单；旧失败文件和
+主目录七文件/R20未变，未重试、换查询/endpoint或启动模型。
+HTTPError具体正文/响应头未保存，不能把某项SELECT、字段、认证或整个分页能力判为确定原因；
+返回body/中断上界也不是该未保留错误实体的精确网络账单。原run与收据不改写。
+本地独立failure_diagnosis与input_exposure_record保留；训练/评价/hidden为0。
+reviewed_at=2026-10-27；literature_cutoff=本轮仅本地收据，未刷新文献；target_venue=CSCWD2027；
+policy_version=tmc_review_policy_v3_20260621；git_commit=5198b85；
+evidence_level=INPUT_TERMINAL_RECEIPTS_AUDITED_ONLY；whole-paper=E0_UNAVAILABLE / Unverifiable，N/S。
+完整输入、原RSU/坐标/provider/费用资格、独立formal/holdout/support及强公平比较仍缺；
+本轮单次额度已消费，不自动开启第三套获取或科学任务。
+
+## 2026-10-27：分页新范围已获人工授权，软件资格通过（执行前记录）
 
 人工答复“允许按分页新方案继续”已单独绑定原私有方案hash，旧授权不复用。
 新增固定分页执行器及独立收据消费者，34项纯软件验证通过，包含成功组装/消费、
