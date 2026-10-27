@@ -139,6 +139,20 @@ effective outer units is low power under the internal policy; an uncorrected
 p-value cannot promote a claim. Predefine zero-denominator percentage handling
 and undefined BCa/degenerate cases rather than replacing them with significance.
 
+The existing numerical consumer is not a qualified stream adapter. Before reuse,
+require provenance-validated canonical pairing across per-method files; the legacy
+pair key includes the input filename. Reject missing/partial requested outer IDs
+instead of falling back to paired rows. Map every native metric's units/direction
+explicitly: `optional_unused_transfer_bytes` is lower-is-better and is absent from
+the legacy direction set. A deterministic rule's one physical record needs a
+validated shared-reference contract for learned seed pairs, without new physical
+rule repeats or independent sample inflation. Authenticate interval/source/run
+labels and project exact physical ticks before the old overlap utility; arbitrary
+different labels and fractional seconds are not an independence certificate.
+Mark zero-variance standardized effects/degenerate intervals explicitly, and
+retain the declared comparison family plus all missingness. Existing unit tests
+and synthetic witnesses do not qualify an end-to-end scientific consumer.
+
 Hidden opening requires an independently validated input/split manifest, complete
 history exclusions, source/checkpoint/config hashes, fixed claims/statistical
 code, a passed artifact audit and the later task's explicit execution grant.

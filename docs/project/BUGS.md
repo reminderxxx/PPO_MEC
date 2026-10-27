@@ -1,3 +1,11 @@
+## 2026-10-27：stream统计适配尚未取得资格（OPEN）
+
+既有统计pair key含source文件名；拆开的method文件不会自动配对。
+请求的outer key缺失时会回退到row key，不能直接支撑新stream外层时间统计；
+`optional_unused_transfer_bytes`也不在旧lower-is-better集合中。
+规则单次记录与学习seed配对、退化effect标记及可信source/run/physical tick适配仍需独立实现验收。
+这些是新合同兼容缺口，不是已证实的历史统计错误；本轮只读诊断，无源码修复或科学重跑。
+
 ## 2026-10-27：新来源时间/坐标不自动兼容；LuST小数秒截断（OPEN）
 
 LuST exporter把FCD time经int(float(...))转换，provider再按整数分组。
