@@ -1,3 +1,11 @@
+## 2026-10-27 独立分页输入生产/消费
+
+- `scripts/prepare_tgsim_paged_input.py`：新授权、原方案hash、固定页与累计账单执行器。
+- `scripts/audit_tgsim_paged_input.py`：只读收据/hash/count/索引消费者，不再次索引原生行。
+- `tests/test_tgsim_paged_preparation.py`：合成成功、缺页/重复/漂移/中断、预算及消费端防篡改验证。
+- `data/raw/mobility/tgsim/tgsim_paged_input_qualification_20261027_v1/`：新页和明确标记的native派生CSV；create-only，不混入旧失败前缀。
+- `artifacts/analysis/paper_tgsim_paged_input_qualification_20261027_v1/`：独立声明、前后metadata/count、页收据和验证、身份SQLite、终端账本；Git忽略。
+
 ## 2026-10-27 TGSIM有界输入准备
 
 - `scripts/prepare_tgsim_input.py`：精确方案/人工授权绑定、版本前后核对、单次有界下载与原生时间身份/持续八车输入检查。

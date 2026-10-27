@@ -1,3 +1,23 @@
+## 2026-10-27 新授权分页输入任务
+
+原bulk任务已失败封存，禁止执行其旧命令。新人工答复只批准
+`paper_tgsim_paged_acquisition_proposal_20261027.md` 的既定范围，原私有方案hash不改。
+
+```bash
+python -m pytest -p no:cacheprovider tests/test_tgsim_input_preparation.py tests/test_tgsim_paged_preparation.py -q
+python scripts/prepare_tgsim_paged_input.py --proposal <frozen_paged_proposal.json> --grant <new_bound_human_grant.json>
+python scripts/audit_tgsim_paged_input.py --analysis <paged_analysis_directory> --output <fresh_private_audit.json>
+```
+
+先软件资格与clean commit，后单次启动新目录。固定50000行/页、系统ID排序与原生字段，
+前后版本和count匹配；短页、重复、乱序、未知系统ID格式、认证/API错误、重定向或预算失败即停止。
+仅接受整数或ASCII `row-*` 系统ID排序表示，不现场放宽格式。metadata/count各前后一次，
+轨迹页和附件各一次；最多120轨迹页/144总请求，禁止替代endpoint和自动重试。
+新增body上限512MiB，两轮body保守累计上限690.82MiB；新旧原件/派生CSV/索引/收据累计2GiB，
+45分钟和600万原生索引行。原生行仅建立一次身份索引；分页组装读取次数单独说明。
+消费者核对全部收据与文件hash、累计账单、前后版本、页清单和只读索引行数；失败也需审计。
+派生CSV不是bulk字节复本，版本/count稳定不是事务快照，输入扫描不赋予hidden或科学资格。
+
 ## 2026-10-27 TGSIM单次输入准备
 
 先读 `paper_tgsim_input_qualification_proposal_20261027.md`。人工已明确批准其中两份

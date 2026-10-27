@@ -1,3 +1,10 @@
+## 2026-10-27 分页输入独立生产/消费
+
+新分页入口复用既有输入模块的增量有界fetch、原生身份检查及持续车群计算，
+不进入provider/环境/算法。分页层负责新grant、固定URL/页/系统ID、前后count与累计请求/磁盘账单；
+旧bulk入口与失败合同保持原样。独立auditor只读消费新claim/completion、逐请求/页验证和SQLite计数，
+不重新索引、修复或筛选数据，不输出科学资格。
+
 ## 2026-10-27 完整会话MC确认生产/消费
 
 新四个study脚本只调用既有 `IntentAwareStreamSAGHMAPPOAgent` 与原环境：
