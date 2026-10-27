@@ -33,8 +33,9 @@ WHITE = "#FFFFFF"
 class Drawing:
     """Keep PDF and SVG geometry identical and check every text line."""
 
-    def __init__(self, folder: Path):
+    def __init__(self, folder: Path, paper_width_mm: float = 180):
         self.folder = folder
+        self.paper_width_mm = float(paper_width_mm)
         folder.mkdir(parents=True, exist_ok=True)
         fonts = Path("/System/Library/Fonts/Supplemental")
         self.fonts = {"regular": "Times-Roman", "bold": "Times-Bold", "italic": "Times-Italic"}
@@ -44,15 +45,14 @@ class Drawing:
                 name = f"SAGHTimes-{style}"
                 pdfmetrics.registerFont(TTFont(name, str(file)))
                 self.fonts[style] = name
-        # 180 mm wide: 26 drawing units become 7.37 pt in the paper.
-        self.scale = (180 / 25.4 * 72) / WIDTH
+        self.scale = (self.paper_width_mm / 25.4 * 72) / WIDTH
         self.pdf = canvas.Canvas(str(folder / "sagh_algorithm_architecture.pdf"),
                                  pagesize=(WIDTH * self.scale, HEIGHT * self.scale))
         self.pdf.setTitle("Multi-vehicle SAGH decision and learning architecture")
         self.pdf.setAuthor("PPO_MEC")
         self.pdf.scale(self.scale, self.scale)
-        self.svg = [f'<svg xmlns="http://www.w3.org/2000/svg" width="180mm" '
-                    f'height="{HEIGHT / 10:g}mm" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" '
+        self.svg = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.paper_width_mm:g}mm" '
+                    f'height="{HEIGHT * self.paper_width_mm / WIDTH:g}mm" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" '
                     'aria-labelledby="title desc">',
                     '<title id="title">Multi-vehicle SAGH decision and learning architecture</title>',
                     '<desc id="desc">Causal observations, graph and candidate encoding, '
@@ -139,7 +139,7 @@ class Drawing:
         self.svg.append('</svg>')
         (self.folder / "sagh_algorithm_architecture.svg").write_text('\n'.join(self.svg))
         (self.folder / "layout_validation.json").write_text(json.dumps({
-            "canvas_units": [WIDTH, HEIGHT], "paper_width_mm": 180,
+            "canvas_units": [WIDTH, HEIGHT], "paper_width_mm": self.paper_width_mm,
             "body_font_pt_at_180mm": 26*self.scale,
             "text_lines_checked": len(self.text_checks), "overflow_count": 0,
             "text": self.text_checks}, indent=2))
