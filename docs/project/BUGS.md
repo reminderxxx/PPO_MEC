@@ -1,3 +1,10 @@
+## 2026-10-28：提高socket超时不足以恢复提前断流（OPEN）
+
+剩余页page020再次提前结束，错误为IncompleteRead；不是达到120秒读取上限。
+实际服务端/代理/网络根因尚未知。20个完整页仍可追溯，但不能把其派生前缀作为完整输入。
+当前合同无自动重试，未自动启动第三套下载。有限重试提案不扩原总资源预算；
+需先明确重试条款，再实现父链累计、保留每次attempt及匹配消费端，不能递归使用旧effective_caps重置预算。
+
 ## 2026-10-28 Transport stall after20 complete pages
 
 The syntax/ID fixes worked for1000000 composed rows; page020 stalled during HTTP200/gzip read. Exact remote/network cause is unknown. Preserve the incomplete page and old run. Remaining-page contract increases only per-read timeout to120s within carried remaining total limits, and distinguishes complete-page reuse from network acquisition. No automatic retry or partial-body splice. Native/complete-input qualification remains pending.

@@ -1,3 +1,12 @@
+## 2026-10-28：剩余页任务也因响应提前结束停止，重试政策待明确答复
+
+b15a11d复用20完整页后，缺失page020的HTTP200/gzip流提前结束；120秒读取上限没有消除断流。
+实际新增5请求、23.285683秒、426314返回body字节及65536中断上界，新增完整页0。
+独立终端审计已运行一次，原文件和20个完整页保留；原生索引/完整源/几何/后置核验均为0。
+未启动第三套下载。需要改变原“无自动重试”条款的具体提案见
+`paper_tgsim_bounded_transport_retry_proposal_20261028.md`，总预算继续扣除所有已用部分。
+该提案未获重试政策答复、未声称新重试软件资格；训练/评价/hidden仍0，论文目标未完成。
+
 ## 2026-10-28 Complete-page transport recovery
 
 081d8ef acquired20 valid pages/1000000 rows, then page020 HTTP200/gzip stalled at a30s socket read.25 requests,383.804718s,35296468 encoded-body/read-bound bytes and122302692 decoded bytes are preserved. Native-key index0, complete sources0, geometry0; terminal receipt audit ran once. Independent diagnosis precedes a separately frozen remaining-page task: local copies of20 complete provenance-bound pages, no partial020 or derived-prefix reuse, remaining501574444 body bytes/119 requests/2316 executor seconds/1166187496 decoded bytes; cumulative disk2GiB.45 software tests pass, science0. No paper readiness claim.

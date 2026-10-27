@@ -1,5 +1,9 @@
 ## 2026-10-28 Remaining-page recovery
 
+终端更新：该单次任务已因page020提前断流停止并审计，原件封存；以下入口不再执行。
+第三套取数未启动，改变“无自动重试”条款的具体提案见
+`paper_tgsim_bounded_transport_retry_proposal_20261028.md`，先待明确答复再做软件资格。
+
 Read `paper_tgsim_remaining_pages_recovery_20261028.md`. Freeze fresh paths/plan/source, verify parent completion SHA and deduct its body/request/decoded/executor-time spend. `recover_tgsim_paged_input.py --plan <remaining_plan> --plan_sha <sha>` reuses only20 complete provenance-bound pages via local copy, never the partial page or derived prefix. Audit with the same SHA; reuse receipt bytes are stored bytes, network_body_bytes=0. Old artifacts are immutable. Total executor times are aggregated; whole workflow elapsed time is not capped by this statement.
 
 Matching software command:
