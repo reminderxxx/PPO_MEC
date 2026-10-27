@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-26
+更新日期：2026-10-27
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -36,6 +36,18 @@
 | DAG调度与训练难度 | [Learning Scheduling Algorithms for Data Processing Clusters](https://people.csail.mit.edu/malte/pub/papers/2019-sigcomm-decima.pdf) | ACM SIGCOMM, 2019；DOI 10.1145/3341302.3342080；作者全文§5.1–5.3、附录C核验；早期方法基础 | Decima联合设计图状态与stage/parallelism动作；短到长episode课程缓解初始积压，同到达序列的回报基线降低外生随机性。 | Spark并行调度不同于移动FIFO/cache；先核验可达服务空间，再设计相同权限的因果候选动作。其随机终止针对持续到达，不能照搬到真实车辆离开/有限任务边界；同窗口配对评价也不等于已实现其训练梯度基线。 | Method foundation / 状态动作闭环与课程消融。 |
 | 策略不变奖励塑形 | [Policy invariance under reward transformations: Theory and application to reward shaping](https://people.eecs.berkeley.edu/~russell/papers/icml99-shaping.pdf) | ICML, 1999；作者全文定理1核验；venue/year由作者publication list核验；DOI不填 | Potential-based shaping使用gamma×后继势函数减当前势函数，在定理条件下保留所选折扣目标的最优策略。 | 若采用有限时域时间增广势函数，全部真实终止状态须处理终端势；外部截断与bootstrap另核。不能直接保证未折扣评价目标不变，也不保证有限预算PPO学得更好；评估保留原始业务奖励，所有匹配对照有同等塑形预算。 | Reward方法基础 / 非本项目原创。 |
 | 课程训练综述 | [Curriculum Learning for Reinforcement Learning Domains: A Framework and Survey](https://www.jmlr.org/papers/v21/20-212.html) | JMLR, 21(181):1–50, 2020；出版社摘要/元数据核验，全文未通读 | 系统整理任务/经验排序与知识迁移，讨论从易到难学习复杂目标任务的假设、能力及评价。 | 可预先固定少请求到多请求、弱到强缓存竞争的训练课程；最终统一混合负载测试，保留困难和负向结果，并计入全部课程交互与专家成本。课程不构成adapter/VEC特定创新。 | Training protocol / curriculum背景。 |
+
+### 2026-10-27：Multi-agent SAGH 架构图公开近邻核对
+
+本轮只查公开材料，未向网站上传文稿、图源或实验数据。重点核对既有 Decima Fig. 4、移动边缘缓存 MF-ECS Fig. 4 与多服务依赖卸载 MADDPG Fig. 3 的状态—表征—策略—环境反馈和训练分区；新图按 R20 / frozen StreamControlPPO 合同自行绘制。图式参考不代表方法复现、性能对比或 novelty 审查。以下仅补记本轮检索中发现且原表未录入的相关条目；待核元数据不得作确定引文。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 数字孪生与车辆协同 | [Adaptive Digital Twin and Multiagent Deep Reinforcement Learning for Vehicular Edge Computing and Networks](https://ieeexplore.ieee.org/abstract/document/9451579) | IEEE TII, 18(2):1405–1413, 2022；IEEE 搜索摘要/元数据；2021 为 online 年；全文未读、DOI 待核 | 公开摘要描述镜像环境中的服务匹配、coordination graph 与多 agent 卸载调度；不据摘要推断完整网络结构。 | R20 是多车共享 actor 与集中式协调、typed 模型依赖和持续已发布 DAG；GRU 接触特征不等于完整数字孪生，不据 MARL 名称宣称新颖性。 | 相关工作候选 / agent 与预测层边界。 |
+| 分布式 VEC 与 MARL | [Decentralized Vehicular Edge Computing Framework for Energy-Efficient Task Coordination](https://ieeevtc.org/vtc2024spring/DATA/PID2024002405.pdf) | IEEE VTC Spring, 2024；会议公开 PDF 首页和摘要已核；DOI 待核 | 区分车辆任务、计算实体、卸载动作与多智能体协调；侧重能耗、时延和完成率。 | 当前 SAGH 使用共享预约日历集中协调各车辆条件动作；不能画成完全独立的去中心化执行，也不把三动作头当三个 agent。 | 架构图 agent 身份对照 / 相关工作候选。 |
+| DAG 依赖与协同卸载 | [A collaborative computation and dependency-aware task offloading method for vehicular edge computing: a reinforcement learning approach](https://link.springer.com/article/10.1186/s13677-022-00340-3) | Journal of Cloud Computing, 11:68, 2022；DOI 10.1186/s13677-022-00340-3；出版社正文/摘要已核 | 以 DAG 表示依赖，在车—边—云卸载中使用 DDPG；Fig. 1 分离依赖 DAG 与执行位置。 | 当前实现按串行拓扑推进，动作包含模型对象 admission、共享预约和 handoff 准备；不能复制其并行子任务和连续控制语义。 | DAG/卸载背景与图示边界。 |
+| 迁移成本线索 | [Computing and Communication Cost-Aware Service Migration Enabled by Transfer Reinforcement Learning for Dynamic Vehicular Edge Computing Networks](https://doi.org/10.1109/TMC.2022.3225239) | 检索元数据指向 IEEE TMC, 23(1):257–269, 2024；本轮一手出版元数据、全文与 DOI 对应均待核 | 题名提示计算与通信迁移成本应分别表达；未作正文算法或图结构事实判断。 | 图中区分模型传输、服务执行与状态推进；真实物理成本和算法收益另需证据，不将 transfer RL 当现有 SAGH 模块。 | 待核队列；不作为本图技术依据。 |
+| 多 agent PPO 迁移线索 | [Prioritized Experience Replay and Four-Trajectory Exploration - Multi-agents Proximal Policy Optimization: Multi-agents Reinforcement Learning-Based service migration strategy under vehicular edge computing](https://www.sciencedirect.com/science/article/abs/pii/S0045790625007797) | 出版社检索题名；年份、卷页、DOI、正文均待核 | 标题含多 agent PPO、探索及 replay；本轮未据此确认其训练合同或图结构。 | SAGH 图必须画成自身 on-policy trajectories 与 frozen Monte Carlo/PPO 路径，不因近邻题名出现 replay 就加入 off-policy replay、target networks。 | 待核队列 / 防止套用错误训练模块。 |
 
 ### 2026-10-25：长期训练奖励与场景决策价值对照
 

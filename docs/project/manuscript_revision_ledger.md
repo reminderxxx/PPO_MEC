@@ -240,3 +240,11 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 前后对照：R19 首页仅 `Zhuowen He, QingHua Zhu*` 和两个邮箱 → R20 按老师稿四个并列位置加入 `Third Aughor`、`Fourth Author` 及其两处占位邮箱，保留单行单位和通讯作者星号。R19 缺老师稿首页底部横线和资助/通讯说明 → R20 使用相同页面锚定和 8 pt 横线说明位置，资助值明示 `[to be completed]` 而非复制未核实的基金声明。R19 摘要标签为普通粗体、一级标题用字面全大写、表题大小写与老师稿不一 → R20 将 `Abstract—` 斜体、一级标题改为标题式文本配小型大写、二级标题改标题式斜体、表题主句改 8 pt 全大写；两张窄表仅调列宽以避免 `Vehicle` 和 `Complete % ↑` 断词。结论后的投稿流程提醒已移出论文正文，待办在本记录中保留。
 - 老师原件的 `Third Aughor` 拼法按样稿占位照录，实际姓名、邮箱和基金信息待作者确认；红色文字是老师稿修订标记，未作为终稿字体颜色复制。老师稿原有图表数量和实验内容不作为格式模板复制。源码仓库地址仍待核定，不在本文中捏造。
 - 验证：bundled `render_docx.py --emit_pdf` 和 `pdfinfo` 得 Letter 六页，六页 PNG 原尺寸逐页目视无裁切、重叠或图表漂移；DOCX ZIP 完整。R19→R20 题目全文相同、两表全部单元格文字相同、三张媒体字节相同、25 条参考文献原文/编号相同且所有有效文字 run 仍为 8 pt。只改 Word 排版与投稿元数据占位，未运行算法测试；真实第三/四作者、邮箱、基金信息及源码地址仍待核实。
+
+## 2026-10-27 独立 Multi-agent SAGH 架构图候选（未回写 R20）
+
+- 用户要求：制作复杂但逻辑清晰的学术算法系统图，明确 agent、SAGH、multi-agent RL，参考公开同方向图式并自行审查。范围为新图及图注，不扩展为正文、实验或既有图位置修改。
+- 来源基线：R20 DOCX SHA-256 `0b8aa78cc0aeb8741f256f7fe14f90d18e1a2ae2c24f20f2885e880a02cf99ca`；科学源码 `35975cb3d73c84ddbabf01f6749bbc2d60c826de` 的 `src/agents/ppo_agent.py::StreamControlPPO.act_controls`。当前主工作区旧 `semantic_discrete_5` 三控制器合同不与持续请求版混画。
+- 独立图源为 `scripts/plot_sagh_architecture.py`；本地交付在 `artifacts/figures/sagh_architecture_20261027/`，含可编辑 SVG、矢量 PDF、600 dpi PNG、英文图注、`validation.json` 和 `self_review.md`。原简化策略链 → 新图明确五分区、车辆 agent 共享 actor、图与候选表征、先全部选站点再重建日历的两遍协调、条件模型/事件头、联合执行、团队 Monte Carlo 回报、集中价值函数、条件基线、clipped PPO 与参数回流；surrogate 只连训练基线。
+- 验证：绘图生成、`py_compile`、`git diff --check` 通过；PDF 单页纯矢量、Times 字体嵌入，SVG 93 个可编辑文本，PNG 为 4252×3686；180 mm 宽时正文约 7.37 pt。最终预览目视检查无叠字、越框或箭头穿字。R20 DOCX hash 不变，未替换其 Fig. 2，IV-A 内既定位置保持。
+- 边界/未完成：本图是待作者采用的独立媒体候选，不是 R21 全文；实际插入论文后的分页和模板尺寸需另验。未训练或验证性能、组件因果增益与收敛，不作顶刊就绪判断。公开图式只作表达参考，新增相关线索已登记文献表；未向外部上传未公开材料。
