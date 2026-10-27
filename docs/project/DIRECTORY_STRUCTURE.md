@@ -1,3 +1,9 @@
+## 2026-10-27 Query diagnostic capsule
+
+- `scripts/diagnose_tgsim_query.py`: fixed three-observation sequence; no scientific calls.
+- `tests/test_tgsim_query_diagnosis.py`: synthetic syntax/unknown-error stop paths.
+- `artifacts/analysis/paper_tgsim_query_diagnosis_20261027_v1/`: create-only diagnostic claims, response entities/receipts and completion.
+
 ## 2026-10-27 独立分页输入生产/消费
 
 - `scripts/prepare_tgsim_paged_input.py`：新授权、原方案hash、固定页与累计账单执行器。

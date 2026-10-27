@@ -1,3 +1,7 @@
+## 2026-10-27 User resumed query recovery
+
+Direct human continuation is recorded as a new bounded task. Missing HTTPError entities/headers are now captured under64KiB per error and counted;38 synthetic tests pass, including native chunk truncation, same-request HTTP errors, cumulative budgets and the three-observation diagnostic. No new network observation yet; science remains0 and paper goal incomplete.
+
 ## 2026-10-27：分页输入任务HTTP400停止，单次审计完成
 
 34项软件资格通过且5198b85推送成功后，按新授权单次执行。两源前置metadata及匿名count匹配，

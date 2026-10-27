@@ -13,6 +13,7 @@ import signal
 import sqlite3
 import subprocess
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -24,6 +25,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class BudgetLimit(RuntimeError):
     """A hard task limit, never a recoverable per-source quality rejection."""
+
+
+class HTTPStatusFailure(ValueError):
+    """A retained diagnostic entity is never successful input."""
+
+
+def open_including_http_error(opener, request, timeout):
+    try:
+        return opener.open(request, timeout=timeout)
+    except urllib.error.HTTPError as response:
+        # This is the existing response, not another request. Consume only a
+        # bounded diagnostic entity, retain its headers and then fail globally.
+        return response
 
 
 def digest(path):
@@ -89,20 +103,24 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
         budget.guard()
         timeout = min(30., budget.proposal['max_wall_clock_seconds'] - (budget.clock() - budget.started))
         request = urllib.request.Request(url, headers={'User-Agent': 'PPO-MEC-input-qualification/1.0', 'Accept-Encoding': 'identity'})
-        with destination.open('xb') as out, opener.open(request, timeout=timeout) as response:
+        with destination.open('xb') as out, open_including_http_error(opener, request, timeout) as response:
             record.update(final_url=validate_url(response.geturl()), status_code=response.status,
                           response_headers=dict(response.headers))
-            if response.status != 200:
-                raise ValueError('expected a complete200 response')
-            if 'text/html' in response.headers.get('Content-Type', '').lower():
+            diagnostic = response.status != 200
+            if diagnostic:
+                maximum_bytes = min(maximum_bytes, 65536)
+                record.update(diagnostic_body_only=True, diagnostic_capture_cap_bytes=maximum_bytes)
+            if not diagnostic and 'text/html' in response.headers.get('Content-Type', '').lower():
                 raise ValueError('HTML is not an approved metadata/CSV response')
             if response.headers.get('Content-Encoding', 'identity').lower() not in ('identity', ''):
                 raise ValueError('compressed transfer outside this plain-CSV contract')
             length = response.headers.get('Content-Length')
             length = int(length) if length is not None else None
-            if length is not None and (length > maximum_bytes or length > budget.proposal['max_download_bytes'] - budget.download_bytes):
+            if not diagnostic and length is not None and (length > maximum_bytes or length > budget.proposal['max_download_bytes'] - budget.download_bytes):
                     raise BudgetLimit('declared body exceeds remaining byte budget')
             while length is None or record['bytes'] < length:
+                if diagnostic and record['bytes'] >= maximum_bytes:
+                    break
                 size = budget.read_size(maximum_bytes - record['bytes'])
                 record['interrupted_read_body_upper_bound'] = size
                 # HTTPResponse.read(size) can discard a received partial chunk
@@ -117,6 +135,9 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
                 record['bytes'] += len(block)
                 h.update(block)
                 out.write(block)
+            if diagnostic:
+                record['diagnostic_entity_complete'] = (record['bytes'] == length if length is not None else record['bytes'] < maximum_bytes)
+                raise HTTPStatusFailure(f'HTTP{response.status}; diagnostic entity/headers retained, no retry')
             if length is not None and record['bytes'] != length:
                 raise ValueError('truncated declared response')
         record['status'] = 'complete'
@@ -127,7 +148,7 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
         budget.interrupted_body_upper_bound += record['interrupted_read_body_upper_bound']
         record.update(sha256=h.hexdigest(), finished_at_unix=time.time(), cumulative_download_bytes=budget.download_bytes,
                       cumulative_body_bytes_upper_bound=budget.download_bytes + budget.interrupted_body_upper_bound,
-                      receipt_contract='tgsim_returned_body_and_interruption_bound_v2',
+                      receipt_contract='tgsim_returned_body_and_http_error_entity_v3',
                       byte_accounting='bytes/cumulative_download_bytes count returned payload; an interrupted read has an explicit conservative additional bound, not an exact network byte total')
         save_new(receipt_path, record)
     return record

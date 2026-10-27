@@ -1,3 +1,7 @@
+## 2026-10-27 Separately authorized query recovery
+
+Read `paper_tgsim_query_recovery_20261027.md`. Use `diagnose_tgsim_query.py --plan <frozen_plan> --plan_sha <sha>` from a clean commit once. Three observations,256KiB/120s, old+new disk2GiB; no retries. Retain v3 HTTP error entities/headers as failed diagnostic input. Earlier run contracts remain archived.
+
 ## 2026-10-27 新授权分页输入任务
 
 终端状态：本任务已从5198b85单次执行并因首个轨迹页HTTP400停止，独立消费者已运行一次。

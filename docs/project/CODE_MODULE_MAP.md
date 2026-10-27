@@ -1,3 +1,7 @@
+## 2026-10-27 HTTP error diagnostic producer/consumer
+
+Shared `prepare_tgsim_input.fetch` v3 converts the existing HTTPError response to a bounded retained diagnostic entity, saves headers/status/hash/body counts, then fails globally. No second request. Existing receipt consumers still validate retained bytes/hash and failed status; old v2 receipts are immutable. `diagnose_tgsim_query` permits only the declared syntax rejection followed by two one-row capability observations. No provider or policy dependency.
+
 ## 2026-10-27 分页输入独立生产/消费
 
 新分页入口复用既有输入模块的增量有界fetch、原生身份检查及持续车群计算，

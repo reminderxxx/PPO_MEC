@@ -1,3 +1,7 @@
+## 2026-10-27 Error-capture software repaired; actual400 cause pending
+
+HTTPError response headers and up to64KiB diagnostic body are now retained from the same request, counted and marked failed; oversized entities are explicitly incomplete.38 synthetic checks pass. This fixes future observability only, not the already sealed run or its missing error detail. New three-observation task is separately authorized; no reward/provider/geometry/scientific change.
+
 ## 2026-10-27：冻结轨迹分页模板返回HTTP400，详细原因不可核验（OPEN）
 
 两源匿名count及前置版本匹配，但首个固定轨迹页HTTP400；没有轨迹行/有效页或几何输入。

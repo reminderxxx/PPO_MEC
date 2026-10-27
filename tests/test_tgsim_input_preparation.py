@@ -3,6 +3,7 @@ import csv
 import http.client
 import io
 import json
+import urllib.error
 from pathlib import Path
 
 import pytest
@@ -206,3 +207,31 @@ def test_native_complete_chunked_response_has_no_unresolved_payload(tmp_path):
     assert saved['status']=='complete' and saved['bytes']==3
     assert saved['interrupted_read_body_upper_bound']==0
     assert saved['cumulative_body_bytes_upper_bound']==3
+
+
+def test_http_error_entity_and_headers_are_retained_from_same_request(tmp_path):
+    url='https://data.transportation.gov/api/assets/example';body=b'{"message":"parse error"}'
+    error=urllib.error.HTTPError(url,400,'Bad Request',{'Content-Type':'application/json','Content-Length':str(len(body))},io.BytesIO(body))
+    class FailedOpener:
+        calls=0
+        def open(self,*args,**kwargs):self.calls+=1;raise error
+    opener=FailedOpener();b=budget(tmp_path);raw=tmp_path/'error_body';receipt=tmp_path/'receipt.json'
+    with pytest.raises(ValueError,match='HTTP400'):
+        fetch(url,raw,b,receipt,opener=opener)
+    saved=json.loads(receipt.read_text())
+    assert opener.calls==1 and raw.read_bytes()==body and b.download_bytes==len(body)
+    assert saved['status_code']==400 and saved['status']=='failed'
+    assert saved['diagnostic_body_only'] and saved['diagnostic_entity_complete']
+    assert saved['response_headers']['Content-Type']=='application/json'
+
+
+def test_large_http_error_is_bounded_and_never_successful_input(tmp_path):
+    url='https://data.transportation.gov/api/assets/example';body=b'x'*70000
+    response=Response(body,length=len(body));response.status=400;opener=Opener(response)
+    b=budget(tmp_path,max_download_bytes=80000);raw=tmp_path/'diagnostic';receipt=tmp_path/'receipt.json'
+    with pytest.raises(ValueError,match='HTTP400'):
+        fetch(url,raw,b,receipt,opener=opener)
+    saved=json.loads(receipt.read_text())
+    assert opener.calls==1 and raw.stat().st_size==65536
+    assert saved['status']=='failed' and not saved['diagnostic_entity_complete']
+    assert saved['bytes']==b.download_bytes==65536
