@@ -1,3 +1,17 @@
+## 2026-10-27：历史输入保守账本已整理，独立比较仍未获输入资格
+
+本轮只读核对历史元数据、原始输入身份和缺失路径角色，区分计划输出、可选失败标记、
+被拒绝的路径候选与真正的输入/审计依赖；完整私有原件留在本地history-closure包。
+未知执行时段继续隔离，未从旧window ID、相邻配置、文件名或日期推断独立性。
+目前不能认证新的formal/hidden输入；不再通过同一原始时间网格反复枚举解决样本不足。
+下一阶段的输入、配对统计、固定模型、强公平对照、holdout开启和有界预算草案见
+`paper_independent_evidence_protocol_20261027.md`。它是待输入/软件/计算授权的方案，
+不是新科学执行合同，未启动训练、评价、formal或holdout，也未下载数据。
+旧开发收益、失败与负seed原样保留，whole-paper仍为E0_UNAVAILABLE / Unverifiable。
+reviewed_at=2026-10-27；literature_cutoff=2026-10-26（本轮未新增文献审查）；
+target_venue=CSCWD2027；policy_version=tmc_review_policy_v3_20260621；
+科学版本仍为f24075b，当前结论仅涉及输入资格与待办边界，不晋级canonical或论文。
+
 ## 2026-10-27：完整会话MC确认已回收，局部开发门通过
 
 冻结科学源码f24075b，单次12单元/24checkpoint/144完整训练episode已完成，
