@@ -624,3 +624,5 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 2026-10-27 direct user continuation: see [TGSIM query recovery](docs/project/paper_tgsim_query_recovery_20261027.md). HTTP error entities/headers are retained under a64KiB cap, then execution still fails. A separate three-observation diagnostic precedes any fresh acquisition; zero policy training/evaluation.
 
 2026-10-28: retained server diagnostics identified the400 syntax cause. Explicit native columns and opaque-ID uniqueness/encoded-page recovery passed42 software checks; complete input qualification is still pending. Recovery contract and audit command are in RUNBOOK.
+
+2026-10-28:20 valid TGSIM pages were acquired before a transport stall. The separate [remaining-page contract](docs/project/paper_tgsim_remaining_pages_recovery_20261028.md) retains complete pages and deducts prior resource spend;45 software checks pass. No complete-input or paper benefit claim yet.

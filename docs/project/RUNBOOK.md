@@ -1,3 +1,13 @@
+## 2026-10-28 Remaining-page recovery
+
+Read `paper_tgsim_remaining_pages_recovery_20261028.md`. Freeze fresh paths/plan/source, verify parent completion SHA and deduct its body/request/decoded/executor-time spend. `recover_tgsim_paged_input.py --plan <remaining_plan> --plan_sha <sha>` reuses only20 complete provenance-bound pages via local copy, never the partial page or derived prefix. Audit with the same SHA; reuse receipt bytes are stored bytes, network_body_bytes=0. Old artifacts are immutable. Total executor times are aggregated; whole workflow elapsed time is not capped by this statement.
+
+Matching software command:
+```bash
+python -m pytest -p no:cacheprovider tests/test_tgsim_input_preparation.py tests/test_tgsim_paged_preparation.py tests/test_tgsim_query_diagnosis.py tests/test_tgsim_recovery.py -q
+```
+45 checks passed before this new launch.
+
 ## 2026-10-28 Explicit-field recovery
 
 The independent diagnosis retained the server compiler error: wildcard placement caused400. Source1 explicit native fields returned200; its opaque ID exposed an overly narrow local guard. Preserve both observations; only the remaining source2 one-row probe may execute in a new output. After it passes, freeze a new `recover_tgsim_paged_input.py --plan <plan> --plan_sha <sha>` run.42 tests pass. Encoded pages may be gzip; retain wire entities and enforce1.2GiB decoded-text/65536-character line limits plus cumulative2GiB disk. Opaque IDs use unique SQLite keys, not lexical order. Audit with `audit_tgsim_paged_input.py --expected_proposal_sha <sha> --analysis <run> --output <fresh_audit>`. No automatic retry or science.

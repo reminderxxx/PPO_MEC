@@ -1,3 +1,7 @@
+## 2026-10-28 Transport stall after20 complete pages
+
+The syntax/ID fixes worked for1000000 composed rows; page020 stalled during HTTP200/gzip read. Exact remote/network cause is unknown. Preserve the incomplete page and old run. Remaining-page contract increases only per-read timeout to120s within carried remaining total limits, and distinguishes complete-page reuse from network acquisition. No automatic retry or partial-body splice. Native/complete-input qualification remains pending.
+
 ## 2026-10-28 Diagnosed query syntax and opaque-ID guard
 
 Server error explicitly identifies wildcard placement. Use explicit native columns. Official row IDs contain dot/underscore; accept their literal identity, never assume their lexical comparator equals server:id order. Recovery checks uniqueness across pages in SQLite and discloses server-order/atomic-snapshot limits.42 software tests pass; full-input/geometry/science eligibility remains unverified.

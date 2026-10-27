@@ -1,3 +1,7 @@
+## 2026-10-28 Remaining-page provenance
+
+A fresh remaining-page raw/analysis directory contains local copies of approved complete bodies plus new missing pages. Reuse receipts bind original body/receipt/validation/execution claim and offset/version; network body=0. Parent completion and its SHA carry finite remaining caps. No original files or partial page are modified.
+
 ## 2026-10-28 Recovery producer and indexes
 
 - `scripts/recover_tgsim_paged_input.py`: explicit native query, bounded encoded/decoded bodies, opaque identity composition.

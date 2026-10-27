@@ -61,6 +61,25 @@ class NativeComposer:
                          encoded_gzip=encoded_gzip,opaque_system_ids_unique=True)
 
 
+def effective_caps(plan):
+    caps=dict(max_download_bytes_new_task=536870912,max_wall_clock_seconds=2700,
+              max_rows_to_index=6000000,maximum_http_requests=144,max_decoded_csv_bytes=1288490188)
+    if plan.get('continuation_parent_completion'):
+        parent=Path(plan['continuation_parent_completion'])
+        if not parent.resolve().is_relative_to(ROOT.resolve()) or digest(parent)!=plan['continuation_parent_completion_sha256']:
+            raise ValueError('sealed parent completion identity differs')
+        previous=json.loads(parent.read_text())
+        if previous['status']!='failed_preserved_do_not_retry' or previous['rows_indexed']!=0:
+            raise ValueError('only this pre-native-index failed parent is eligible')
+        caps.update(max_download_bytes_new_task=caps['max_download_bytes_new_task']-previous['total_body_download_bytes_upper_bound'],
+                    max_wall_clock_seconds=int(caps['max_wall_clock_seconds']-previous['elapsed_seconds']),
+                    maximum_http_requests=caps['maximum_http_requests']-previous['http_requests'],
+                    max_decoded_csv_bytes=caps['max_decoded_csv_bytes']-previous['decoded_csv_bytes'])
+        if plan['prior_accounted_body_bound']!=previous['two_task_body_upper_bound']:
+            raise ValueError('parent transfer bill not carried forward')
+    return caps
+
+
 def execute(plan_path,plan_sha):
     if digest(plan_path)!=plan_sha:raise ValueError('recovery plan hash mismatch')
     plan=json.loads(plan_path.read_text());grant=Path(plan['authorization_file'])
@@ -71,8 +90,7 @@ def execute(plan_path,plan_sha):
     if any(digest(ROOT/name)!=sha for name,sha in plan['source_hashes'].items()):
         raise ValueError('frozen source hash mismatch')
     if tuple(s['asset_id'] for s in plan['sources'])!=ASSETS:raise ValueError('source pool differs')
-    if (plan['max_download_bytes_new_task']!=536870912 or plan['max_wall_clock_seconds']!=2700
-            or plan['max_rows_to_index']!=6000000 or plan['maximum_http_requests']!=144
+    if (any(plan[k]!=v for k,v in effective_caps(plan).items())
             or plan['maximum_trajectory_pages']!=120 or plan['page_rows']!=50000
             or plan['max_cumulative_new_disk_bytes_including_old_failure']!=2147483648
             or plan['training_frames']!=0 or plan['evaluation_frames']!=0):raise ValueError('recovery caps differ')
@@ -91,8 +109,8 @@ def execute(plan_path,plan_sha):
                 cumulative_disk_roots=plan['disk_roots'],training_frames=0,evaluation_frames=0,hidden_openings=0,
                 automatic_retry=False,source_hashes=plan['source_hashes'])
     save_new(analysis/'execution_claim.json',dict(record,proposal=plan))
-    def deadline(signum,frame):raise TimeoutError('45minute recovery deadline')
-    signal.signal(signal.SIGALRM,deadline);signal.setitimer(signal.ITIMER_REAL,2700)
+    def deadline(signum,frame):raise TimeoutError('bounded remaining recovery deadline')
+    signal.signal(signal.SIGALRM,deadline);signal.setitimer(signal.ITIMER_REAL,plan['max_wall_clock_seconds'])
     try:
         record.update(acquire(plan,raw,analysis,budget,append_fn=composer,gzip_pages=True))
         budget.guard();record['status']='acquired_and_input_checked_not_science_qualified'

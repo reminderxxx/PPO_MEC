@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import urllib.parse
 import hashlib
+import gzip
 
 import pytest
 
@@ -176,13 +177,22 @@ def test_independent_consumer_checks_failure_files_and_exact_bill(tmp_path,monke
     with pytest.raises(ValueError,match='bytes/hash'):consumer.audit(analysis)
 
 
-@pytest.mark.parametrize('recovery',[False,True])
+@pytest.mark.parametrize('recovery',[False,True,'reuse'])
 def test_independent_success_consumer_rejects_missing_page_inventory(tmp_path,monkeypatch,recovery):
     from scripts import audit_tgsim_paged_input as consumer
     plan,raw,analysis,budget=setup(tmp_path,geometry=True);plan['destination_raw_directory']=str(raw)
     if recovery:
         from scripts.recover_tgsim_paged_input import NativeComposer
         plan.update(identity_mode='opaque_unique_sqlite',max_decoded_csv_bytes=100000)
+        if recovery=='reuse':
+            from scripts import prepare_tgsim_paged_input as producer
+            monkeypatch.setattr(producer,'ROOT',tmp_path)
+            old=tmp_path/'old_complete_page';old.write_bytes(gzip.compress(b'source_row_id,id,time,xloc_kf,yloc_kf,run_index\n1,1,0.0,1,2,1\n2,1,0.1,1,2,1\n'))
+            url=page_url(plan['sources'][0],0,2);sha_old=hashlib.sha256(old.read_bytes()).hexdigest()
+            old_receipt=tmp_path/'old_receipt.json';old_info=dict(path=str(old),url=url,status='complete',status_code=200,bytes=old.stat().st_size,sha256=sha_old,encoded_wire_body_retained=True,automatic_retry=False,interrupted_read_body_upper_bound=0)
+            old_receipt.write_text(json.dumps(old_info));validation=tmp_path/'old_validation.json';validation.write_text(json.dumps(dict(rows=2,sha256=sha_old,asset_id='synthetic-a',offset=0)))
+            parent_claim=tmp_path/'parent_claim.json';parent_claim.write_text(json.dumps(dict(proposal=plan,proposal_sha256='fixture-parent')))
+            plan['complete_page_reuse']={url:dict(source_path=str(old),source_receipt=str(old_receipt),source_receipt_sha256=hashlib.sha256(old_receipt.read_bytes()).hexdigest(),source_validation=str(validation),source_validation_sha256=hashlib.sha256(validation.read_bytes()).hexdigest(),rows=2,asset_id='synthetic-a',offset=0,source_execution_claim=str(parent_claim),source_execution_claim_sha256=hashlib.sha256(parent_claim.read_bytes()).hexdigest(),source_proposal_sha256='fixture-parent')}
         composer=NativeComposer(analysis,100000)
         result=acquire(plan,raw,analysis,budget,opener=FixtureTransport(plan),append_fn=composer,gzip_pages=True)
         composer.close();result['decoded_csv_bytes']=composer.decoded
@@ -202,6 +212,11 @@ def test_independent_success_consumer_rejects_missing_page_inventory(tmp_path,mo
                     cumulative_disk_roots=[str(raw),str(analysis)],raw_files=[dict(path=p.name,bytes=p.stat().st_size,
                     sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in raw.iterdir()])
     path=analysis/'completion.json';path.write_text(json.dumps(completion))
-    assert consumer.audit(analysis)['native_indexed_rows_verified']==6
+    audited=consumer.audit(analysis);assert audited['native_indexed_rows_verified']==6
+    if recovery=='reuse':
+        assert audited['network_http_requests']==27 and audited['reused_complete_pages']==1
+        old_info['status']='failed';old_receipt.write_text(json.dumps(old_info))
+        with pytest.raises(ValueError,match='reused complete page provenance'):consumer.audit(analysis)
+        old_info['status']='complete';old_receipt.write_text(json.dumps(old_info))
     completion['page_inventory'].pop();path.write_text(json.dumps(completion))
     with pytest.raises(ValueError,match='page inventory'):consumer.audit(analysis)

@@ -8,7 +8,7 @@ import pytest
 
 from scripts.prepare_tgsim_input import Budget, BudgetLimit, fetch
 from scripts.prepare_tgsim_paged_input import system_id_key
-from scripts.recover_tgsim_paged_input import NativeComposer
+from scripts.recover_tgsim_paged_input import NativeComposer,effective_caps
 
 
 def budget(tmp_path):
@@ -56,3 +56,30 @@ def test_compressed_fetch_retains_encoded_bytes_and_explicit_opt_in(tmp_path):
     r=fetch('https://data.transportation.gov/resource/fixture.csv',path,b,tmp_path/'receipt.json',opener=opener,accept_gzip=True)
     assert opener.calls==1 and path.read_bytes()==body and b.download_bytes==len(body)
     assert r['encoded_wire_body_retained'] and gzip.decompress(path.read_bytes())==b'a,b\n1,2\n'
+
+
+def test_remaining_caps_carry_parent_spend_without_reset(tmp_path,monkeypatch):
+    import hashlib
+    from scripts import recover_tgsim_paged_input as producer
+    monkeypatch.setattr(producer,'ROOT',tmp_path)
+    parent=tmp_path/'completion.json';parent.write_text(json.dumps(dict(status='failed_preserved_do_not_retry',rows_indexed=0,total_body_download_bytes_upper_bound=35296468,elapsed_seconds=383.804718084,http_requests=25,decoded_csv_bytes=122302692,two_task_body_upper_bound=222864504)))
+    plan=dict(continuation_parent_completion=str(parent),continuation_parent_completion_sha256=hashlib.sha256(parent.read_bytes()).hexdigest(),prior_accounted_body_bound=222864504)
+    caps=effective_caps(plan)
+    assert caps['max_download_bytes_new_task']==501574444
+    assert caps['maximum_http_requests']==119 and caps['max_wall_clock_seconds']==2316
+    assert caps['max_decoded_csv_bytes']==1166187496
+    plan['prior_accounted_body_bound']=0
+    with pytest.raises(ValueError,match='bill not carried'):effective_caps(plan)
+
+
+def test_read_timeout_is_explicit_and_cannot_exceed_hard_cap(tmp_path):
+    class Response(io.BytesIO):
+        status=200;headers={'Content-Type':'text/csv','Content-Length':'1'}
+        def geturl(self):return 'https://data.transportation.gov/resource/fixture.csv'
+    class Opener:
+        seen=None
+        def open(self,request,**kwargs):self.seen=kwargs['timeout'];return Response(b'x')
+    b=budget(tmp_path);b.proposal['max_wall_clock_seconds']=200;opener=Opener()
+    fetch('https://data.transportation.gov/resource/fixture.csv',tmp_path/'body',b,tmp_path/'receipt.json',opener=opener,read_timeout_seconds=120)
+    assert opener.seen==120
+    with pytest.raises(ValueError,match='bounded'):fetch('https://data.transportation.gov/resource/fixture.csv',tmp_path/'never',b,tmp_path/'never.json',opener=opener,read_timeout_seconds=121)

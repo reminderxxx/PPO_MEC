@@ -1,3 +1,7 @@
+## 2026-10-28 Complete-page reuse accounting
+
+`acquire.get` validates a frozen complete-page reuse manifest and locally copies approved encoded bodies; HTTP counters/body spend remain unchanged. `effective_caps` derives new limits from the immutable failed parent. Auditor independently verifies reuse provenance and counts actual HTTP requests separately from logical page receipts. Shared fetch read timeout is explicit, bounded by120s and the executor deadline.
+
 ## 2026-10-28 Explicit recovery composition
 
 `acquire` accepts an opt-in native composer and gzip wire pages; old contracts retain their default behavior. `NativeComposer` streams bounded plain/gzip CSV into a native derived file and a unique opaque-ID index. Existing native consumer indexes each native row once. Terminal auditor binds the caller frozen proposal SHA, all receipts, page validation, both SQLite counts and decoded cap. Original run artifacts are immutable.

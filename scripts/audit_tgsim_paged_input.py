@@ -38,7 +38,7 @@ def audit(analysis, *, expected_proposal_sha=None):
             expected_requests[f'{asset}_page_{index:03d}_receipt.json']=page_url(source,offset,proposal['page_rows'])
         for attachment in source['support_csv_attachments']:
             aid=attachment['asset_id'];expected_requests[f'{asset}_{aid}_receipt.json']=f'https://{HOST}/api/assets/{aid}'
-    seen=set();body=uncertain=0;receipts=[]
+    seen=set();body=uncertain=0;receipts=[];network_requests=0
     for path in sorted(analysis.glob('*_receipt.json')):
         receipt=json.loads(path.read_text());target=Path(receipt['path']).resolve()
         if path.name not in expected_requests or receipt['url']!=expected_requests[path.name]:
@@ -50,14 +50,34 @@ def audit(analysis, *, expected_proposal_sha=None):
             raise ValueError('received file bytes/hash differ from receipt')
         if receipt['status'] not in ('complete','failed') or receipt['automatic_retry']:
             raise ValueError('invalid request terminal/retry status')
-        body+=receipt['bytes'];uncertain+=receipt['interrupted_read_body_upper_bound']
-        receipts.append(dict(path=path.name,status=receipt['status'],bytes=receipt['bytes']))
+        reuse=receipt.get('operation')=='reuse_complete_page'
+        if reuse:
+            approved=proposal.get('complete_page_reuse',{}).get(receipt['url'])
+            if approved is None or approved!=receipt['source_provenance'] or receipt.get('network_body_bytes')!=0:
+                raise ValueError('unapproved page reuse or disguised network body')
+            source=Path(approved['source_path']);old_path=Path(approved['source_receipt']);validation_path=Path(approved['source_validation'])
+            old=json.loads(old_path.read_text());validation=json.loads(validation_path.read_text())
+            parent_claim_path=Path(approved['source_execution_claim']);parent_claim=json.loads(parent_claim_path.read_text())
+            parent_source=next(s for s in parent_claim['proposal']['sources'] if s['asset_id']==approved['asset_id'])
+            current_source=next(s for s in proposal['sources'] if s['asset_id']==approved['asset_id'])
+            if (digest(old_path)!=approved['source_receipt_sha256'] or digest(validation_path)!=approved['source_validation_sha256']
+                    or old['status']!='complete' or old['url']!=receipt['url'] or old['sha256']!=receipt['sha256']
+                    or digest(source)!=old['sha256'] or validation['sha256']!=old['sha256']
+                    or validation['rows']!=approved['rows'] or receipt['interrupted_read_body_upper_bound']!=0
+                    or digest(parent_claim_path)!=approved['source_execution_claim_sha256']
+                    or parent_claim['proposal_sha256']!=approved['source_proposal_sha256']
+                    or parent_source['metadata_pin']!=current_source['metadata_pin']
+                    or validation['asset_id']!=approved['asset_id'] or validation['offset']!=approved['offset']):
+                raise ValueError('reused complete page provenance differs')
+        else:
+            body+=receipt['bytes'];uncertain+=receipt['interrupted_read_body_upper_bound'];network_requests+=1
+        receipts.append(dict(path=path.name,status=receipt['status'],bytes=receipt['bytes'],operation='reuse_complete_page' if reuse else 'http_request'))
     prior=proposal.get('prior_accounted_body_bound',OLD_BODY_BOUND)
     if (body!=completion['total_body_download_bytes'] or body+uncertain!=completion['total_body_download_bytes_upper_bound']
             or completion['two_task_body_upper_bound']!=prior+body+uncertain
             or body+uncertain>proposal['max_download_bytes_new_task']
-            or completion['http_requests']!=len(receipts)
-            or len(receipts)>proposal['maximum_http_requests']):
+            or completion['http_requests']!=network_requests
+            or network_requests>proposal['maximum_http_requests']):
         raise ValueError('request/byte/cumulative bill mismatch or cap breach')
     inventory=completion['raw_files']
     if {p.name for p in raw.iterdir() if p.is_file()}!={item['path'] for item in inventory}:
@@ -112,8 +132,11 @@ def audit(analysis, *, expected_proposal_sha=None):
     current_disk=disk_bytes(completion['cumulative_disk_roots'])
     if max(current_disk,completion['cumulative_disk_bytes'])>proposal['max_cumulative_new_disk_bytes_including_old_failure']:
         raise ValueError('cumulative disk cap breached')
+    if completion.get('elapsed_seconds',0)>proposal['max_wall_clock_seconds']+1:
+        raise ValueError('executor wall-time cap exceeded')
     return dict(status='terminal_receipt_inventory_and_bill_audited',acquisition_complete=success,
                 source_commit=completion['source_commit'],request_receipts=receipts,
+                network_http_requests=network_requests,reused_complete_pages=len(receipts)-network_requests,
                 returned_body_bytes=body,interrupted_body_upper_bound=uncertain,
                 two_task_body_upper_bound=prior+body+uncertain,cumulative_disk_bytes=current_disk,
                 native_indexed_rows_verified=indexed if success else None,

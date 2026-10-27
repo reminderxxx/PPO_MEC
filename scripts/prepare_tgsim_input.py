@@ -90,9 +90,11 @@ class Budget:
         return min(65536, remaining, per_file_remaining)
 
 
-def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=None, accept_gzip=False):
+def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=None, accept_gzip=False, read_timeout_seconds=30):
     """Exactly one request. Keep partial bytes and an error receipt on any failure."""
     validate_url(url)
+    if not 0 < read_timeout_seconds <= 120:
+        raise ValueError('read timeout must be bounded by120seconds')
     maximum_bytes = maximum_bytes or budget.proposal['max_download_bytes']
     opener = opener or urllib.request.build_opener(OfficialRedirect())
     record = dict(url=url, path=str(destination), status='requesting', bytes=0,
@@ -101,7 +103,7 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
     h = hashlib.sha256()
     try:
         budget.guard()
-        timeout = min(30., budget.proposal['max_wall_clock_seconds'] - (budget.clock() - budget.started))
+        timeout = min(float(read_timeout_seconds), budget.proposal['max_wall_clock_seconds'] - (budget.clock() - budget.started))
         request = urllib.request.Request(url, headers={'User-Agent': 'PPO-MEC-input-qualification/1.0', 'Accept-Encoding': 'gzip' if accept_gzip else 'identity'})
         with destination.open('xb') as out, open_including_http_error(opener, request, timeout) as response:
             record.update(final_url=validate_url(response.geturl()), status_code=response.status,

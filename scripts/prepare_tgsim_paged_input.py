@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import re
 import signal
+import shutil
 import subprocess
 import time
 import urllib.parse
@@ -159,8 +160,41 @@ def acquire(proposal, raw, analysis, budget, *, opener=None, append_fn=None, gzi
     def get(url, path, receipt, cap=None, *, version_check=False, gzip_body=False):
         if path.exists() or receipt.exists():
             raise FileExistsError('request output already exists')
+        reused=proposal.get('complete_page_reuse',{}).get(url)
+        if reused is not None:
+            if not gzip_body:raise ValueError('only audited complete trajectory pages can be reused')
+            source=Path(reused['source_path']);original=Path(reused['source_receipt']);validation=Path(reused['source_validation'])
+            claim_path=Path(reused['source_execution_claim'])
+            if not all(p.resolve().is_relative_to(ROOT.resolve()) for p in (source,original,validation,claim_path)):
+                raise ValueError('reuse must remain inside the approved worktree')
+            if digest(original)!=reused['source_receipt_sha256'] or digest(validation)!=reused['source_validation_sha256']:
+                raise ValueError('original complete-page provenance hash differs')
+            old=json.loads(original.read_text());checked=json.loads(validation.read_text())
+            if digest(claim_path)!=reused['source_execution_claim_sha256']:
+                raise ValueError('source execution claim hash differs')
+            claim=json.loads(claim_path.read_text())
+            old_source=next(s for s in claim['proposal']['sources'] if s['asset_id']==reused['asset_id'])
+            new_source=next(s for s in proposal['sources'] if s['asset_id']==reused['asset_id'])
+            if (claim['proposal_sha256']!=reused['source_proposal_sha256'] or old_source['metadata_pin']!=new_source['metadata_pin']
+                    or checked['asset_id']!=reused['asset_id'] or checked['offset']!=reused['offset']):
+                raise ValueError('reused page source version/offset differs')
+            if (old['status']!='complete' or old['url']!=url or old.get('status_code')!=200
+                    or Path(old['path']).resolve()!=source.resolve() or digest(source)!=old['sha256']
+                    or old['bytes']!=source.stat().st_size or checked['sha256']!=old['sha256']
+                    or checked['rows']!=reused['rows']):
+                raise ValueError('partial/changed page cannot be reused')
+            budget.guard()
+            with source.open('rb') as inp,path.open('xb') as out:shutil.copyfileobj(inp,out,1024**2)
+            budget.guard()
+            info=dict(old,path=str(path),operation='reuse_complete_page',network_body_bytes=0,
+                      interrupted_read_body_upper_bound=0,cumulative_download_bytes=budget.download_bytes,
+                      cumulative_body_bytes_upper_bound=budget.download_bytes+budget.interrupted_body_upper_bound,
+                      source_provenance=reused,receipt_contract='tgsim_audited_complete_page_reuse_v1')
+            save_new(receipt,info)
+            return info
         budget.request(url, version_check=version_check)
-        return fetch(url, path, budget, receipt, maximum_bytes=cap, opener=opener, accept_gzip=gzip_body)
+        return fetch(url, path, budget, receipt, maximum_bytes=cap, opener=opener, accept_gzip=gzip_body,
+                     read_timeout_seconds=proposal.get('read_timeout_seconds',30))
 
     def source_check(source, phase):
         asset = source['asset_id']; meta = analysis/f'{asset}_metadata_{phase}.json'

@@ -1,3 +1,7 @@
+## 2026-10-28 Complete-page transport recovery
+
+081d8ef acquired20 valid pages/1000000 rows, then page020 HTTP200/gzip stalled at a30s socket read.25 requests,383.804718s,35296468 encoded-body/read-bound bytes and122302692 decoded bytes are preserved. Native-key index0, complete sources0, geometry0; terminal receipt audit ran once. Independent diagnosis precedes a separately frozen remaining-page task: local copies of20 complete provenance-bound pages, no partial020 or derived-prefix reuse, remaining501574444 body bytes/119 requests/2316 executor seconds/1166187496 decoded bytes; cumulative disk2GiB.45 software tests pass, science0. No paper readiness claim.
+
 ## 2026-10-28 HTTP400 root cause identified; recovery qualification
 
 The retained compiler message states star selections must lead the select-list. Explicit native fields returnedHTTP200 for source1. Its legitimate opaque row ID exposed the old punctuation guard; that diagnostic remains sealed after2 observations. A separate remaining source2 probe is planned; total diagnostic budget stays3.42 synthetic producer/consumer checks pass for HTTP error capture, ID uniqueness, encoded pages, bounded decoding and audit. No complete new input or scientific benefit is yet asserted.
