@@ -1,3 +1,11 @@
+## 2026-10-27 TGSIM有界输入准备
+
+- `scripts/prepare_tgsim_input.py`：精确方案/人工授权绑定、版本前后核对、单次有界下载与原生时间身份/持续八车输入检查。
+- `tests/test_tgsim_input_preparation.py`：纯软件预算、create-only、重复/缺帧/小数时间、跨run隔离及收据失败保留验证。
+- `data/raw/mobility/tgsim/tgsim_input_qualification_20261027_v1/`：本轮获授权的新原件；不覆盖、移动或上传。
+- `artifacts/analysis/paper_tgsim_input_qualification_20261027_v1/`：新建执行声明、逐请求收据、版本快照、身份索引与输入检查；Git忽略。
+- 入口不接live provider/registry，原RSU几何/单位及物理费用兼容不由文件名或下载成功证明。
+
 ## 2026-10-27 完整会话确认入口
 
 - `scripts/run_stream_complete_session_study.py`：完整物理终止、native MC与显式训练标签生产端。

@@ -1,9 +1,9 @@
 # TGSIM输入准备方案（2026-10-27）
 
-状态：`PROPOSED_WAITING_EXPLICIT_DATA_PREPARATION_INSTRUCTION`。
-本轮已完成公开目录、字段及本地provider的只读核对。尚未下载轨迹原件、
-生成模拟轨迹、修改provider或执行任何策略。以下是供用户审查的数据准备任务，
-不是新训练、评价、formal或holdout合同。
+状态：`EXACT_SCOPE_GRANTED_SOFTWARE_QUALIFIED_PENDING_SINGLE_ACQUISITION`。
+2026-10-27用户对已展示方案明确回复“允许按该范围准备数据”。原私有方案SHA不改写，
+答复单独绑定为grant；范围和硬上限保持如下。执行器17项纯软件检查通过，
+实际获取状态以新建执行声明/收据为准。这仍不是训练、评价、formal或holdout合同。
 
 ## 具体来源与有限范围
 

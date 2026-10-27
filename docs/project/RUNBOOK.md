@@ -1,3 +1,27 @@
+## 2026-10-27 TGSIM单次输入准备
+
+先读 `paper_tgsim_input_qualification_proposal_20261027.md`。人工已明确批准其中两份
+轨迹CSV、16个官方几何附件；入口仅接受原方案SHA与该范围的人工答复绑定，
+不会从普通自动提醒推导授权。原始方案不改写，人工答复保存为独立grant。
+
+```bash
+python scripts/prepare_tgsim_input.py --proposal <exact_acquisition_proposal.json> --grant <bound_human_grant.json>
+python -m pytest -p no:cacheprovider tests/test_tgsim_input_preparation.py -q
+```
+
+正式输入任务要求clean commit及两个全新目录。它先核对官方schema/rowsUpdatedAt/附件ID，
+每个原件请求一次，保存响应头、最终URL、SHA、字节与失败收据，下载后再核对数据版本。
+同名几何附件按asset ID分开保存。总下载512MiB、磁盘2GiB、45分钟、600万索引行均为硬上限。
+失败/部分文件和执行声明保留；已有目标即拒绝，不自动重试、换源、解压或扩展预算。
+
+SQLite派生身份索引按source/run/vehicle/精确0.1秒tick检查；重复、非有限值、离网时间或
+表头错配显式拒绝，不平均/插值/丢行修复。缺帧分隔连续轨迹；持续八车480采样点候选
+只有时间资格，端点跨度47.9秒，不等于原成本模型的480帧暴露。
+所有扫描用途记为input-qualification暴露；不同run标签不自动成为独立采集或hidden。
+几何CSV清单/形状和新站点坐标不认证原固定RSU覆盖；不得现场缩放、移动RSU或改费用。
+`completion.json`和逐源qualification必须一起读取，下载完成不等于输入通过，更不等于科学资格。
+provider适配、盲法split、真实成本、训练/评价与formal/holdout仍需后续独立合同。
+
 ## 2026-10-27 完整会话MC确认
 
 先读 `paper_complete_session_confirmation_20261027.md` 和独立时间暴露诊断。
