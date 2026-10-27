@@ -275,3 +275,12 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 前后对照：三张 85 mm 子图 → 一张 180×93 mm 通栏图。上部依次为状态/编码、共享多车 actor 与条件动作、联合执行；下部压缩为训练支路。以简化网络/DAG/预约符号、条件概率和 booking/状态/参数反馈呈现结构，保留两遍协调、模型依赖与 surrogate 训练基线边界；典型标签约 8.50 pt，小标签约 7.65 pt。
 - 图源 `scripts/plot_sagh_integrated_figure.py`；交付在 `artifacts/figures/sagh_integrated_paper_20261027/`，含矢量 PDF、可编辑 SVG、600 dpi PNG、英文图注、自审与独立 Letter 通栏校样。
 - 验证：生成、`py_compile`、`git diff --check`、PDF/SVG 边界/尺寸、字体嵌入及 180/600 dpi 渲染通过；最终图与尺寸校样目视检查。R20 hash 未变，未改算法或实验结论；全文分页与最终模板验收仍未覆盖。
+
+
+## 2026-10-27 原图单页可编辑 PowerPoint 交付
+
+- 最新要求：将第四版整合图制作成一页 PPT，每个模块可调整，保留原图内容与排布；本轮不重新设计、不增加封面或页面、不回写 R20。
+- 唯一图源：`artifacts/figures/sagh_integrated_paper_20261027/sagh_algorithm_architecture.svg`，SHA-256 `6828e9a87414b0c6b54f12d7c18ea611073b196fdca30886f24b4f3bffd1713e`。源 SVG/PDF 原件未变，R20 文稿与 Fig. 2 位置不变。
+- 前后对照：原图 185 个 SVG 图元 → 单页 180×93 mm PPTX，186 个原生形状（虚线边框的填充与描边分开）、57 个原生文字框、20 个模块组及 5 个功能区域组；另含连接箭头组，共 43 组。没有整图图片或图片遮盖层。原文字、配色、数学分段、相对坐标、字号与实/虚线语义保留；模块可整块调整，组内元素可继续编辑。
+- 成品：`artifacts/presentations/sagh_editable_20261027/output/sagh_architecture_editable.pptx`。私有构建与检查位于同级 `build/`，不作为额外交付或公开 artifact 上传。
+- 验证：Artifact Tool 构建/最终导入与渲染、finalizePresentation 包结构/单页/尺寸/字体校验通过；独立 ZIP/XML 对照确认源图 57 个文本完全相同、无图片、全部分组为保持坐标的变换，源图 hash 未变。最终渲染与已检查候选逐像素相同；与原图进行目视和像素差异对照。不同渲染器有文字/边缘抗锯齿差异，不据此声称原生 Office 像素级一致。本机无 Microsoft PowerPoint，未声称在该软件内验收；未改算法或实验。
