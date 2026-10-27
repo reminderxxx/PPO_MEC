@@ -58,6 +58,7 @@ class Budget:
         self.proposal, self.directories, self.clock = proposal, directories, clock
         self.started = clock()
         self.download_bytes = self.rows = 0
+        self.interrupted_body_upper_bound = 0
 
     def guard(self):
         if self.clock() - self.started >= self.proposal['max_wall_clock_seconds']:
@@ -81,7 +82,8 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
     maximum_bytes = maximum_bytes or budget.proposal['max_download_bytes']
     opener = opener or urllib.request.build_opener(OfficialRedirect())
     record = dict(url=url, path=str(destination), status='requesting', bytes=0,
-                  started_at_unix=time.time(), automatic_retry=False)
+                  started_at_unix=time.time(), automatic_retry=False,
+                  interrupted_read_body_upper_bound=0)
     h = hashlib.sha256()
     try:
         budget.guard()
@@ -101,7 +103,14 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
             if length is not None and (length > maximum_bytes or length > budget.proposal['max_download_bytes'] - budget.download_bytes):
                     raise BudgetLimit('declared body exceeds remaining byte budget')
             while length is None or record['bytes'] < length:
-                block = response.read(budget.read_size(maximum_bytes - record['bytes']))
+                size = budget.read_size(maximum_bytes - record['bytes'])
+                record['interrupted_read_body_upper_bound'] = size
+                # HTTPResponse.read(size) can discard a received partial chunk
+                # when its outer IncompleteRead exposes an empty payload.
+                # read1 returns received payload incrementally before the next
+                # truncated-chunk error. Retain uncertainty if a read raises.
+                block = response.read1(size)
+                record['interrupted_read_body_upper_bound'] = 0
                 if not block:
                     break
                 budget.download_bytes += len(block)
@@ -115,7 +124,11 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
         record.update(status='failed', error_type=type(error).__name__, error=str(error))
         raise
     finally:
-        record.update(sha256=h.hexdigest(), finished_at_unix=time.time(), cumulative_download_bytes=budget.download_bytes)
+        budget.interrupted_body_upper_bound += record['interrupted_read_body_upper_bound']
+        record.update(sha256=h.hexdigest(), finished_at_unix=time.time(), cumulative_download_bytes=budget.download_bytes,
+                      cumulative_body_bytes_upper_bound=budget.download_bytes + budget.interrupted_body_upper_bound,
+                      receipt_contract='tgsim_returned_body_and_interruption_bound_v2',
+                      byte_accounting='bytes/cumulative_download_bytes count returned payload; an interrupted read has an explicit conservative additional bound, not an exact network byte total')
         save_new(receipt_path, record)
     return record
 
@@ -322,6 +335,8 @@ def execute(proposal_path, grant_path):
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
         receipt.update(elapsed_seconds=time.monotonic()-budget.started, total_body_download_bytes=budget.download_bytes,
+                       total_body_download_bytes_upper_bound=budget.download_bytes+budget.interrupted_body_upper_bound,
+                       body_byte_accounting='successfully returned payload plus explicit interrupted-read upper bound; not an exact network byte total',
                        rows_examined=budget.rows, new_disk_bytes=sum(p.stat().st_size for root in [raw,analysis] for p in root.rglob('*') if p.is_file()),
                        raw_files=[dict(path=p.name,bytes=p.stat().st_size,sha256=digest(p)) for p in raw.iterdir() if p.is_file()])
         save_new(analysis/'completion.json', receipt)

@@ -1,5 +1,6 @@
 """Software-only budget/provenance/time checks. No network or project environment."""
 import csv
+import http.client
 import io
 import json
 from pathlib import Path
@@ -169,3 +170,39 @@ def test_geometry_names_are_not_identity_keys():
     pin=metadata_pin(meta)
     assert len(pin['support_attachment_identities'])==2
     assert {x['assetId'] for x in pin['support_attachment_identities']}=={'a','b'}
+
+
+class NativeChunkedResponse:
+    """Exercise the standard-library parser that produced the observed failure."""
+    def __init__(self, body):
+        class Socket:
+            def makefile(self, *args, **kwargs):
+                return io.BytesIO(b'HTTP/1.1 200 OK\r\nContent-Type: text/csv\r\nTransfer-Encoding: chunked\r\n\r\n'+body)
+        self.response=http.client.HTTPResponse(Socket());self.response.begin()
+        self.headers=self.response.headers;self.status=self.response.status
+    def __enter__(self):return self
+    def __exit__(self,*args):self.response.close()
+    def geturl(self):return 'https://data.transportation.gov/api/assets/example'
+    def read1(self,size):return self.response.read1(size)
+
+
+def test_native_chunk_truncation_retains_payload_and_bounds_uncertainty(tmp_path):
+    opener=Opener(NativeChunkedResponse(b'8\r\nabc'))
+    b=budget(tmp_path,max_download_bytes=10);raw=tmp_path/'raw.csv';receipt=tmp_path/'receipt.json'
+    with pytest.raises(http.client.IncompleteRead):
+        fetch('https://data.transportation.gov/api/assets/example',raw,b,receipt,opener=opener)
+    saved=json.loads(receipt.read_text())
+    assert opener.calls==1 and raw.read_bytes()==b'abc'
+    assert saved['bytes']==b.download_bytes==3
+    assert saved['cumulative_body_bytes_upper_bound']==10
+    assert saved['interrupted_read_body_upper_bound']==7
+    assert b.interrupted_body_upper_bound==7
+    assert saved['status']=='failed'
+
+
+def test_native_complete_chunked_response_has_no_unresolved_payload(tmp_path):
+    opener=Opener(NativeChunkedResponse(b'3\r\nabc\r\n0\r\n\r\n'))
+    saved=fetch('https://data.transportation.gov/api/assets/example',tmp_path/'raw.csv',budget(tmp_path),tmp_path/'receipt.json',opener=opener)
+    assert saved['status']=='complete' and saved['bytes']==3
+    assert saved['interrupted_read_body_upper_bound']==0
+    assert saved['cumulative_body_bytes_upper_bound']==3

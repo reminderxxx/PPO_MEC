@@ -1,9 +1,13 @@
 # TGSIM输入准备方案（2026-10-27）
 
-状态：`EXACT_SCOPE_GRANTED_SOFTWARE_QUALIFIED_PENDING_SINGLE_ACQUISITION`。
+状态：`FIRST_ACQUISITION_FAILED_PRESERVED_NO_AUTOMATIC_RETRY`。
 2026-10-27用户对已展示方案明确回复“允许按该范围准备数据”。原私有方案SHA不改写，
-答复单独绑定为grant；范围和硬上限保持如下。执行器17项纯软件检查通过，
-实际获取状态以新建执行声明/收据为准。这仍不是训练、评价、formal或holdout合同。
+答复单独绑定为grant；范围和硬上限保持如下。冻结5eb3804已执行一次：获取前两份
+元数据版本匹配，首份CSV在分块HTTP响应中断后停止；没有完整轨迹、几何或输入资格结果。
+部分字节、响应头和失败收据保留，未重试或追加拼接；实际原件只存本地。
+独立诊断后仅修正中断读取/字节上界账本，19项软件检查通过，未再次请求真实数据。
+后续分页取得的独立草案见 `paper_tgsim_paged_acquisition_proposal_20261027.md`，
+它须新的明确范围授权；本轮失败账单不重置。这仍不是训练、评价、formal或holdout合同。
 
 ## 具体来源与有限范围
 
