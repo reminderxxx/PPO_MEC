@@ -1,3 +1,7 @@
+## 2026-10-28 Explicit recovery composition
+
+`acquire` accepts an opt-in native composer and gzip wire pages; old contracts retain their default behavior. `NativeComposer` streams bounded plain/gzip CSV into a native derived file and a unique opaque-ID index. Existing native consumer indexes each native row once. Terminal auditor binds the caller frozen proposal SHA, all receipts, page validation, both SQLite counts and decoded cap. Original run artifacts are immutable.
+
 ## 2026-10-27 HTTP error diagnostic producer/consumer
 
 Shared `prepare_tgsim_input.fetch` v3 converts the existing HTTPError response to a bounded retained diagnostic entity, saves headers/status/hash/body counts, then fails globally. No second request. Existing receipt consumers still validate retained bytes/hash and failed status; old v2 receipts are immutable. `diagnose_tgsim_query` permits only the declared syntax rejection followed by two one-row capability observations. No provider or policy dependency.

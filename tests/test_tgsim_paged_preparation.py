@@ -176,10 +176,18 @@ def test_independent_consumer_checks_failure_files_and_exact_bill(tmp_path,monke
     with pytest.raises(ValueError,match='bytes/hash'):consumer.audit(analysis)
 
 
-def test_independent_success_consumer_rejects_missing_page_inventory(tmp_path,monkeypatch):
+@pytest.mark.parametrize('recovery',[False,True])
+def test_independent_success_consumer_rejects_missing_page_inventory(tmp_path,monkeypatch,recovery):
     from scripts import audit_tgsim_paged_input as consumer
     plan,raw,analysis,budget=setup(tmp_path,geometry=True);plan['destination_raw_directory']=str(raw)
-    result=acquire(plan,raw,analysis,budget,opener=FixtureTransport(plan))
+    if recovery:
+        from scripts.recover_tgsim_paged_input import NativeComposer
+        plan.update(identity_mode='opaque_unique_sqlite',max_decoded_csv_bytes=100000)
+        composer=NativeComposer(analysis,100000)
+        result=acquire(plan,raw,analysis,budget,opener=FixtureTransport(plan),append_fn=composer,gzip_pages=True)
+        composer.close();result['decoded_csv_bytes']=composer.decoded
+    else:
+        result=acquire(plan,raw,analysis,budget,opener=FixtureTransport(plan))
     proposal=tmp_path/'proposal.json';proposal.write_text(json.dumps(plan))
     grant=tmp_path/'grant.json';grant.write_text('synthetic')
     sha=hashlib.sha256(proposal.read_bytes()).hexdigest();monkeypatch.setattr(consumer,'PROPOSAL_SHA',sha)

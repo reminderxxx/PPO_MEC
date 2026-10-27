@@ -622,3 +622,5 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 2026-10-15容量补审发现tight7/8窗口无法全8完成，主实验保留为冻结开发比较。另定义原布局、全程≥2站可达的高移动探索support，0新增训练，不替换主表；见docs/project/joint_tail_capacity_review_20261015.md与joint_tail_mobility_support_contract_20261015.md。
 
 2026-10-27 direct user continuation: see [TGSIM query recovery](docs/project/paper_tgsim_query_recovery_20261027.md). HTTP error entities/headers are retained under a64KiB cap, then execution still fails. A separate three-observation diagnostic precedes any fresh acquisition; zero policy training/evaluation.
+
+2026-10-28: retained server diagnostics identified the400 syntax cause. Explicit native columns and opaque-ID uniqueness/encoded-page recovery passed42 software checks; complete input qualification is still pending. Recovery contract and audit command are in RUNBOOK.

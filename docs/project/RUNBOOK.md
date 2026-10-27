@@ -1,3 +1,7 @@
+## 2026-10-28 Explicit-field recovery
+
+The independent diagnosis retained the server compiler error: wildcard placement caused400. Source1 explicit native fields returned200; its opaque ID exposed an overly narrow local guard. Preserve both observations; only the remaining source2 one-row probe may execute in a new output. After it passes, freeze a new `recover_tgsim_paged_input.py --plan <plan> --plan_sha <sha>` run.42 tests pass. Encoded pages may be gzip; retain wire entities and enforce1.2GiB decoded-text/65536-character line limits plus cumulative2GiB disk. Opaque IDs use unique SQLite keys, not lexical order. Audit with `audit_tgsim_paged_input.py --expected_proposal_sha <sha> --analysis <run> --output <fresh_audit>`. No automatic retry or science.
+
 ## 2026-10-27 Separately authorized query recovery
 
 Read `paper_tgsim_query_recovery_20261027.md`. Use `diagnose_tgsim_query.py --plan <frozen_plan> --plan_sha <sha>` from a clean commit once. Three observations,256KiB/120s, old+new disk2GiB; no retries. Retain v3 HTTP error entities/headers as failed diagnostic input. Earlier run contracts remain archived.

@@ -1,3 +1,7 @@
+## 2026-10-28 Diagnosed query syntax and opaque-ID guard
+
+Server error explicitly identifies wildcard placement. Use explicit native columns. Official row IDs contain dot/underscore; accept their literal identity, never assume their lexical comparator equals server:id order. Recovery checks uniqueness across pages in SQLite and discloses server-order/atomic-snapshot limits.42 software tests pass; full-input/geometry/science eligibility remains unverified.
+
 ## 2026-10-27 Error-capture software repaired; actual400 cause pending
 
 HTTPError response headers and up to64KiB diagnostic body are now retained from the same request, counted and marked failed; oversized entities are explicitly incomplete.38 synthetic checks pass. This fixes future observability only, not the already sealed run or its missing error detail. New three-observation task is separately authorized; no reward/provider/geometry/scientific change.

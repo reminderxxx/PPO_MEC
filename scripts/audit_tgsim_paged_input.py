@@ -12,14 +12,15 @@ except ModuleNotFoundError:
         disk_bytes, digest, metadata_pin, page_url, parse_count, save_new)
 
 
-def audit(analysis):
+def audit(analysis, *, expected_proposal_sha=None):
+    expected_proposal_sha=expected_proposal_sha or PROPOSAL_SHA
     claim=json.loads((analysis/'execution_claim.json').read_text())
     completion=json.loads((analysis/'completion.json').read_text())
     proposal=claim['proposal'];raw=Path(proposal['destination_raw_directory'])
-    if claim['proposal_sha256']!=PROPOSAL_SHA or completion['proposal_sha256']!=PROPOSAL_SHA:
+    if claim['proposal_sha256']!=expected_proposal_sha or completion['proposal_sha256']!=expected_proposal_sha:
         raise ValueError('paged proposal binding differs')
     original=Path(claim['command_arguments']['proposal']);grant=Path(claim['command_arguments']['grant'])
-    if (digest(original)!=PROPOSAL_SHA or json.loads(original.read_text())!=proposal
+    if (digest(original)!=expected_proposal_sha or json.loads(original.read_text())!=proposal
             or digest(grant)!=claim['grant_sha256']):
         raise ValueError('frozen proposal/grant identity differs')
     if completion['source_commit']!=claim['source_commit'] or completion['grant_sha256']!=claim['grant_sha256']:
@@ -51,8 +52,9 @@ def audit(analysis):
             raise ValueError('invalid request terminal/retry status')
         body+=receipt['bytes'];uncertain+=receipt['interrupted_read_body_upper_bound']
         receipts.append(dict(path=path.name,status=receipt['status'],bytes=receipt['bytes']))
+    prior=proposal.get('prior_accounted_body_bound',OLD_BODY_BOUND)
     if (body!=completion['total_body_download_bytes'] or body+uncertain!=completion['total_body_download_bytes_upper_bound']
-            or completion['two_task_body_upper_bound']!=OLD_BODY_BOUND+body+uncertain
+            or completion['two_task_body_upper_bound']!=prior+body+uncertain
             or body+uncertain>proposal['max_download_bytes_new_task']
             or completion['http_requests']!=len(receipts)
             or len(receipts)>proposal['maximum_http_requests']):
@@ -94,6 +96,10 @@ def audit(analysis):
                 actual=connection.execute('SELECT count(*) FROM samples').fetchone()[0]
             if actual!=count or check['rows']!=count or not check['derived_from_pages'] or check['bulk_byte_equality_claim']:
                 raise ValueError('native identity count or derived-CSV claim differs')
+            if proposal.get('identity_mode')=='opaque_unique_sqlite':
+                with sqlite3.connect(f'file:{analysis / (asset+"_system_ids.sqlite")}?mode=ro',uri=True) as connection:
+                    identities=connection.execute('SELECT count(*) FROM identities').fetchone()[0]
+                if identities!=count:raise ValueError('opaque source-ID count mismatch')
             if digest(raw/f'{asset}_derived_native.csv')!=check['derived_csv_sha256']:
                 raise ValueError('derived native CSV identity differs')
             indexed+=actual
@@ -101,13 +107,15 @@ def audit(analysis):
             raise ValueError('indexed-row count cap/mismatch')
         if len(completion['geometry_checks'])!=16:
             raise ValueError('geometry inventory incomplete')
+        if proposal.get('max_decoded_csv_bytes') is not None and completion['decoded_csv_bytes']>proposal['max_decoded_csv_bytes']:
+            raise ValueError('decoded CSV cap exceeded')
     current_disk=disk_bytes(completion['cumulative_disk_roots'])
     if max(current_disk,completion['cumulative_disk_bytes'])>proposal['max_cumulative_new_disk_bytes_including_old_failure']:
         raise ValueError('cumulative disk cap breached')
     return dict(status='terminal_receipt_inventory_and_bill_audited',acquisition_complete=success,
                 source_commit=completion['source_commit'],request_receipts=receipts,
                 returned_body_bytes=body,interrupted_body_upper_bound=uncertain,
-                two_task_body_upper_bound=OLD_BODY_BOUND+body+uncertain,cumulative_disk_bytes=current_disk,
+                two_task_body_upper_bound=prior+body+uncertain,cumulative_disk_bytes=current_disk,
                 native_indexed_rows_verified=indexed if success else None,
                 certified_formal_or_hidden=0,training_frames=0,evaluation_frames=0,
                 limitation='An audited failure is not complete input. Successful input is neither an atomic snapshot nor proof of hidden independence, original RSU/provider/cost compatibility or paper readiness.')
@@ -116,4 +124,5 @@ def audit(analysis):
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--analysis',type=Path,required=True);parser.add_argument('--output',type=Path,required=True)
-    args=parser.parse_args();save_new(args.output,audit(args.analysis));print('paged input terminal audit saved')
+    parser.add_argument('--expected_proposal_sha')
+    args=parser.parse_args();save_new(args.output,audit(args.analysis,expected_proposal_sha=args.expected_proposal_sha));print('paged input terminal audit saved')

@@ -1,3 +1,10 @@
+## 2026-10-28 Recovery producer and indexes
+
+- `scripts/recover_tgsim_paged_input.py`: explicit native query, bounded encoded/decoded bodies, opaque identity composition.
+- `tests/test_tgsim_recovery.py`: official ID punctuation, duplicate IDs, gzip/decoded limits and wire-byte accounting.
+- Recovery raw pages use `.csv.body`; encoding is bound in each receipt. Native CSV is separately derived.
+- `<asset>_system_ids.sqlite` verifies opaque IDs; `<asset>_identity.sqlite` verifies native run/vehicle/tick; neither certifies hidden independence.
+
 ## 2026-10-27 Query diagnostic capsule
 
 - `scripts/diagnose_tgsim_query.py`: fixed three-observation sequence; no scientific calls.

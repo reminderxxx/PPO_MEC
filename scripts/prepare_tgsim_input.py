@@ -90,7 +90,7 @@ class Budget:
         return min(65536, remaining, per_file_remaining)
 
 
-def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=None):
+def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=None, accept_gzip=False):
     """Exactly one request. Keep partial bytes and an error receipt on any failure."""
     validate_url(url)
     maximum_bytes = maximum_bytes or budget.proposal['max_download_bytes']
@@ -102,7 +102,7 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
     try:
         budget.guard()
         timeout = min(30., budget.proposal['max_wall_clock_seconds'] - (budget.clock() - budget.started))
-        request = urllib.request.Request(url, headers={'User-Agent': 'PPO-MEC-input-qualification/1.0', 'Accept-Encoding': 'identity'})
+        request = urllib.request.Request(url, headers={'User-Agent': 'PPO-MEC-input-qualification/1.0', 'Accept-Encoding': 'gzip' if accept_gzip else 'identity'})
         with destination.open('xb') as out, open_including_http_error(opener, request, timeout) as response:
             record.update(final_url=validate_url(response.geturl()), status_code=response.status,
                           response_headers=dict(response.headers))
@@ -112,8 +112,10 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
                 record.update(diagnostic_body_only=True, diagnostic_capture_cap_bytes=maximum_bytes)
             if not diagnostic and 'text/html' in response.headers.get('Content-Type', '').lower():
                 raise ValueError('HTML is not an approved metadata/CSV response')
-            if response.headers.get('Content-Encoding', 'identity').lower() not in ('identity', ''):
+            allowed_encodings = ('identity', '', 'gzip') if accept_gzip else ('identity', '')
+            if response.headers.get('Content-Encoding', 'identity').lower() not in allowed_encodings:
                 raise ValueError('compressed transfer outside this plain-CSV contract')
+            record['encoded_wire_body_retained'] = response.headers.get('Content-Encoding','identity').lower()=='gzip'
             length = response.headers.get('Content-Length')
             length = int(length) if length is not None else None
             if not diagnostic and length is not None and (length > maximum_bytes or length > budget.proposal['max_download_bytes'] - budget.download_bytes):

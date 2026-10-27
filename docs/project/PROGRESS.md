@@ -1,3 +1,7 @@
+## 2026-10-28 HTTP400 root cause identified; recovery qualification
+
+The retained compiler message states star selections must lead the select-list. Explicit native fields returnedHTTP200 for source1. Its legitimate opaque row ID exposed the old punctuation guard; that diagnostic remains sealed after2 observations. A separate remaining source2 probe is planned; total diagnostic budget stays3.42 synthetic producer/consumer checks pass for HTTP error capture, ID uniqueness, encoded pages, bounded decoding and audit. No complete new input or scientific benefit is yet asserted.
+
 ## 2026-10-27 User resumed query recovery
 
 Direct human continuation is recorded as a new bounded task. Missing HTTPError entities/headers are now captured under64KiB per error and counted;38 synthetic tests pass, including native chunk truncation, same-request HTTP errors, cumulative budgets and the three-observation diagnostic. No new network observation yet; science remains0 and paper goal incomplete.

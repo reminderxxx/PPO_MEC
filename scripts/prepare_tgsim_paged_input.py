@@ -87,7 +87,7 @@ def parse_count(path, expected):
 def system_id_key(value):
     if re.fullmatch(r'[0-9]+', value):
         return ('integer', int(value))
-    if re.fullmatch(r'row-[a-z0-9-]+', value):
+    if re.fullmatch(r'row-[a-z0-9._~-]+', value):
         return ('row_ascii', value)
     raise ValueError('unsupported or empty source system-ID representation')
 
@@ -150,16 +150,17 @@ def validate_plan(proposal_path, grant_path):
     return proposal, grant
 
 
-def acquire(proposal, raw, analysis, budget, *, opener=None):
+def acquire(proposal, raw, analysis, budget, *, opener=None, append_fn=None, gzip_pages=False):
     """All requests live here; any exception exits globally, never per-page retry."""
     opener = opener or urllib.request.build_opener(NoRedirect())
+    append_fn = append_fn or append_page
     result = dict(page_inventory=[], trajectory_checks=[], geometry_checks=[])
 
-    def get(url, path, receipt, cap=None, *, version_check=False):
+    def get(url, path, receipt, cap=None, *, version_check=False, gzip_body=False):
         if path.exists() or receipt.exists():
             raise FileExistsError('request output already exists')
         budget.request(url, version_check=version_check)
-        return fetch(url, path, budget, receipt, maximum_bytes=cap, opener=opener)
+        return fetch(url, path, budget, receipt, maximum_bytes=cap, opener=opener, accept_gzip=gzip_body)
 
     def source_check(source, phase):
         asset = source['asset_id']; meta = analysis/f'{asset}_metadata_{phase}.json'
@@ -183,10 +184,11 @@ def acquire(proposal, raw, analysis, budget, *, opener=None):
         with combined.open('x', newline='') as out:
             writer = csv.writer(out); writer.writerow(source['expected_native_fields'])
             for index, offset in enumerate(range(0, count, proposal['page_rows'])):
-                path = raw/f'{asset}_page_{index:03d}.csv'
+                path = raw/f'{asset}_page_{index:03d}.csv{(".body" if gzip_pages else "")}'
                 receipt = analysis/f'{asset}_page_{index:03d}_receipt.json'
-                info = get(page_url(source, offset, proposal['page_rows']), path, receipt)
-                previous, checked = append_page(path, source, writer, min(proposal['page_rows'], count-offset), previous, budget)
+                info = get(page_url(source, offset, proposal['page_rows']), path, receipt, gzip_body=gzip_pages)
+                extra = {'encoded_gzip':info['encoded_wire_body_retained']} if gzip_pages else {}
+                previous, checked = append_fn(path, source, writer, min(proposal['page_rows'], count-offset), previous, budget, **extra)
                 out.flush(); budget.guard()
                 entry = dict(asset_id=asset, page_index=index, offset=offset, limit=proposal['page_rows'],
                              path=path.name, bytes=info['bytes'], sha256=info['sha256'], **checked)
@@ -195,7 +197,7 @@ def acquire(proposal, raw, analysis, budget, *, opener=None):
         # Index each native row exactly once, after the complete page composition.
         check = inspect_trajectory(combined, source, analysis/f'{asset}_identity.sqlite', budget)
         check.update(derived_from_pages=True, bulk_byte_equality_claim=False,
-                     system_id_order_guard='numeric integers or ASCII row-*; unknown representations fail',
+                     system_id_order_guard=('server :id order requested; opaque IDs checked globally unique, encoded order not independently decoded' if gzip_pages else 'numeric integers or ASCII row-*; unknown representations fail'),
                      derived_csv_sha256=digest(combined))
         if check['rows'] != count:
             raise ValueError('native indexed count differs from source total')
