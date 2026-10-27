@@ -16,6 +16,8 @@
 后续论文证据工作按 [自主推进合同](docs/project/paper_goal_continuation_20261026.md)
 分阶段冻结预算、回收与独立审查。准备意图候选与旧论文主方法分版本保存，
 未获得完整 formal/holdout 证据前不替换论文主表。
+完整会话MC确认使用独立 [确认合同](docs/project/paper_complete_session_confirmation_20261027.md)
+及 `launch_stream_complete_session_study.py` 的单次有界campaign；不续写旧前缀研究。
 
 2026-10-16 持续请求共同学习适配：七算法及SA去预测版现消费request-bound新合同，已发布queue图/异构模型费用、请求记忆切换与含空闲期的团队tail已接入；DQN跨空闲/请求连接。GRU按新train分区重新固定拟合，旧checkpoint拒绝。八配置×3seed×64会话（上限737280训练帧）合同已冻结，正式运行/结果以`artifacts/joint_stream_learning/continuation.json`指针为准；未回收前不报告算法优势。 [共同学习合同](docs/project/joint_stream_learning_contract_20261016.md)。
 

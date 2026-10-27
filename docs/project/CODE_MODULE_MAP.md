@@ -1,3 +1,11 @@
+## 2026-10-27 完整会话MC确认生产/消费
+
+新四个study脚本只调用既有 `IntentAwareStreamSAGHMAPPOAgent` 与原环境：
+完整episode训练器记录真实每帧reward/释放请求，再生成native suffix/10与会计credit/8，
+不调用critic补尾、不重启fragment或补post-terminal步。auditor独立复算MC并核对晚到波、
+完整终止、参数/预算/原始cache；launcher冻结唯一campaign和seed执行声明，replay消费固定最终模型。
+旧prefix执行器与审查消费者保持原样，新labels/schema不混入旧run或默认benchmark。
+
 ## 2026-10-26 主方法准备意图候选
 
 `sa_ghmappo_agent.py::IntentAwareStreamSAGHMAPPOAgent` 只限制主方法的可选准备，

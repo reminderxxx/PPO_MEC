@@ -1,3 +1,23 @@
+## 2026-10-27 完整会话MC确认
+
+先读 `paper_complete_session_confirmation_20261027.md` 和独立时间暴露诊断。
+`run_stream_complete_session_study.py --parent_runs <three frozen cohort roots> --diagnosis <temporal_exposure_diagnosis.json> --seed 7 --preflight --output <fresh preflight>`
+在固定stream条件做两变体完整会话软件预检，原生奖励不用于选参数。
+用 `audit_stream_complete_session_study.py --runs <preflight> --opportunity <frozen probe> --preflight --output <fresh audit>`
+重建完整native MC、每车会计credit、idle、晚到波、真实终止和缓存账本。
+
+代码验证并clean commit、尝试push后，单次调用
+`launch_stream_complete_session_study.py --parent_runs <three frozen cohort roots> --diagnosis <diagnosis> --preflight_run <preflight> --preflight_audit <audit/analysis.json> --output <fresh campaign> --continuation <persistent continuation.json>`。
+它冻结输入/源码hash、144完整训练episode/69120帧上限、180评价/86400帧上限、9重放/4320帧上限，
+每seed原子一次execution claim，保存独立进程命令/PID/log并更新20分钟回收时间。
+科学seed输出为 `<campaign>/runs/seed7|17|27`；运行中不改tracked源码。
+结束后同一auditor对三seed运行，另用
+`replay_stream_complete_session_study.py --runs <three roots> --campaign <campaign/campaign.json> --output <fresh replay>`
+执行事前固定9个最终episode及初始父轨迹比较。
+新 `training_targets.jsonl` 独立保存行为/价值和完整suffix标签，消费者从原始reward逐帧复算。
+同外生会话和上限，不保证各策略实际终止帧数相同；不人为填补post-terminal帧。
+全部私有输出留在被Git忽略的analysis目录，不进入默认benchmark或正式主表。
+
 ## 2026-10-26 主方法准备意图研究
 
 先用 `diagnose_stream_preparation.py --runs <three final-cohort runs> --output <fresh diagnosis>`

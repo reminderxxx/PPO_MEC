@@ -1,3 +1,12 @@
+## 2026-10-27 完整会话确认入口
+
+- `scripts/run_stream_complete_session_study.py`：完整物理终止、native MC与显式训练标签生产端。
+- `scripts/launch_stream_complete_session_study.py`：单次campaign、唯一seed声明、预算/源码冻结与后台启动。
+- `scripts/audit_stream_complete_session_study.py`：MC、晚到暴露、真实终止、预算和缓存收据消费端。
+- `scripts/replay_stream_complete_session_study.py`：九个事前固定最终模型的独立物理重放。
+- `tests/test_stream_complete_session_study.py`：晚到/idle/tail、概率、上限和篡改拒绝验证。
+- 本地 `artifacts/analysis/paper_complete_session_*`：软件资格、campaign及科学seed原件，Git忽略。
+
 ## 2026-10-26 主方法准备意图研究
 
 - `scripts/diagnose_stream_preparation.py`：历史物理账本的独立只读浪费诊断。
