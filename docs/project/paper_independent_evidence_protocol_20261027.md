@@ -100,6 +100,37 @@ algorithm, observation/action mapping, update rules, hyperparameters and costs.
 At least one direction-matched strong external comparison still needs that audit.
 Do not silently substitute a similarly named local controller for it.
 
+The local `joint_stream_control_v2` dispatch has a static source map; this is
+separate from the generic registry's legacy algorithm contracts:
+
+| Local method | Stream specialization within the common controller |
+|---|---|
+| `mappo` | Shared role/action heads and central critic; no extra domain context |
+| `ppo` | Same actor/planner authority; appended central critic inputs zeroed |
+| `dqn` | Autoregressive Q/replay/target-head update, with common candidate features/planning |
+| `cache_offload_drl` | Learned mean cache context over four RSU execution candidates |
+| `dag_offload_drl` | Four released-DAG/workload scalars through a domain encoder |
+| `dt_handoff_drl` | Dedicated confidence/dwell/next-RSU/future-load scalar context |
+
+All six use common two-pass planning, forecast-aware features/masks, public cost
+priors, released queues, slot/current-model protection and LRU fallback. The PPO
+actor therefore still has shared planning/peer information; zeroing critic inputs
+does not establish decentralized information. Non-SA candidate graph vectors are
+zero. These are local adaptations, not six independently reproduced public papers.
+Static context differences do not certify distinct scientific actions or traces.
+The common planner and the main candidate's additional prior/intent restrictions
+must remain explicit in the comparison; do not change comparators to improve rank.
+
+Before a new learned comparison, bind each opt-in class, method/options, source
+and tensor hashes, active features and update schedule. Five PPO-family stream
+comparators share a checkpoint contract string, so that string alone cannot bind
+method identity. DQN snapshots do not include replay-complete resume state.
+Record actual replay/gradient/decision/compute and predictor exposure, and audit
+behavioral duplication prospectively on matched inputs. The old trainer/smoke
+does not qualify the draft new-time schedule, strict consumer or hidden opening.
+This mapping authorizes no implementation, tuning or scientific execution and
+does not demonstrate a historical wrong load, duplicate result or invalid run.
+
 Proposed resource envelope, subject to input/software qualification and a later
 explicit grant: ten learned configurations × three seeds ×144 complete episodes,
 at most480 frames each, or4320 episodes/2073600 actual training frames. Schedule

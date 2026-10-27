@@ -1,3 +1,16 @@
+## 2026-10-27：六个stream学习对照的静态合同已核对
+
+只读核对14份冻结源码，记录六方法的opt-in类、继承分派、信息、动作、更新与checkpoint合同。
+共享两阶段规划、预测特征/掩码、费用prior与LRU须作为共同组件披露；
+PPO仅去掉附加critic输入，不代表actor无共享信息。cache/DAG/DT各有上下文，
+静态差异不证明科学轨迹非重复，也不等于六篇公开论文的忠实复现。
+独立证据方案已补入方法身份、实际资源、行为去重与外部复现准入条件。
+未导入策略、加载模型、运行环境或读取新数据，训练/评价均为0；源码与既有结果不改。
+新增外部对照、公平新时间比较与formal/hidden/support仍需独立有界合同；数据准备问题仍待回复。
+reviewed_at=2026-10-27；literature_cutoff=本轮仅本地源码映射，未刷新算法文献；
+target_venue=CSCWD2027；policy_version=tmc_review_policy_v3_20260621；scientific_git=f24075b；
+evidence_level=STATIC_SOURCE_CONTRACT_MAP_ONLY；whole-paper=E0_UNAVAILABLE / Unverifiable，N/S。
+
 ## 2026-10-27：独立统计消费合同已只读核对
 
 数据准备指令待回复期间，仅核对既有统计/窗口消费者及合成软件样例；原有9项测试通过。

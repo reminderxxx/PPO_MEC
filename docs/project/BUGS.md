@@ -1,3 +1,12 @@
+## 2026-10-27：stream本地对照身份与外部复现仍须分开（OPEN）
+
+六个opt-in stream对照共用规划/信息与动作框架，不能套用generic registry的旧合同，
+或因名称相似而称外部论文复现。DAG为标量上下文，DT为独立移动上下文；
+源码不同不足以证明未来科学行为非重复。PPO的critic去中心输入也不消除actor的共享规划信息。
+五个PPO-family stream对照共用checkpoint合同字符串，新消费者须另外绑定method/options/class与hash；
+DQN保存不含完整replay续训状态。此轮仅静态映射，未证明历史错误加载、重复或无效结果。
+强方向匹配外部复现、公平历史/实际计算成本及新执行/评价消费链仍待独立验收，不在本轮改基线。
+
 ## 2026-10-27：stream统计适配尚未取得资格（OPEN）
 
 既有统计pair key含source文件名；拆开的method文件不会自动配对。
