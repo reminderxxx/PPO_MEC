@@ -1,3 +1,12 @@
+## 2026-10-27：新来源时间/坐标不自动兼容；LuST小数秒截断（OPEN）
+
+LuST exporter把FCD time经int(float(...))转换，provider再按整数分组。
+纯软件fixture的0.0/0.1秒同车两行均成为time_index0；不能直接用更小step_length
+生成480个不同物理tick。未改源码、未生成轨迹，旧1秒样本不因此无效。
+TGSIM的相对run时钟、米坐标与现有NGSIM原始数值/固定RSU几何需新输入合同；
+不同source/run的同ID或同time不可合并，不通过换数据集名称自动宣称独立泛化。
+来源准备只完成目录/schema可行性，未证明八车持续性、独立采集数或formal/hidden资格。
+
 ## 2026-10-27：历史执行身份缺口与独立输入容量（OPEN）
 
 历史低值Frame_ID与后来的segment/raw-time provider语义不能凭window ID或offset互换；

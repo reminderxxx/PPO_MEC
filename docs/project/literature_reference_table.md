@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-26
+更新日期：2026-10-27（新增输入来源参考；其他条目的原核验日期保留）
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -12,6 +12,19 @@
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
 ## 维护规范
+
+### 2026-10-27：独立移动性输入与时间语义核对
+
+仅公开关键词/发布方目录检索，未上传任何项目原件。本节用于数据取得与方法边界，
+不是整套novelty刷新或数值证据；未下载候选轨迹、训练或复现所列方法。
+
+| 方向 | 论文 / 报告 | Venue / 状态 | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 使用边界 |
+| --- | --- | --- | --- | --- | --- |
+| 新实测轨迹来源 | [Third Generation Simulation Data (TGSIM): A Closer Look at The Impacts of Automated Driving Systems on Human Behavior](https://rosap.ntl.bts.gov/view/dot/74647) | FHWA技术报告FHWA-JPO-24-133，2024-05-01；发布方书目/摘要核验 | 介绍固定/移动航拍及基础设施视频获取人类与自动驾驶车辆轨迹的方法。 | 可为独立实测移动性补充提供来源；仍需核对run相对时钟、车辆身份、坐标与当前RSU合同，不由官方目录推出可用八车会话或独立holdout。 | 数据方法背景；非顶刊论文、非VEC模型成本/请求质量证据。 |
+| 高速真实轨迹 | [The highD Dataset: A Drone Dataset of Naturalistic Vehicle Trajectories on German Highways for Validation of Highly Automated Driving Systems](https://doi.org/10.1109/ITSC.2018.8569552)；[发布方目录](https://levelxdata.com/highd-dataset/) | IEEE ITSC2018，2118–2125；官方引用信息核验 | 提供无人机提取的自然高速车辆轨迹；官方format分开recording/track元数据和轨迹，便于绑定采样与坐标。 | 当前highD provider仍为骨架；需要授权取得及frameRate、bounding-box位置、车辆ID作用域验收，不能直接当新独立主表输入。 | 数据来源背景；人工申请未提交，未下载，质量由发布方说明而非本项目复核。 |
+| 城市真实轨迹 | [On the new era of urban traffic monitoring with massive drone data: The pNEUMA large-scale field experiment](https://doi.org/10.1016/j.trc.2019.11.023)；[EPFL条款/书目](https://open-traffic.epfl.ch/index.php/terms-conditions/) | Transportation Research Part C111:50–71，2020；作者项目页书目核验，本文方法未复现 | 多无人机观测城市轨迹，提供与高速场景不同的多车交互输入。 | WGS84与不同采样率、每车重复时间字段及缺失覆盖须显式处理；未来若采用，只作受控移动性补充，不称joint AI/VEC trace。 | 数据候选；下载页许可文字存在差异，具体版本/文件与使用条件仍待核对。 |
+| 原始轨迹质量 | [A critical evaluation of the Next Generation Simulation (NGSIM) vehicle trajectory dataset](https://doi.org/10.1016/j.trb.2017.09.018) | Transportation Research Part B105:362–377，2017；出版社检索摘要核验，直接页面403/全文未审 | 用重新提取的轨迹检视NGSIM原始轨迹误差及其条件差异。 | 说明原始轨迹驱动实验仍需时间/单位/速度质量审计；清洗或另存同一采集不能当作新的独立采集，也不能据此推断本项目全部数据无效。 | 数据质量背景；不引用未核验的误差数值。 |
+| 交互预测参考 | [TrajPT: A trajectory data-based pre-trained transformer model for learning multi-vehicle interactions](https://doi.org/10.1016/j.trc.2025.105013) | Transportation Research Part C171:105013，2025；出版社摘要与作者机构书目核验 | 以轨迹的时空图与联合attention学习交互表征，预训练后用于车道切换和轨迹预测。 | 可作为未来预测对照线索；不能用轨迹预测排名替代RSU切换/ETA校准和准备净收益；本轮不改变冻结GRU。 | 非VEC缓存/迁移控制对照；源码、权重与匹配预算未审，不称已复现。 |
 
 ### 2026-10-26：准备浪费诊断后的近邻复核
 

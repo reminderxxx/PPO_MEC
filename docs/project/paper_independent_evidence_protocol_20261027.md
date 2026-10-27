@@ -25,6 +25,10 @@ local-provider proposal. No automatic download, overwrite, SUMO generation or
 provider substitution is authorized here. LuST remains a possible separately
 qualified simulation supplement; it cannot replace real-driving evidence by name.
 
+The source-specific next input-preparation proposal is
+`paper_tgsim_input_qualification_proposal_20261027.md`. Its proposed acquisition
+cap and input checks do not grant a new science budget or certify a hidden split.
+
 Proposed target: 12 formal outer time units and 12 separate hidden outer time
 units, each supporting a complete physical session of at most480 frames. A new
 matched-training study would additionally need 12 separate train outer time units.
