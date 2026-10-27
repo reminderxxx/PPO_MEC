@@ -74,3 +74,21 @@ This new contract supersedes the immediate-budget paragraph only for that new
 task; it never extends or rewrites the completed fixed-prefix experiment.
 New input/geometry/topology candidates are qualified locally; global historical
 exposure closure is pending, so no new hidden/formal split is asserted.
+
+## 2026-10-27 complete-session collection
+
+The single complete-session confirmation is finished at frozen scientific
+commit f24075b. All12 cells/24 checkpoints,144 terminal training episodes,
+180 fixed evaluations and nine prospective final-episode replays are audited.
+Its original development gate passes; the failed prefix run remains immutable.
+Full results, negative seeds/time units and the actual-resource fairness boundary
+are saved only in the local `paper_complete_session_review_20261027_v1` package.
+This is bounded consumed-train warm-start support, with E3 replay limited to
+the nine declared episodes. It does not promote canonical or manuscript claims.
+
+No further optimization against these three consumed training time sessions is
+authorized by this confirmation. The next phase is read-only history exposure
+closure and an independent-input/comparator/statistics/holdout protocol. Inspect
+metadata and provenance, without reading sealed scores or starting a new training
+campaign; unresolved intervals must remain unknown or conservatively excluded.
+A separate explicit bounded compute contract is required before that next run.

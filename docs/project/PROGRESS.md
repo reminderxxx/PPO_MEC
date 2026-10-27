@@ -1,3 +1,19 @@
+## 2026-10-27：完整会话MC确认已回收，局部开发门通过
+
+冻结科学源码f24075b，单次12单元/24checkpoint/144完整训练episode已完成，
+真实训练暴露、240帧晚到波、native MC完整尾和原始cache账本核验通过。
+180次固定评价与事前9个最终episode独立逐帧重放通过；9个control初始轨迹匹配原父模型。
+预设开发门通过；完整数值、seed/时间单元负例、实际帧/梯度成本和36条冻结规则复核
+仅保存在本地 `paper_complete_session_review_20261027_v1`，不覆盖原前缀失败结果。
+这是同外生会话与上限的warm-start局部支持；实际终止长度和梯度步不同，
+不能据此声称整套结构必要、收敛或独立泛化。论文和默认canonical保持原样。
+此确认预算已结束，不再围绕三个已消费train时段追加优化；下一阶段先闭合全历史暴露ledger，
+再冻结独立输入、强公平对照、统计和holdout开启规则，未启动另一套训练。
+reviewed_at=2026-10-27（Asia/Shanghai）；literature_cutoff=2026-10-26；target_venue=CSCWD2027；
+policy_version=tmc_review_policy_v3_20260621；scientific_git=f24075b；
+evidence_level=native-ledger/complete-MC audit plus E3 for9 predeclared train episodes only；
+whole-paper formal readiness=E0_UNAVAILABLE / Unverifiable，N/S。
+
 ## 2026-10-27：完整会话MC确认执行链已通过软件资格
 
 按独立确认合同新增完整会话训练、单次campaign启动、MC/晚到波/缓存审计和9固定重放入口。
