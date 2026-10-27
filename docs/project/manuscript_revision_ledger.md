@@ -248,3 +248,12 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 独立图源为 `scripts/plot_sagh_architecture.py`；本地交付在 `artifacts/figures/sagh_architecture_20261027/`，含可编辑 SVG、矢量 PDF、600 dpi PNG、英文图注、`validation.json` 和 `self_review.md`。原简化策略链 → 新图明确五分区、车辆 agent 共享 actor、图与候选表征、先全部选站点再重建日历的两遍协调、条件模型/事件头、联合执行、团队 Monte Carlo 回报、集中价值函数、条件基线、clipped PPO 与参数回流；surrogate 只连训练基线。
 - 验证：绘图生成、`py_compile`、`git diff --check` 通过；PDF 单页纯矢量、Times 字体嵌入，SVG 93 个可编辑文本，PNG 为 4252×3686；180 mm 宽时正文约 7.37 pt。最终预览目视检查无叠字、越框或箭头穿字。R20 DOCX hash 不变，未替换其 Fig. 2，IV-A 内既定位置保持。
 - 边界/未完成：本图是待作者采用的独立媒体候选，不是 R21 全文；实际插入论文后的分页和模板尺寸需另验。未训练或验证性能、组件因果增益与收敛，不作顶刊就绪判断。公开图式只作表达参考，新增相关线索已登记文献表；未向外部上传未公开材料。
+
+
+## 2026-10-27 论文用方法总览图重绘（独立媒体第二版）
+
+- 最新要求：用户强调用于论文，覆盖上一轮五层纵向解释图的呈现方式。只重绘独立算法图、图注和排版校样；R20 正文与 Fig. 2 的 IV-A 位置不变。
+- 基线：R20 DOCX SHA-256 仍为 `0b8aa78cc0aeb8741f256f7fe14f90d18e1a2ae2c24f20f2885e880a02cf99ca`；科学合同继续取 `35975cb3d73c84ddbabf01f6749bbc2d60c826de` 的 StreamControlPPO。上一轮图在 `artifacts/figures/sagh_architecture_20261027/` 保留。
+- 前后对照：原 180×156 mm 纵向文字卡片 → 新 180×114 mm 横向状态/编码/共享条件策略/环境，上下分开在线与训练；用 DAG、网络符号、预约槽、策略分解与短标签替代长句，保留多车共享 actor、两遍协调、booking 更新反馈和训练基线专用 surrogate。典型标签约 7.94 pt；图源为 `scripts/plot_sagh_paper_overview.py`。
+- 新交付：`artifacts/figures/sagh_paper_overview_20261027/` 内的矢量 PDF、可编辑 SVG、600 dpi PNG、英文图注、自审和验证；独立 Letter 双栏通栏校样使用 R20 方法片段，不写回 DOCX，不作为新版全文。
+- 验证：绘图脚本、`py_compile`、`git diff --check`、PDF/SVG 结构与 Poppler 渲染通过，最终图和实际尺寸校样目视检查无越框、穿字或图注重叠；R20 hash 未变。未运行算法实验；完整论文分页和官方模板验收未覆盖。第二版作为论文候选优先使用，未晋级性能或顶刊就绪结论。
