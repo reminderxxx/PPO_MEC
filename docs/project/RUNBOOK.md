@@ -1,3 +1,26 @@
+## 2026-10-28 奖励学习曲线单次执行与自动回收
+
+先读`paper_reward_curve_contract_20261028.md`与一手图页核验。用户本轮授权的独立curve任务不依赖TGSIM修复。
+64项软件资格通过后，冻结clean commit、完整source与输入SHA、cases/schedule/probes、九重放和fresh输出，
+由launcher单次启动3worker；source运行中冻结，部分失败保留且不按奖励续跑。
+
+```bash
+python scripts/launch_stream_reward_curve.py --campaign <frozen_campaign.json> --expected_sha <sha>
+```
+
+launcher完成20cell后自动调用`collect_stream_reward_curve.py`核账、规则/九重放和绘图，不要并行手动再执行collector。
+`run_stream_reward_curve.py`只由launcher按frozen方法/seed路径分发。最大1393920物理帧/48小时/10GiB；
+每cell96训练/48评价、13checkpoint，fixedfinal96。每20分钟核对一次身份/完成/失败与单元数，正常未变安静。
+回收失败先独立诊断，必要时新只读consumer恢复任务；不得删改原件、重新训练补图或按表现挑种子。
+
+```bash
+python -m pytest -p no:cacheprovider tests/test_stream_reward_curve.py tests/test_stream_reward_curve_collection.py tests/test_stream_reward_curve_launcher.py -q
+```
+
+64通过；测试的完整软件cell使用合成环境，不是论文科学样本。绘图库可用`requirements_reward_figures.txt`安装。
+图件同时输出PDF/SVG/600dpi PNG、每seed CSV、实际交互帧补图、caption/hash与资源CSV。
+共享冻结GRU有旧拟合暴露；本地学习对照共planner，不能称外部论文忠实复现。已消费train曲线不等于泛化。
+
 ## 2026-10-28 原生空值终止与独立行账本软件修正
 
 附件入口恢复已终止：固定16附件和第二源21页保留，但`yloc_kf`空值导致原生检查失败，

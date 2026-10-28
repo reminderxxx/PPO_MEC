@@ -1,3 +1,13 @@
+## 2026-10-28 奖励图独立任务
+
+- `scripts/run_stream_reward_curve.py`：一个方法/seed的96训练、48固定评价、13checkpoint和gzip原生收据。
+- `scripts/launch_stream_reward_curve.py`：一次campaign、三worker、硬资源界限与失败传播，完成后自动回收。
+- `scripts/collect_stream_reward_curve.py`：逐帧/MC/初始化/checkpoint/花费核验、规则和九前瞻独立重放。
+- `scripts/plot_stream_reward_curve.py`：legacy诊断或审计绑定的固定策略图、实际帧图与矢量导出。
+- 私有`paper_reward_figure_20261028_v1/`保存授权/历史资格/冻结plan/验证/图；
+  私有`paper_reward_curve_campaign_20261028_v1/`保存20cell与collection，不上传原件。
+- 对应三个`tests/test_stream_reward_curve*.py`只运行合成资格；不创建新的正式论文或provider入口。
+
 ## 2026-10-28 原生失败账本
 
 - `tests/test_tgsim_native_failure_accounting.py`：拒绝行收费、插入计数、版本防降级和父链消费合成测试。

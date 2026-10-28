@@ -1,3 +1,12 @@
+## 2026-10-28 奖励曲线生产与消费
+
+新curve runner复用原`stream_episode`完整native team MC、`make_env`和固定agent factory，
+只包装资源/收据与独立loaded evaluator/RNG隔离，不改算法或奖励。optimizer.step仅观察计数，调用后恢复原方法。
+launcher负责claim、3worker、总deadline/磁盘与终端自动collector；collector独立重建逐帧回报/MC、
+物理control/roll对应、fresh-seed权重、class/options/hash与资源账，执行冻结规则/九重放。
+plotter从audit重建固定probe点并验证全部method/seed/checkpoint，真实帧补图不作错位预算插值；
+图件不由manuscript或summary直接反推。该路径不接入live registry/canonical或改变主算法职责。
+
 ## 2026-10-28 原生行尝试与插入分账
 
 `prepare_tgsim_input.Budget`仍以`rows`计尝试/执行硬上限，另以`rows_inserted`计成功INSERT。

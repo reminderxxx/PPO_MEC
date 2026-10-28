@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-27（新增输入来源参考；其他条目的原核验日期保留）
+更新日期：2026-10-28（新增奖励图的一手图页/统计参考；其他条目的原核验日期保留）
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -12,6 +12,18 @@
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
 ## 维护规范
+
+### 2026-10-28：奖励与学习曲线图页参考
+
+本轮直接阅读公开作者/会议 PDF 并渲染相关整页，未上传项目材料，未复现原论文数值。
+完整轴、图号、重复次数、阴影语义、未披露字段及本项目执行规范见
+[奖励图核验](paper_reward_figure_reference_20261028.md)。已有 MAPPO、ToN 容器迁移与 SR-CL 条目不重复新增论文；其本轮核验范围分别为 Fig.2、Fig.11 和 Fig.8。期刊已发表不等于其每个图都具备充分 seed/CI 披露，不能照搬不明确的误差带。
+
+| 方向 | 论文 / 一手来源 | Venue / 状态 | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 使用边界 |
+| --- | --- | --- | --- | --- | --- |
+| RL 统计与样本效率图 | [Deep Reinforcement Learning at the Edge of the Statistical Precipice](https://papers.neurips.cc/paper_files/paper/2021/hash/f514cec81cb148559cf475e7426eed5e-Abstract.html)；[正式 PDF](https://papers.nips.cc/paper/2021/file/f514cec81cb148559cf475e7426eed5e-Paper.pdf) | NeurIPS 2021，正式会议页/全文核验 | Fig.10 用真实训练 frames 对 IQM 分数并明确点态 95% 分层 bootstrap CI；分析固定 final 与训练中最大值不同口径的偏差。 | 本项目应冻结原始评价回报、配对条件与窗口外层统计；不得以重叠窗口伪增独立样本，也不得为使图显著事后选择聚合量。 | 作图/评估方法参考，非 VEC 算法对照；不由该文推出 3 seeds 已足够或本项目通过正式统计门。 |
+| ISAC/VEC 奖励曲线 | [Lyapunov-Guided Offloading Optimization Based on Soft Actor-Critic for ISAC-Aided Internet of Vehicles](https://cam.tju.edu.cn/homepage/wuhuaming/PDF/TMC_Liang.pdf)；[作者机构目录](https://cam.tju.edu.cn/homepage/wuhuaming/PDF/) | IEEE TMC 23(12):14708–14721，2024；DOI `10.1109/TMC.2024.3445350`，作者所存最终出版 PDF 核验 | Fig.5 将 LySAC/LyDDPG 的 Average Reward 对 Iteration Number，与 Fig.6 系统成本并列；正文说明阴影变异来自三个 learning rates。 | 可借鉴奖励与物理成本并列；本项目误差带需按独立 seed/窗口精确定义，不能把学习率差异当 seed CI。该文 ISAC/SAC 不等于当前离散 controller 级 MAPPO。 | 图页参考，不是外部方法忠实复现；当前核验版未定位 seed 数、阴影公式和平滑窗。 |
+| 主动状态迁移近邻线索 | [A Mobility-Aware Reinforcement Learning Proactive Solution for State Data Migration in Edge Computing](https://ieeexplore.ieee.org/document/10943072/) | IEEE CAMAD 2024，2025-04-07 进入 Xplore；DOI `10.1109/CAMAD62243.2024.10943072`；IEEE 书目/摘要核验 | 摘要联合 DL/RL、移动性和 state data proactive migration，强调服务延迟 SLA。 | 跨 RSU 连续 DAG、adapter 准备与迁移成本仍须独立机制证据，不能把通用预测+RL 状态迁移本身当创新。 | 本轮检索附带发现，尚未核其实际奖励图/全文，不计入五篇图页核验或顶刊对照。 |
 
 ### 2026-10-27：独立移动性输入与时间语义核对
 
@@ -35,11 +47,11 @@
 | --- | --- | --- | --- | --- | --- |
 | 移动预测与迁移成本 | [Intelligent service migration for the internet of vehicles in edge computing: A mobility-aware deep reinforcement learning framework](https://www.sciencedirect.com/science/article/pii/S1389128624008533) | Computer Networks 257:111021, 2025；DOI 10.1016/j.comnet.2024.111021；出版社摘要核验 | HMM 预测车辆行为，结合 double-dueling DQN 与 prioritized replay 优化时延/能耗。 | 预测+DRL迁移已有近邻；需检验 typed model 准备、连续 DAG 状态恢复和共享资源浪费的额外收益，不能把加预测器本身当创新。 | B-Supporting；未核全文/代码，不称忠实复现。 |
 | 预测缓存与卸载组合 | [Cache-assisted task offloading in Vehicular Edge Computing: A spatio-temporal deep reinforcement learning approach](https://www.sciencedirect.com/science/article/pii/S0140366425003081) | Computer Communications, 2025；DOI 10.1016/j.comcom.2025.108351；出版社摘要核验 | ST-FGCN 需求预测、PIECC 协同缓存、GA3C 卸载形成三模块管线。 | “预测+图网络+缓存+RL”组合不足以支撑新颖性；必须验证执行意图一致的准备、持续状态迁移和模块净贡献。缓存对象语义仍需全文核验。 | 近邻矩阵；不推断其未研究任何机制。 |
-| 多用户共享层迁移 | [Multi-User Layer-Aware Online Container Migration in Edge-Assisted Vehicular Networks](https://ieeexplore.ieee.org/document/10315072/) | IEEE/ACM ToN 32(2):1807–1822, 2024；DOI 10.1109/TNET.2023.3330255；IEEE 摘要核验 | attention/LSTM 提取多用户层共享信息，策略梯度选择在线容器迁移。 | 共享 base/adapter 可能重复已有 layer sharing；区别须落在 adapter 依赖、DAG 持续状态、准备兑现与付费链路，而非简单共享权重概念。 | A-Adjacent；container layer 不等于 adapter，全文对比待补。 |
+| 多用户共享层迁移 | [Multi-User Layer-Aware Online Container Migration in Edge-Assisted Vehicular Networks](https://ieeexplore.ieee.org/document/10315072/)；[作者最终稿](https://fangyimou.github.io/papers/ton-2024.pdf) | IEEE/ACM ToN 32(2):1807–1822, 2024；DOI 10.1109/TNET.2023.3330255；2026-10-28 追加 Fig.11 / 实验段核验 | attention/LSTM 提取多用户层共享信息，策略梯度选择在线容器迁移；Fig.11(c) 提供 Epoch 对 Average Total Reward 的真实图例。 | 共享 base/adapter 可能重复已有 layer sharing；区别须落在 adapter 依赖、DAG 持续状态、准备兑现与付费链路，而非简单共享权重概念。 | A-Adjacent；container layer 不等于 adapter。正文重复 5–6 次不等于已明确 6 seeds；阴影术语未给公式。其他机制的完整复现/比较仍未进行。 |
 | PPO/MAPPO 服务迁移 | [Multi-Agents Service Migration Strategy Under Vehicle Edge Computing](https://ieeexplore.ieee.org/abstract/document/11097660) | IEEE IV, 2025；DOI 10.1109/IV64158.2025.11097660；IEEE 摘要核验 | PERFT、RNN、attention 与 CTDE/MAPPO 结合。 | 仅堆叠 PPO 优化组件不构成差异；PPO_MEC 需冻结同动作/信息/成本预算并证明服务与机制收益。 | 方法近邻，不是当前仓库 comparator 的外部原型实现。 |
 | 同方向期刊扩展线索 | [Prioritized Experience Replay and Four-Trajectory Exploration - Multi-agents Proximal Policy Optimization: Multi-agents Reinforcement Learning-Based service migration strategy under vehicular edge computing](https://www.sciencedirect.com/science/article/abs/pii/S0045790625007797) | Computers & Electrical Engineering；DOI 10.1016/j.compeleceng.2025.110836；出版社检索摘要，正式卷期/年份待核 | 公开摘要描述 PERFT-PPO 与 PERFT-MAPPO 的资源/迁移控制。 | 同上；与 IV 论文的扩展关系待全文核验，不计为独立复现实验。 | 元数据/全文待核；页面直接读取403。 |
 | 生成预测与多时间尺度 MARL | [Generative Multi-Agent Reinforcement Learning for Priority-Aware Task Offloading and Service Caching in Vehicular Edge Networks](https://pure.kfupm.edu.sa/en/publications/generative-multi-agent-reinforcement-learning-for-priority-aware-/) | 作者机构页列 IEEE TVT accepted/in press, 2026；DOI 10.1109/TVT.2026.3726814；IEEE 原页/最终出版待核 | 机构摘要描述生成预测、层级双时间尺度与 actor-critic 的联合缓存/卸载。 | 该组合进一步压缩宽泛结构创新；本项目应以真实可观测的连续执行/adapter 准备代价和因果消融区分。 | 暂不评 venue 质量等级；摘要/状态由作者机构给出，未核全文。 |
-| 无缝迁移与资源分配线索 | [Mobility-Aware Seamless Service Migration and Resource Allocation in Multi-Edge IoV Systems](https://doi.org/10.1109/TMC.2025.3540407) | 2025 TMC 线索；本轮 DOI 页面不可访问，卷页/方法待一手核验 | 可检查迁移决策与资源分配耦合、轨迹及 testbed 证据要求，尚不引用具体算法结论。 | PPO_MEC 需独立强比较与物理校准；不能凭合成成本宣称真实无缝迁移。 | Unverified；不得凭二手摘要确定结果。 |
+| 无缝迁移与资源分配线索 | [Mobility-Aware Seamless Service Migration and Resource Allocation in Multi-Edge IoV Systems](https://doi.org/10.1109/TMC.2025.3540407)；[作者 arXiv 全文](https://arxiv.org/abs/2503.13494) | 2025 TMC 线索；2026-10-28 作者稿 Fig.8 和实验段已核验，DOI 页面仍不可访问，最终卷页待一手核对 | SR-CL 将异步 actor-critic 服务迁移与凸优化资源分配结合；Fig.8 并列训练奖励及迁移频率。 | PPO_MEC 需独立强比较与物理校准；可以借鉴奖励加迁移代价图，不能凭合成成本宣称真实无缝迁移。 | 作者版本的方法/图页已核，不把未定位的 seed/平滑/CI 补猜为完整披露；正式出版卷页、外部方法复现仍未核验。 |
 | 迁移计算/通信费用线索 | [Computing and Communication Cost-Aware Service Migration Enabled by Transfer Reinforcement Learning for Dynamic Vehicular Edge Computing Networks](https://doi.org/10.1109/TMC.2022.3225239) | TMC 线索；本轮 DOI 页面不可访问，年份/卷页待一手核验 | 可检查迁移计算与通信成本的联合核算；方法细节待核。 | 本项目恢复状态的节点尺度成本需真实账本与对照，不能只改 reward 权重。 | Unverified；暂不引用数值结论。 |
 | 主动迁移流程线索 | [MAPSM: Mobility-Aware Proactive Service Migration Framework for Mobile-Edge Computing in Consumer Internet of Vehicles](https://doi.org/10.1109/TCE.2025.3563627) | TCE 2025 线索；DOI 页面不可访问，最终元数据待一手核验 | 可检查预测、预迁移与切换流程的时序验证；具体方法待核。 | 本项目应分离预测精度、准备实际使用、迁移净收益，不把三者等同。 | Unverified；不作为已复现 baseline。 |
 | actor-critic 迁移线索 | [VRCCS-AC: Reinforcement Learning for Service Migration in Vehicular Edge Computing Systems](https://doi.org/10.1109/TSC.2024.3407581) | TSC 2024 线索；DOI 页面不可访问，最终元数据/方法待一手核验 | 服务迁移 actor-critic 近邻线索；尚无本轮一手方法核验。 | 需明确与同类控制对象及预算的差异，不能凭名称比较优劣。 | Unverified；待官方全文/书目核验。 |

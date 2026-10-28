@@ -1,3 +1,13 @@
+## 2026-10-28：当前主方法缺少密集固定策略学习曲线（OPEN）
+
+旧64集训练回报随外生任务强烈变化，固定评价仅ep32/64；当前完整会话只有initial/final三次更新。
+不能把不同版本/条件的训练点、warm-start继承表现或插值包装成当前from-scratch收敛证据。
+公开部分期刊图未披露seed/阴影公式，或阴影来自学习率，不能复制其外形而猜统计含义。
+独立曲线任务64项软件资格通过，尚无新科学结果；训练episodes相同也不意味着实际帧/梯度/compute相同。
+主图保留全部seed和固定三probe，另给真实帧图与资源账本；共同planner/本地实现边界、共享旧GRU拟合、
+已消费train及负seed/回退须保留。固定final12不可替换三probe最后点，也不能根据新曲线回头挑checkpoint。
+[合同](paper_reward_curve_contract_20261028.md)。整体paper-ready继续Unverifiable。
+
 ## 2026-10-28：第二源原生横向坐标缺失；旧失败行账本不一致（OPEN / SOFTWARE FIXED）
 
 固定16附件新地址均HTTP200且矩形CSV形状核对通过，第二源21页/1024281 opaque身份保留。

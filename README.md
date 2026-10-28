@@ -1,3 +1,12 @@
+## 2026-10-28 奖励图独立闭环任务
+
+用户最新要求单独推进奖励图；TGSIM输入失败不阻塞该任务。已核对[五篇一手图页](docs/project/paper_reward_figure_reference_20261028.md)，
+并从768个旧训练点生成明确标记legacy的诊断图。当前主方法密集固定策略曲线仍缺，不能插值伪造收敛。
+[新合同](docs/project/paper_reward_curve_contract_20261028.md)固定主方法/MAPPO/PPO/DQN×5seed×96完整训练episode，
+共13个固定checkpoint；从随机策略开始，共享冻结已拟合GRU。64项软件资格通过，启动前冻结clean commit/plan。
+`launch_stream_reward_curve.py`完成后自动核账、九重放并导出PDF/SVG/PNG；不修改奖励、环境、规则或其他算法。
+已消费train学习图不等于formal/holdout泛化，整体论文目标仍未完成。
+
 ## 2026-10-28 最新输入终端状态与失败账本
 
 16份附件与第二轨迹21页已保留，但原生横向坐标空值使输入资格失败；后置版本未核验。
