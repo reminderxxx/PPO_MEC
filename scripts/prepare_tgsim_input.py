@@ -76,6 +76,8 @@ class Budget:
         self.proposal, self.directories, self.clock = proposal, directories, clock
         self.started = clock()
         self.download_bytes = self.rows = 0
+        self.rows_inserted = 0
+        self.native_input_failure = None
         self.interrupted_body_upper_bound = 0
 
     def guard(self):
@@ -92,6 +94,33 @@ class Budget:
         if remaining <= 0 or per_file_remaining <= 0:
             raise BudgetLimit('download byte budget reached')
         return min(65536, remaining, per_file_remaining)
+
+
+def native_row_counters(budget):
+    """Rejected rows still spend the attempt budget; INSERTs are counted separately."""
+    return dict(native_row_accounting_version='attempts_and_insertions_v1',
+                rows_examined=budget.rows, rows_indexed=budget.rows_inserted,
+                native_input_failure=budget.native_input_failure)
+
+
+def native_row_counts(record):
+    """Return charged attempts and insertions, without reinterpreting old records."""
+    indexed = record.get('rows_indexed', 0)
+    version = record.get('native_row_accounting_version')
+    if version is None:
+        if 'rows_examined' in record:
+            raise ValueError('native attempt counts require an accounting version')
+        attempted = indexed
+    elif version == 'attempts_and_insertions_v1':
+        if 'rows_indexed' not in record:
+            raise ValueError('missing native insertion count')
+        attempted = record['rows_examined']
+    else:
+        raise ValueError('unknown native row accounting version')
+    if (type(attempted) is not int or type(indexed) is not int
+            or not 0 <= indexed <= attempted):
+        raise ValueError('invalid native row attempt/insertion counts')
+    return attempted, indexed
 
 
 def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=None, accept_gzip=False, read_timeout_seconds=30):
@@ -259,9 +288,21 @@ def inspect_trajectory(path, source, database, budget):
                 budget.rows += 1; rows += 1
                 if None in row or any(row.get(k) is None for k in expected):
                     raise ValueError(f'ragged row at line{reader.line_num}')
-                numbers = {k: float(row[k]) for k in numeric}
-                if not all(math.isfinite(v) for v in numbers.values()):
-                    raise ValueError(f'nonfinite numeric value at line{reader.line_num}')
+                numbers = {}
+                for key in numeric:
+                    try:
+                        value = float(row[key])
+                    except (ValueError, OverflowError) as error:
+                        budget.native_input_failure = dict(asset_id=source['asset_id'],
+                            column=key, physical_line=reader.line_num,
+                            value=row[key][:128], reason='invalid_numeric')
+                        raise ValueError(f'{source["asset_id"]}: invalid numeric field {key} at line{reader.line_num}') from error
+                    if not math.isfinite(value):
+                        budget.native_input_failure = dict(asset_id=source['asset_id'],
+                            column=key, physical_line=reader.line_num,
+                            value=row[key][:128], reason='nonfinite_numeric')
+                        raise ValueError(f'{source["asset_id"]}: nonfinite numeric field {key} at line{reader.line_num}')
+                    numbers[key] = value
                 t = Decimal(row['time']); tick = t * 10
                 run, vehicle = Decimal(row['run_index']), Decimal(row['id'])
                 if any(x != x.to_integral_value() for x in (tick, run, vehicle)) or t < 0:
@@ -271,6 +312,7 @@ def inspect_trajectory(path, source, database, budget):
                     connection.execute('INSERT INTO samples VALUES(?,?,?)', (run, vehicle, tick))
                 except sqlite3.IntegrityError as error:
                     raise ValueError(f'duplicate source/run/vehicle/time at line{reader.line_num}') from error
+                budget.rows_inserted += 1
                 x, y = numbers['xloc_kf'], numbers['yloc_kf']
                 b = bounds.setdefault(run, [x, x, y, y])
                 b[:] = [min(b[0], x), max(b[1], x), min(b[2], y), max(b[3], y)]
@@ -379,6 +421,7 @@ def execute(proposal_path, grant_path):
                        body_byte_accounting='successfully returned payload plus explicit interrupted-read upper bound; not an exact network byte total',
                        rows_examined=budget.rows, new_disk_bytes=sum(p.stat().st_size for root in [raw,analysis] for p in root.rglob('*') if p.is_file()),
                        raw_files=[dict(path=p.name,bytes=p.stat().st_size,sha256=digest(p)) for p in raw.iterdir() if p.is_file()])
+        receipt.update(native_row_counters(budget))
         save_new(analysis/'completion.json', receipt)
     print(json.dumps({k:receipt[k] for k in ['status','elapsed_seconds','total_body_download_bytes','rows_examined','training_frames','evaluation_frames']}), flush=True)
 

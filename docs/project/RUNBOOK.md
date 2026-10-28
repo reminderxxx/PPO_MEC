@@ -1,3 +1,16 @@
+## 2026-10-28 原生空值终止与独立行账本软件修正
+
+附件入口恢复已终止：固定16附件和第二源21页保留，但`yloc_kf`空值导致原生检查失败，
+后置版本/count未执行。原审计已单次尝试并因19047尝试/19046实际INSERT差异拒绝。
+不得再次执行该run或audit，也不以新软件重写原失败。以下旧取数入口仅为历史说明。
+
+新字段合同见[软件说明](paper_tgsim_native_failure_accounting_20261028.md)：
+`native_row_accounting_version=attempts_and_insertions_v1`要求`rows_examined`收费、
+`rows_indexed`核对实际SQLite，父链也扣除拒绝尝试；未知/降级版本拒绝。
+新测试`tests/test_tgsim_native_failure_accounting.py`与此前六组共101项合成验证通过。
+本轮无真实数据重跑、新网络、索引或科学执行；当前无活动job。
+后续本地缺失分布合同及版本闭合须独立冻结范围，不能按剩余额度自动恢复旧任务。
+
 ## 2026-10-28 已批准附件地址与完整源引用任务
 
 读取`paper_tgsim_geometry_endpoint_recovery_proposal_20261028.md`。人工grant绑定原私有方案SHA，

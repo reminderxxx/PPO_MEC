@@ -4,10 +4,10 @@ import math
 from pathlib import Path
 
 try:
-    from scripts.prepare_tgsim_input import BudgetLimit, digest, fetch, save_new
+    from scripts.prepare_tgsim_input import BudgetLimit, digest, fetch, save_new, native_row_counts
     from scripts.prepare_tgsim_paged_input import ROOT, PRIVATE
 except ModuleNotFoundError:
-    from prepare_tgsim_input import BudgetLimit, digest, fetch, save_new
+    from prepare_tgsim_input import BudgetLimit, digest, fetch, save_new, native_row_counts
     from prepare_tgsim_paged_input import ROOT, PRIVATE
 
 RETRY_POLICY_SHA = '98b13e620983b304c4adb50a42c93594c50824b4c34eadeb53d0dc2367bd50f1'
@@ -39,6 +39,7 @@ def ancestor_bill(plan, *, allow_indexed_parent=False):
         if not path.is_relative_to(ROOT.resolve()) or digest(path) != current['continuation_parent_completion_sha256']:
             raise ValueError('ancestor completion SHA/path differs')
         completion = json.loads(path.read_text())
+        attempted_rows, _ = native_row_counts(completion)
         parent_path = Path(completion['command_arguments']['proposal']).resolve()
         if (not any(parent_path.is_relative_to(root.resolve()) for root in (ROOT, PRIVATE))
                 or digest(parent_path) != completion['proposal_sha256']
@@ -51,13 +52,13 @@ def ancestor_bill(plan, *, allow_indexed_parent=False):
         if (claim['proposal'] != parent or claim['proposal_sha256'] != completion['proposal_sha256']
                 or claim['source_commit'] != completion['source_commit']
                 or completion['status'] != 'failed_preserved_do_not_retry'
-                or (completion['rows_indexed'] != 0 and not allow_indexed_parent)):
+                or (attempted_rows != 0 and not allow_indexed_parent)):
             raise ValueError('ancestor provenance/status/native indexing differs')
         for key in ('training_frames', 'evaluation_frames', 'hidden_openings'):
             if completion[key] != 0 or claim[key] != 0:
                 raise ValueError('ancestor input-only boundary differs')
         values = [completion[k] for k in ('total_body_download_bytes_upper_bound',
-                   'http_requests', 'elapsed_seconds', 'decoded_csv_bytes','rows_indexed')]
+                   'http_requests', 'elapsed_seconds', 'decoded_csv_bytes')] + [attempted_rows]
         if any(not math.isfinite(v) or v < 0 for v in values):
             raise ValueError('invalid ancestor resource spend')
         chain.append(dict(path=str(path), sha256=digest(path), plan_sha256=completion['proposal_sha256'],
@@ -71,14 +72,17 @@ def ancestor_bill(plan, *, allow_indexed_parent=False):
     caps = dict(ORIGINAL_CAPS); prior = current['prior_accounted_body_bound']; elapsed = 0.
     for item in reversed(chain):
         parent = item['plan']; previous = item['completion']
+        attempted_rows, _ = native_row_counts(previous)
         expected = dict(caps)
         if any(parent[k] != v for k,v in expected.items()):
             raise ValueError('ancestor budget was reset or enlarged')
         for spend,limit in (('total_body_download_bytes_upper_bound','max_download_bytes_new_task'),
                             ('http_requests','maximum_http_requests'),('elapsed_seconds','max_wall_clock_seconds'),
-                            ('decoded_csv_bytes','max_decoded_csv_bytes'),('rows_indexed','max_rows_to_index')):
+                            ('decoded_csv_bytes','max_decoded_csv_bytes')):
             if previous[spend] > parent[limit]:
                 raise ValueError('ancestor already exceeded its resource budget')
+        if attempted_rows > parent['max_rows_to_index']:
+            raise ValueError('ancestor already exceeded its native attempt budget')
         if parent['prior_accounted_body_bound'] != prior:
             raise ValueError('ancestor accumulated transfer bill not carried forward')
         prior += previous['total_body_download_bytes_upper_bound']
@@ -87,7 +91,7 @@ def ancestor_bill(plan, *, allow_indexed_parent=False):
         caps['max_download_bytes_new_task'] -= previous['total_body_download_bytes_upper_bound']
         caps['maximum_http_requests'] -= previous['http_requests']
         caps['max_decoded_csv_bytes'] -= previous['decoded_csv_bytes']
-        caps['max_rows_to_index'] -= previous['rows_indexed']
+        caps['max_rows_to_index'] -= attempted_rows
         # Carry the stricter integer executor cap at each boundary. Do not
         # recover discarded fractional seconds in a later continuation.
         caps['max_wall_clock_seconds'] = int(caps['max_wall_clock_seconds']-previous['elapsed_seconds'])

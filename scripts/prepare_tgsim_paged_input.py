@@ -15,10 +15,10 @@ import urllib.request
 
 try:
     from scripts.prepare_tgsim_input import (ASSETS, HOST, ROOT, Budget, BudgetLimit,
-        digest, fetch, inspect_geometry, inspect_trajectory, metadata_pin, save_new)
+        digest, fetch, inspect_geometry, inspect_trajectory, metadata_pin, save_new, native_row_counters)
 except ModuleNotFoundError:
     from prepare_tgsim_input import (ASSETS, HOST, ROOT, Budget, BudgetLimit,
-        digest, fetch, inspect_geometry, inspect_trajectory, metadata_pin, save_new)
+        digest, fetch, inspect_geometry, inspect_trajectory, metadata_pin, save_new, native_row_counters)
 
 PROPOSAL_SHA = '71abfd4dfb1937ad694effa2b8d41e2f3d6b14bc3c02164b290c42b5a8e15a64'
 OLD_BODY_BOUND = 187500016
@@ -305,8 +305,9 @@ def execute(proposal_path, grant_path):
         record.update(elapsed_seconds=budget.clock()-budget.started,total_body_download_bytes=budget.download_bytes,
                       total_body_download_bytes_upper_bound=budget.download_bytes+budget.interrupted_body_upper_bound,
                       two_task_body_upper_bound=OLD_BODY_BOUND+budget.download_bytes+budget.interrupted_body_upper_bound,
-                      http_requests=budget.requests,rows_indexed=budget.rows,cumulative_disk_bytes=disk_bytes(roots),
+                      http_requests=budget.requests,cumulative_disk_bytes=disk_bytes(roots),
                       raw_files=[dict(path=p.name,bytes=p.stat().st_size,sha256=digest(p)) for p in sorted(raw.iterdir()) if p.is_file()])
+        record.update(native_row_counters(budget))
         save_new(analysis/'completion.json',record)
     print(json.dumps({k:record[k] for k in ['status','http_requests','rows_indexed','total_body_download_bytes','elapsed_seconds']}),flush=True)
 

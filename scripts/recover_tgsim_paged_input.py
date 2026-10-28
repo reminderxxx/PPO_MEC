@@ -10,12 +10,12 @@ import subprocess
 import time
 
 try:
-    from scripts.prepare_tgsim_input import ASSETS, BudgetLimit, InputDeadline, digest, save_new
+    from scripts.prepare_tgsim_input import ASSETS, BudgetLimit, InputDeadline, digest, save_new, native_row_counters, native_row_counts
     from scripts.prepare_tgsim_paged_input import ROOT, PagedBudget, acquire, disk_bytes, system_id_key
     from scripts.tgsim_bounded_transport import BoundedPageFetcher, validate_retry_grant
     from scripts.tgsim_geometry_recovery import GRANT_SCOPE, CompleteSourceReference, validate_geometry_grant
 except ModuleNotFoundError:
-    from prepare_tgsim_input import ASSETS, BudgetLimit, InputDeadline, digest, save_new
+    from prepare_tgsim_input import ASSETS, BudgetLimit, InputDeadline, digest, save_new, native_row_counters, native_row_counts
     from prepare_tgsim_paged_input import ROOT, PagedBudget, acquire, disk_bytes, system_id_key
     from tgsim_bounded_transport import BoundedPageFetcher, validate_retry_grant
     from tgsim_geometry_recovery import GRANT_SCOPE, CompleteSourceReference, validate_geometry_grant
@@ -73,7 +73,7 @@ def effective_caps(plan):
         if not parent.resolve().is_relative_to(ROOT.resolve()) or digest(parent)!=plan['continuation_parent_completion_sha256']:
             raise ValueError('sealed parent completion identity differs')
         previous=json.loads(parent.read_text())
-        if previous['status']!='failed_preserved_do_not_retry' or previous['rows_indexed']!=0:
+        if previous['status']!='failed_preserved_do_not_retry' or native_row_counts(previous)[0]!=0:
             raise ValueError('only this pre-native-index failed parent is eligible')
         caps.update(max_download_bytes_new_task=caps['max_download_bytes_new_task']-previous['total_body_download_bytes_upper_bound'],
                     max_wall_clock_seconds=int(caps['max_wall_clock_seconds']-previous['elapsed_seconds']),
@@ -131,7 +131,7 @@ def execute(plan_path,plan_sha):
         record.update(status='failed_preserved_do_not_retry',error_type=type(error).__name__,error=str(error));raise
     finally:
         signal.setitimer(signal.ITIMER_REAL,0);composer.close()
-        record.update(elapsed_seconds=budget.clock()-budget.started,http_requests=budget.requests,rows_indexed=budget.rows,
+        record.update(elapsed_seconds=budget.clock()-budget.started,http_requests=budget.requests,
                       reused_native_rows=sum(r['rows'] for r in reference.checked.values()) if geometry else 0,
                       extra_transport_attempts=page_fetcher.extra_attempts if bounded else 0,
                       decoded_csv_bytes=composer.decoded,total_body_download_bytes=budget.download_bytes,
@@ -140,6 +140,7 @@ def execute(plan_path,plan_sha):
                       byte_accounting='retained encoded wire entities plus interrupted-read bound; old unretained error entity and exact wire traffic remain unverified',
                       cumulative_disk_bytes=disk_bytes(plan['disk_roots']),
                       raw_files=[dict(path=p.name,bytes=p.stat().st_size,sha256=digest(p)) for p in sorted(raw.iterdir()) if p.is_file()])
+        record.update(native_row_counters(budget))
         save_new(analysis/'completion.json',record)
     print(json.dumps({k:record[k] for k in ['status','http_requests','rows_indexed','total_body_download_bytes','elapsed_seconds']}),flush=True)
 

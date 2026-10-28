@@ -5,11 +5,13 @@ from pathlib import Path
 import sqlite3
 
 try:
+    from scripts.prepare_tgsim_input import native_row_counts
     from scripts.prepare_tgsim_paged_input import (HOST, OLD_BODY_BOUND, PROPOSAL_SHA,
         disk_bytes, digest, metadata_pin, page_url, geometry_url, parse_count, save_new)
     from scripts.tgsim_bounded_transport import retryable, validate_retry_grant
     from scripts.tgsim_geometry_recovery import validate_geometry_grant, verify_reference
 except ModuleNotFoundError:
+    from prepare_tgsim_input import native_row_counts
     from prepare_tgsim_paged_input import (HOST, OLD_BODY_BOUND, PROPOSAL_SHA,
         disk_bytes, digest, metadata_pin, page_url, geometry_url, parse_count, save_new)
     from tgsim_bounded_transport import retryable, validate_retry_grant
@@ -53,6 +55,7 @@ def audit(analysis, *, expected_proposal_sha=None):
     expected_proposal_sha=expected_proposal_sha or PROPOSAL_SHA
     claim=json.loads((analysis/'execution_claim.json').read_text())
     completion=json.loads((analysis/'completion.json').read_text())
+    attempted_rows, inserted_rows = native_row_counts(completion)
     proposal=claim['proposal'];raw=Path(proposal['destination_raw_directory'])
     if claim['proposal_sha256']!=expected_proposal_sha or completion['proposal_sha256']!=expected_proposal_sha:
         raise ValueError('paged proposal binding differs')
@@ -192,7 +195,7 @@ def audit(analysis, *, expected_proposal_sha=None):
             if digest(raw/f'{asset}_derived_native.csv')!=check['derived_csv_sha256']:
                 raise ValueError('derived native CSV identity differs')
             indexed+=actual
-        if indexed!=completion['rows_indexed'] or indexed>proposal['max_rows_to_index']:
+        if indexed!=inserted_rows or attempted_rows!=indexed or attempted_rows>proposal['max_rows_to_index']:
             raise ValueError('indexed-row count cap/mismatch')
         if len(completion['geometry_checks'])!=16:
             raise ValueError('geometry inventory incomplete')
@@ -220,7 +223,7 @@ def audit(analysis, *, expected_proposal_sha=None):
                 with sqlite3.connect(f'file:{database}?mode=ro',uri=True) as connection:
                     counts[suffix]=connection.execute(f'SELECT count(*) FROM {table}').fetchone()[0]
         native_rows+=counts.get('identity',0);partial_indices[asset]=counts
-    if native_rows!=completion.get('rows_indexed',0) or native_rows>proposal['max_rows_to_index']:
+    if native_rows!=inserted_rows or attempted_rows>proposal['max_rows_to_index']:
         raise ValueError('terminal native index row count differs')
     reused_native_rows=sum(info['rows'] for info in reference_checks.values())
     if reused_native_rows!=completion.get('reused_native_rows',0):
@@ -242,6 +245,8 @@ def audit(analysis, *, expected_proposal_sha=None):
                 returned_body_bytes=body,interrupted_body_upper_bound=uncertain,
                 two_task_body_upper_bound=prior+body+uncertain,cumulative_disk_bytes=current_disk,
                 native_indexed_rows_verified=indexed if success else None,
+                native_rows_examined_charged=attempted_rows,
+                native_rows_inserted_verified=native_rows,
                 certified_formal_or_hidden=0,training_frames=0,evaluation_frames=0,
                 limitation='An audited failure is not complete input. Successful input is neither an atomic snapshot nor proof of hidden independence, original RSU/provider/cost compatibility or paper readiness.')
 

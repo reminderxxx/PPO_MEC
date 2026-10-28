@@ -6,11 +6,11 @@ import sqlite3
 import urllib.parse
 
 try:
-    from scripts.prepare_tgsim_input import digest, save_new
+    from scripts.prepare_tgsim_input import digest, save_new, native_row_counts
     from scripts.prepare_tgsim_paged_input import ROOT, page_url
     from scripts.tgsim_bounded_transport import ancestor_bill
 except ModuleNotFoundError:
-    from prepare_tgsim_input import digest, save_new
+    from prepare_tgsim_input import digest, save_new, native_row_counts
     from prepare_tgsim_paged_input import ROOT, page_url
     from tgsim_bounded_transport import ancestor_bill
 
@@ -116,11 +116,12 @@ def verify_reference(binding,source,budget=None):
     for name in ('parent_plan','parent_completion','parent_audit'):
         if digest(ref[name])!=ref[name+'_sha256']:raise ValueError('reference parent evidence differs')
     parent=json.loads(Path(ref['parent_plan']).read_text());completion=json.loads(Path(ref['parent_completion']).read_text())
+    _, inserted_rows = native_row_counts(completion)
     analysis=Path(ref['parent_completion']).parent;raw=Path(parent['destination_raw_directory'])
     claim=json.loads((analysis/'execution_claim.json').read_text());audit=json.loads(Path(ref['parent_audit']).read_text())
     if (completion['proposal_sha256']!=ref['parent_plan_sha256'] or claim['proposal']!=parent
             or claim['proposal_sha256']!=completion['proposal_sha256']
-            or claim['source_commit']!=completion['source_commit'] or completion['rows_indexed']!=count
+            or claim['source_commit']!=completion['source_commit'] or inserted_rows!=count
             or audit['source_commit']!=completion['source_commit']
             or audit['readonly_index_counts'][asset]!={'identity':count,'system_ids':count}
             or source!=next(s for s in parent['sources'] if s['asset_id']==asset)):

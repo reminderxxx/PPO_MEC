@@ -1,8 +1,11 @@
 # TGSIM附件入口修正与剩余输入提案（2026-10-28）
 
-状态：`EXPLICITLY_GRANTED_SOFTWARE_QUALIFIED_PENDING_SINGLE_LAUNCH`。
-人工明确答复“允许按新方案继续”。新实现90项软件检查通过，首份只读引用核对通过；
-尚未执行新数据请求。须先冻结clean commit和新plan，再单次启动。旧有限run不修复或续写。
+状态：`SINGLE_RUN_TERMINATED_NATIVE_INPUT_REJECTED_AUDIT_FAILED`。
+人工明确答复后，fe01e53已单次执行；16附件新入口及第二源21页取回，原生坐标空值使检查停止。
+后置版本/count未执行；19047次尝试与19046实际插入差异也使单次终端审计拒绝，原件全部封存。
+独立诊断后另立行账本软件修正，101项合成检查通过，无真实重跑。
+当前状态与下一质量任务草案见[说明](paper_tgsim_native_failure_accounting_20261028.md)。
+下方为事前提案和历史依据，不作为再次启动授权；旧有限run也不修复或续写。
 私有方案SHA：`9d06abc89b7ef016c8b83df4b07b179c123df3ddb019e3c9185535ef1fe0f2f4`。
 
 ## 本轮已经得到的输入与失败

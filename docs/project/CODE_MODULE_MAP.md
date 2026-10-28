@@ -1,3 +1,11 @@
+## 2026-10-28 原生行尝试与插入分账
+
+`prepare_tgsim_input.Budget`仍以`rows`计尝试/执行硬上限，另以`rows_inserted`计成功INSERT。
+`native_row_counters`给bulk/paged/recovery输出显式版本；`native_row_counts`供分页审计、
+完整源只读引用、直接父门禁和完整祖先账单共同消费。预算按尝试扣，SQLite按插入核，
+旧分页记录保持旧严格语义；不放宽任何数据质量/取数grant，不产生算法依赖。
+数值错误保留来源、字段、物理行和有界原值；不填补缺值，不触发语义错误重试。
+
 ## 2026-10-28 几何入口与完整源引用职责
 
 `tgsim_geometry_recovery`在精确新grant下验证16个dataset-scoped URL和来源manifest；

@@ -1,3 +1,10 @@
+## 2026-10-28 原生失败账本
+
+- `tests/test_tgsim_native_failure_accounting.py`：拒绝行收费、插入计数、版本防降级和父链消费合成测试。
+- `docs/project/paper_tgsim_native_failure_accounting_20261028.md`：失败状态、生产/消费字段合同与下一质量任务草案。
+- 已有geometry raw/analysis保留16附件、第二源21页及失败原生前缀索引；首源仍只读引用旧包。
+- 私有执行包保留单次audit失败日志、独立diagnosis与input exposure；不创建替代数据目录或改写旧文件。
+
 ## 2026-10-28 完整轨迹只读引用与附件修正
 
 - `scripts/tgsim_geometry_recovery.py`：新精确grant、固定附件映射、完整源manifest/hash与双索引只读消费。
