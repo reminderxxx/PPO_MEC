@@ -74,6 +74,12 @@ def page_url(source, offset, page_rows):
     return source['trajectory_endpoint'] + '?' + urllib.parse.urlencode(query)
 
 
+def geometry_url(proposal,source,attachment):
+    key=source['asset_id']+'/'+attachment['asset_id']
+    if 'fixed_geometry_urls' in proposal:return proposal['fixed_geometry_urls'][key]
+    return f"https://{HOST}/api/assets/{attachment['asset_id']}"
+
+
 def parse_count(path, expected):
     data = json.loads(path.read_text())
     if (not isinstance(data, list) or len(data) != 1 or not isinstance(data[0], dict)
@@ -151,11 +157,13 @@ def validate_plan(proposal_path, grant_path):
     return proposal, grant
 
 
-def acquire(proposal, raw, analysis, budget, *, opener=None, append_fn=None, gzip_pages=False, page_fetcher=None):
+def acquire(proposal, raw, analysis, budget, *, opener=None, append_fn=None, gzip_pages=False, page_fetcher=None, source_reference=None):
     """Requests stop on error unless an explicitly qualified page fetcher is supplied."""
     opener = opener or urllib.request.build_opener(NoRedirect())
     append_fn = append_fn or append_page
     result = dict(page_inventory=[], trajectory_checks=[], geometry_checks=[])
+    references=proposal.get('complete_source_references',{})
+    if references and source_reference is None:raise ValueError('qualified complete-source consumer required')
 
     def get(url, path, receipt, cap=None, *, version_check=False, gzip_body=False):
         if path.exists() or receipt.exists():
@@ -211,12 +219,30 @@ def acquire(proposal, raw, analysis, budget, *, opener=None, append_fn=None, gzi
     # Count and metadata before BOTH assets; no trajectory/geometry until they pass.
     for source in proposal['sources']:
         source_check(source, 'before')
+    for source in proposal['sources']:
+        if source['asset_id'] in references:
+            info,check=source_reference(source,budget)
+            result.setdefault('source_references',[]).append(info)
+            result['trajectory_checks'].append(dict(check,reused_complete_source=True))
+
+    def geometries(source):
+        asset=source['asset_id']
+        for attachment in source['support_csv_attachments']:
+            aid=attachment['asset_id'];path=raw/f'{asset}_{aid}_{attachment["name"]}'
+            get(geometry_url(proposal,source,attachment),path,analysis/f'{asset}_{aid}_receipt.json',8*1024**2)
+            result['geometry_checks'].append(inspect_geometry(path,strict_rectangular=bool(proposal.get('geometry_recovery_policy_sha256'))))
+
+    if proposal.get('geometry_first'):
+        for source in proposal['sources']:geometries(source)
     pages = sum((s['expected_count_from_frozen_metadata_not_fresh_query'] + proposal['page_rows']-1)
                 // proposal['page_rows'] for s in proposal['sources'])
     if pages > proposal['maximum_trajectory_pages']:
         raise BudgetLimit('trajectory page cap reached before fetching')
     for source in proposal['sources']:
         asset = source['asset_id']; count = source['expected_count_from_frozen_metadata_not_fresh_query']
+        if asset in references:
+            if not proposal.get('geometry_first'):geometries(source)
+            continue
         combined = raw/f'{asset}_derived_native.csv'; previous = None
         with combined.open('x', newline='') as out:
             writer = csv.writer(out); writer.writerow(source['expected_native_fields'])
@@ -239,10 +265,7 @@ def acquire(proposal, raw, analysis, budget, *, opener=None, append_fn=None, gzi
         if check['rows'] != count:
             raise ValueError('native indexed count differs from source total')
         save_new(analysis/f'{asset}_qualification.json', check); result['trajectory_checks'].append(check)
-        for attachment in source['support_csv_attachments']:
-            aid = attachment['asset_id']; path = raw/f'{asset}_{aid}_{attachment["name"]}'
-            get(f'https://{HOST}/api/assets/{aid}', path, analysis/f'{asset}_{aid}_receipt.json', 8*1024**2)
-            result['geometry_checks'].append(inspect_geometry(path))
+        if not proposal.get('geometry_first'):geometries(source)
     for source in proposal['sources']:
         source_check(source, 'after')
     return result

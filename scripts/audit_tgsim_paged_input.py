@@ -6,12 +6,14 @@ import sqlite3
 
 try:
     from scripts.prepare_tgsim_paged_input import (HOST, OLD_BODY_BOUND, PROPOSAL_SHA,
-        disk_bytes, digest, metadata_pin, page_url, parse_count, save_new)
+        disk_bytes, digest, metadata_pin, page_url, geometry_url, parse_count, save_new)
     from scripts.tgsim_bounded_transport import retryable, validate_retry_grant
+    from scripts.tgsim_geometry_recovery import validate_geometry_grant, verify_reference
 except ModuleNotFoundError:
     from prepare_tgsim_paged_input import (HOST, OLD_BODY_BOUND, PROPOSAL_SHA,
-        disk_bytes, digest, metadata_pin, page_url, parse_count, save_new)
+        disk_bytes, digest, metadata_pin, page_url, geometry_url, parse_count, save_new)
     from tgsim_bounded_transport import retryable, validate_retry_grant
+    from tgsim_geometry_recovery import validate_geometry_grant, verify_reference
 
 
 def audit_attempts(receipt, logical_path, raw, analysis, proposal):
@@ -63,20 +65,31 @@ def audit(analysis, *, expected_proposal_sha=None):
     for key in ('training_frames','evaluation_frames','hidden_openings'):
         if claim[key]!=0 or completion[key]!=0:
             raise ValueError('input-only boundary breached')
-    if proposal.get('automatic_retry'):
-        lineage=validate_retry_grant(proposal,json.loads(grant.read_text()))
+    geometry=bool(proposal.get('geometry_recovery_policy_sha256'))
+    if not geometry and any(proposal.get(k) for k in ('fixed_geometry_urls','complete_source_references','geometry_first')):
+        raise ValueError('legacy audit contract cannot change routes or reuse full source')
+    if geometry or proposal.get('automatic_retry'):
+        validator=validate_geometry_grant if geometry else validate_retry_grant
+        lineage=validator(proposal,json.loads(grant.read_text()))
         if claim.get('ancestor_bill')!=lineage or completion.get('ancestor_bill')!=lineage:
             raise ValueError('ancestor audit bill differs')
     expected_requests={}
+    references=proposal.get('complete_source_references',{});reference_checks={}
     for source in proposal['sources']:
         asset=source['asset_id']
         for phase in ('before','after'):
             expected_requests[f'{asset}_metadata_{phase}_receipt.json']=source['metadata_url']
             expected_requests[f'{asset}_count_{phase}_receipt.json']=source['row_count_url']
-        for index,offset in enumerate(range(0,source['expected_count_from_frozen_metadata_not_fresh_query'],proposal['page_rows'])):
-            expected_requests[f'{asset}_page_{index:03d}_receipt.json']=page_url(source,offset,proposal['page_rows'])
+        if asset not in references:
+            for index,offset in enumerate(range(0,source['expected_count_from_frozen_metadata_not_fresh_query'],proposal['page_rows'])):
+                expected_requests[f'{asset}_page_{index:03d}_receipt.json']=page_url(source,offset,proposal['page_rows'])
+        elif (analysis/f'{asset}_source_reference.json').exists():
+            verified,_=verify_reference(references[asset],source)
+            if json.loads((analysis/f'{asset}_source_reference.json').read_text())!=verified:
+                raise ValueError('saved complete-source reference result differs')
+            reference_checks[asset]=verified
         for attachment in source['support_csv_attachments']:
-            aid=attachment['asset_id'];expected_requests[f'{asset}_{aid}_receipt.json']=f'https://{HOST}/api/assets/{aid}'
+            aid=attachment['asset_id'];expected_requests[f'{asset}_{aid}_receipt.json']=geometry_url(proposal,source,attachment)
     seen=set();body=uncertain=0;receipts=[];network_requests=extra_attempts=reused_pages=0;attempt_paths=set()
     for path in sorted(analysis.glob('*_receipt.json')):
         receipt=json.loads(path.read_text());target=Path(receipt['path']).resolve()
@@ -152,6 +165,10 @@ def audit(analysis, *, expected_proposal_sha=None):
                 meta=json.loads((analysis/f'{asset}_metadata_{phase}.json').read_text())
                 if metadata_pin(meta)!=source['metadata_pin']:raise ValueError('version drift')
                 parse_count(analysis/f'{asset}_count_{phase}.json',count)
+            if asset in references:
+                if asset not in reference_checks:raise ValueError('missing successful complete-source reference')
+                if any(p['asset_id']==asset for p in pages):raise ValueError('reused source was recomposed')
+                continue
             items=[p for p in pages if p['asset_id']==asset]
             offsets=list(range(0,count,proposal['page_rows']))
             if ([p['offset'] for p in items]!=offsets
@@ -179,6 +196,17 @@ def audit(analysis, *, expected_proposal_sha=None):
             raise ValueError('indexed-row count cap/mismatch')
         if len(completion['geometry_checks'])!=16:
             raise ValueError('geometry inventory incomplete')
+        if geometry:
+            expected_geometry={str(raw/f'{s["asset_id"]}_{a["asset_id"]}_{a["name"]}')
+                               for s in proposal['sources'] for a in s['support_csv_attachments']}
+            checks=completion['geometry_checks']
+            if {g['path'] for g in checks}!=expected_geometry:raise ValueError('geometry checks omit a fixed file')
+            raw_shas={str(raw/item['path']):item['sha256'] for item in inventory}
+            for check in checks:
+                if (check['sha256']!=raw_shas[check['path']] or len(check['header'])<2
+                        or check['data_rows']<1 or {int(k) for k in check['row_width_counts']}!={len(check['header'])}
+                        or sum(check['row_width_counts'].values())!=check['data_rows']):
+                    raise ValueError('geometry CSV shape/hash check differs')
         if proposal.get('max_decoded_csv_bytes') is not None and completion['decoded_csv_bytes']>proposal['max_decoded_csv_bytes']:
             raise ValueError('decoded CSV cap exceeded')
     if proposal.get('max_decoded_csv_bytes') is not None and completion['decoded_csv_bytes']>proposal['max_decoded_csv_bytes']:
@@ -194,6 +222,12 @@ def audit(analysis, *, expected_proposal_sha=None):
         native_rows+=counts.get('identity',0);partial_indices[asset]=counts
     if native_rows!=completion.get('rows_indexed',0) or native_rows>proposal['max_rows_to_index']:
         raise ValueError('terminal native index row count differs')
+    reused_native_rows=sum(info['rows'] for info in reference_checks.values())
+    if reused_native_rows!=completion.get('reused_native_rows',0):
+        raise ValueError('reused native rows were omitted or counted as new')
+    if any((analysis/f'{asset}_identity.sqlite').exists() or (analysis/f'{asset}_system_ids.sqlite').exists()
+           or (raw/f'{asset}_derived_native.csv').exists() for asset in references):
+        raise ValueError('complete source was copied/redecoded/reindexed in new task')
     current_disk=disk_bytes(completion['cumulative_disk_roots'])
     if max(current_disk,completion['cumulative_disk_bytes'])>proposal['max_cumulative_new_disk_bytes_including_old_failure']:
         raise ValueError('cumulative disk cap breached')
@@ -203,6 +237,8 @@ def audit(analysis, *, expected_proposal_sha=None):
                 source_commit=completion['source_commit'],request_receipts=receipts,
                 network_http_requests=network_requests,reused_complete_pages=reused_pages,
                 extra_transport_attempts=extra_attempts,readonly_index_counts=partial_indices,
+                complete_source_references=reference_checks,reused_native_rows_verified=reused_native_rows,
+                available_native_rows_verified=indexed+reused_native_rows if success else None,
                 returned_body_bytes=body,interrupted_body_upper_bound=uncertain,
                 two_task_body_upper_bound=prior+body+uncertain,cumulative_disk_bytes=current_disk,
                 native_indexed_rows_verified=indexed if success else None,

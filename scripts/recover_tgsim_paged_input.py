@@ -13,10 +13,12 @@ try:
     from scripts.prepare_tgsim_input import ASSETS, BudgetLimit, InputDeadline, digest, save_new
     from scripts.prepare_tgsim_paged_input import ROOT, PagedBudget, acquire, disk_bytes, system_id_key
     from scripts.tgsim_bounded_transport import BoundedPageFetcher, validate_retry_grant
+    from scripts.tgsim_geometry_recovery import GRANT_SCOPE, CompleteSourceReference, validate_geometry_grant
 except ModuleNotFoundError:
     from prepare_tgsim_input import ASSETS, BudgetLimit, InputDeadline, digest, save_new
     from prepare_tgsim_paged_input import ROOT, PagedBudget, acquire, disk_bytes, system_id_key
     from tgsim_bounded_transport import BoundedPageFetcher, validate_retry_grant
+    from tgsim_geometry_recovery import GRANT_SCOPE, CompleteSourceReference, validate_geometry_grant
 
 
 class NativeComposer:
@@ -87,10 +89,13 @@ def execute(plan_path,plan_sha):
     plan=json.loads(plan_path.read_text());grant=Path(plan['authorization_file'])
     if digest(grant)!=plan['authorization_sha256']:raise ValueError('direct human authorization hash mismatch')
     authorization=json.loads(grant.read_text())
-    if not authorization.get('execution_authorized') or authorization.get('scope')!='same_source_input_recovery_zero_science':
+    geometry=bool(plan.get('geometry_recovery_policy_sha256'))
+    if not authorization.get('execution_authorized') or authorization.get('scope')!=(GRANT_SCOPE if geometry else 'same_source_input_recovery_zero_science'):
         raise ValueError('input recovery grant missing')
     bounded=plan.get('automatic_retry',False)
-    lineage=validate_retry_grant(plan,authorization) if bounded else None
+    if not geometry and any(plan.get(k) for k in ('fixed_geometry_urls','complete_source_references','geometry_first')):
+        raise ValueError('legacy grant cannot change attachment routes or reuse full source')
+    lineage=validate_geometry_grant(plan,authorization) if geometry else (validate_retry_grant(plan,authorization) if bounded else None)
     if any(digest(ROOT/name)!=sha for name,sha in plan['source_hashes'].items()):
         raise ValueError('frozen source hash mismatch')
     if tuple(s['asset_id'] for s in plan['sources'])!=ASSETS:raise ValueError('source pool differs')
@@ -110,7 +115,8 @@ def execute(plan_path,plan_sha):
     raw.mkdir(parents=True,exist_ok=False);analysis.mkdir(parents=True,exist_ok=False)
     budget=PagedBudget(plan,[Path(p) for p in plan['disk_roots']]);composer=NativeComposer(analysis,plan['max_decoded_csv_bytes'])
     page_fetcher=BoundedPageFetcher(plan,analysis) if bounded else None
-    record=dict(status='running',contract='tgsim_explicit_native_recovery_v1',proposal_sha256=plan_sha,grant_sha256=digest(grant),
+    reference=CompleteSourceReference(plan,analysis) if geometry else None
+    record=dict(status='running',contract='tgsim_geometry_reference_recovery_v1' if geometry else 'tgsim_explicit_native_recovery_v1',proposal_sha256=plan_sha,grant_sha256=digest(grant),
                 source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
                 command_arguments=dict(proposal=str(plan_path),grant=str(grant)),started_at_unix=time.time(),
                 cumulative_disk_roots=plan['disk_roots'],training_frames=0,evaluation_frames=0,hidden_openings=0,
@@ -119,13 +125,14 @@ def execute(plan_path,plan_sha):
     def deadline(signum,frame):raise InputDeadline('bounded remaining recovery deadline')
     signal.signal(signal.SIGALRM,deadline);signal.setitimer(signal.ITIMER_REAL,plan['max_wall_clock_seconds'])
     try:
-        record.update(acquire(plan,raw,analysis,budget,append_fn=composer,gzip_pages=True,page_fetcher=page_fetcher))
+        record.update(acquire(plan,raw,analysis,budget,append_fn=composer,gzip_pages=True,page_fetcher=page_fetcher,source_reference=reference))
         budget.guard();record['status']='acquired_and_input_checked_not_science_qualified'
     except BaseException as error:
         record.update(status='failed_preserved_do_not_retry',error_type=type(error).__name__,error=str(error));raise
     finally:
         signal.setitimer(signal.ITIMER_REAL,0);composer.close()
         record.update(elapsed_seconds=budget.clock()-budget.started,http_requests=budget.requests,rows_indexed=budget.rows,
+                      reused_native_rows=sum(r['rows'] for r in reference.checked.values()) if geometry else 0,
                       extra_transport_attempts=page_fetcher.extra_attempts if bounded else 0,
                       decoded_csv_bytes=composer.decoded,total_body_download_bytes=budget.download_bytes,
                       total_body_download_bytes_upper_bound=budget.download_bytes+budget.interrupted_body_upper_bound,

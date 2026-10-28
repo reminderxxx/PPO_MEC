@@ -28,7 +28,7 @@ def retryable(receipt):
             and receipt.get('status_code', 200) == 200 and kind in TRANSPORT_ERRORS)
 
 
-def ancestor_bill(plan):
+def ancestor_bill(plan, *, allow_indexed_parent=False):
     """Read only metadata, verifying every parent completion AND its frozen plan."""
     current = plan; chain = []; seen = set()
     while current.get('continuation_parent_completion'):
@@ -51,13 +51,13 @@ def ancestor_bill(plan):
         if (claim['proposal'] != parent or claim['proposal_sha256'] != completion['proposal_sha256']
                 or claim['source_commit'] != completion['source_commit']
                 or completion['status'] != 'failed_preserved_do_not_retry'
-                or completion['rows_indexed'] != 0):
+                or (completion['rows_indexed'] != 0 and not allow_indexed_parent)):
             raise ValueError('ancestor provenance/status/native indexing differs')
         for key in ('training_frames', 'evaluation_frames', 'hidden_openings'):
             if completion[key] != 0 or claim[key] != 0:
                 raise ValueError('ancestor input-only boundary differs')
         values = [completion[k] for k in ('total_body_download_bytes_upper_bound',
-                   'http_requests', 'elapsed_seconds', 'decoded_csv_bytes')]
+                   'http_requests', 'elapsed_seconds', 'decoded_csv_bytes','rows_indexed')]
         if any(not math.isfinite(v) or v < 0 for v in values):
             raise ValueError('invalid ancestor resource spend')
         chain.append(dict(path=str(path), sha256=digest(path), plan_sha256=completion['proposal_sha256'],
@@ -71,12 +71,12 @@ def ancestor_bill(plan):
     caps = dict(ORIGINAL_CAPS); prior = current['prior_accounted_body_bound']; elapsed = 0.
     for item in reversed(chain):
         parent = item['plan']; previous = item['completion']
-        expected = dict(caps,max_wall_clock_seconds=int(ORIGINAL_CAPS['max_wall_clock_seconds']-elapsed))
+        expected = dict(caps)
         if any(parent[k] != v for k,v in expected.items()):
             raise ValueError('ancestor budget was reset or enlarged')
         for spend,limit in (('total_body_download_bytes_upper_bound','max_download_bytes_new_task'),
                             ('http_requests','maximum_http_requests'),('elapsed_seconds','max_wall_clock_seconds'),
-                            ('decoded_csv_bytes','max_decoded_csv_bytes')):
+                            ('decoded_csv_bytes','max_decoded_csv_bytes'),('rows_indexed','max_rows_to_index')):
             if previous[spend] > parent[limit]:
                 raise ValueError('ancestor already exceeded its resource budget')
         if parent['prior_accounted_body_bound'] != prior:
@@ -87,8 +87,11 @@ def ancestor_bill(plan):
         caps['max_download_bytes_new_task'] -= previous['total_body_download_bytes_upper_bound']
         caps['maximum_http_requests'] -= previous['http_requests']
         caps['max_decoded_csv_bytes'] -= previous['decoded_csv_bytes']
+        caps['max_rows_to_index'] -= previous['rows_indexed']
+        # Carry the stricter integer executor cap at each boundary. Do not
+        # recover discarded fractional seconds in a later continuation.
+        caps['max_wall_clock_seconds'] = int(caps['max_wall_clock_seconds']-previous['elapsed_seconds'])
         elapsed += previous['elapsed_seconds']
-    caps['max_wall_clock_seconds'] = int(ORIGINAL_CAPS['max_wall_clock_seconds'] - elapsed)
     if plan['prior_accounted_body_bound'] != prior or any(v <= 0 for v in caps.values()):
         raise ValueError('no remaining budget or current accumulated bill differs')
     return dict(caps=caps, ancestors=binding, prior_accounted_body_bound=prior,

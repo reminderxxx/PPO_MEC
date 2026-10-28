@@ -1,3 +1,13 @@
+## 2026-10-28 几何入口与完整源引用职责
+
+`tgsim_geometry_recovery`在精确新grant下验证16个dataset-scoped URL和来源manifest；
+`verify_reference`仅二进制hash与`mode=ro&immutable=1`的两个SQLite计数，不解压或创建索引。
+`acquire`用opt-in source-reference consumer跳过首源下载/组合/index，并可在第二轨迹前取附件。
+新附件使用严格非空矩形CSV形状检查；legacy输入入口保持原默认合同。
+`ancestor_bill`仅在新scope下允许已索引父源，逐层扣除native行及保守整数wall；旧grant仍拒绝该父状态。
+独立审计另外验证新HTTP/attempt账单、固定几何清单、复用行与新增行，禁止新目录出现首源复制/重索引。
+算法、环境、奖励、预测器、规则、live provider与论文消费者不在本轮修改范围。
+
 ## 2026-10-28 显式有限重试与父链账单
 
 `recover_tgsim_paged_input.execute`仅在新政策grant绑定准确proposal SHA后启用

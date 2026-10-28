@@ -313,13 +313,15 @@ def inspect_trajectory(path, source, database, budget):
         connection.commit(); connection.close()
 
 
-def inspect_geometry(path):
+def inspect_geometry(path, *, strict_rectangular=False):
     with path.open(encoding='utf-8-sig', newline='') as data:
-        reader = csv.reader(data)
+        reader = csv.reader(data,strict=strict_rectangular)
         header = next(reader)
         rows = 0; widths = defaultdict(int)
         for row in reader:
             rows += 1; widths[len(row)] += 1
+    if strict_rectangular and (len(header)<2 or rows<1 or set(widths)!={len(header)}):
+        raise ValueError('geometry must be a nonempty rectangular CSV with at least two columns')
     return dict(path=str(path), sha256=digest(path), header=header, data_rows=rows,
                 row_width_counts=dict(widths), coordinate_mapping='NOT_CERTIFIED',
                 limitation='CSV inventory/shape only; names or lane centerlines do not georeference original RSUs')

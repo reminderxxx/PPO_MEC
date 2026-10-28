@@ -1,7 +1,8 @@
 # TGSIM附件入口修正与剩余输入提案（2026-10-28）
 
-状态：`PROPOSED_AWAITING_EXPLICIT_ENDPOINT_CHANGE_AND_COMPLETE_SOURCE_REUSE_ANSWER`。
-未执行新数据请求，未实现下一执行器。原有限重试run已终止，不能在原run修复或续写。
+状态：`EXPLICITLY_GRANTED_SOFTWARE_QUALIFIED_PENDING_SINGLE_LAUNCH`。
+人工明确答复“允许按新方案继续”。新实现90项软件检查通过，首份只读引用核对通过；
+尚未执行新数据请求。须先冻结clean commit和新plan，再单次启动。旧有限run不修复或续写。
 私有方案SHA：`9d06abc89b7ef016c8b83df4b07b179c123df3ddb019e3c9185535ef1fe0f2f4`。
 
 ## 本轮已经得到的输入与失败
@@ -59,10 +60,11 @@ https://data.transportation.gov/api/views/<dataset-id>/files/<attachment-assetId
 
 ## 获授权后的先行软件资格
 
-当前执行器只允许pre-native-index失败父链，不能直接拿本轮父completion继续。
-须先另立实现和合成验收：完整源只读provenance消费、旧4023022行不重新计新索引、三祖先累计扣费、
+旧入口只允许pre-native-index失败父链。新精确scope已实现post-native父源只读消费，旧grant不能激活它。
+独立实现与90项合成验收已完成：完整源只读provenance消费、旧4023022行不重新计新索引、三祖先累计扣费、
 更严格整数剩余时限、固定16个新附件URL映射、attempt/复用/新索引分账，以及独立审计拒绝篡改和漏账。
-仅软件验收通过并冻结clean commit/新plan后，单次启动；真实软件资格不靠重复请求旧数据取得。
+需冻结clean commit/新plan后单次启动；真实软件资格不靠重复请求旧数据取得。附件只验收非空矩形CSV形状，
+不据此认证坐标映射、RSU覆盖或物理费用。真实新URL可用性仍未实测。
 
 本轮仍是输入准备；训练/评价/拟合/hidden、算法/环境/奖励/预测器/规则/基线/RSU/坐标/provider/费用
 修改预算均0。成功输入也不能替代独立formal/holdout、公平对照、真实任务质量和物理成本证据。

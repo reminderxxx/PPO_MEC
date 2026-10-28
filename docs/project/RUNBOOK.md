@@ -1,3 +1,20 @@
+## 2026-10-28 已批准附件地址与完整源引用任务
+
+读取`paper_tgsim_geometry_endpoint_recovery_proposal_20261028.md`。人工grant绑定原私有方案SHA，
+90项软件检查通过。新frozen plan使用`geometry_recovery_policy_sha256`、固定16个`fixed_geometry_urls`，
+以及首份的`complete_source_references`；必须先验证完整祖先链、clean commit与create-only新路径。
+
+```bash
+python scripts/recover_tgsim_paged_input.py --plan <geometry_recovery_plan.json> --plan_sha <frozen_sha>
+python scripts/audit_tgsim_paged_input.py --expected_proposal_sha <frozen_sha> --analysis <new_analysis> --output <fresh_private_audit>
+```
+
+原首份不重下/解压/重组/索引；先做两源前置版本/count和只读引用核对，再取16附件与第二轨迹，最后两源后置检查。
+新HTTP≤48（预期45，额外传输尝试≤3）、body/中断上界≤398676278、decoded≤551200289、wall≤1523秒、
+新native行≤1976978、累计新旧磁盘≤2GiB。几何只接受非空矩形CSV形状，不代表坐标或RSU认证。
+数据/HTTP/重定向/预算错误停止，无其他源、地址回退或额外科学任务。终端只审计新run一次。
+验证命令为此前五组TGSIM测试加`tests/test_tgsim_geometry_recovery.py`，共90项通过。
+
 ## 2026-10-28 有限恢复已终止：几何HTTP404
 
 260daca的单次run已停止并审计一次，禁止再次执行旧命令或旧audit。

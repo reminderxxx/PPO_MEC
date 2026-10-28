@@ -1,3 +1,12 @@
+## 2026-10-28 完整轨迹只读引用与附件修正
+
+- `scripts/tgsim_geometry_recovery.py`：新精确grant、固定附件映射、完整源manifest/hash与双索引只读消费。
+- `tests/test_tgsim_geometry_recovery.py`：引用不重索引/不改原件、三父扣费、错误停止和匹配审计。
+- 新raw：`data/raw/mobility/tgsim/tgsim_geometry_input_qualification_20261028_v1/`，仅新16附件和第二源页/派生CSV。
+- 新analysis：`artifacts/analysis/paper_tgsim_geometry_input_qualification_20261028_v1/`，新收据/索引与首源`*_source_reference.json`。
+- 首源CSV/81页/双索引留在旧目录，以冻结manifest引用，不复制进新raw，不将旧失败几何实体作为有效文件。
+- 输入包因此是带显式provenance的多根引用；不自动接入live provider或作为正式论文输入。
+
 ## 2026-10-28 有限重试独立目录
 
 - `scripts/tgsim_bounded_transport.py`：完整祖先账单、明确政策授权、有限轨迹传输重试。
