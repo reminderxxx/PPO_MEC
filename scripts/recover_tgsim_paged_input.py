@@ -10,11 +10,13 @@ import subprocess
 import time
 
 try:
-    from scripts.prepare_tgsim_input import ASSETS, BudgetLimit, digest, save_new
+    from scripts.prepare_tgsim_input import ASSETS, BudgetLimit, InputDeadline, digest, save_new
     from scripts.prepare_tgsim_paged_input import ROOT, PagedBudget, acquire, disk_bytes, system_id_key
+    from scripts.tgsim_bounded_transport import BoundedPageFetcher, validate_retry_grant
 except ModuleNotFoundError:
-    from prepare_tgsim_input import ASSETS, BudgetLimit, digest, save_new
+    from prepare_tgsim_input import ASSETS, BudgetLimit, InputDeadline, digest, save_new
     from prepare_tgsim_paged_input import ROOT, PagedBudget, acquire, disk_bytes, system_id_key
+    from tgsim_bounded_transport import BoundedPageFetcher, validate_retry_grant
 
 
 class NativeComposer:
@@ -87,13 +89,17 @@ def execute(plan_path,plan_sha):
     authorization=json.loads(grant.read_text())
     if not authorization.get('execution_authorized') or authorization.get('scope')!='same_source_input_recovery_zero_science':
         raise ValueError('input recovery grant missing')
+    bounded=plan.get('automatic_retry',False)
+    lineage=validate_retry_grant(plan,authorization) if bounded else None
     if any(digest(ROOT/name)!=sha for name,sha in plan['source_hashes'].items()):
         raise ValueError('frozen source hash mismatch')
     if tuple(s['asset_id'] for s in plan['sources'])!=ASSETS:raise ValueError('source pool differs')
-    if (any(plan[k]!=v for k,v in effective_caps(plan).items())
+    caps=lineage['caps'] if bounded else effective_caps(plan)
+    if (any(plan[k]!=v for k,v in caps.items())
             or plan['maximum_trajectory_pages']!=120 or plan['page_rows']!=50000
             or plan['max_cumulative_new_disk_bytes_including_old_failure']!=2147483648
-            or plan['training_frames']!=0 or plan['evaluation_frames']!=0):raise ValueError('recovery caps differ')
+            or plan['training_frames']!=0 or plan['evaluation_frames']!=0
+            or sum(len(s['support_csv_attachments']) for s in plan['sources'])!=16):raise ValueError('recovery caps differ')
     for source in plan['sources']:
         if source['fixed_query']!={'$select':':id as source_row_id,'+','.join(source['expected_native_fields']),'$order':':id','$limit':50000,'$offset':0}:
             raise ValueError('explicit fixed query differs')
@@ -103,22 +109,24 @@ def execute(plan_path,plan_sha):
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():raise ValueError('freeze clean source')
     raw.mkdir(parents=True,exist_ok=False);analysis.mkdir(parents=True,exist_ok=False)
     budget=PagedBudget(plan,[Path(p) for p in plan['disk_roots']]);composer=NativeComposer(analysis,plan['max_decoded_csv_bytes'])
+    page_fetcher=BoundedPageFetcher(plan,analysis) if bounded else None
     record=dict(status='running',contract='tgsim_explicit_native_recovery_v1',proposal_sha256=plan_sha,grant_sha256=digest(grant),
                 source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
                 command_arguments=dict(proposal=str(plan_path),grant=str(grant)),started_at_unix=time.time(),
                 cumulative_disk_roots=plan['disk_roots'],training_frames=0,evaluation_frames=0,hidden_openings=0,
-                automatic_retry=False,source_hashes=plan['source_hashes'])
+                automatic_retry=bounded,source_hashes=plan['source_hashes'],ancestor_bill=lineage)
     save_new(analysis/'execution_claim.json',dict(record,proposal=plan))
-    def deadline(signum,frame):raise TimeoutError('bounded remaining recovery deadline')
+    def deadline(signum,frame):raise InputDeadline('bounded remaining recovery deadline')
     signal.signal(signal.SIGALRM,deadline);signal.setitimer(signal.ITIMER_REAL,plan['max_wall_clock_seconds'])
     try:
-        record.update(acquire(plan,raw,analysis,budget,append_fn=composer,gzip_pages=True))
+        record.update(acquire(plan,raw,analysis,budget,append_fn=composer,gzip_pages=True,page_fetcher=page_fetcher))
         budget.guard();record['status']='acquired_and_input_checked_not_science_qualified'
     except BaseException as error:
         record.update(status='failed_preserved_do_not_retry',error_type=type(error).__name__,error=str(error));raise
     finally:
         signal.setitimer(signal.ITIMER_REAL,0);composer.close()
         record.update(elapsed_seconds=budget.clock()-budget.started,http_requests=budget.requests,rows_indexed=budget.rows,
+                      extra_transport_attempts=page_fetcher.extra_attempts if bounded else 0,
                       decoded_csv_bytes=composer.decoded,total_body_download_bytes=budget.download_bytes,
                       total_body_download_bytes_upper_bound=budget.download_bytes+budget.interrupted_body_upper_bound,
                       two_task_body_upper_bound=plan['prior_accounted_body_bound']+budget.download_bytes+budget.interrupted_body_upper_bound,

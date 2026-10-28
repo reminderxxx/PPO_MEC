@@ -1,6 +1,11 @@
 # TGSIM有限传输重试提案（2026-10-28）
 
-状态：`PROPOSED_AWAITING_EXPLICIT_RETRY_POLICY_ANSWER`。未启动第三套下载。
+状态：`EXPLICITLY_GRANTED_SOFTWARE_QUALIFIED_PENDING_SINGLE_LAUNCH`。
+
+人工明确答复“允许有限重试，继续完成”，绑定原私有proposal SHA
+`98b13e620983b304c4adb50a42c93594c50824b4c34eadeb53d0dc2367bd50f1`。
+67项纯软件检查通过，包含父链预算、断流重试、语义停止、读取上界及生产/消费端；
+新取数必须在clean commit与前瞻plan冻结后单次启动。以下提案正文保留原政策和资源范围。
 
 ## 已审计事实与需要改变的规则
 
@@ -43,7 +48,7 @@ body/中断上界、请求、执行时长和解码量。当前effective_caps只�
 新read_size必须扣除先前失败attempt的读取上界，成功尝试选择也不能重复计网络账。
 合成样例覆盖断流后成功、连续失败耗尽、语义错误不重试、全局请求/字节/时间不足即停、
 父链累计、原件不改写和审计防篡改。通过后freeze clean commit及新的执行计划，再单次启动。
-本提案尚未声称这一重试实现已具备软件资格。
+上述实现已完成67项纯软件验收；真实输入完整性仍须新任务终端独立核验。
 
 训练、策略评价、模型拟合、hidden开启及算法/奖励/预测器/环境/规则/基线/RSU修改均为0。
 输入完成也不自动认证独立采集、原RSU/provider/成本、formal/holdout或论文目标达成。

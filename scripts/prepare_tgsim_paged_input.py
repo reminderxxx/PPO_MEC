@@ -151,8 +151,8 @@ def validate_plan(proposal_path, grant_path):
     return proposal, grant
 
 
-def acquire(proposal, raw, analysis, budget, *, opener=None, append_fn=None, gzip_pages=False):
-    """All requests live here; any exception exits globally, never per-page retry."""
+def acquire(proposal, raw, analysis, budget, *, opener=None, append_fn=None, gzip_pages=False, page_fetcher=None):
+    """Requests stop on error unless an explicitly qualified page fetcher is supplied."""
     opener = opener or urllib.request.build_opener(NoRedirect())
     append_fn = append_fn or append_page
     result = dict(page_inventory=[], trajectory_checks=[], geometry_checks=[])
@@ -192,6 +192,9 @@ def acquire(proposal, raw, analysis, budget, *, opener=None, append_fn=None, gzi
                       source_provenance=reused,receipt_contract='tgsim_audited_complete_page_reuse_v1')
             save_new(receipt,info)
             return info
+        if gzip_body and page_fetcher is not None:
+            return page_fetcher(url,path,budget,receipt,opener=opener,
+                                read_timeout_seconds=proposal.get('read_timeout_seconds',30))
         budget.request(url, version_check=version_check)
         return fetch(url, path, budget, receipt, maximum_bytes=cap, opener=opener, accept_gzip=gzip_body,
                      read_timeout_seconds=proposal.get('read_timeout_seconds',30))

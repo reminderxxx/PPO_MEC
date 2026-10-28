@@ -1,3 +1,13 @@
+## 2026-10-28 有限重试独立目录
+
+- `scripts/tgsim_bounded_transport.py`：完整祖先账单、明确政策授权、有限轨迹传输重试。
+- `tests/test_tgsim_bounded_transport.py`：断流/语义错误/预算/父链/消费端合成检查。
+- 新raw为`data/raw/mobility/tgsim/tgsim_bounded_retry_input_qualification_20261028_v1/`；
+  成功页与`.attempt_<n>`原件分开保存；成功原件复制为组合入口，网络账只按attempt计。
+- 新analysis为`artifacts/analysis/paper_tgsim_bounded_retry_input_qualification_20261028_v1/`；
+  `attempts/`保存逐尝试收据，顶层logical receipt绑定其SHA、选择和聚合账单；两者均须审计。
+- 新旧原件/副本/派生CSV/索引/收据都纳入累计2GiB，全部Git忽略。
+
 ## 2026-10-28 Remaining-page provenance
 
 A fresh remaining-page raw/analysis directory contains local copies of approved complete bodies plus new missing pages. Reuse receipts bind original body/receipt/validation/execution claim and offset/version; network body=0. Parent completion and its SHA carry finite remaining caps. No original files or partial page are modified.

@@ -1,3 +1,24 @@
+## 2026-10-28 已批准有限传输重试
+
+直接答复已绑定`paper_tgsim_bounded_transport_retry_proposal_20261028.md`的原私有方案SHA。
+67项纯软件检查通过后，冻结新plan/source clean commit，再单次执行：
+
+```bash
+python scripts/recover_tgsim_paged_input.py --plan <bounded_retry_plan.json> --plan_sha <exact_sha>
+python scripts/audit_tgsim_paged_input.py --expected_proposal_sha <exact_sha> --analysis <new_analysis> --output <fresh_private_audit>
+```
+
+软件资格命令：
+```bash
+python -m pytest -p no:cacheprovider tests/test_tgsim_input_preparation.py tests/test_tgsim_paged_preparation.py tests/test_tgsim_query_diagnosis.py tests/test_tgsim_recovery.py tests/test_tgsim_bounded_transport.py -q
+```
+
+完整祖先账单继续扣除；新请求≤114、encoded body/读取上界≤501082594、执行器≤2292秒、
+解码≤1043884804。累计磁盘2GiB，native索引600万行；20完整页只复用，不重下。
+只对轨迹socket超时/IncompleteRead/明确断连最多额外2次/页、8次全局；每次从零且保留原件。
+总deadline、HTTP/认证/限流、schema/CRC/身份/版本/count/预算错误停止，无新范围或无限重试。
+终端只审计本新run一次；旧审计/索引不重跑。输入成功不代表事务快照、独立hidden或原RSU/成本兼容。
+
 ## 2026-10-28 Remaining-page recovery
 
 终端更新：该单次任务已因page020提前断流停止并审计，原件封存；以下入口不再执行。

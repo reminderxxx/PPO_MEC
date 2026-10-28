@@ -7,9 +7,44 @@ import sqlite3
 try:
     from scripts.prepare_tgsim_paged_input import (HOST, OLD_BODY_BOUND, PROPOSAL_SHA,
         disk_bytes, digest, metadata_pin, page_url, parse_count, save_new)
+    from scripts.tgsim_bounded_transport import retryable, validate_retry_grant
 except ModuleNotFoundError:
     from prepare_tgsim_paged_input import (HOST, OLD_BODY_BOUND, PROPOSAL_SHA,
         disk_bytes, digest, metadata_pin, page_url, parse_count, save_new)
+    from tgsim_bounded_transport import retryable, validate_retry_grant
+
+
+def audit_attempts(receipt, logical_path, raw, analysis, proposal):
+    entries=receipt['attempts'];selected=receipt['selected_attempt']
+    if (not proposal.get('automatic_retry') or not receipt['automatic_retry']
+            or not 1<=len(entries)<=proposal['max_total_attempts_per_trajectory_page']
+            or (selected is not None and selected!=len(entries))
+            or (receipt['status']=='complete')!=(selected is not None)):
+        raise ValueError('bounded attempt selection/status differs')
+    body=uncertain=0;paths=set();last=None
+    for number,entry in enumerate(entries,1):
+        path=Path(entry['path']).resolve()
+        expected=analysis/'attempts'/f'{logical_path.stem}_attempt_{number}.json'
+        if path!=expected.resolve() or path in paths or digest(path)!=entry['sha256']:
+            raise ValueError('attempt receipt SHA/inventory differs')
+        paths.add(path);attempt=json.loads(path.read_text());target=Path(attempt['path']).resolve()
+        # Every attempt uses a fresh full request and an independent body.
+        expected_body=raw/(logical_path.name.removesuffix('_receipt.json')+'.csv.body'+f'.attempt_{number}')
+        if (target!=expected_body.resolve() or attempt['url']!=receipt['url']
+                or attempt['automatic_retry'] or attempt['status'] not in ('complete','failed')
+                or target.stat().st_size!=attempt['bytes'] or digest(target)!=attempt['sha256']):
+            raise ValueError('attempt body/URL/hash/status differs')
+        if number<len(entries) and not retryable(attempt):
+            raise ValueError('semantic or nontransport failure was retried')
+        if selected==number and (attempt['status']!='complete' or attempt.get('status_code')!=200):
+            raise ValueError('selected attempt is incomplete')
+        body+=attempt['bytes'];uncertain+=attempt['interrupted_read_body_upper_bound'];last=attempt
+    if (receipt['network_body_bytes']!=body or receipt['http_request_count']!=len(entries)
+            or receipt['interrupted_read_body_upper_bound']!=uncertain
+            or receipt['bytes']!=last['bytes'] or receipt['sha256']!=last['sha256']
+            or receipt.get('encoded_wire_body_retained')!=last.get('encoded_wire_body_retained')):
+        raise ValueError('attempt aggregate or selected body differs')
+    return body,uncertain,len(entries),paths
 
 
 def audit(analysis, *, expected_proposal_sha=None):
@@ -28,6 +63,10 @@ def audit(analysis, *, expected_proposal_sha=None):
     for key in ('training_frames','evaluation_frames','hidden_openings'):
         if claim[key]!=0 or completion[key]!=0:
             raise ValueError('input-only boundary breached')
+    if proposal.get('automatic_retry'):
+        lineage=validate_retry_grant(proposal,json.loads(grant.read_text()))
+        if claim.get('ancestor_bill')!=lineage or completion.get('ancestor_bill')!=lineage:
+            raise ValueError('ancestor audit bill differs')
     expected_requests={}
     for source in proposal['sources']:
         asset=source['asset_id']
@@ -38,7 +77,7 @@ def audit(analysis, *, expected_proposal_sha=None):
             expected_requests[f'{asset}_page_{index:03d}_receipt.json']=page_url(source,offset,proposal['page_rows'])
         for attachment in source['support_csv_attachments']:
             aid=attachment['asset_id'];expected_requests[f'{asset}_{aid}_receipt.json']=f'https://{HOST}/api/assets/{aid}'
-    seen=set();body=uncertain=0;receipts=[];network_requests=0
+    seen=set();body=uncertain=0;receipts=[];network_requests=extra_attempts=reused_pages=0;attempt_paths=set()
     for path in sorted(analysis.glob('*_receipt.json')):
         receipt=json.loads(path.read_text());target=Path(receipt['path']).resolve()
         if path.name not in expected_requests or receipt['url']!=expected_requests[path.name]:
@@ -48,10 +87,12 @@ def audit(analysis, *, expected_proposal_sha=None):
         seen.add(target)
         if target.stat().st_size!=receipt['bytes'] or digest(target)!=receipt['sha256']:
             raise ValueError('received file bytes/hash differ from receipt')
-        if receipt['status'] not in ('complete','failed') or receipt['automatic_retry']:
+        bounded=receipt.get('operation')=='bounded_trajectory_attempts'
+        if receipt['status'] not in ('complete','failed') or (receipt['automatic_retry'] and not bounded):
             raise ValueError('invalid request terminal/retry status')
         reuse=receipt.get('operation')=='reuse_complete_page'
         if reuse:
+            reused_pages+=1
             approved=proposal.get('complete_page_reuse',{}).get(receipt['url'])
             if approved is None or approved!=receipt['source_provenance'] or receipt.get('network_body_bytes')!=0:
                 raise ValueError('unapproved page reuse or disguised network body')
@@ -69,9 +110,20 @@ def audit(analysis, *, expected_proposal_sha=None):
                     or parent_source['metadata_pin']!=current_source['metadata_pin']
                     or validation['asset_id']!=approved['asset_id'] or validation['offset']!=approved['offset']):
                 raise ValueError('reused complete page provenance differs')
+        elif bounded:
+            if '_page_' not in path.name or receipt['url'] in proposal.get('complete_page_reuse',{}):
+                raise ValueError('only missing trajectory pages may retry')
+            b,u,n,files=audit_attempts(receipt,path,raw,analysis,proposal)
+            if attempt_paths & files:raise ValueError('attempt double counted')
+            attempt_paths.update(files);body+=b;uncertain+=u;network_requests+=n;extra_attempts+=n-1
         else:
             body+=receipt['bytes'];uncertain+=receipt['interrupted_read_body_upper_bound'];network_requests+=1
         receipts.append(dict(path=path.name,status=receipt['status'],bytes=receipt['bytes'],operation='reuse_complete_page' if reuse else 'http_request'))
+    if {p.resolve() for p in (analysis/'attempts').glob('*.json')}!=attempt_paths:
+        raise ValueError('unaccounted/duplicated transport attempt receipts')
+    if proposal.get('automatic_retry') and (extra_attempts>proposal['max_extra_attempts_global']
+            or extra_attempts!=completion['extra_transport_attempts']):
+        raise ValueError('global extra attempt cap/count differs')
     prior=proposal.get('prior_accounted_body_bound',OLD_BODY_BOUND)
     if (body!=completion['total_body_download_bytes'] or body+uncertain!=completion['total_body_download_bytes_upper_bound']
             or completion['two_task_body_upper_bound']!=prior+body+uncertain
@@ -129,6 +181,19 @@ def audit(analysis, *, expected_proposal_sha=None):
             raise ValueError('geometry inventory incomplete')
         if proposal.get('max_decoded_csv_bytes') is not None and completion['decoded_csv_bytes']>proposal['max_decoded_csv_bytes']:
             raise ValueError('decoded CSV cap exceeded')
+    if proposal.get('max_decoded_csv_bytes') is not None and completion['decoded_csv_bytes']>proposal['max_decoded_csv_bytes']:
+        raise ValueError('decoded CSV cap exceeded')
+    partial_indices={};native_rows=0
+    for source in proposal['sources']:
+        asset=source['asset_id'];counts={}
+        for suffix,table in (('identity','samples'),('system_ids','identities')):
+            database=analysis/f'{asset}_{suffix}.sqlite'
+            if database.exists():
+                with sqlite3.connect(f'file:{database}?mode=ro',uri=True) as connection:
+                    counts[suffix]=connection.execute(f'SELECT count(*) FROM {table}').fetchone()[0]
+        native_rows+=counts.get('identity',0);partial_indices[asset]=counts
+    if native_rows!=completion.get('rows_indexed',0) or native_rows>proposal['max_rows_to_index']:
+        raise ValueError('terminal native index row count differs')
     current_disk=disk_bytes(completion['cumulative_disk_roots'])
     if max(current_disk,completion['cumulative_disk_bytes'])>proposal['max_cumulative_new_disk_bytes_including_old_failure']:
         raise ValueError('cumulative disk cap breached')
@@ -136,7 +201,8 @@ def audit(analysis, *, expected_proposal_sha=None):
         raise ValueError('executor wall-time cap exceeded')
     return dict(status='terminal_receipt_inventory_and_bill_audited',acquisition_complete=success,
                 source_commit=completion['source_commit'],request_receipts=receipts,
-                network_http_requests=network_requests,reused_complete_pages=len(receipts)-network_requests,
+                network_http_requests=network_requests,reused_complete_pages=reused_pages,
+                extra_transport_attempts=extra_attempts,readonly_index_counts=partial_indices,
                 returned_body_bytes=body,interrupted_body_upper_bound=uncertain,
                 two_task_body_upper_bound=prior+body+uncertain,cumulative_disk_bytes=current_disk,
                 native_indexed_rows_verified=indexed if success else None,

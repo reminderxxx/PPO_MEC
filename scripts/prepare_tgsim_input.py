@@ -27,6 +27,10 @@ class BudgetLimit(RuntimeError):
     """A hard task limit, never a recoverable per-source quality rejection."""
 
 
+class InputDeadline(TimeoutError):
+    """Total execution deadline, distinct from a retryable socket timeout."""
+
+
 class HTTPStatusFailure(ValueError):
     """A retained diagnostic entity is never successful input."""
 
@@ -76,7 +80,7 @@ class Budget:
 
     def guard(self):
         if self.clock() - self.started >= self.proposal['max_wall_clock_seconds']:
-            raise TimeoutError('total input-task wall-clock cap reached')
+            raise InputDeadline('total input-task wall-clock cap reached')
         disk = sum(p.stat().st_size for root in self.directories for p in root.rglob('*') if p.is_file())
         # Reserve8MiB for terminal receipts/errors; never fill the hard2GiB cap.
         if disk > self.proposal['max_new_disk_bytes'] - 8 * 1024 * 1024:
@@ -84,7 +88,7 @@ class Budget:
 
     def read_size(self, per_file_remaining):
         self.guard()
-        remaining = self.proposal['max_download_bytes'] - self.download_bytes
+        remaining = self.proposal['max_download_bytes'] - self.download_bytes - self.interrupted_body_upper_bound
         if remaining <= 0 or per_file_remaining <= 0:
             raise BudgetLimit('download byte budget reached')
         return min(65536, remaining, per_file_remaining)
@@ -102,10 +106,13 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
                   interrupted_read_body_upper_bound=0)
     h = hashlib.sha256()
     try:
+        record['failure_phase'] = 'guard'
         budget.guard()
         timeout = min(float(read_timeout_seconds), budget.proposal['max_wall_clock_seconds'] - (budget.clock() - budget.started))
         request = urllib.request.Request(url, headers={'User-Agent': 'PPO-MEC-input-qualification/1.0', 'Accept-Encoding': 'gzip' if accept_gzip else 'identity'})
+        record['failure_phase'] = 'open'
         with destination.open('xb') as out, open_including_http_error(opener, request, timeout) as response:
+            record['failure_phase'] = 'headers'
             record.update(final_url=validate_url(response.geturl()), status_code=response.status,
                           response_headers=dict(response.headers))
             diagnostic = response.status != 200
@@ -120,17 +127,19 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
             record['encoded_wire_body_retained'] = response.headers.get('Content-Encoding','identity').lower()=='gzip'
             length = response.headers.get('Content-Length')
             length = int(length) if length is not None else None
-            if not diagnostic and length is not None and (length > maximum_bytes or length > budget.proposal['max_download_bytes'] - budget.download_bytes):
+            if not diagnostic and length is not None and (length > maximum_bytes or length > budget.proposal['max_download_bytes'] - budget.download_bytes - budget.interrupted_body_upper_bound):
                     raise BudgetLimit('declared body exceeds remaining byte budget')
             while length is None or record['bytes'] < length:
                 if diagnostic and record['bytes'] >= maximum_bytes:
                     break
+                record['failure_phase'] = 'guard'
                 size = budget.read_size(maximum_bytes - record['bytes'])
                 record['interrupted_read_body_upper_bound'] = size
                 # HTTPResponse.read(size) can discard a received partial chunk
                 # when its outer IncompleteRead exposes an empty payload.
                 # read1 returns received payload incrementally before the next
                 # truncated-chunk error. Retain uncertainty if a read raises.
+                record['failure_phase'] = 'read'
                 block = response.read1(size)
                 record['interrupted_read_body_upper_bound'] = 0
                 if not block:
@@ -138,7 +147,9 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
                 budget.download_bytes += len(block)
                 record['bytes'] += len(block)
                 h.update(block)
+                record['failure_phase'] = 'write'
                 out.write(block)
+            record['failure_phase'] = 'body_validation'
             if diagnostic:
                 record['diagnostic_entity_complete'] = (record['bytes'] == length if length is not None else record['bytes'] < maximum_bytes)
                 raise HTTPStatusFailure(f'HTTP{response.status}; diagnostic entity/headers retained, no retry')
@@ -147,6 +158,8 @@ def fetch(url, destination, budget, receipt_path, *, maximum_bytes=None, opener=
         record['status'] = 'complete'
     except BaseException as error:
         record.update(status='failed', error_type=type(error).__name__, error=str(error))
+        if isinstance(error, urllib.error.URLError):
+            record['transport_reason_type'] = type(error.reason).__name__
         raise
     finally:
         budget.interrupted_body_upper_bound += record['interrupted_read_body_upper_bound']

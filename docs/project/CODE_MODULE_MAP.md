@@ -1,3 +1,13 @@
+## 2026-10-28 显式有限重试与父链账单
+
+`recover_tgsim_paged_input.execute`仅在新政策grant绑定准确proposal SHA后启用
+`tgsim_bounded_transport.BoundedPageFetcher`，旧入口仍停止于任一错误。
+`ancestor_bill`逐层绑定plan/completion SHA与claim，拒绝循环、重复、遗漏和预算重置。
+共享`Budget.read_size`及Content-Length检查扣除既有中断读取上界；总deadline独立于socket超时。
+`acquire`只对缺失轨迹页提供opt-in fetcher，版本/count/附件仍单请求并立即失败停止。
+审计消费者独立核对每次attempt、成功选择、真实网络计数与聚合上界，canonical副本不重复计网络。
+CRC/schema/身份及原生索引错误不在传输重试范围。没有算法或live provider依赖变化。
+
 ## 2026-10-28 Complete-page reuse accounting
 
 `acquire.get` validates a frozen complete-page reuse manifest and locally copies approved encoded bodies; HTTP counters/body spend remain unchanged. `effective_caps` derives new limits from the immutable failed parent. Auditor independently verifies reuse provenance and counts actual HTTP requests separately from logical page receipts. Shared fetch read timeout is explicit, bounded by120s and the executor deadline.

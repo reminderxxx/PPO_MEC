@@ -1,3 +1,12 @@
+## 2026-10-28 TGSIM有限传输重试
+
+人工已明确答复“允许有限重试，继续完成”。新任务只在原两源/16几何、原页大小与剩余预算内执行；
+仅轨迹页超时/IncompleteRead/明确断连最多额外2次，每页总3次、全局额外最多8次。
+[已批准合同](docs/project/paper_tgsim_bounded_transport_retry_proposal_20261028.md)使用
+`recover_tgsim_paged_input.py`、`tgsim_bounded_transport.py`与匹配只读审计消费者。
+祖先账单逐层校验扣除；每次attempt保留独立原件/收据，旧失败不改写。67项软件检查通过，
+真实输入是否完整以单次终端审计为准；训练/评价/hidden均0，论文证据目标仍未完成。
+
 ## 持续请求 v2 开发确认（2026-10-17）
 
 八组v1已回收；SA超过cache但低于DAG，DT与DAG原实现重复，独立审查保留11次保护违规。当前`joint_stream_control_v2`修复接口、均衡日程和可选准备/冷站成本；旧checkpoint拒绝。入口与预算见[确认合同](docs/project/joint_stream_refinement_contract_20261017.md)。此开发入口不替代正式Protocol，formal/holdout封存。
