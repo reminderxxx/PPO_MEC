@@ -1,11 +1,15 @@
 # TGSIM有限传输重试提案（2026-10-28）
 
-状态：`EXPLICITLY_GRANTED_SOFTWARE_QUALIFIED_PENDING_SINGLE_LAUNCH`。
+状态：`EXECUTED_ONCE_FAILED_GEOMETRY_HTTP404_AUDITED_SEALED`。
+
+终端更新：首份4023022行/81页及双身份索引通过；首几何HTTP404后停止，第二轨迹/几何/后置核验未达。
+66请求、768.440340秒、102406316 encoded-body字节；额外重试0。终端审计一次通过，原件封存。
+下一[附件入口修正提案](paper_tgsim_geometry_endpoint_recovery_proposal_20261028.md)需单独明确答复和软件验收。
 
 人工明确答复“允许有限重试，继续完成”，绑定原私有proposal SHA
 `98b13e620983b304c4adb50a42c93594c50824b4c34eadeb53d0dc2367bd50f1`。
 67项纯软件检查通过，包含父链预算、断流重试、语义停止、读取上界及生产/消费端；
-新取数必须在clean commit与前瞻plan冻结后单次启动。以下提案正文保留原政策和资源范围。
+本任务已从clean commit与冻结plan单次执行。以下保留原政策和资源范围，不授予再次启动。
 
 ## 已审计事实与需要改变的规则
 
