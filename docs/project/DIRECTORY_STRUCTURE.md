@@ -1,3 +1,13 @@
+## 2026-10-29 证据强化开发入口
+
+- `scripts/analyze_stream_learning_attribution.py`：只读消费已绑定SHA的curve audit/plot，分解初始差与相对学习增量，不加载策略。
+- `scripts/qualify_stream_reference_endpoints.py`：只对旧main final60做状态费用/完成端点只读资格，不重做旧20cell奖励审计。
+- `scripts/complete_stream_initial_evidence.py` / `scripts/audit_stream_initial_evidence.py`：只补缺少的45条ep000和3固定重放，原15条/最终结果只读引用。
+- `scripts/run_stream_head_balance_study.py` / `scripts/launch_stream_head_balance_study.py` / `scripts/collect_stream_head_balance_study.py`：单个opt-in主方法候选、固定旧main锚和自动核账/重放/接受门。
+- 对应`tests/test_stream_learning_attribution.py`、`test_stream_initial_evidence.py`、`test_stream_head_balance.py`及parent测试只做合成软件资格。
+- 私有`paper_evidence_strengthening_20261029_v1/`保留授权、独立审查/文献/诊断和前瞻计划，不上传原始实验或审查。
+- 不更改正式benchmark/canonical目录；运行前以[合同](paper_evidence_strengthening_contract_20261029.md)和独立clean plan为准。
+
 ## 2026-10-28 奖励图独立任务
 
 - `scripts/run_stream_reward_curve.py`：一个方法/seed的96训练、48固定评价、13checkpoint和gzip原生收据。

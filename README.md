@@ -1,10 +1,19 @@
-## 2026-10-28 奖励图独立闭环任务
+## 2026-10-29 论文证据强化
+
+四方法×五seed奖励图已实际交付；[结果与负例](docs/project/paper_reward_curve_result_20261028.md)
+保留初始优势、两个回退seed和状态成本反例。用户现授权广泛文献对照、独立诊断后自主改进与验收。
+[强化合同](docs/project/paper_evidence_strengthening_contract_20261029.md)分开补齐全12条件initial→final归因，
+以及只对主方法验证一个稀疏head等权候选；原对照、规则、奖励、环境和预测器不变。
+先软件资格、clean source/plan冻结，再单次有界执行和自动回收；当前结果不推断新候选优势。
+formal/hidden认证仍为0，整体论文未完成；TGSIM旧失败不阻塞这两个开发补证任务。
+
+## 2026-10-28 奖励图独立闭环任务（已完成）
 
 用户最新要求单独推进奖励图；TGSIM输入失败不阻塞该任务。已核对[五篇一手图页](docs/project/paper_reward_figure_reference_20261028.md)，
-并从768个旧训练点生成明确标记legacy的诊断图。当前主方法密集固定策略曲线仍缺，不能插值伪造收敛。
+并从768个旧训练点生成明确标记legacy的诊断图。后续真实固定策略曲线已完成，不插值或挑峰值。
 [新合同](docs/project/paper_reward_curve_contract_20261028.md)固定主方法/MAPPO/PPO/DQN×5seed×96完整训练episode，
-共13个固定checkpoint；从随机策略开始，共享冻结已拟合GRU。64项软件资格通过，启动前冻结clean commit/plan。
-`launch_stream_reward_curve.py`完成后自动核账、九重放并导出PDF/SVG/PNG；不修改奖励、环境、规则或其他算法。
+共13个固定checkpoint；从随机策略开始，共享冻结已拟合GRU。64项软件资格通过后单次执行，
+已核账、九重放并导出PDF/SVG/600dpi PNG；不修改奖励、环境、规则或其他算法。
 已消费train学习图不等于formal/holdout泛化，整体论文目标仍未完成。
 
 ## 2026-10-28 最新输入终端状态与失败账本

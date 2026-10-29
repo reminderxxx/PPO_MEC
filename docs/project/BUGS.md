@@ -1,3 +1,18 @@
+## 2026-10-29：稀疏head学习权重、归因与独立证据缺口（OPEN）
+
+固定八集显示priority占旧全active-row目标77.0%–80.5%，cache仅0.372%–0.873%；
+这是可检验的目标权重不均，不是已证明的唯一奖励根因。新等权head候选可能放大稀疏方差，
+只允许一次冻结比较；原对照/奖励/环境不变，失败不能扩训追第一。graph gate微小与surrogate回归下降
+均不能替代模块必要性；surrogate当前只进控制变量，不在线调整logit。
+全12 initial还缺45条，不能把三probe学习增量外推到全部12条件；新只评价任务先冻结再执行。
+初始化校正：全部5seed main/MAPPO/PPO随机张量相同，但forward/prior/mask不同；17624是双optimizer合计。
+旧统计有1正例和7项stream兼容缺口，尚无严格消费端资格；418未知历史隔离、独立formal/hidden为0。
+近期就绪准入/多LoRA工作使单纯mask/cache创新表述风险增加，需连续DAG/跨RSU机制与真实净成本证据。
+已保存TGSIM source1的27窗只是容量上界；run相对时钟/绝对重叠不明，原后置version/count未达。
+TGSIM图像参考坐标为米，原NGSIM provider保留feet数值几何；不能无声把旧四RSU套到另一站点或混用dt。
+需要独立provider/站点几何/物理成本和DAG映射资格，现仍0个可认证formal/hidden单元。
+[实现及客观接受门](paper_evidence_strengthening_contract_20261029.md)。
+
 ## 2026-10-28：学习曲线已补齐，初始结构优势与训练收益仍不可混同（OPEN）
 
 20cell、260checkpoint和全部五seed13点曲线已由真实固定评价补齐，九final重放一致；缺少密集记录这一项关闭。

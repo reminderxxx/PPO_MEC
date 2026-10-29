@@ -648,3 +648,49 @@ class IntentAwareStreamSAGHMAPPOAgent(RelocationAwareStreamSAGHMAPPOAgent):
         obj.load_state_dict(saved['state_dict'], strict=True)
         obj.completed_updates.zero_()
         return obj
+
+
+class HeadBalancedIntentStreamSAGHMAPPOAgent(IntentAwareStreamSAGHMAPPOAgent):
+    """Opt-in main-only policy/entropy reduction over active control heads.
+
+    Actor initialization, distributions, physical priors, candidate masks,
+    critics, auxiliary losses and optimizer behavior remain inherited. The
+    independent checkpoint contract prevents this candidate from being loaded
+    as the historical main method.
+    """
+    checkpoint_contract = 'stream_main_head_balanced_intent_v1'
+    head_reduction = 'active_mean_within_head_equal_mean_across_heads_v1'
+
+    def __init__(self, *, policy_head_reduction=head_reduction, **kwargs):
+        if policy_head_reduction != self.head_reduction:
+            raise ValueError('unknown main-method head reduction')
+        super().__init__(**kwargs)
+        self.options['policy_head_reduction'] = policy_head_reduction
+        self._head_balance_batches = []
+
+    def _reduce_active_policy_terms(self, objective, entropy, weight, *, batch_indices=None,
+                                    entropy_coefficient=1.):
+        counts = weight.sum(0)
+        enabled = (counts > 0).to(weight.dtype)
+        denominator = enabled.sum().clamp(min=1)
+        objective_means = (objective*weight).sum(0)/counts.clamp(min=1)
+        entropy_means = (entropy*weight).sum(0)/counts.clamp(min=1)
+        policy = -(objective_means*enabled).sum()/denominator
+        balanced_entropy = (entropy_means*enabled).sum()/denominator
+        self._head_balance_batches.append(dict(
+            reduction_dtype=str(objective.dtype),
+            batch_indices=[] if batch_indices is None else batch_indices.detach().cpu().tolist(),
+            active_counts=counts.detach().cpu().tolist(),
+            objective_head_weights=(enabled/denominator).detach().cpu().tolist(),
+            objective_head_means=objective_means.detach().cpu().tolist(),
+            entropy_head_means=entropy_means.detach().cpu().tolist(),
+            policy_loss=float(policy.detach()),
+            balanced_entropy=float(balanced_entropy.detach())))
+        return policy, entropy_coefficient*balanced_entropy
+
+    def update(self, rollouts, *, epochs=4):
+        self._head_balance_batches = []
+        result = super().update(rollouts, epochs=epochs)
+        result.update(policy_head_reduction=self.head_reduction,
+                      head_balance_batches=self._head_balance_batches)
+        return result

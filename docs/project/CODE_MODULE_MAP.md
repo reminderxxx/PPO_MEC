@@ -1,3 +1,13 @@
+## 2026-10-29 主方法head均衡与补证消费端
+
+`ScheduledControlPPO`只增加窄policy/entropy reducer hook，默认保留原乘除顺序；
+`HeadBalancedIntentStreamSAGHMAPPOAgent`在原主算法文件中opt-in覆盖该hook，独立checkpoint contract，
+不进入live registry、不改变旧类默认行为或其他算法。旧e00d5fa完整更新的bitwise等价由合成回归核验。
+initial补证入口只加载旧main的ep000、只执行45个缺失评价和3重放；旧15 probe/final60/rule12为SHA引用。
+主方法候选runner复用原物理episode、MC、预算、RNG、checkpoint助手，独立consumer重建新原件与head覆盖，
+只读消费旧main审计作锚。parent负责单claim/2worker/硬界限/失败传播及自动collector，不负责参数选择。
+只读learning attribution脚本不依赖环境或模型，分解为数学恒等式，不能作为因果模块归因。
+
 ## 2026-10-28 奖励曲线生产与消费
 
 新curve runner复用原`stream_episode`完整native team MC、`make_env`和固定agent factory，

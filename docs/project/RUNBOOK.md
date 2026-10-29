@@ -2047,3 +2047,13 @@ python scripts/launch_joint_stream_learning.py --output_root artifacts/joint_str
 科学运行要求clean Git，所有方法各seeds7/17/27×64会话，最大737280训练帧；32只在12固定probe看曲线，64完整48条件固定最终。新增一次seed101/30epoch GRU拟合，仅新train前两会话、第三内部验证；记录真实原时间偏移和SHA，不复用覆盖新dev的旧bundle。最终原始events/receipts在各方法子目录，根`results.jsonl`合并全部final汇总；`audit.json`/`results_review.md`为独立消费输出，`launcher_result.json=complete`才是整个流水线完成。
 
 当前运行指针`artifacts/joint_stream_learning/continuation.json`，每20分钟只读其指向的progress/result及必要日志末尾，不盯奖励/轮次。正常运行静默；完成自动回收分析，独立审查后再落实下一有界实施任务。失败保留原件，不自动重跑或续训；不要重复执行已启动科学launch。
+# 2026-10-29 论文证据强化开发流程
+
+按[强化合同](paper_evidence_strengthening_contract_20261029.md)先保存独立审查/诊断，再实现两个独立任务：
+缺少的全12 initial归因补证，以及一个head均衡主方法候选。旧reward curve audit只读复用，不重训或重复旧审计。
+先运行对应合成测试；clean scoped commit后在私有目录冻结source/输入/授权/旧audit SHA、绝对deadline和输出路径。
+`complete_stream_initial_evidence.py`只评价缺少的45集并自动审计三重放；
+`launch_stream_head_balance_study.py --campaign <frozen_plan> --expected_sha <sha>`一次启动最多2worker，
+完成五cell后自动运行匹配collector。两任务合计最多3worker，运行中tracked源码冻结。
+每20分钟至多核对身份、终端状态和完成单元数；失败保留原件，不能原地重试、改变门或追加候选。
+终端核对实际初始/最终与成本/负seed，再交数据、图与接受门；局部通过仍不晋级canonical或称论文完成。

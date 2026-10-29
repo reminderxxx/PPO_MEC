@@ -690,6 +690,17 @@ class ScheduledControlPPO(CoordinatedControlPPO):
     def _apply_control_gradients(self,loss):
         self.optimizer.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(self.parameters(),.5);self.optimizer.step()
 
+    def _reduce_active_policy_terms(self, objective, entropy, weight, *, batch_indices=None,
+                                    entropy_coefficient=1.):
+        """Historical active-row reduction; opt-in subclasses may balance heads.
+
+        Keep the default operations unchanged so existing policies and controls
+        retain their original update semantics.
+        """
+        denominator = weight.sum().clamp(min=1)
+        return (-(objective*weight).sum()/denominator,
+                entropy_coefficient*(entropy*weight).sum()/denominator)
+
     def _evaluate(self,data,*,actions=None,deterministic=False,return_details=False,target=False,execution_actions=None,execution_only=False):
         own=data['own'];batch=len(own)
         latent=self.graph_encoder(data['graph']);latent=self.graph_message(torch.cat((latent,torch.bmm(data['adjacency'],latent)),-1))
@@ -795,11 +806,13 @@ class ScheduledControlPPO(CoordinatedControlPPO):
                 kl=(((ratio-1)-logratio)*weight).sum()/den
                 if self.stability_enabled and float(kl.detach())>.02:stopped=True;break
                 objective=torch.minimum(ratio*advantages[index],ratio.clamp(.8,1.2)*advantages[index])
-                policy=-(objective*weight).sum()/den
+                policy,entropy_penalty=self._reduce_active_policy_terms(
+                    objective,entropy,weight,batch_indices=index,
+                    entropy_coefficient=self._entropy_coefficient(progress))
                 vf=(prefix-targets[index,None]).square().mean()+(value-team[index]).square().mean()+(q-targets[index,None]).square().mean()
                 expected=torch.cat((targets[index,None],costs[index]),-1)[:,None]
                 aux=(surrogate-expected).square().mean() if self.surrogate_enabled else vf*0
-                loss=policy+.5*vf-self._entropy_coefficient(progress)*(entropy*weight).sum()/den+.2*aux
+                loss=policy+.5*vf-entropy_penalty+.2*aux
                 self._apply_control_gradients(loss)
                 if self.surrogate_enabled:self.surrogate_mse.mul_(.95).add_(.05*(surrogate[...,0].detach()-targets[index,None]).square().mean())
                 losses.append([float(policy.detach()),float(vf.detach()),float(aux.detach())]);kls.append(float(kl.detach()));clips.append(float((((ratio-1).abs()>.2)*weight).sum().detach()/den));entropies.append(float((entropy*weight).sum().detach()/den));qerrors.append(float((q.detach()-targets[index,None]).square().mean()))
