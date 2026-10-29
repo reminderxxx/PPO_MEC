@@ -1,5 +1,16 @@
 ## 2026-10-29 终端复用与强化后软件任务
 
+本地组件成本T现已完成，直接复用`local_cost_execution/audit.json`与`delivery.json`，不为画图重跑测量/审计。
+[结果](paper_local_adapter_cost_result_20261029.md)给出全部测值、7资格/21正式attempt、费用和解释边界。
+新只读导出入口：
+
+```text
+python scripts/plot_local_adapter_cost_support.py --execution_root COMPLETED_ROOT --expected_plan_sha SHA --expected_audit_sha SHA --expected_delivery_sha SHA --output FRESH_EXPORT
+```
+
+导出只读小型已审计结果，验证输入绑定及每组3值，保留全部qualifier/正式/嵌套/残差；禁止改SHA筛样或回跑模型。
+PDF需渲染核对，图/原数据/私有review不上传；已有最终图直接复用。
+
 两项强化科学任务已终端并交付；[固定结果](paper_evidence_strengthening_result_20261029.md)保留head候选拒绝结论。
 复用现有initial和head collection的audit/complete；不得重新运行旧launcher、collector或重放。
 

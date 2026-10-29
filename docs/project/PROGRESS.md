@@ -1,3 +1,14 @@
+## 2026-10-29：本机组件成本单次执行完成，技术支持通过
+
+d5d7e3d与精确plan/grant单次完成28attempt，自动独立audit一次；12模型/16helper、28generate/12loopback等矩阵一致。
+合计146.527909秒，自动delivery665022277B、日志2639312B，全部硬限内；含外部控制日志的交付复核也通过。
+32个组件组各保留3个正式值，7资格与21正式attempt分列，244行区间/嵌套/残差CSV及矢量图已导出核对。
+状态恢复均值0.114583ms，ALPR adapter load864.147694ms；activation含完整性检查，transfer含hash/账本/file/fsync/guard，
+均不能改称纯switch、TCP吞吐或无线/RSU成本。A8token/B5token且rank/DoRA不同，不因果比速。
+[实际结果与边界](paper_local_adapter_cost_result_20261029.md)只支持本机技术路径，不校准stream、不证明任务质量或净收益。
+本轮有界科学及四项准备/T技术支持已交付；Q缺许可图像/独立groundtruth，formal/hidden/站点物理成本仍未认证。
+保留原main、全部失败及418未知隔离，paper_goal_complete=false，不自动追加候选或下载。
+
 ## 2026-10-29：四项后续准备交付，本地成本执行链完成有限软件验收
 
 统计v2新增8fixture、单轮8项检查通过，根审查核4个source与101个保存产物SHA；不宣称真实独立性或CI覆盖已认证。

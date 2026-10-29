@@ -1,3 +1,12 @@
+## 2026-10-29：本机技术成本已观测，真实质量及物理映射仍缺（OPEN）
+
+本地T28attempt单次完成，独立审计与交付通过；此前没有当前组件观测这一小范围缺口已补。
+但仪器化activation含张量核验，transfer含hash/日志/磁盘/ACK，不能直接填入纯switch/无线链路模型。
+A8token/B5token且rank/DoRA/尺寸不同，不能把时延差当同任务因果性能对照；技术suffix没有适用驾驶groundtruth。
+Q缺许可图像和独立标签，stream尺寸/费用/原RSU/时钟映射及分离校准验证未建立，break-even不可用。
+formal/hidden独立认证0、418未知隔离保留，技术T通过不消除学习回退或候选失败。
+[结果与未覆盖范围](paper_local_adapter_cost_result_20261029.md)。
+
 ## 2026-10-29：稀疏head学习权重、归因与独立证据缺口（OPEN）
 
 固定八集显示priority占旧全active-row目标77.0%–80.5%，cache仅0.372%–0.873%；

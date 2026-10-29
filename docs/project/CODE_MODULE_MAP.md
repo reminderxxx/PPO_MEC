@@ -4,6 +4,8 @@
 生产与独立重新消费在同一CLI的不同operation，输入/矩阵/物理身份再次校验。当前仅合成资格，不能认证真实capture。
 新的本地T runner与独立stdlib auditor分开；模型依赖只能在通过独立执行grant与全部门后的受控worker载入，
 合成资格使用假模型与小型原件，不触发原模型或资源传输。旧suffix runtime、live provider和算法职责不变。
+`plot_local_adapter_cost_support.py`只消费完成的plan/audit/delivery小型JSON，核绑定后导出全部区间/摘要/账单CSV与图，
+依赖stdlib及Matplotlib，不能调用生产/审计或更新仿真费用；不把绘图侧写入原件或模型路径。
 原生provider/几何和公平启发式仍只有设计合同，不把未实现consumer写成live模块。
 
 ## 2026-10-29 主方法head均衡与补证消费端

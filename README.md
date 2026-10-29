@@ -60,6 +60,9 @@ formal/hidden认证仍为0，整体论文未完成；TGSIM旧失败不阻塞这�
 
 # PPO_MEC
 
+2026-10-29本机技术组件成本已单次完成并独立审计，图/CSV及质量、无线和费用映射边界见
+[本机成本结果](docs/project/paper_local_adapter_cost_result_20261029.md)；这不改变head候选拒绝或全篇未完成结论。
+
 八车辆论文主方法的训练集机会诊断与等交互预算消融入口见
 [研究合同](docs/project/paper_main_opportunity_20261026.md)。这是独立 opt-in
 开发研究；不改变默认算法、规则、环境奖励或正式结果。
