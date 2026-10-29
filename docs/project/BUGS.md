@@ -6,6 +6,8 @@
 两冻结adapter卡均训练集未知/无结果，不能用模型名或技术suffix证明质量；“继续补”未给出数据身份。
 下一步仍须具体图像/独立标签来源及许可适用性，再冻结新Q；不自动下载、重测旧图或追加训练。
 [来源补充与边界](paper_task_quality_source_reconciliation_20261029.md)。
+用户随后选择制定公开数据小样本方案；已形成[条件性获取合同](paper_public_task_sample_acquisition_proposal_20261029.md)，
+但EdgeVision逐文件入口、CCPD无牌标签和小文件大小均未认证，方案不等于已获取输入或已消除本缺口。
 
 ## 2026-10-29：本机技术成本已观测，真实质量及物理映射仍缺（OPEN）
 

@@ -13,6 +13,18 @@
 
 ## 维护规范
 
+### 2026-10-29：任务图像来源与标注边界
+
+只核公开原始发布说明，未下载图像/视频或复现外部结果；这些条目支持数据资格设计，不是VEC算法强对照。
+
+| 方向 | 论文/原始数据 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+| --- | --- | --- | --- | --- | --- |
+| 车牌外部标注 | [Towards End-to-End License Plate Detection and Recognition: A Large Dataset and Baseline](https://openaccess.thecvf.com/content_ECCV_2018/papers/Zhenbo_Xu_Towards_End-to-End_License_ECCV_2018_paper.pdf)；[作者仓库](https://github.com/detectRecog/CCPD) | ECCV 2018；作者仓库核验标题/年份/数据MIT声明，论文页码255–271按作者BibTeX；本轮不重审性能 | 作者说明文件名编码车牌与几何，demo和整包入口分开；外部标签可先于模型输出冻结。 | 字符规范必须保留中文，模型输入不能泄漏文件名答案；无框不等于无牌，旧adapter训练重叠仍未知。小文件入口与无牌标签资格未核，不自动下载整包。 | Task-quality source qualification，非缓存/迁移baseline。 |
+| 摩托车头盔外部标注 | [EdgeVision Dataset V1](https://data.mendeley.com/datasets/j82bnw7gsr/1)，DOI 10.17632/j82bnw7gsr.1 | Mendeley Data，2026；原数据发布页核验，不是已核验顶刊论文 | 发布方声明CC BY4.0、真实摩托车图像和五人标注，提供三种框格式。 | 可优先准备有限Helmet/NoHelmet fixture；类ID/ROI须严格转换。发布日期不能证明训练独立，文件大小/逐文件可获取性尚未核，不能直接认证质量。 | Task-quality input，非算法novelty或部署收益证据。 |
+| 摩托车头盔与跟踪单位 | [Helmet Use Detection of Tracked Motorcycles Using CNN-Based Multi-Task Learning](https://doi.org/10.1109/access.2020.3021357) | IEEE Access，2020；DOI原页本轮触发机器人检查，搜索可见原摘要；全文及许可未重核 | 原摘要描述带跟踪单位的头盔数据，提示应区分视频帧与独立摩托车事件。 | 应保留物理主体/session分组，不能将重复帧当独立质量样本；本次不选为直接获取源，不借论文规模认证本项目。 | Data unit / limitation；非顶刊算法对照。 |
+| 头盔目标语义 | [Video Analytics for Detecting Motorcyclist Helmet Rule Violations](https://openaccess.thecvf.com/content/CVPR2023W/AICity/papers/Tsai_Video_Analytics_for_Detecting_Motorcyclist_Helmet_Rule_Violations_CVPRW_2023_paper.pdf) | CVPR Workshops 2023，AI City；CVF搜索摘要核验，HTML本轮403，作者/页码/DOI待核；不是CVPR主会 | 原实验摘要区分司机/乘客及戴盔类别，标签对象须明确。 | 本项目有限fixture应指定单ROI，不能把整车框或任意一人佩戴推成所有人戴盔。未获取该挑战数据或据此主张任务质量。 | Label semantics / bounded source design。 |
+| 头盔复杂场景负例 | [Robust Motorcycle Helmet Detection in Real-World Scenarios: Using Co-DETR and Minority Class Enhancement](https://openaccess.thecvf.com/content/CVPR2024W/AICity/papers/Vo_Robust_Motorcycle_Helmet_Detection_in_Real-World_Scenarios_Using_Co-DETR_and_CVPRW_2024_paper.pdf) | CVPR Workshops 2024，AI City；CVF搜索摘要核验，HTML本轮403，作者/页码/DOI待核；不是CVPR主会 | 公开实验摘要保留多人框/模糊等分类困难，提示ROI歧义与失败保留。 | 不在看到输出后换图或缩窄任务求通过；这不是本项目adapter复现，也不提供其训练集独立性。 | Task-quality limitation，不用于算法排名。 |
+
 ### 2026-10-29：机制归因、真实开销与近邻系统证据
 
 本轮按公开原论文实验段和图表核对证据形态；不上传项目材料，不复现外部数值，不启动项目训练或策略评价。公开作者稿与正式版本分开标识；未找到 seed/CI 不能解释为作者没有做，也不沿用未核验的二手 venue。新近邻说明“adapter cache / 依赖感知 / 多时间尺度 / 可行性 admission”均已有单独或组合研究，项目差异仍须落实为跨 RSU 连续 DAG、执行状态版本、因果可得预测和准备净收益。
