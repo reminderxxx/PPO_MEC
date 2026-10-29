@@ -1,3 +1,30 @@
+## 2026-10-29 终端复用与强化后软件任务
+
+两项强化科学任务已终端并交付；[固定结果](paper_evidence_strengthening_result_20261029.md)保留head候选拒绝结论。
+复用现有initial和head collection的audit/complete；不得重新运行旧launcher、collector或重放。
+
+[严格stream统计](paper_stream_statistics_contract_20261029.md)只有合成生产/消费资格，真实输入不接受。
+v1两轮的32场景被物化为64实例，保留预算FAIL；v2已另立8个目录、单轮8项检查通过，不能重生成旧fixture。
+
+```text
+python scripts/analyze_stream_statistics.py produce --plan PLAN --expected_plan_sha SHA --output FRESH_BUNDLE
+python scripts/analyze_stream_statistics.py analyze --plan PLAN --expected_plan_sha SHA --bundle BUNDLE --expected_bundle_sha SHA --output FRESH_RESULT
+```
+
+PLAN须明确synthetic、完整矩阵/物理时钟、来源及schema，不把命令当真实formal/holdout开启权限。
+针对新版本的验收原件复用私有`stream_statistics_v2_software/`，不为提醒循环跑测试。
+
+[本地组件成本实现任务](paper_local_adapter_cost_implementation_20261029.md)先验收独立producer/consumer；
+尚未取得对应clean source、当前硬件/依赖、资源/旧参考和精确execution grant之前，不运行真实T。
+
+```text
+python scripts/run_local_adapter_cost_support.py --plan PLAN --plan_sha256 SHA --grant GRANT --output FRESH_ROOT --audit_output FRESH_EXTERNAL_AUDIT --delivery_output FRESH_EXTERNAL_DELIVERY
+```
+
+T的调用矩阵/字节/5400秒/1GiB等须由另立执行plan精确冻结；不能直接把准备方案当grant。
+Q缺适用图像/独立groundtruth，仍不可执行。全程无新下载、训练/环境评价、旧FAIL改写或依赖安装，
+技术一致性不等于驾驶质量，loopback不等于无线/RSU实测。
+
 ## 2026-10-28 奖励学习曲线单次执行与自动回收
 
 先读`paper_reward_curve_contract_20261028.md`与一手图页核验。用户本轮授权的独立curve任务不依赖TGSIM修复。

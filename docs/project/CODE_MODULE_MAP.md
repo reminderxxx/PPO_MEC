@@ -1,3 +1,11 @@
+## 2026-10-29 强化后的统计与本地成本软件
+
+`analyze_stream_statistics.py`只依赖明确schema、hash绑定原生行及NumPy/stdlib，不依赖环境、agent或旧统计脚本；
+生产与独立重新消费在同一CLI的不同operation，输入/矩阵/物理身份再次校验。当前仅合成资格，不能认证真实capture。
+新的本地T runner与独立stdlib auditor分开；模型依赖只能在通过独立执行grant与全部门后的受控worker载入，
+合成资格使用假模型与小型原件，不触发原模型或资源传输。旧suffix runtime、live provider和算法职责不变。
+原生provider/几何和公平启发式仍只有设计合同，不把未实现consumer写成live模块。
+
 ## 2026-10-29 主方法head均衡与补证消费端
 
 `ScheduledControlPPO`只增加窄policy/entropy reducer hook，默认保留原乘除顺序；

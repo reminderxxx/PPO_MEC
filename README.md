@@ -4,7 +4,9 @@
 保留初始优势、两个回退seed和状态成本反例。用户现授权广泛文献对照、独立诊断后自主改进与验收。
 [强化合同](docs/project/paper_evidence_strengthening_contract_20261029.md)分开补齐全12条件initial→final归因，
 以及只对主方法验证一个稀疏head等权候选；原对照、规则、奖励、环境和预测器不变。
-先软件资格、clean source/plan冻结，再单次有界执行和自动回收；当前结果不推断新候选优势。
+两任务现已[完成并交付](docs/project/paper_evidence_strengthening_result_20261029.md)：全12条件原main训练增量−1.117099，
+head等权候选相对原main−1.448509且全部效益门失败，保留原main，不扩训或选峰值。
+六次事前重放匹配；继续统计软件、原生几何/时钟、系统成本及公平对照合同准备，不自动开启新科学任务。
 formal/hidden认证仍为0，整体论文未完成；TGSIM旧失败不阻塞这两个开发补证任务。
 
 ## 2026-10-28 奖励图独立闭环任务（已完成）

@@ -1,5 +1,9 @@
 ## 2026-10-29 证据强化开发入口
 
+- `docs/project/paper_evidence_strengthening_result_20261029.md`：完整initial及被拒head候选的固定结果；私有图件/CSV不复制到仓库。
+- `scripts/analyze_stream_statistics.py`：独立合成统计生产/消费CLI；真实科学输入保持关闭，v1预算失败与v2独立修正分目录保留。
+- `scripts/run_local_adapter_cost_support.py` / `scripts/audit_local_adapter_cost_support.py`：另立的T组件成本软件生产/独立消费端；真实执行需新精确grant及clean source/硬件资格。
+- `docs/project/paper_tgsim_native_provider_geometry_contract_20261029.md`、`paper_local_cost_quality_support_contract_20261029.md`和`paper_fair_domain_comparator_contract_20261029.md`：输入、成本/质量和公平对照合同；不等于运行资格或科学结果。
 - `scripts/analyze_stream_learning_attribution.py`：只读消费已绑定SHA的curve audit/plot，分解初始差与相对学习增量，不加载策略。
 - `scripts/qualify_stream_reference_endpoints.py`：只对旧main final60做状态费用/完成端点只读资格，不重做旧20cell奖励审计。
 - `scripts/complete_stream_initial_evidence.py` / `scripts/audit_stream_initial_evidence.py`：只补缺少的45条ep000和3固定重放，原15条/最终结果只读引用。
