@@ -66,3 +66,15 @@ v3的3页清单已完整取得，原生2392文件与COCO对应，6目标及其se
 只读引用完整COCO、3完整metadata及旧selection，不下载或复制这些原件。第0图仅跟随已留302的字面publicS3 Location，收据redirect_from=-1明确指历史已SHA绑定的parent；其他5图只用原metadata URL并最多1次publicS3 Location，预期11新HTTP。任何失败保存停止，不替换目标，不再自动开下一套网络任务。
 前缀累计19HTTP/5526965B返回body/65536读取上界，另有689404B声明未读实体上界；总已收费6281905B。新最多13HTTP/60826959B，仍累计32HTTP/64MiB/256MiB原资源上限，全部负结果/原件/新软件与导出计账。
 `finish_public_helmet_pilot.py`复用有界Capture，仅允许plan把请求/字节/时间cap缩小；`audit_public_helmet_delivery.py`独立验证全部原生GT/文件identity、继承账单、旧冻结选择、6图片/Pillow完整性与300秒收尾。新raw=`public_helmet_delivery_20261030_v4/`，私有`final_delivery_v4/`。consumer仅单次，exit0/无failure/audit-terminal SHA同时成立才资格；模型/Q/ALPR/hidden/论文完成均不因此获准。
+
+## 实际交付：Helmet6输入资格通过（2026-10-30）
+
+clean `a5ecc585d2aaf389a79dec7a4724185d73f82440`固定输入收尾只启动一次，实际11HTTP/10643077B、33.830951秒（独立consumer0.489504秒）。六张不同原图总10642407B，Helmet/NoHelmet原生ROI各3例；全部publisher SHA/size、Pillow格式/尺寸、框边界、完整清单及事前选择均通过。producer/consumer exit0、无consumer_failure、audit-terminal SHA配对通过，另作一次只读交付层接受，未重跑审计。
+
+累计实际30HTTP/16170042B返回body、65536B中断读取上界、689404B独立声明未读实体上界，收费合计16924982B（约16.14MiB），低于32HTTP/64MiB。真实wire总量仍不可核验；不能把body或上述界限称全部互联网精确流量。原900秒范围的3个Helmet失败（v1/v2/v3）、更早M超时/API错误均封存；新额外300秒范围单列，不将旧失败改为成功。
+
+交付位于主目录私有`paper_evidence_strengthening_20261029_v1/quality_helmet_pilot_acquisition_20261030_v1/final_delivery_v4/`：`helmet_samples.csv`、`helmet_groundtruth.json`、`audit.json`、`delivery_verification.json`、`independent_delivery_acceptance.json`；6原图仍为worktree新raw的opaque body文件，不上传GitHub。
+
+本次只完成Helmet6输入。完整2392图COCO/8275标注及2392 metadata已暴露并记录；六原图不是六个新独立采集，公开许可声明也不认证底层权利链或模型训练无重叠。未来Q必须固定原生ROI/相同预处理/全部样本及成对基线，另立模型评价范围；本次模型、Q、训练/拟合/hidden均0。ALPR文字/明确NONE六例尚未资格，12例总计划不完整，任务质量收益及论文目标仍未验证。
+
+软件验证谱系保留：首producer3/consumer2合成案例、1个22B存储微例及各次纯内存/AST增量分别绑定源码；不声称最终版本全部旧case重跑。最终输入端到端运行和单次独立审计真实通过，不是训练/benchmark结果。主目录七个用户修改文件SHA均未变，R20/老师稿位未编辑。

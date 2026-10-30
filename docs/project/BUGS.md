@@ -1,3 +1,7 @@
+## 2026-10-30：Helmet输入入口已闭合，质量/ALPR边界保持OPEN
+
+通过合法206 items分页、只读完整COCO引用及已见HTTP sideband多值修正，实际6原图+外部原生ROI已独立资格，未重跑旧失败或审计。这里只支持当前发布方响应兼容，不声称通用HTTP头全兼容。ALPR文字/NONE样本、模型训练重叠、底层权利链、真实任务质量增益仍未闭合；输入成功不认证Q或论文完成。详见[实际交付](paper_public_helmet_pilot_contract_20261030.md#实际交付helmet6输入资格通过2026-10-30)。
+
 ## 2026-10-30：官方folder与COCO入口已解析，图像资格待执行
 
 同来源脚本/root/folder诊断已取得官方COCO文件ID、size、SHA及单文件URL，累计12HTTP/1588374B。历史HTTP200/APIerror400和641.769310秒FAIL保留，不追认为当时成功。新[Helmet6输入合同](paper_public_helmet_pilot_contract_20261030.md)解决入口后的有界获取，当前未下载实际图像、未作Q；ALPR无牌/文字GT、训练独立性及底层权利链仍缺。

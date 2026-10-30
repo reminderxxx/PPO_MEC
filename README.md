@@ -1,3 +1,5 @@
+Helmet6实际输入已交付：6原图的发布方哈希/尺寸/原生ROI通过单次独立审计，3+3目标固定；[结果及边界](docs/project/paper_public_helmet_pilot_contract_20261030.md#实际交付helmet6输入资格通过2026-10-30)。模型/Q仍0，ALPR及论文目标未完成。
+
 完整COCO与3图像metadata页已保留并冻结6目标；按[固定文件收尾](docs/project/paper_public_helmet_pilot_contract_20261030.md#最终固定文件收尾额外独立300秒不恢复旧时间)只补这6原图，旧失败/900秒范围保留，额外300秒单列，网络总额度不增。
 
 最新官方folder清单已取得独立COCO文件身份。现按[Helmet6输入合同](docs/project/paper_public_helmet_pilot_contract_20261030.md)准备固定6图与原生GT，原M12封存、累计总账不重置；模型/Q仍0。
