@@ -37,3 +37,7 @@ M有资格发现后，D仍需固定实际标签、文件ID/大小/URL和sample_m
 终端交付实际取得的文件/元数据和账单；只提供超限整包、无单文件标签或CCPD无牌语义仍缺时停止，
 不把入口失败当数据集无效，不静默换来源或下载整个训练库。
 原12图ALPR负结果、所有旧失败、main及被拒候选不改写；模型/训练/评价/拟合/hidden预算0，论文仍未完成。
+
+初次真实CLI初始化通过，但新raw命名空间未在Git忽略中登记，随后GET被clean-source门在联网前拒绝。
+原初始化目录/意图/命令和零请求终端审计保留，不在原目录恢复。独立诊断后仅补`/data/raw/task_quality/`忽略规则，
+用`git check-ignore`、`git diff --check`及新clean commit核对，再在fresh目录初始化；HTTP/body实际支出仍为0，不是重取数据。

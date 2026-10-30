@@ -2,6 +2,7 @@
 /artifacts/
 /data/raw/ai_workflow_pilot/
 /data/raw/mobility/tgsim/
+/data/raw/task_quality/
 
 # Python caches and test output
 __pycache__/
