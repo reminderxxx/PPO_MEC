@@ -1,3 +1,8 @@
+## 2026-10-30：Helmet6真实成对Q完成，严格质量门失败
+
+- clean `0292c959`单次执行2模型进程/12generate，独立audit和全部视觉输入/LoRA参数/原始token核验通过；两臂严格0/6、各6格式错。Helmet六次均输出NO_HELMET内容，三正例也未区分；保留全负结果，不改parser救分。
+- 实际parent217.449秒，0下载/训练/环境episode；逐例CSV/原始JSON/资源CSV私有交付。结果与claim边界见[本轮结果](paper_helmet_quality_pilot_result_20261030.md)，paper_goal_complete=false；不据n6声称总体效果。
+
 ## 2026-10-30：Helmet6 Q独立实现与冻结准备
 
 输入已交付后人工明确继续推进；先独立预实现审查，再另立固定ROI两臂(base/Helmet)各6generate、32token、CPUfloat32、1800秒/128MiB任务。原生框无手改、prompt/parser事前锁定、全部格式错/负值保留；不下载/训练、不等ALPR、不得从0/6重试。producer4软件case通过，内存预计算6PNG SHA而未写PNG/未加载模型；consumer4case另列。真实Q尚未启动，论文未完成。

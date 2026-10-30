@@ -1,3 +1,5 @@
+2026-10-30 Helmet Q已单次终端，结果见`paper_helmet_quality_pilot_result_20261030.md`；直接复用私有audit/terminal/CSV，协议审计PASS与质量门FAIL分开，不重跑或补测。
+
 ## 2026-10-30：Helmet6固定ROI质量pilot
 
 先读[Q合同](paper_helmet_quality_pilot_contract_20261030.md)。完成独立软件接受/clean source/输入资源及plan-grant SHA冻结后，仅一次`run_helmet_quality_pilot.py --plan <plan> --plan_sha256 <sha> --grant <grant>`；两个无GT workerplan只由parent启动，勿手动执行worker或现成audit。producer1200/每worker600/consumer剩余600合计1800秒，日志/全128MiB。协议通过但全错仍可audit_success，质量标志单独报，不补测/调prompt。

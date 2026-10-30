@@ -1,3 +1,8 @@
+## 2026-10-30：Helmet固定6ROI任务质量资格未通过
+
+- 12真实生成/独立audit完整，但base及Helmet各严格0/6、各6格式错；Helmet对3正3负均输出NO_HELMET内容。严格格式门与内容错误分别保留，不做事后parser/prompt修补。
+- parsed_label全null的disagreement=0不能当行为一致；训练数据重叠、原训练任务与ROI分类匹配仍UNVERIFIED。见`paper_helmet_quality_pilot_result_20261030.md`。技术加载/参数一致不认证任务收益；本负例不支持论文质量收益claim。
+
 ## 2026-10-30：Helmet输入入口已闭合，质量/ALPR边界保持OPEN
 
 通过合法206 items分页、只读完整COCO引用及已见HTTP sideband多值修正，实际6原图+外部原生ROI已独立资格，未重跑旧失败或审计。这里只支持当前发布方响应兼容，不声称通用HTTP头全兼容。ALPR文字/NONE样本、模型训练重叠、底层权利链、真实任务质量增益仍未闭合；输入成功不认证Q或论文完成。详见[实际交付](paper_public_helmet_pilot_contract_20261030.md#实际交付helmet6输入资格通过2026-10-30)。

@@ -49,3 +49,5 @@ Helmet真实active status及全部LoRA参数CPUfloat32 SHA要与原safetensors�
 不据n6作总体准确率/显著性、训练独立性、检测性能、驾驶安全、无线/RSU成本或系统净收益结论。
 公开COCO外部GT足以本pilot来源绑定，不认证每例双人重新标注，模型训练集仍未知。
 ALPR文字/NONE样本尚缺，12例全计划未完成；任何结果都不晋级canonical、不改老师稿位/论文主表，不追加主方法候选。
+
+实际执行与保留的质量失败见[结果](paper_helmet_quality_pilot_result_20261030.md)；执行/自动审计已完成，禁止重跑本run或事后改判分覆盖负结果。
