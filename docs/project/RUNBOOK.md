@@ -4,6 +4,7 @@
 `diagnose_public_task_entry.py init --plan <frozen_plan> --sha256 <sha>`仅初始化fresh root，
 `get --root <fresh> --index 0`只读已发布bundle；index1还须`--proof <saved_offsets_and_review> --proof_sha256 <frozen_sha>`，无独立实际调用关系复核不请求。
 结束后仅一次`audit --root <fresh> --output <new_audit>`，失败也保留账单，不恢复旧run或启动图像/模型。
+folder_inventory新计划使用同一入口：index0为发布方已给出的固定版本folder列表；index1的proof须绑定实际返回的完整folder entry/原件SHA与精确URL，仍只各一次，不枚举猜测ID。
 
 先读[实现合同](paper_public_task_metadata_implementation_20261030.md)。clean source、plan/grant/proposal SHA冻结后，
 `acquire_public_task_metadata.py init --root <fresh_raw> --plan <plan> --grant <grant> --sha256 <plan_sha>`只初始化一次。

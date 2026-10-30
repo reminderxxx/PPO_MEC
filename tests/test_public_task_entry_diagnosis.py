@@ -57,3 +57,17 @@ def test_diagnosis_declared_cap_rejected_before_body_read(case):
     root,tmp,_=case;op=Opener(Response(0,b'not consumed',length=3145728))
     with pytest.raises(AssertionError,match='declared response cap'):entry.get(root,0,opener=op,verify_source=False)
     a=entry.audit(root,tmp/'audit.json');assert a['new_body_bytes']==0 and a['new_interrupted_upper']==65536 and a['cumulative_requests']==9
+
+
+def test_folder_inventory_exact_member_and_prior_count_once(tmp_path):
+    contract=B/'folder_inventory_v1/contract.json';bundle=tmp_path/'bundle.txt';bundle.write_text('/datasets/${t}/folders/${n}')
+    page=tmp_path/'page.txt';page.write_text(entry.BUNDLE.split('mendeley.com')[1])
+    p={'raw_root':str(tmp_path/'run'),'contract':str(contract),'contract_sha256':entry.common.digest(contract),'official_bundle':str(bundle),
+       'official_bundle_sha256':entry.common.digest(bundle),'official_page':str(page),'official_page_sha256':entry.common.digest(page),'storage_roots':[str(tmp_path)]}
+    pp=tmp_path/'plan.json';entry.common.save(pp,p);entry.init(pp,entry.common.digest(pp),verify_source=False);root=Path(p['raw_root'])
+    folder={'id':'valid-folder-uuid','name':'COCO'};r=Response(0,json.dumps([folder]).encode());r.url=entry.FOLDERS
+    entry.get(root,0,opener=Opener(r),verify_source=False)
+    proof=tmp_path/'proof.json';url=entry.FILES.split('?')[0]+'?folder_id=valid-folder-uuid&version=1'
+    entry.common.save(proof,{'folder_body_sha256':entry.common.digest(root/'request_0/body.bin'),'folder_entry':folder,'corrected_url':url})
+    r=Response(1,b'[]');r.url=url;entry.get(root,1,proof,entry.common.digest(proof),opener=Opener(r),verify_source=False)
+    a=entry.audit(root,tmp_path/'audit.json');assert a['cumulative_requests']==12 and a['cumulative_body_bytes']==1585971+a['new_body_bytes'] and not a['input_qualified']

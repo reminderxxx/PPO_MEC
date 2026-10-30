@@ -7,6 +7,7 @@ import subprocess
 import time
 import urllib.error
 import urllib.request
+import urllib.parse
 
 if __package__:
     from . import acquire_public_task_metadata as common
@@ -16,6 +17,14 @@ else:
 BUNDLE = 'https://data.mendeley.com/datasets/bundle.js?8814bfd8bfcb6231e2b5'
 FILES = 'https://data.mendeley.com/public-api/datasets/j82bnw7gsr/files?folder_id=root&version=1'
 CAPS = (3145728, 131072)
+FOLDERS = 'https://data.mendeley.com/public-api/datasets/j82bnw7gsr/folders/1'
+
+
+def folder_mode(p):
+    return json.loads(Path(p['contract']).read_text()).get('kind')=='folder_inventory'
+
+
+def caps(p):return (131072,131072) if folder_mode(p) else CAPS
 
 
 def load(root):
@@ -23,11 +32,20 @@ def load(root):
     assert common.digest(root/'plan.json') == claim['plan_sha256'], 'plan binding'
     c = json.loads(Path(p['contract']).read_text())
     assert common.digest(Path(p['contract'])) == p['contract_sha256'], 'new authorization contract'
-    assert c['human_instruction']=='你继续找办法' and c['urls']==[BUNDLE,FILES], 'fixed diagnosis sources'
-    assert c['new_caps']=={'http_attempts':2,'bundle_body_plus_upper':3145728,'file_list_body_plus_upper':131072,'shared_clock_wall_seconds_including_audit':300,'images_models':0}, 'fixed new bounds'
+    assert c['human_instruction']=='你继续找办法', 'current diagnosis authorization'
+    if folder_mode(p):
+        assert c['urls']==[FOLDERS,'https://data.mendeley.com/public-api/datasets/j82bnw7gsr/files?folder_id={selected_id}&version=1'], 'published folder sources'
+        assert c['new_caps']=={'http_attempts':2,'folder_body_plus_upper':131072,'file_list_body_plus_upper':131072,'shared_clock_wall_seconds_including_audit':300,'images_models':0}, 'fixed folder bounds'
+        bundle=Path(p['official_bundle']);assert common.digest(bundle)==p['official_bundle_sha256'] and '/datasets/${t}/folders/${n}' in bundle.read_text(), 'publisher folder route'
+    else:
+        assert c['urls']==[BUNDLE,FILES], 'fixed diagnosis sources'
+        assert c['new_caps']=={'http_attempts':2,'bundle_body_plus_upper':3145728,'file_list_body_plus_upper':131072,'shared_clock_wall_seconds_including_audit':300,'images_models':0}, 'fixed new bounds'
     prior = json.loads(Path(c['prior_audit']).read_text())
     assert common.digest(Path(c['prior_audit']))==c['prior_audit_sha256'], 'immutable prior ledger'
-    assert (prior['requests'],prior['body_bytes'],prior['interrupted_read_upper_bound'])==(8,932050,0), 'prior costs once'
+    if 'cumulative_requests' in prior:
+        prior={'requests':prior['cumulative_requests'],'body_bytes':prior['cumulative_body_bytes'],'interrupted_read_upper_bound':prior['cumulative_interrupted_upper']}
+    expected=c['prior_counts'];assert (prior['requests'],prior['body_bytes'],prior['interrupted_read_upper_bound'])==(expected['requests'],expected['body_bytes'],expected['interrupted_upper']), 'prior costs once'
+    assert prior['requests']+2<=12 and prior['body_bytes']+prior['interrupted_read_upper_bound']+sum(caps(p))<=5242880, 'prospective cumulative limits'
     assert claim['boot_uuid']==common.extension_boot_id(), 'current diagnosis boot identity'
     assert 0<=claim['start_clock']<=common.clock(), 'shared clock order'
     return p,claim,prior
@@ -45,6 +63,12 @@ def init(plan_path, expected, *, verify_source=True):
 
 def prove(root,p,proof_path):
     body=root/'request_0/body.bin'; proof=json.loads(proof_path.read_text()); text=body.read_text()
+    if folder_mode(p):
+        obj=json.loads(text);folders=obj.get('folders') if isinstance(obj,dict) else obj;entry=proof['folder_entry']
+        assert proof['folder_body_sha256']==common.digest(body) and isinstance(folders,list) and entry in folders, 'exact listed folder identity'
+        folder=entry['id'];assert isinstance(folder,str) and folder!='root' and 0<len(folder)<=80 and all(c.isalnum() or c in '_-' for c in folder), 'opaque folder identifier'
+        assert proof['corrected_url']==FILES.split('?')[0]+'?'+urllib.parse.urlencode({'folder_id':folder,'version':1}), 'folder-specific published file route'
+        return
     assert proof['bundle_sha256']==common.digest(body) and proof['corrected_url']==FILES, 'bundle correction proof'
     fragments=[]
     for part in proof['snippets']:
@@ -73,9 +97,10 @@ def get(root,index,proof_path=None,proof_sha256=None,*,opener=None,verify_source
         assert common.digest(Path(p['official_page']))==p['official_page_sha256'] and BUNDLE.split('mendeley.com')[1] in Path(p['official_page']).read_text(), 'published bundle URL'
     remaining=300-(common.clock()-claim['start_clock'])-10
     assert remaining>0, 'total diagnosis deadline'
-    assert common.stored_bytes(p)+sum(CAPS)+1048576<=268435456, 'cumulative storage reserve'
+    assert common.stored_bytes(p)+sum(caps(p))+1048576<=268435456, 'cumulative storage reserve'
     folder=root/('request_%d'%index);folder.mkdir(exist_ok=False)
-    url=(BUNDLE,FILES)[index];record={'url':url,'index':index,'bytes':0,'upper':65536,'status':'requesting','start':common.clock(),'retry':False}
+    url=(FOLDERS if folder_mode(p) else BUNDLE) if index==0 else json.loads(proof_path.read_text())['corrected_url']
+    record={'url':url,'index':index,'bytes':0,'upper':65536,'status':'requesting','start':common.clock(),'retry':False}
     if proof_path:
         (folder/'proof.json').write_bytes(proof_path.read_bytes());record['proof_sha256']=proof_sha256
     def deadline(*unused):raise TimeoutError('diagnosis absolute deadline')
@@ -90,7 +115,7 @@ def get(root,index,proof_path=None,proof_sha256=None,*,opener=None,verify_source
             mime=response.headers.get('Content-Type','').lower().split(';')[0]
             assert mime.startswith('text/') or mime in ('application/javascript','application/json'), 'metadata MIME'
             assert response.headers.get('Content-Encoding','identity').lower() in ('','identity'), 'identity encoding'
-            limit=CAPS[index]-65536;length=response.headers.get('Content-Length')
+            limit=caps(p)[index]-65536;length=response.headers.get('Content-Length')
             assert length is None or 0<=int(length)<=limit, 'declared response cap'
             while length is None or record['bytes']<int(length):
                 size=min(65536,limit-record['bytes']);assert size>0, 'body cap'
@@ -100,10 +125,11 @@ def get(root,index,proof_path=None,proof_sha256=None,*,opener=None,verify_source
             assert response.status==200, 'HTTP error retained; stop'
             assert length is None or record['bytes']==int(length), 'truncated body'
         text=(folder/'body.bin').read_text()
-        if index:
+        if index or folder_mode(p):
             obj=json.loads(text)
             assert not (isinstance(obj,dict) and 'error' in obj), 'API error retained; stop'
-            assert isinstance(obj,list) or isinstance(obj,dict) and isinstance(obj.get('files'),list), 'not a file list'
+            key='folders' if index==0 else 'files'
+            assert isinstance(obj,list) or isinstance(obj,dict) and isinstance(obj.get(key),list), 'not a metadata list'
         record['status']='complete'
     except BaseException as error:
         record.update(status='failed',error_type=type(error).__name__,error=str(error));raise
@@ -120,10 +146,11 @@ def _audit(root,output):
     for index,folder in enumerate(sorted(root.glob('request_*'))):
         assert folder.name=='request_%d'%index and index<2, 'request sequence'
         r=json.loads((folder/'receipt.json').read_text());body=folder/'body.bin'
-        assert r['url']==(BUNDLE,FILES)[index] and not r['retry'], 'fixed source'
+        target=(FOLDERS if folder_mode(p) else BUNDLE) if index==0 else json.loads((folder/'proof.json').read_text())['corrected_url']
+        assert r['url']==target and not r['retry'], 'fixed source'
         assert r['body_sha256']==(common.digest(body) if body.exists() else None), 'body hash'
         assert (body.stat().st_size if body.exists() else 0)==r['retained_bytes']<=r['bytes'], 'retained body'
-        assert 0<=r['upper']<=65536 and r['bytes']+r['upper']<=CAPS[index], 'per-file bill'
+        assert 0<=r['upper']<=65536 and r['bytes']+r['upper']<=caps(p)[index], 'per-file bill'
         assert r['finish']>=r['start']>=claim['start_clock'], 'clock order'
         assert not records or records[-1]['status']=='complete', 'requests after error'
         if index:
@@ -141,14 +168,14 @@ def _audit(root,output):
             assert r['final_url']==r['url'], 'exact final URL'
             length=headers.get('content-length');assert length is None or int(length)==r['bytes'], 'complete declared length'
             body.read_text()
-            if index:
-                obj=json.loads(body.read_text());assert isinstance(obj,list) or isinstance(obj,dict) and isinstance(obj.get('files'),list), 'file list container'
+            if index or folder_mode(p):
+                key='folders' if index==0 else 'files';obj=json.loads(body.read_text());assert isinstance(obj,list) or isinstance(obj,dict) and isinstance(obj.get(key),list), 'metadata list container'
                 assert not isinstance(obj,dict) or 'error' not in obj, 'API error'
         records.append(r)
     body=sum(r['bytes'] for r in records);upper=sum(r['upper'] for r in records);elapsed=common.clock()-claim['start_clock']
     assert prior['requests']+len(records)<=12 and prior['body_bytes']+body+upper<=5242880, 'cumulative M caps'
     storage=common.stored_bytes(p);assert storage+1048576<=268435456, 'all-new-old storage'
-    result={'new_requests':len(records),'new_body_bytes':body,'new_interrupted_upper':upper,'cumulative_requests':prior['requests']+len(records),'cumulative_body_bytes':prior['body_bytes']+body,'cumulative_interrupted_upper':upper,'elapsed_new_scope':elapsed,'new300s_pass':0<=elapsed<=300,'failures':sum(r['status']!='complete' for r in records),'storage_before_audit':storage,'terminal_reserve':1048576,'input_qualified':False,'images':0,'model_calls':0,'paper_goal_complete':False,'prior_deadline_failure_unchanged':True,'wire_total':'UNAVAILABLE;returned-body/read bound only','receipt_sha256':[common.digest(f/'receipt.json') for f in sorted(root.glob('request_*'))]}
+    result={'new_requests':len(records),'new_body_bytes':body,'new_interrupted_upper':upper,'cumulative_requests':prior['requests']+len(records),'cumulative_body_bytes':prior['body_bytes']+body,'cumulative_interrupted_upper':prior['interrupted_read_upper_bound']+upper,'elapsed_new_scope':elapsed,'new300s_pass':0<=elapsed<=300,'failures':sum(r['status']!='complete' for r in records),'storage_before_audit':storage,'terminal_reserve':1048576,'input_qualified':False,'images':0,'model_calls':0,'paper_goal_complete':False,'prior_deadline_failure_unchanged':True,'wire_total':'UNAVAILABLE;returned-body/read bound only','receipt_sha256':[common.digest(f/'receipt.json') for f in sorted(root.glob('request_*'))]}
     common.save(output,result);common.save(root/'terminal.json',{'audit':str(output),'sha256':common.digest(output)})
     return result
 
@@ -157,6 +184,7 @@ def audit(root,output):
     root=Path(root)
     assert not (root/'consumer_failure.json').exists() and not output.exists() and not (root/'terminal.json').exists(), 'one terminal consumer only'
     claim=json.loads((root/'claim.json').read_text());remaining=300-(common.clock()-claim['start_clock'])
+    retained_mode=json.loads((root/'plan.json').read_text());failure_upper=sum(caps(retained_mode))
     def deadline(*unused):raise TimeoutError('consumer diagnosis absolute deadline')
     previous=signal.signal(signal.SIGALRM,deadline)
     try:
@@ -166,7 +194,7 @@ def audit(root,output):
     except BaseException as error:
         common.save(root/'consumer_failure.json',{'error_type':type(error).__name__,'error':str(error),
                     'unverified_attempt_directory_count':len(list(root.glob('request_*'))),
-                    'new_body_upper_conservative':sum(CAPS),'old_deadline_failure_unchanged':True,
+                    'new_body_upper_conservative':failure_upper,'old_deadline_failure_unchanged':True,
                     'input_qualified':False,'paper_goal_complete':False,'audit_success':False})
         raise
     finally:

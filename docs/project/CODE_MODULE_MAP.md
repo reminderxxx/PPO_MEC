@@ -948,6 +948,8 @@ Delivery v2保留predeparture交付prefix、对已完成请求禁准备，模型
 `registry`显式新stream合同→各算法直接Stream类→`ppo_agent.StreamControlPPO`（共享已发布图/候选/两阶段控制与PPO团队MC）；`dqn_agent.StreamDQNAgent`独立跨空闲Q/replay/target更新。`prepare_joint_stream_learning`仅新train重拟合固定GRU并冻结provenance→`train_joint_stream_control`逐物理帧费用与团队tail→`audit_joint_stream_learning`独立账本/重载/重放/结果consumer；`launch_joint_stream_learning`管理有限顺序作业。旧default/v3路径不变，旧checkpoint仍按原合同载入，不能自动升级stream。
 # 2026-10-30 公开元数据单次追加职责
 
+`diagnose_public_task_entry.py`负责独立同源脚本/参数及folder_inventory技术诊断；其capture与终端audit按冻结mode共享预算，URL只能来自发布方调用或真实folder entry，始终不标输入质量合格。
+
 `run_public_task_metadata_extension.py`仅编排明确授权的fresh init、固定一次GET及独立一次终端消费。
 `acquire_public_task_metadata.py`负责授权/来源/祖先费用/稳定boot与请求硬限；
 `audit_public_task_metadata.py`从原件独立核账。三者都不加载模型或执行任务质量评价。

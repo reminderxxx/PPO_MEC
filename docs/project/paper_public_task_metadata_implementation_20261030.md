@@ -147,3 +147,14 @@ body/MIME/编码/HTTP/API/schema/时间/来源证据错误均停；无redirect/r
 仅字段名出现不能授权请求。consumer独立核所有保留文本的MIME/encoding/UTF8，完整响应另核URL/长度，
 自身设置300秒剩余时间硬alarm；失败保存未审计上界prefix，禁止重跑。
 首3合成检查对应修正前版本；此增量新增fixture0，仅AST/范围检查和独立静态接受，不冒称最终3项全链路重测。
+
+同源脚本诊断已单次封存：bundle653919B，参数修正列表返回正常`[]`共2B；新2请求/653921B，
+累计10请求/1585971B、168.6904秒，0图像/模型。正常空root列表不证明整个数据集没有文件。
+同一最新“继续找办法”指令下，另立两请求folder_inventory：发布方脚本明确
+`/public-api/datasets/{id}/folders/{version}`，首请求固定j82bnw7gsr/1；第二请求的folder ID必须来自首响应完整entry，
+保存JSON SHA、entry、精确URL及请求前proof SHA，不能猜ID或重取root。
+每请求128KiB含中断上界、新统一300秒，最多累计12请求/1848115B，仍受M12/5MiB及存储256MiB上限。
+新1个folder模式合成案例通过，旧3不重跑；独立静态审查后仅修mode失败prefix及累计祖先upper两个输出，
+AST/算术检查通过，新增fixture0，不称最终4项全链路。sourcefreeze包含common helper。
+新raw=`data/raw/task_quality/public_folder_inventory_20261030_v1/`，私有包在诊断包的`folder_inventory_v1/`；
+不自动取图像、归档或做Q。先读完整folder列表，优先查询明确COCO/annotation文件夹，仅查询一个真实folder。

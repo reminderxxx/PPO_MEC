@@ -2,6 +2,7 @@
 
 - `scripts/acquire_public_task_metadata.py` / `scripts/audit_public_task_metadata.py`：M元数据生产/独立终端消费；不读取图像或加载模型。
 - `scripts/diagnose_public_task_entry.py` / `tests/test_public_task_entry_diagnosis.py`：发布方bundle及有片段证据的folder参数诊断，3项离线检查；fresh raw=`data/raw/task_quality/public_entry_diagnosis_20261030_v1/`，私有包`quality_public_entry_diagnosis_20261030_v1/`。
+- 同脚本folder_inventory模式仅请求固定版本folder树和其中一个真实folder的文件清单；raw=`data/raw/task_quality/public_folder_inventory_20261030_v1/`，私有包为诊断包下`folder_inventory_v1/`，另1个合成案例分版记录。
 - `tests/test_public_task_metadata.py`：纯合成传输、授权、来源、时钟和账单门。
 - `scripts/run_public_task_metadata_extension.py` / `tests/test_public_task_metadata_extension.py`：明确授权单次追加查询与自动一次消费；首8和新3资格分版保留，0模型。
 - `docs/project/paper_public_task_metadata_implementation_20261030.md`：固定公开来源及M/D共同预算，不授予模型测试权限。
