@@ -3,7 +3,7 @@
 - `scripts/acquire_public_task_metadata.py` / `scripts/audit_public_task_metadata.py`：M元数据生产/独立终端消费；不读取图像或加载模型。
 - `tests/test_public_task_metadata.py`：纯合成传输、授权、来源、时钟和账单门。
 - `docs/project/paper_public_task_metadata_implementation_20261030.md`：固定公开来源及M/D共同预算，不授予模型测试权限。
-- raw命名空间为`data/raw/task_quality/`：`public_task_metadata_20261030_v1/`为零请求前置拒绝，`v2/`已保存7响应并封存；固定路由fresh子任务用`public_task_metadata_20261030_v3/`，继承原绝对deadline。私有analysis在主目录`paper_evidence_strengthening_20261029_v1/quality_public_sample_acquisition_20261030_v1/`，不上传原件。
+- raw命名空间为`data/raw/task_quality/`：`public_task_metadata_20261030_v1/`为零请求前置拒绝，`v2/`已保存7响应并封存；`public_task_metadata_20261030_v3/`继承原绝对deadline，GET前超时、零新增请求，亦已封存。私有analysis在主目录`paper_evidence_strengthening_20261029_v1/quality_public_sample_acquisition_20261030_v1/`，不上传原件。
 
 ## 2026-10-29 证据强化开发入口
 

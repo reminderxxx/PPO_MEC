@@ -6,6 +6,9 @@
 后续URL须有前一原件中的固定链接证明并通过来源/类型门。一次失败立即停止，不换源/重试。
 终端只单次`audit_public_task_metadata.py --root <raw> --plan_sha256 <sha> --decision <reason> --output <fresh_audit>`。
 现有audit/terminal复用；M余额不是图像或Q资格，D不能从满额重新起算。全程0模型/训练/评价。
+本轮v1/v2/v3现均终端封存：累计7HTTP、图像0，v3在GET前原600秒deadline耗尽。
+不得使用上面的CLI续写任何旧目录；[单次追加时间方案](paper_public_task_metadata_implementation_20261030.md#待明确批准只追加一次公开文件清单查询)
+待明确答复及独立软件/计划冻结，不是已经运行或可直接复制启动的恢复命令。
 
 ## 2026-10-29 终端复用与强化后软件任务
 

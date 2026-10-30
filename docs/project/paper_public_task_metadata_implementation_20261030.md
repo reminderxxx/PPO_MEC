@@ -49,3 +49,30 @@ CCPD demo仅0.jpg–4.jpg，未带牌照文字标签；EdgeVision文件列表由
 新fresh子目录继承原首请求的绝对CLOCK_MONOTONIC和boot，累计原7请求/932037B，保留600秒原deadline，
 禁止递归parent或重取旧页面。仅4个内存/现存元数据解析检查和AST检查，新增fixture0；旧20不重跑。
 如软件准备已耗尽原deadline即不请求，不能因另立目录暂停或重置计时。
+
+## 本轮终端结果与独立后续范围（2026-10-30）
+
+固定路由子任务在GET前被`metadata total deadline`拦下，新增HTTP为0；其fresh目录没有request目录，
+已单次终端审计并封存。累计仍7请求、932037B返回body、中断读取上界0、图像0、模型调用0。
+终端审计时距原首请求641.769310秒，明确为`FAILED_METADATA_DEADLINE_LEDGER_RETAINED`，
+不能用此前264.193802秒的中间审计掩盖原600秒窗口后来耗尽的事实。
+接口适配、来源链补齐及复核留在真实计时段，耗尽了窗口；这是执行安排问题，尚未测试匿名固定路由，
+不能推断来源不可用、网络失败或只提供整包。CCPD编号demo也不能补作具备外部文字/无牌GT的ALPR6例。
+
+主目录私有包`quality_public_sample_acquisition_20261030_v1/`保存`acquisition_delivery.json`、
+`request_ledger.csv`、三份各单次终端audit及原件；旧目录、原审计及费用不改写。
+七个用户修改文件SHA未变，论文稿位未改，`paper_goal_complete=false`。
+14旧fixture及6增量fixture各自通过，不声称最终版本20项全链路；路由4纯解析检查及后续AST/静态接受单列。
+
+### 待明确批准：只追加一次公开文件清单查询
+
+原方案M明确规定“最多12个HTTP请求、5MiB响应体、10分钟”；本次已耗尽10分钟，追加时间须另立范围。
+具体待答复方案：只查询`https://data.mendeley.com/public-api/datasets/j82bnw7gsr/files?version=1`一次，
+新增最多1HTTP、1MiB返回body及中断上界、120秒（含producer/收据/独立consumer）。
+原账保留，累计最多8HTTP/1980613B；全部新旧原件/日志/账单继续计入256MiB磁盘上限。
+这120秒是明确追加的独立时间，不能把旧641.769310秒重新标为600秒内或重置旧M+D历时。
+执行前完成离线软件资格、完整失败父链核对、clean源码与精确计划冻结，之后才启动新绝对deadline。
+不重取旧页面、不重定向/重试/Range/换源；HTTP/auth/身份/版本/MIME/encoding/schema或预算失败保存停止。
+如果返回只有大归档，报告小样本入口未闭合；此批不取图像、不自动开D或Q。
+私有`single_route_extension_proposal.json` SHA为
+`258cc36483cb7219073911e6ac6a0083dc961b942f3b7c42a77e817b00905818`；尚未执行，不从旧批准或时间经过推导追加许可。

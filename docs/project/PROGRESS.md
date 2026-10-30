@@ -1,3 +1,11 @@
+## 2026-10-30：M窗口耗尽，7官方响应保留，输入未资格
+
+固定路由子任务GET前截止检查拒绝，新增HTTP0；单次终端audit保留641.769310秒与deadline FAIL。
+原累计7HTTP/932037B、中断上界0、图像0/模型0；不能将适配/复核耗时解释为来源不可用或网络失败。
+三raw目录均封存，七个用户文件SHA未变，论文未改。实际原件/CSV与`acquisition_delivery.json`在私有执行包。
+[独立追加方案](paper_public_task_metadata_implementation_20261030.md#待明确批准只追加一次公开文件清单查询)仅同一URL、1HTTP/1MiB/120秒，
+旧账不重置、无图像/Q，等待明确追加时间范围；不自动开下一轮。paper_goal_complete=false。
+
 ## 2026-10-30：官方元数据7请求已保存，固定路由适配继承原deadline
 
 初始raw命名空间未忽略，被clean门在联网前拒绝；零请求现场已单次审计封存，仅补Git忽略后用新目录。
