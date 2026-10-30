@@ -103,3 +103,21 @@ plan/新claim绑定稳定UUID，GET及consumer实时核同UUID。历史boot仅�
 
 匹配离线资格、独立复核、clean commit、source/plan/grant冻结及一次push尝试完成之后才单次启动新任务。
 只有JSON元数据容器返回成功仍不等于图像/标签/版本内容已认证；实际原件留给终端解读，来源字段缺失标UNVERIFIED。
+
+### 单次追加终端结果：HTTP 200，API错误，未取得清单
+
+clean `c810fbe1ed91f39fd33fc3309777e0875761c2a9`冻结三个脚本及精确plan/grant后已成功推送，
+本次及此前排队代码均已同步。新入口只启动一次，HTTP返回200、JSON原文`{"error":400}`，13B，
+不是文件清单；不能写成HTTP400，也不能推断错误具体参数、认证要求、来源不存在或只有大包。
+独立账本audit自动单次完成：6.764155秒；含terminal6.785543秒，外部命令6.847217秒，均在新120秒内。
+累计8请求/932050B、中断读取上界0；新图像0、模型/训练/评价0，input_qualified=false、paper_goal_complete=false。
+旧641.769310秒FAIL原值保留，不以新成功传输/audit状态将其抹平；跨scope/boot连续总历时不作认证。
+
+producer/audit_success及`AUDITED_METADATA_LEDGER_ONLY`只确认响应传输/JSON容器和账单完整，
+不确认API文件清单、单文件可取、标签、图像或真实任务质量。终端独立解读明确为
+`INPUT_UNQUALIFIED_API_ERROR_400_OVER_HTTP_200`。原响应/收据/terminal保持不变，不为改变判定改写原件。
+私有`extension_result_review.json`、`extension_delivery.json`、`cumulative_request_ledger_after_extension.csv`
+及`extension_delivery_verification.json`保存完整结果、全部负记录和7个主目录文件SHA保护核对。
+已复用自动audit，不重跑；单次追加授权已消费，无活动job、没有新的循环问题或空闲提醒。
+后续真实阻塞是可用且可追溯的发布方单文件/外部标签入口；须有入口证据或另立明确更正范围，
+不能根据账面请求余量重试、改endpoint、探测、取大包、自动开D/Q或把图像获取说成完成。

@@ -3,7 +3,8 @@
 用户已允许按[小样本方案](docs/project/paper_public_task_sample_acquisition_proposal_20261029.md)下载。
 先用[元数据门](docs/project/paper_public_task_metadata_implementation_20261030.md)核官方文件身份/标签入口，
 M支出计入M+D共同上限；实际图像与模型质量未获资格前不启动推理或训练，不改论文稿位。
-本轮已取得7份官方元数据响应，原M时间窗口耗尽、图像0；旧run封存，人工已批准单次追加文件清单查询，先独立离线验收/冻结后计120秒。
+本轮含已批准追加累计8次请求/932050B；追加返回HTTP200但JSON为`{"error":400}`，未取得文件清单，图像0。
+所有run封存，入口/标签仍未资格；[终端说明](docs/project/paper_public_task_metadata_implementation_20261030.md#单次追加终端结果http-200api错误未取得清单)保留错误/账单，不自动重试或启动质量评价。
 
 ## 2026-10-29 论文证据强化
 

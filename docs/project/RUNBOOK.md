@@ -11,6 +11,9 @@
 需独立软件资格/clean source/plan/grant冻结。新入口为
 `run_public_task_metadata_extension.py --plan <new_plan> --sha256 <plan_sha> --grant <new_grant>`，
 只创建fresh extension root，自动单次独立终端audit，严禁再次手动运行consumer或GET。
+该追加现已终端：HTTP200/JSON`{"error":400}`，1请求13B，累计8/932050B，图像0。
+只复用私有`extension_audit.json`、`extension_completion.json`和`extension_delivery.json`；上述入口不是再次启动许可。
+需可用单文件/标签入口或另立明确更正范围，当前无活动job，不按请求余额继续探测。
 
 ## 2026-10-29 终端复用与强化后软件任务
 

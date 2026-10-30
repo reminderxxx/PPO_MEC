@@ -6,6 +6,7 @@
 - `docs/project/paper_public_task_metadata_implementation_20261030.md`：固定公开来源及M/D共同预算，不授予模型测试权限。
 - raw命名空间为`data/raw/task_quality/`：`public_task_metadata_20261030_v1/`为零请求前置拒绝，`v2/`已保存7响应并封存；`public_task_metadata_20261030_v3/`继承原绝对deadline，GET前超时、零新增请求，亦已封存。私有analysis在主目录`paper_evidence_strengthening_20261029_v1/quality_public_sample_acquisition_20261030_v1/`，不上传原件。
 - 新追加独立root为`data/raw/task_quality/public_task_metadata_extension_20261030_v1/`；独立120秒，不续写旧root或将旧7请求重复计数。
+- extension root现已终端封存：唯一响应HTTP200/JSON API error400；私有包中`extension_delivery.json`为交付入口，图像0。
 
 ## 2026-10-29 证据强化开发入口
 
