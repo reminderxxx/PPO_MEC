@@ -5,6 +5,7 @@
 M支出计入M+D共同上限；实际图像与模型质量未获资格前不启动推理或训练，不改论文稿位。
 本轮含已批准追加累计8次请求/932050B；追加返回HTTP200但JSON为`{"error":400}`，未取得文件清单，图像0。
 所有run封存，入口/标签仍未资格；[终端说明](docs/project/paper_public_task_metadata_implementation_20261030.md#单次追加终端结果http-200api错误未取得清单)保留错误/账单，不自动重试或启动质量评价。
+最新“继续找办法”另立[同源脚本/参数诊断](docs/project/paper_public_task_metadata_implementation_20261030.md#最新继续找办法独立来源支持的参数排查)，先核发布方脚本证据，再决定固定修正查询，0图像/模型。
 
 ## 2026-10-29 论文证据强化
 

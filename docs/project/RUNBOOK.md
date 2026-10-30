@@ -1,5 +1,10 @@
 ## 2026-10-30 公开任务小样本M门
 
+最新独立同源诊断先读[参数排查合同](paper_public_task_metadata_implementation_20261030.md#最新继续找办法独立来源支持的参数排查)。
+`diagnose_public_task_entry.py init --plan <frozen_plan> --sha256 <sha>`仅初始化fresh root，
+`get --root <fresh> --index 0`只读已发布bundle；index1还须`--proof <saved_offsets_and_review> --proof_sha256 <frozen_sha>`，无独立实际调用关系复核不请求。
+结束后仅一次`audit --root <fresh> --output <new_audit>`，失败也保留账单，不恢复旧run或启动图像/模型。
+
 先读[实现合同](paper_public_task_metadata_implementation_20261030.md)。clean source、plan/grant/proposal SHA冻结后，
 `acquire_public_task_metadata.py init --root <fresh_raw> --plan <plan> --grant <grant> --sha256 <plan_sha>`只初始化一次。
 每次`get --root <raw> --intent <create_only_intent> --sha256 <intent_sha>`仅发一个元数据请求；

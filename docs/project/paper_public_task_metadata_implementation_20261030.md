@@ -121,3 +121,29 @@ producer/audit_success及`AUDITED_METADATA_LEDGER_ONLY`只确认响应传输/JSO
 已复用自动audit，不重跑；单次追加授权已消费，无活动job、没有新的循环问题或空闲提醒。
 后续真实阻塞是可用且可追溯的发布方单文件/外部标签入口；须有入口证据或另立明确更正范围，
 不能根据账面请求余量重试、改endpoint、探测、取大包、自动开D/Q或把图像获取说成完成。
+
+## 最新“继续找办法”：独立、来源支持的参数排查
+
+人工随后要求“你继续找办法”，另立同来源有界技术诊断，旧8请求和原失败目录不改写。
+公开代码检索提示文件列表常用`folder_id=root`，此仅是线索，不能当发布方行为证明或直接猜参数下载。
+先读取原官方HTML字面列出的`/datasets/bundle.js?8814bfd8bfcb6231e2b5`，仅作为文本，不执行JS。
+若已保存发布方脚本片段证实`folder_id`/`root`/`/files`的实际调用约定，再查询同一dataset/version/list路径的
+`?folder_id=root&version=1`；没有该证据即不发第二请求，任何错误保留停止。
+
+`diagnose_public_task_entry.py`包含独立capture与单次终端audit操作，先3项离线检查通过，旧suite不重跑。
+新最多2HTTP，bundle最多3MiB、列表最多128KiB（均含返回body及不确定读取上界），独立300秒含解读和audit。
+原8/932050B只计一次，新满额最多10HTTP/4208850B，仍受累计M12HTTP/5MiB和新旧全部存储256MiB限额。
+发布方URL、原HTML hash、原累计audit SHA、源码clean commit及计划先冻结，再启动统一clock和稳定UUID。
+body/MIME/编码/HTTP/API/schema/时间/来源证据错误均停；无redirect/retry/Range、账号/token、镜像或模型调用。
+本轮不取图像/归档/视频/模型、不自动开D/Q；网页文字检索的工具流量未计量，单列为UNAVAILABLE，
+不把HTTP原件body上界冒充所有互联网检索精确wire总账。
+
+新raw为`data/raw/task_quality/public_entry_diagnosis_20261030_v1/`，私有包为主目录
+`paper_evidence_strengthening_20261029_v1/quality_public_entry_diagnosis_20261030_v1/`。
+固定第0请求仅官方bundle，第1请求必须有第0原件SHA及文字offset/片段证明。终端只运行一次audit，
+既有transport完成与真实文件/标签输入资格继续分开；paper_goal_complete=false。
+独立审查拦下仅三个token共现不足以证明路由、consumer缺传输字段核验和缺执行中deadline三项。
+修正后第1请求须先取得独立语义复核（同一public files调用及root文件夹关系），并在发请求前冻结proof SHA；
+仅字段名出现不能授权请求。consumer独立核所有保留文本的MIME/encoding/UTF8，完整响应另核URL/长度，
+自身设置300秒剩余时间硬alarm；失败保存未审计上界prefix，禁止重跑。
+首3合成检查对应修正前版本；此增量新增fixture0，仅AST/范围检查和独立静态接受，不冒称最终3项全链路重测。
