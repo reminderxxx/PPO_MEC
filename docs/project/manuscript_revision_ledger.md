@@ -351,3 +351,9 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 版本底稿仍是已确认 R22 **标注稿**，SHA-256 `78e38c83d7005e445164dfbb3dfdd62db254bb5ea68e486f15d61f967fda083b`。构建时将此前已授权的累积修订从待确认 v3（SHA-256 `8bfe1b8413278fa10aa8689d319abe017e28838f433c1bbbdb0e5b5ea86fcb6d`）作为 XML 差异重施于 R22 包，再单独修订本轮标题；v3 本身未被收纳为正式底稿。新候选 `artifacts/manuscript/rl_alignment_review_20261030/Multi-agent SAGH reinforcement learning for Workflow-Aware Adapter Preparation in Vehicular Edge Computing_marked_candidate_v4.docx`，SHA-256 `2036e25fc7798a45533f3a1f7e9c486eee39b7b7b4c6c8e881cc509ef768ba80`；**仍待作者确认，不赋 R23，不替换 R22 正式底稿。**
 - 定点前后对照：正文直系段落索引 35，`IV. SAGH Decision and Learning Loop` → `IV. SAGH-Based Joint Scheduling Algorithm`；新增 Word 定位批注 ID 41。章节导读 `Section IV develops SAGH from the order of shared resource commitments`、IV-A `Algorithm Rationale and Architecture` 与 Fig. 2 的 `decision and learning architecture` 均与新标题相容，无需为标题改动重写。
 - 验证：DOCX ZIP 完整；v3→v4 仅 `word/document.xml`、`word/comments.xml` 有差异，正文文字只变索引 35；旧 41 条批注逐字节保留，新批注 ID 41 的 start/end/reference 完整。25 条参考文献原文与顺序不变，全部有效 run 为 Times New Roman 8 pt；其余表格、三张媒体、作者栏和实验数值不变。bundled `render_docx.py --emit_pdf` 得 Letter 双栏六页，六页原尺寸目视无标题溢出或其他排版异常；与 v3 最终渲染逐页像素比较仅第 3 页标题字形区域变化，其他五页逐像素相同。算法、配置与实验数据未改，无需运行训练或 benchmark；候选确认是本轮剩余事项。
+
+## 2026-10-30 论文英文写作语气与语义检查规则
+
+- 用户要求在论文 `agent.md` 手册加入长期规则：不用防御性写作，参考同方向专业写法，保证英语语义表达清晰。本轮只调整修订手册及本台账，不改论文 DOCX、算法、图表、实验或参考文献；待确认标注候选 v4 仍为 SHA-256 `2036e25fc7798a45533f3a1f7e9c486eee39b7b7b4c6c8e881cc509ef768ba80`，未因本条规则自动晋版。
+- 位置与前后对照：`agent.md`“写作和图式检查”原语气条款仅要求积极表述、突出可核验优势并守住证据边界 → 现明确以同方向论文的段落功能、术语和自然英文为参照，直接呈现问题、方法和有证据的贡献，避免重复自我削弱；新增逐句检查主语、动作对象、指代、搭配、修饰、并列及因果连接。原有如实交代适用范围、不得编造数值或隐去实质负例等约束保留。本轮要求与旧规则不冲突。
+- 验证：`git diff --check` 与两文件定向差异核对；确认只有该条手册规则及本台账新增记录。无论文文件或代码改动，因此不做 DOCX 渲染、训练和 benchmark。后续在获授权的论文修订轮按此规则执行，v4 整体仍待作者确认。
