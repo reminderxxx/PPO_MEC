@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-27
+更新日期：2026-10-30
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -10,6 +10,14 @@
 - 正式投稿前需要再次核对 IEEE Xplore、ACM DL、USENIX 或会议官网的最终卷期、页码和 BibTeX。
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
+
+### 2026-10-30：系统子问题讨论中的缓存依赖补充
+
+本轮为研究结构与复现路线讨论，未修改论文、算法或实验结论。既有 COHCTO、POLAR、S-LoRA、dLoRA 与依赖感知迁移条目不重复登记；公开摘要不能证明其未处理某机制，适配实现也不能冒充原论文忠实复现。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| LoRA 与 KV 依赖缓存 | [Improving the Serving Performance of Multi-LoRA Large Language Models via Efficient LoRA and KV Cache Management](https://arxiv.org/abs/2505.03756) | arXiv, 2025；正式 venue 待核验；作者摘要核验，全文未读 | FASTLIBRA 以依赖感知缓存管理器维护 LoRA/KV 使用依赖，并用统一成本模型决定换入换出。摘要结果句另用 ELORA 名称，命名一致性及数值待全文核验，本轮不引用其性能数值。 | 依赖感知对象缓存和统一成本模型已有系统工作；本项目候选问题是移动接触窗口内 base/adapter 与已完成 DAG 输出的共同就绪，以及多车准备对共享资源的影响。应用级 DAG 输出不是 KV cache，当前未证明上述候选增量。 | Related Work / 缓存子问题与系统成本校准；不是已复现 baseline，不自动加入固定文稿引文。 |
 
 ### 2026-10-26：主方法预测分支优化的方法基础
 
