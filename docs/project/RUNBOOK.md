@@ -1,3 +1,5 @@
+固定文件收尾先读[精确范围](paper_public_helmet_pilot_contract_20261030.md#最终固定文件收尾额外独立300秒不恢复旧时间)。clean/freeze/grant/独立复核后仅一次`finish_public_helmet_pilot.py --plan <plan> --plan_sha256 <sha> --grant <grant>`，自动一次delivery consumer；不手动重跑。300秒额外范围单列，原失败/时间不复活，后续失败不另开自动网络。
+
 原生206恢复仅按[新限定合同](paper_public_helmet_pilot_contract_20261030.md#原生206分页与只读coco恢复)使用freshv3，只读引用已完整COCO，继承最初clock，禁止递归恢复或重下COCO。两旧run/audit不可重跑。
 
 首Helmet run因旧测试链接计账0HTTP失败已封存；仅[合同中的direct0HTTP恢复](paper_public_helmet_pilot_contract_20261030.md#首次0http存储拒绝与原deadline恢复)允许freshv2继承原clock。不得为v2另开新900秒或修改旧目录。

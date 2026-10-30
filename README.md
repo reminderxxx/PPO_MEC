@@ -1,3 +1,5 @@
+完整COCO与3图像metadata页已保留并冻结6目标；按[固定文件收尾](docs/project/paper_public_helmet_pilot_contract_20261030.md#最终固定文件收尾额外独立300秒不恢复旧时间)只补这6原图，旧失败/900秒范围保留，额外300秒单列，网络总额度不增。
+
 最新官方folder清单已取得独立COCO文件身份。现按[Helmet6输入合同](docs/project/paper_public_helmet_pilot_contract_20261030.md)准备固定6图与原生GT，原M12封存、累计总账不重置；模型/Q仍0。
 
 ## 2026-10-30 公开任务小样本输入

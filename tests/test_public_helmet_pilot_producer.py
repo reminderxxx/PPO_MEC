@@ -48,7 +48,7 @@ class Response:
 
 def capture(tmp_path, monkeypatch):
     monkeypatch.setattr(p, 'boot', lambda: 'test')
-    plan = {'storage_roots': [str(tmp_path)]}
+    plan = {'storage_roots': [str(tmp_path)], 'new_caps': dict(p.CAPS)}
     return p.Capture(tmp_path, plan, {'boot_uuid': 'test', 'start_clock': p.clock()})
 
 

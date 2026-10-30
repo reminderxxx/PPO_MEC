@@ -269,7 +269,7 @@ def lower_headers(headers):
     for key, value in headers.items():
         require(isinstance(key, str) and isinstance(value, str), "header strings")
         name = key.lower()
-        if name == "set-cookie" and name in result:
+        if name in ("set-cookie", "server-timing") and name in result:
             result[name] += "\n" + value
             continue
         require(name not in result or result[name] == value, "conflicting case-insensitive header")
@@ -284,7 +284,7 @@ def retained_header_pairs(receipt):
     for pair in pairs:
         require(isinstance(pair, list) and len(pair) == 2 and all(isinstance(v, str) for v in pair), "header pair strings")
         key, value = pair; name = key.lower()
-        if name == "set-cookie" and name in normalized:
+        if name in ("set-cookie", "server-timing") and name in normalized:
             normalized[name] += "\n" + value
         else:
             require(name not in normalized or normalized[name] == value, "conflicting critical raw header")

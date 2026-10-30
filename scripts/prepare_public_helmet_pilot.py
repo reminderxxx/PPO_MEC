@@ -100,7 +100,7 @@ def transport_headers(pairs):
     result = {}
     for key, value in pairs:
         name = key.lower()
-        if name == 'set-cookie' and name in result:
+        if name in ('set-cookie', 'server-timing') and name in result:
             result[name] += '\n' + value
         else:
             require(name not in result or result[name] == value, 'conflicting response header')
@@ -116,24 +116,28 @@ class NoRedirect(HTTPRedirectHandler):
 class Capture:
     def __init__(self, root, plan, claim):
         self.root, self.plan, self.claim = Path(root), plan, claim
+        self.caps = plan['new_caps']
+        require(all(type(self.caps[k]) is int and 0 < self.caps[k] <= INITIAL_CAPS[k] for k in INITIAL_CAPS), 'bounded capture caps')
+        self.producer_seconds = plan.get('producer_seconds', 870)
+        require(0 < self.producer_seconds <= self.caps['wall'] - 30, 'consumer time reserve')
         self.records = []
         self.opener = build_opener(NoRedirect())
 
     def remaining(self):
         require(boot() == self.claim['boot_uuid'], 'boot changed')
-        left = self.claim['start_clock'] + 870 - clock()
+        left = self.claim['start_clock'] + self.producer_seconds - clock()
         require(left > 0, 'producer deadline including 30s consumer reserve')
         return left
 
     def request(self, url, role, cap, redirect_from=None):
         self.remaining()
-        require(len(self.records) < CAPS['http'] and url not in {r['url'] for r in self.records},
+        require(len(self.records) < self.caps['http'] and url not in {r['url'] for r in self.records},
                 'request cap or duplicate URL; retries forbidden')
         require(not self.records or self.records[-1]['status'] != 'failed', 'failed prefix sealed')
         allowed(url, initial=redirect_from is None)
-        require(storage(self.plan['storage_roots']) + cap + RESERVE < CAPS['storage'], 'storage reserve')
+        require(storage(self.plan['storage_roots']) + cap + RESERVE < self.caps['storage'], 'storage reserve')
         used = sum(r['bytes'] + r['upper'] for r in self.records)
-        require(CAPS['body'] - used >= READ and cap >= READ, 'full pre-open uncertainty reserve')
+        require(self.caps['body'] - used >= READ and cap >= READ, 'full pre-open uncertainty reserve')
         number = len(self.records)
         directory = self.root / ('request_%03d' % number)
         directory.mkdir(exist_ok=False)
@@ -148,7 +152,7 @@ class Capture:
         failure = None
         try:
             # Reserve uncertainty before open/each read, including signal boundaries.
-            r['upper'] = min(READ, cap, CAPS['body'] - used)
+            r['upper'] = min(READ, cap, self.caps['body'] - used)
             try:
                 response = self.opener.open(Request(url, headers=headers), timeout=min(60, self.remaining()))
             except HTTPError as error:
@@ -162,7 +166,7 @@ class Capture:
             require(h.get('content-encoding', 'identity').strip().lower() in ('', 'identity'), 'encoded response')
             length = h.get('content-length')
             if length is not None:
-                require(length.isdecimal() and int(length) <= min(cap, CAPS['body'] - used), 'Content-Length/cap')
+                require(length.isdecimal() and int(length) <= min(cap, self.caps['body'] - used), 'Content-Length/cap')
             paged = role.startswith('image_metadata_page_') and r['status_code'] == 206
             if paged:
                 page = int(role.rsplit('_', 1)[1]); start = page * 1000
@@ -181,7 +185,7 @@ class Capture:
                         r['upper'] = 0
                         break
                     self.remaining()
-                    remaining = min(cap - r['bytes'], CAPS['body'] - used - r['bytes'])
+                    remaining = min(cap - r['bytes'], self.caps['body'] - used - r['bytes'])
                     require(remaining > 0, 'body cap reached before EOF')
                     amount = min(READ, remaining)
                     r['upper'] = amount

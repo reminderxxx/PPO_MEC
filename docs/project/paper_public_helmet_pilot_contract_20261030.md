@@ -57,3 +57,12 @@ images清单合法返回HTTP206、`Content-Range: items 0-999/2392`、Content-Le
 前缀累计15HTTP/3719957B返回body/读取上界0；另外保守扣未读声明实体754940−65536=689404B，不能把旧upper0改写或称精确wire总量。
 新上限17HTTP/62699503B（累计32HTTP/64MiB含该额外声明上界），存储256MiB。仍继承最初900秒绝对deadline，修复等待也扣除，不另开时间。
 只允许固定1d336三收据/原件及其b619零请求祖先链，逐SHA核对并拒绝重复恢复；新raw `public_helmet_pilot_20261030_v3/`、私有`native_pagination_v3/`。两纯内存header/算术检查和AST增量通过，0新fixture，不重跑旧case/audit。模型/Q/训练仍0。
+
+## 最终固定文件收尾：额外独立300秒，不恢复旧时间
+
+v3的3页清单已完整取得，原生2392文件与COCO对应，6目标及其selection SHA已冻结。第0图的发布方302包含两条合法`Server-Timing`统计头，被本地泛化冲突门拒绝；原图本体未请求。失败收据0body/65536读取上界及全部旧失败原封保留，原900秒范围不重置或追认为成功。
+用户持续要求自主找办法并已明确允许下载；据此另立只补固定6文件的有限收尾任务：额外独立300秒（producer240/consumer60），不是原900秒复活，不声称整套历时≤900秒。此范围不新增来源、metadata/COCO查询、样本或科学授权。
+先独立诊断并修已见的合法sideband头，保留raw header pairs；Set-Cookie/Server-Timing可多值，Content-Length/Type/Encoding/Range/Location等冲突仍拒。Cookie不发送，原body/source no-symlink不变。
+只读引用完整COCO、3完整metadata及旧selection，不下载或复制这些原件。第0图仅跟随已留302的字面publicS3 Location，收据redirect_from=-1明确指历史已SHA绑定的parent；其他5图只用原metadata URL并最多1次publicS3 Location，预期11新HTTP。任何失败保存停止，不替换目标，不再自动开下一套网络任务。
+前缀累计19HTTP/5526965B返回body/65536读取上界，另有689404B声明未读实体上界；总已收费6281905B。新最多13HTTP/60826959B，仍累计32HTTP/64MiB/256MiB原资源上限，全部负结果/原件/新软件与导出计账。
+`finish_public_helmet_pilot.py`复用有界Capture，仅允许plan把请求/字节/时间cap缩小；`audit_public_helmet_delivery.py`独立验证全部原生GT/文件identity、继承账单、旧冻结选择、6图片/Pillow完整性与300秒收尾。新raw=`public_helmet_delivery_20261030_v4/`，私有`final_delivery_v4/`。consumer仅单次，exit0/无failure/audit-terminal SHA同时成立才资格；模型/Q/ALPR/hidden/论文完成均不因此获准。

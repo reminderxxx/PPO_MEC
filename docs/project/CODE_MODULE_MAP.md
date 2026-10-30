@@ -956,3 +956,5 @@ Delivery v2保留predeparture交付prefix、对已完成请求禁准备，模型
 传输/JSON账本完成与API文件清单/图像输入资格分开，实际`{"error":400}`由终端交付审查保留为输入未资格。
 
 `prepare_public_helmet_pilot.py`只负责固定官方COCO/images metadata与6目标的有界获取；`audit_public_helmet_pilot.py`独立重建选择/GT/hash/账单，消费端不联网、不调用producer选择逻辑，不依赖模型/环境。仅共享预定选择规则字符串。
+
+`finish_public_helmet_pilot.py`仅复用Capture下载固定6文件，不重新GET输入清单；`audit_public_helmet_delivery.py`独立消费旧库存provenance与新图片，复用独立consumer纯GT解析函数，不调用producer选择/网络。
