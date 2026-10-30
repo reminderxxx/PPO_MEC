@@ -11,6 +11,16 @@
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
+### 2026-10-30：Related Work 分层核对时发现的交叉近邻
+
+本轮只用出版社公开页面核对题名、元数据和摘要，未读取下列全文，也未将其加入当前论文固定的 25 条正式参考文献。它们说明“模型缓存＋卸载＋多智能体学习”及双时间尺度控制已有明确进展；是否构成可复现对照和逐项差异，须在改稿前进一步核对模型、动作与评估协议。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 双时间尺度模型缓存与 MAPPO | [Popularity-predictive two-timescale joint model caching, task offloading, and resource allocation for mobile edge computing](https://www.sciencedirect.com/science/article/abs/pii/S0140366426002720) | *Computer Communications*, 2026，Article 108682；DOI 10.1016/j.comcom.2026.108682；出版社摘要核验，在线/卷期细节待全文核对 | P2T-MAPPO 以周期级模型缓存、时隙级任务卸载和连续资源分配构造联合控制，并使用模型流行度预测；因此双时间尺度、模型缓存、卸载和 MAPPO 的组合本身不能作为独占空缺。 | 本稿需用已释放 DAG 的目标可见性、base/adapter closure、移动接触窗口、跨请求驻留与共享传输预约的决策合同区别；具体假设差异和同条件收益待阅读全文及匹配实验核验。 | Related Work 的模型缓存与多车学习交叉近邻；候选 baseline，未自动入稿。 |
+| AI 资产缓存与图强化学习 | [Federated graph reinforcement learning for joint caching and inference offloading in edge intelligence](https://www.sciencedirect.com/science/article/pii/S1874490726002429) | *Physical Communication* 78:103233, 2026；DOI 10.1016/j.phycom.2026.103233；出版社摘要核验，全文未读 | 将模型/adapter 等 AI 资产缓存、推理卸载与通信计算资源分配联立，区分慢缓存与快执行，并用图表征和分层受约束 actor–critic；说明 AI 资产级联合控制已有近邻。 | 本稿的候选差异须落实到车辆跨 RSU 的已释放 DAG、具体 base/adapter 依赖、共同传输日历及跨请求反馈；不能仅以图学习或慢快两层作为创新点。 | Related Work / novelty 风险核对；不作为已复现 baseline。 |
+| 时空感知服务缓存与多智能体卸载 | [Adaptive task offloading and resource orchestration under spatiotemporal constraints in mobile edge computing](https://www.sciencedirect.com/science/article/pii/S2352864826000210) | *Digital Communications and Networks* 12(6):994–1002, 2026；DOI 10.1016/j.dcan.2026.03.002；出版社摘要核验，全文未读 | 用 GAT 捕获空间关系、LSTM 建模需求时序，并以多智能体强化学习联合卸载、服务缓存和资源编排；说明时空表征与缓存卸载联动也已有研究。 | 需要区分其一般 service caching 与本稿的 base/adapter 对象、DAG 可见性及共享预约；是否具备同样移动或依赖合同须全文核对，不能凭摘要作缺失断言。 | Related Work 的方法交叉背景；补充近邻，不自动入固定稿。 |
+
 ### 2026-10-30：强化学习结合难点与高性能计算边界
 
 本轮仅据公开出版页面/官方摘要增量核验近邻，讨论研究定位；未修改论文正文、25 条正式引文、算法或实验。摘要层信息不支持“首次提出”或排除全文中可能存在的机制，正式比较前仍需定向阅读全文。
