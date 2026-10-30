@@ -175,8 +175,9 @@ def stored_bytes(roots):
     for base in outer:
         require(base.exists() and not base.is_symlink(), "storage root absent or symlink")
         for path in ([base] if base.is_file() else base.rglob("*")):
-            require(not path.is_symlink(), "symlink in counted storage")
-            if path.is_file():
+            if path.is_symlink():
+                total += path.lstat().st_size
+            elif path.is_file():
                 total += path.stat().st_size
     return total, outer
 
@@ -196,6 +197,34 @@ def parent_binding(plan):
             prior["new300s_pass"] is True and prior["input_qualified"] is False and
             prior["images"] == prior["model_calls"] == 0, "sealed folder parent ledger")
     return actual
+
+
+def zero_http_provenance(plan, current_claim):
+    item = plan.get("zero_http_predecessor")
+    if item is None:
+        return
+    oldroot = Path(item["root"])
+    files = {"plan.json": "plan_sha256", "claim.json": "claim_sha256", "terminal.json": "terminal_sha256",
+             "producer_failure.json": "producer_failure_sha256", "consumer_process.json": "consumer_process_sha256"}
+    for filename, field in files.items():
+        require(digest(safe_file(oldroot / filename)) == item[field], "predecessor exact file SHA")
+    require(digest(safe_file(item["audit"])) == item["audit_sha256"], "predecessor audit SHA")
+    prior_plan, prior_claim = load(oldroot / "plan.json"), load(oldroot / "claim.json")
+    prior_audit, prior_terminal = load(item["audit"]), load(oldroot / "terminal.json")
+    stopped, control = load(oldroot / "producer_failure.json"), load(oldroot / "consumer_process.json")
+    require("zero_http_predecessor" not in prior_plan and
+            prior_plan["source_commit"] == "b619c885281eb0493d290cbacac8589b84e85c36" and
+            prior_plan["new_caps"] == NEW_CAPS and prior_plan["raw_root"] == str(oldroot) and prior_plan["parent_audit"] == plan["parent_audit"],
+            "only initial direct zero-HTTP predecessor allowed")
+    require(not list(oldroot.glob("request_*")) and stopped["requests"] == 0 and stopped["error"] == "storage symlink" and
+            prior_audit["failure_bill"]["attempt_directory_count"] == 0 and prior_audit["input_qualified"] is False and
+            control["returncode"] == 1 and prior_terminal["input_qualified"] is False and
+            prior_terminal["sha256"] == item["audit_sha256"] and
+            Path(prior_terminal["audit"]).resolve() == Path(item["audit"]).resolve() and
+            prior_claim["plan_sha"] == item["plan_sha256"], "verified zero-network failed prefix")
+    require(current_claim["start_clock"] == prior_claim["start_clock"] and
+            current_claim["boot_uuid"] == prior_claim["boot_uuid"] == boot_uuid(),
+            "original absolute deadline/boot must be inherited without reset")
 
 
 def lower_headers(headers):
@@ -632,6 +661,7 @@ def audit(root, output):
         require(NEW_CAPS["wall"] - elapsed > 2, "two-second consumer terminal reserve")
         signal.setitimer(signal.ITIMER_REAL, min(AUDIT_SECONDS - 2, NEW_CAPS["wall"] - elapsed - 2))
         source_binding(plan)
+        zero_http_provenance(plan, claim)
         prior = parent_binding(plan)
         storage, roots = stored_bytes(plan["storage_roots"])
         require(any(root.resolve().is_relative_to(p) for p in roots) and

@@ -79,8 +79,9 @@ def storage(roots):
             continue
         require(p.exists() and not p.is_symlink(), 'storage root absent/symlink')
         for f in ([p] if p.is_file() else p.rglob('*')):
-            require(not f.is_symlink(), 'storage symlink')
-            if f.is_file():
+            if f.is_symlink():
+                total += f.lstat().st_size
+            elif f.is_file():
                 total += f.stat().st_size
     return total
 
@@ -329,6 +330,29 @@ def select(coco, entries):
     return targets, rejected
 
 
+def zero_http_parent(plan):
+    parent = plan.get('zero_http_predecessor')
+    if parent is None:
+        return None
+    root = Path(parent['root'])
+    for name, key in [('plan.json', 'plan_sha256'), ('claim.json', 'claim_sha256'), ('terminal.json', 'terminal_sha256'),
+                      ('producer_failure.json', 'producer_failure_sha256'),
+                      ('consumer_process.json', 'consumer_process_sha256')]:
+        require(not (root / name).is_symlink() and sha(root / name) == parent[key], 'zero-HTTP predecessor SHA')
+    require(sha(parent['audit']) == parent['audit_sha256'], 'zero-HTTP predecessor audit SHA')
+    previous, audit, terminal = load(root/'plan.json'), load(parent['audit']), load(root/'terminal.json')
+    claim, failure, control = load(root/'claim.json'), load(root/'producer_failure.json'), load(root/'consumer_process.json')
+    require('zero_http_predecessor' not in previous and previous['source_commit'] == 'b619c885281eb0493d290cbacac8589b84e85c36' and
+            previous['new_caps'] == CAPS and previous['raw_root'] == str(root) and previous['parent_audit'] == plan['parent_audit'], 'only direct initial failed scope')
+    require(not list(root.glob('request_*')) and failure['requests'] == 0 and failure['error'] == 'storage symlink' and
+            audit['failure_bill']['attempt_directory_count'] == 0 and audit['input_qualified'] is False and
+            control['returncode'] == 1 and terminal['input_qualified'] is False and
+            terminal['sha256'] == parent['audit_sha256'] and Path(terminal['audit']).resolve() == Path(parent['audit']).resolve() and
+            claim['plan_sha'] == parent['plan_sha256'] and claim['boot_uuid'] == boot(), 'exact zero-HTTP failure provenance')
+    require(0 <= clock() - claim['start_clock'] < 868, 'original absolute producer deadline already exhausted')
+    return claim
+
+
 def preflight(plan, expected, grant):
     require(plan['new_caps'] == CAPS and plan['annotation_expected'] == ANNOTATION and
             plan['images_folder_id'] == FOLDER and plan['dataset_id'] == DATASET and plan['version'] == 1 and
@@ -358,18 +382,19 @@ def run(plan_path, expected, grant_path, root, audit_output):
     require(sha(plan_path) == expected, 'external plan SHA')
     plan, grant = load(plan_path), load(grant_path)
     preflight(plan, expected, grant)
+    predecessor = zero_http_parent(plan)
     root = Path(root)
     require(str(root) == plan['raw_root'] and str(audit_output) == plan['audit_output'], 'fixed output paths')
     root.mkdir(parents=True, exist_ok=False)
     for name, src in [('plan.json', plan_path), ('grant.json', grant_path)]:
         with (root / name).open('xb') as stream:
             stream.write(Path(src).read_bytes())
-    claim = {'plan_sha': expected, 'grant_sha256': sha(grant_path), 'boot_uuid': boot(), 'start_clock': clock(),
+    claim = {'plan_sha': expected, 'grant_sha256': sha(grant_path), 'boot_uuid': boot(), 'start_clock': predecessor['start_clock'] if predecessor else clock(),
              'started_at': datetime.now(timezone.utc).isoformat(), 'model_calls': 0}
     save(root / 'claim.json', claim)
     cap = Capture(root, plan, claim)
     previous = signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError('producer shared deadline')))
-    signal.setitimer(signal.ITIMER_REAL, 868)
+    signal.setitimer(signal.ITIMER_REAL, max(0.001, 868 - (clock() - claim['start_clock'])))
     try:
         a = cap.asset(ANNOTATION['url'], 'annotation', ANNOTATION['size'] + READ, ANNOTATION['size'], ANNOTATION['sha256'])
         coco = load(cap.body(a))

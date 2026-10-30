@@ -40,3 +40,10 @@ raw新路径`data/raw/task_quality/public_helmet_pilot_20261030_v1/`；私有包
 成功也只认证Helmet6输入。全COCO与metadata的2392量级标签暴露另计，不称只见过6个标签、hidden、独立采集或模型训练无重叠。
 发布方CC BY声明不是底层权利链完整认证。ALPR的文字/无牌GT仍缺，12例总方案不完整。
 Q/模型/训练/评价/拟合/hidden预算均0；不能据此声称适配器有效、物理费用兼容或论文完成。
+
+## 首次0HTTP存储拒绝与原deadline恢复
+
+clean b619c88首次启动被全局旧software_fixture的pytest `*current`符号链接拦下；producer/consumer各一次封存，新增0HTTP/0body/0图像，原失败audit不改写或重跑。独立诊断后另立最小实现：全局计账只计链接本体`lstat().st_size`，不跟随链接目标；source、raw body、GT等输入仍必须regular/no-symlink，不删除旧fixture。
+新增1个微型tree案例（普通文件、目录别名、文件链接）单轮核producer和consumer计账一致，旧5case不重跑。
+fresh `public_helmet_pilot_20261030_v2/`绑定首失败plan/audit/terminal/producer_failure/control SHA且验证0attempt；只接受这一直接首失败，拒绝递归恢复。
+v2继承首run原`claim.start_clock`和同boot，仍是原900秒绝对deadline，连修复/等待都扣除，绝不开新的899/900秒。producer最多用到原870秒，最后30秒仍给consumer。原HTTP/body余额因0新增不变，所有失败原件继续计磁盘。

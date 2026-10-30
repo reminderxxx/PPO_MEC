@@ -1,3 +1,5 @@
+首Helmet run因旧测试链接计账0HTTP失败已封存；仅[合同中的direct0HTTP恢复](paper_public_helmet_pilot_contract_20261030.md#首次0http存储拒绝与原deadline恢复)允许freshv2继承原clock。不得为v2另开新900秒或修改旧目录。
+
 ## 2026-10-30：Helmet6单次输入任务
 
 先读[精确合同](paper_public_helmet_pilot_contract_20261030.md)。原M12已消费，继承12HTTP/1588374B。clean源码、独立复核、plan/grant SHA和一次push后，单次`prepare_public_helmet_pilot.py --plan <plan> --plan_sha256 <sha> --grant <grant> --root <fresh_raw> --audit_output <fresh_audit>`；包括一次自动consumer，勿手动重跑audit。共享900秒最后30秒用于独立消费。只有exit0、无consumer_failure及匹配audit/terminal同时成立才接受Helmet6输入，Q/模型仍0。

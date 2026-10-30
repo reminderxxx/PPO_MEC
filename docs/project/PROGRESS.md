@@ -1,3 +1,7 @@
+## 2026-10-30：首Helmet输入启动0HTTP封存，原deadline最小恢复
+
+首run在本地全局storage拒绝pytest链接，producer/consumer各一次失败，新请求/body均0。独立诊断后只修lstat计账（不跟随链接），原body/source no-symlink门保持；1个22B软件tree案例通过。v2只绑定b619直接0HTTP失败，继承原900秒绝对CLOCK_MONOTONIC和同UUID，修复等待也计时，不重置HTTP/body/deadline；尚无图像/Q。
+
 ## 2026-10-30：官方COCO单文件找到，Helmet6输入实现中
 
 folder_inventory一次完成2HTTP/2403B，累计12HTTP/1588374B、图像0。官方清单给出2065913B COCO JSON及SHA/单文件URL，images独立folder已定位。按[新输入合同](paper_public_helmet_pilot_contract_20261030.md)另立900秒、新20HTTP及65520490B余量，原M12和旧FAIL不改写。consumer2合成case/producer3合成case分版通过，后续AST增量单列；尚未启动真实图像GET，不称输入或Q合格。
