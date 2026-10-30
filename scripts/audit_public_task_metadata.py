@@ -28,6 +28,27 @@ def audit(root, plan_sha, decision):
     assert grant['plan_sha256'] == plan_sha and grant['proposal_sha256'] == plan['proposal_sha256'], 'authorization binding'
     assert grant.get('allow_metadata') and grant.get('allow_image_downloads') is False, 'metadata-only grant'
     assert claim['boot_id'] == subprocess.check_output(['/usr/sbin/sysctl', '-n', 'kern.boottime'], text=True).strip(), 'boot identity'
+    ancestor = {'requests': 0, 'body_bytes': 0, 'interrupted_read_upper_bound': 0, 'run_start_clock': None}
+    derived_url = None
+    if 'parent_metadata' in plan:
+        p = plan['parent_metadata']; ap = Path(p['audit']); pp = Path(p['plan'])
+        assert digest(ap) == p['audit_sha256'], 'parent audit hash'
+        ancestor = json.loads(ap.read_text()); old_plan = json.loads(pp.read_text())
+        assert digest(pp) == ancestor['plan_sha256'] and 'parent_metadata' not in old_plan, 'nonrecursive parent'
+        assert ancestor['status'] == 'AUDITED_METADATA_LEDGER_ONLY' and not ancestor['request_failures'] and ancestor['within_metadata_deadline'] and ancestor['boot_id'] == claim['boot_id'], 'eligible parent'
+        parent = Path(p['root']); page = parent/'request_000/body.bin'; docs = parent/'request_002/body.bin'
+        terminal=json.loads((parent/'terminal.json').read_text())
+        assert digest(parent/'plan.json')==ancestor['plan_sha256'] and old_plan['raw_root']==str(parent) and terminal['sha256']==p['audit_sha256'] and Path(terminal['audit']).resolve()==ap.resolve(), 'parent root/terminal'
+        for index,key,url in [(0,'page_sha256','https://data.mendeley.com/datasets/j82bnw7gsr/1'),(2,'docs_sha256','https://data.mendeley.com/api/docs/')]:
+            receipt_path=parent/('request_%03d'%index)/'receipt.json'; item=json.loads(receipt_path.read_text())
+            assert digest(receipt_path)==ancestor['request_receipt_sha256'][index] and item['url']==url and item['status']=='complete' and item['body_sha256']==p[key], 'official parent receipt chain'
+        assert digest(page) == p['page_sha256'] and digest(docs) == p['docs_sha256'], 'documented route bodies'
+        a = json.JSONDecoder().raw_decode(page.read_text().split('window.INITIAL_STATE = ',1)[1])[0]
+        d = json.JSONDecoder().raw_decode(docs.read_text().split('window.__state = ',1)[1])[0]['spec']
+        assert a['dataset']['snapshot']['id']=='j82bnw7gsr' and a['dataset']['snapshot']['version']==1 and a['configClient']['publicApiBaseUrl']=='/public-api', 'dataset/public proxy identity'
+        method=d['paths']['/datasets/{id}/files']['get']
+        assert d['servers'][0]['url']=='https://api.data.mendeley.com' and 'public-datasets' in method['tags'] and any(v.get('name')=='version' and v.get('in')=='query' for v in method['parameters']), 'published GET route'
+        derived_url='https://data.mendeley.com/public-api/datasets/j82bnw7gsr/files?version=1'
     folders = sorted(root.glob('request_[0-9][0-9][0-9]'))
     calls = body_bytes = upper = 0
     rows = []
@@ -35,13 +56,14 @@ def audit(root, plan_sha, decision):
         assert folder.name == 'request_%03d' % i, 'request sequence'
         r = json.loads((folder / 'receipt.json').read_text())
         intent = json.loads((folder / 'intent.json').read_text())
+        assert 'parent_metadata' not in plan or intent['url']==derived_url, 'only new parent-mode route'
         assert digest(folder / 'intent.json') == r['intent_sha256'], 'intent binding'
         assert r['url'] == intent['url'] and r['network_requests'] == 1, 'request identity'
         u = urllib.parse.urlsplit(r['url'])
         assert u.scheme == 'https' and u.hostname in plan['allowed_hosts'] and not u.username and not u.password and u.port in (None, 443) and not u.fragment, 'URL scope'
         source, kind = intent.get('source'), intent.get('kind')
         github = source == 'ccpd_author' and kind == 'metadata' and u.hostname == 'api.github.com' and (u.path == '/repos/detectRecog/CCPD/commits/master' or re.fullmatch('/repos/detectRecog/CCPD/git/trees/[0-9a-f]{40}', u.path))
-        edge = source == 'edgevision_v1' and kind == 'metadata' and u.hostname == 'data.mendeley.com' and (u.path in ('/datasets/j82bnw7gsr/1', '/api/docs/') or re.fullmatch('/public-api/datasets/j82bnw7gsr/versions/1(?:/files)?', u.path))
+        edge = source == 'edgevision_v1' and kind == 'metadata' and u.hostname == 'data.mendeley.com' and (r['url']==derived_url or u.path in ('/datasets/j82bnw7gsr/1', '/api/docs/') or re.fullmatch('/public-api/datasets/j82bnw7gsr/versions/1(?:/files)?', u.path))
         docs = source == 'edgevision_v1' and kind == 'documentation' and (r['url'] == 'https://data.mendeley.com/api/docs/' or u.hostname == 'static.data.mendeley.com' and u.path.endswith('.js'))
         assert github or edge or docs, 'dataset/version/kind'
         path = folder / 'body.bin'
@@ -71,18 +93,21 @@ def audit(root, plan_sha, decision):
             assert r['run_start_clock'] == rows[0]['run_start_clock'], 'deadline reset'
             assert r['started_clock'] >= rows[-1]['finished_clock'], 'concurrent requests'
         assert r['url'] not in [x['url'] for x in rows], 'duplicate URL'
-        if r['url'] not in plan['seed_urls']:
+        if r['url'] not in plan['seed_urls'] and r['url'] != derived_url:
             proof = intent['proof']; n = proof['request_index']
             assert type(n) is int and 0 <= n < i, 'parent index'
             parent = folders[n] / 'body.bin'
             assert digest(parent) == proof['body_sha256'] and r['url'] in parent.read_text(), 'source link proof'
         calls += 1; body_bytes += r['bytes']; upper += r['interrupted_read_upper_bound']; rows.append(r)
+    calls += ancestor['requests']; body_bytes += ancestor['body_bytes']; upper += ancestor['interrupted_read_upper_bound']
     cap = plan['metadata_caps']
     assert 0 <= cap['http_requests'] <= 12 and 0 <= cap['body_bytes'] <= 5242880 and 0 < cap['wall_seconds'] <= 600, 'approved caps'
     assert calls <= cap['http_requests'] and body_bytes + upper <= cap['body_bytes'], 'M limits'
     now = time.clock_gettime(time.CLOCK_MONOTONIC)
     assert not rows or now >= rows[-1]['finished_clock'], 'monotonic clock moved backwards'
-    elapsed = now - rows[0]['run_start_clock'] if rows else 0
+    start = ancestor['run_start_clock'] or (rows[0]['run_start_clock'] if rows else None)
+    assert not rows or not ancestor['run_start_clock'] or rows[0]['run_start_clock']==ancestor['run_start_clock'], 'parent deadline reset'
+    elapsed = now - start if start is not None else 0
     # A deadline failure may finish just after its cap; it is retained, not PASS input.
     assert elapsed >= 0, 'monotonic clock moved backwards'
     within_time = elapsed <= cap['wall_seconds']
@@ -99,7 +124,7 @@ def audit(root, plan_sha, decision):
             'D_request_remaining': 32 - calls, 'D_body_remaining': 67108864 - body_bytes - upper,
             'D_wall_remaining': max(0, 1800 - elapsed), 'model_calls': 0, 'image_bytes': 0,
             'D_storage_remaining_conservative': plan['storage_cap'] - stored - 1048576,
-            'run_start_clock': rows[0]['run_start_clock'] if rows else None, 'boot_id': claim['boot_id'],
+            'run_start_clock': start, 'boot_id': claim['boot_id'],
             'D_balance_note': 'Nominal unspent balance, not permission to continue a failed/sealed run; total wall includes orchestration/audit.1MiB terminal reserve charged.',
             'input_qualified': False, 'paper_goal_complete': False,
             'request_receipt_sha256': [digest(p / 'receipt.json') for p in folders]}

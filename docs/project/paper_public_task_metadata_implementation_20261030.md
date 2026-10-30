@@ -41,3 +41,11 @@ M有资格发现后，D仍需固定实际标签、文件ID/大小/URL和sample_m
 初次真实CLI初始化通过，但新raw命名空间未在Git忽略中登记，随后GET被clean-source门在联网前拒绝。
 原初始化目录/意图/命令和零请求终端审计保留，不在原目录恢复。独立诊断后仅补`/data/raw/task_quality/`忽略规则，
 用`git check-ignore`、`git diff --check`及新clean commit核对，再在fresh目录初始化；HTTP/body实际支出仍为0，不是重取数据。
+
+随后M实际取得7个完整官方元数据body，932037B、264.193802秒，单次账本审计通过但输入未资格。
+CCPD demo仅0.jpg–4.jpg，未带牌照文字标签；EdgeVision文件列表由接口加载。
+保存的官方OpenAPI明确GET `/datasets/{id}/files`与version query，网页SSR明确`publicApiBaseUrl=/public-api`。
+另存独立路由诊断后只适配这一有公开依据的固定候选，匿名可用性尚未验证；不申请账号/token。
+新fresh子目录继承原首请求的绝对CLOCK_MONOTONIC和boot，累计原7请求/932037B，保留600秒原deadline，
+禁止递归parent或重取旧页面。仅4个内存/现存元数据解析检查和AST检查，新增fixture0；旧20不重跑。
+如软件准备已耗尽原deadline即不请求，不能因另立目录暂停或重置计时。

@@ -16,6 +16,45 @@ SEEDS = {'https://data.mendeley.com/datasets/j82bnw7gsr/1',
          'https://data.mendeley.com/api/docs/',
          'https://api.github.com/repos/detectRecog/CCPD/commits/master'}
 HOSTS = {'data.mendeley.com', 'static.data.mendeley.com', 'api.github.com', 'github.com'}
+PUBLIC_FILES = 'https://data.mendeley.com/public-api/datasets/j82bnw7gsr/files?version=1'
+
+
+def parent_ledger(plan):
+    if 'parent_metadata' not in plan:
+        return {'requests': 0, 'body_bytes': 0, 'interrupted_read_upper_bound': 0, 'run_start_clock': None}
+    p = plan['parent_metadata']; audit_path = Path(p['audit']); parent_plan = Path(p['plan'])
+    if digest(audit_path) != p['audit_sha256']:
+        raise ValueError('parent audit changed')
+    ledger = json.loads(audit_path.read_text()); previous = json.loads(parent_plan.read_text())
+    if (digest(parent_plan) != ledger['plan_sha256'] or 'parent_metadata' in previous or
+            ledger['status'] != 'AUDITED_METADATA_LEDGER_ONLY' or ledger['request_failures'] or
+            not ledger['within_metadata_deadline'] or ledger['boot_id'] != boot_id()):
+        raise ValueError('ineligible/recursive parent metadata ledger')
+    root = Path(p['root']); terminal = json.loads((root/'terminal.json').read_text())
+    if digest(root/'plan.json') != ledger['plan_sha256'] or previous['raw_root'] != str(root) or terminal['sha256'] != p['audit_sha256'] or Path(terminal['audit']).resolve() != audit_path.resolve():
+        raise ValueError('parent root/terminal mismatch')
+    for index, key, url in [(0,'page_sha256','https://data.mendeley.com/datasets/j82bnw7gsr/1'),(2,'docs_sha256','https://data.mendeley.com/api/docs/')]:
+        rp = root/('request_%03d'%index)/'receipt.json'; record=json.loads(rp.read_text())
+        if digest(rp) != ledger['request_receipt_sha256'][index] or record['url'] != url or record['status'] != 'complete' or record['body_sha256'] != p[key]:
+            raise ValueError('parent official-response identity mismatch')
+    return ledger
+
+
+def published_files_url(plan):
+    p = plan['parent_metadata']; root = Path(p['root'])
+    for index, name in [(0, 'page_sha256'), (2, 'docs_sha256')]:
+        if digest(root / ('request_%03d' % index) / 'body.bin') != p[name]:
+            raise ValueError('published route source changed')
+    page = (root / 'request_000/body.bin').read_text(); docs = (root / 'request_002/body.bin').read_text()
+    a = json.JSONDecoder().raw_decode(page.split('window.INITIAL_STATE = ', 1)[1])[0]
+    d = json.JSONDecoder().raw_decode(docs.split('window.__state = ', 1)[1])[0]['spec']
+    if (a['dataset']['snapshot']['id'] != 'j82bnw7gsr' or a['dataset']['snapshot']['version'] != 1 or
+            a['configClient']['publicApiBaseUrl'] != '/public-api' or
+            d['servers'][0]['url'] != 'https://api.data.mendeley.com' or
+            'public-datasets' not in d['paths']['/datasets/{id}/files']['get']['tags'] or
+            not any(x.get('name') == 'version' and x.get('in') == 'query' for x in d['paths']['/datasets/{id}/files']['get']['parameters'])):
+        raise ValueError('published route schema mismatch')
+    return PUBLIC_FILES
 
 
 def boot_id():
@@ -57,6 +96,7 @@ def check_binding(root, plan):
         raise ValueError('plan/grant binding mismatch')
     if claim['boot_id'] != boot_id():
         raise ValueError('boot identity changed')
+    parent_ledger(plan)
 
 
 def digest(path):
@@ -94,6 +134,7 @@ def initialize(plan_path, expected, grant_path, root):
     plan = json.loads(Path(plan_path).read_text())
     grant = json.loads(Path(grant_path).read_text())
     validate_schema(plan)
+    parent_ledger(plan)
     if grant['plan_sha256'] != expected or grant['proposal_sha256'] != plan['proposal_sha256'] or not grant.get('allow_metadata') or grant.get('allow_image_downloads') is not False:
         raise ValueError('grant binding mismatch')
     source_check(plan)
@@ -124,14 +165,17 @@ def prior_receipts(root):
 
 def validate_intent(root, plan, intent, prior):
     url = intent['url']
+    if 'parent_metadata' in plan and url != PUBLIC_FILES:
+        raise ValueError('parent mode permits only the one new published route')
     u = urllib.parse.urlsplit(url)
     if u.scheme != 'https' or u.hostname not in plan['allowed_hosts'] or u.username or u.password or u.port not in (None, 443) or u.fragment:
         raise ValueError('URL outside pinned source scope')
     source, kind = intent.get('source'), intent.get('kind')
     github_metadata = (source == 'ccpd_author' and kind == 'metadata' and u.hostname == 'api.github.com' and
                        (url in SEEDS or re.fullmatch('/repos/detectRecog/CCPD/git/trees/[0-9a-f]{40}', u.path)))
+    derived = (url == PUBLIC_FILES and source == 'edgevision_v1' and kind == 'metadata' and published_files_url(plan) == url)
     edge_metadata = (source == 'edgevision_v1' and kind == 'metadata' and u.hostname == 'data.mendeley.com' and
-                     (url in SEEDS or re.fullmatch('/public-api/datasets/j82bnw7gsr/versions/1(?:/files)?', u.path)))
+                     (derived or url in SEEDS or re.fullmatch('/public-api/datasets/j82bnw7gsr/versions/1(?:/files)?', u.path)))
     edge_docs = (source == 'edgevision_v1' and kind == 'documentation' and
                  (url == 'https://data.mendeley.com/api/docs/' or
                   (u.hostname == 'static.data.mendeley.com' and u.path.endswith('.js'))))
@@ -139,7 +183,7 @@ def validate_intent(root, plan, intent, prior):
         raise ValueError('wrong dataset/version/resource kind')
     if any(r['url'] == url for r in prior):
         raise ValueError('duplicate URL: no retry')
-    if url not in plan['seed_urls']:
+    if url not in plan['seed_urls'] and not derived:
         proof = intent['proof']
         index = proof['request_index']
         if type(index) is not int or not 0 <= index < len(prior):
@@ -161,15 +205,16 @@ def acquire_one(root, intent_path, expected, *, opener=None, verify_source=True)
         raise ValueError('intent SHA mismatch')
     intent = json.loads(Path(intent_path).read_text())
     prior = prior_receipts(root)
+    ancestor = parent_ledger(plan)
     validate_intent(root, plan, intent, prior)
     caps = plan['metadata_caps']
-    if len(prior) >= caps['http_requests']:
+    if len(prior) + ancestor['requests'] >= caps['http_requests']:
         raise ValueError('request cap exhausted')
-    spent = sum(r['bytes'] + r['interrupted_read_upper_bound'] for r in prior)
+    spent = sum(r['bytes'] + r['interrupted_read_upper_bound'] for r in prior) + ancestor['body_bytes'] + ancestor['interrupted_read_upper_bound']
     available = caps['body_bytes'] - spent
     if available < 65536:
         raise ValueError('insufficient read/diagnostic reserve')
-    started = prior[0]['run_start_clock'] if prior else clock()
+    started = prior[0]['run_start_clock'] if prior else ancestor['run_start_clock'] or clock()
     if prior and (clock() < prior[-1]['finished_clock'] or started > clock()):
         raise ValueError('monotonic clock moved backwards')
     remaining_time = caps['wall_seconds'] - (clock() - started)
