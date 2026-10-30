@@ -958,3 +958,5 @@ Delivery v2保留predeparture交付prefix、对已完成请求禁准备，模型
 `prepare_public_helmet_pilot.py`只负责固定官方COCO/images metadata与6目标的有界获取；`audit_public_helmet_pilot.py`独立重建选择/GT/hash/账单，消费端不联网、不调用producer选择逻辑，不依赖模型/环境。仅共享预定选择规则字符串。
 
 `finish_public_helmet_pilot.py`仅复用Capture下载固定6文件，不重新GET输入清单；`audit_public_helmet_delivery.py`独立消费旧库存provenance与新图片，复用独立consumer纯GT解析函数，不调用producer选择/网络。
+
+`run_helmet_quality_pilot.py`负责无GT两worker的CPU离线固定12次生成与有界parent，`audit_helmet_quality_pilot.py`独立重构GT/ROI/tensor/输出后缀/参数与账单，不调用producer判分或模型generate；tokenizer/safetensors只作读取。

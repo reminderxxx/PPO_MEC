@@ -1,3 +1,7 @@
+## 2026-10-30：Helmet6 Q独立实现与冻结准备
+
+输入已交付后人工明确继续推进；先独立预实现审查，再另立固定ROI两臂(base/Helmet)各6generate、32token、CPUfloat32、1800秒/128MiB任务。原生框无手改、prompt/parser事前锁定、全部格式错/负值保留；不下载/训练、不等ALPR、不得从0/6重试。producer4软件case通过，内存预计算6PNG SHA而未写PNG/未加载模型；consumer4case另列。真实Q尚未启动，论文未完成。
+
 ## 2026-10-30：Helmet6实际输入交付并独立接受
 
 固定6原图/Helmet与NoHelmet原生ROI各3，publisher SHA/size、Pillow/原生框及事前选择通过；a5ecc58一次执行11HTTP/10643077B、33.830951秒，consumer0.489504秒，launch与consumer均exit0，audit/terminal配对及独立交付接受通过，未重跑audit。累计30HTTP/16170042返回B+65536读取上界+689404声明实体上界=16924982B；原全部失败保留，新300秒单列，非旧900复活。实际CSV/GT/报告在私有final_delivery_v4，原图不上传。输入暴露2392COCO图/8275标注，非hidden/独立采集；ALPR/任务质量/训练独立性与论文仍缺，0模型/Q/训练。七用户文件SHA未变。

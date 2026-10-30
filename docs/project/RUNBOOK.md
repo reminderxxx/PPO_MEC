@@ -1,3 +1,7 @@
+## 2026-10-30：Helmet6固定ROI质量pilot
+
+先读[Q合同](paper_helmet_quality_pilot_contract_20261030.md)。完成独立软件接受/clean source/输入资源及plan-grant SHA冻结后，仅一次`run_helmet_quality_pilot.py --plan <plan> --plan_sha256 <sha> --grant <grant>`；两个无GT workerplan只由parent启动，勿手动执行worker或现成audit。producer1200/每worker600/consumer剩余600合计1800秒，日志/全128MiB。协议通过但全错仍可audit_success，质量标志单独报，不补测/调prompt。
+
 固定文件收尾先读[精确范围](paper_public_helmet_pilot_contract_20261030.md#最终固定文件收尾额外独立300秒不恢复旧时间)。clean/freeze/grant/独立复核后仅一次`finish_public_helmet_pilot.py --plan <plan> --plan_sha256 <sha> --grant <grant>`，自动一次delivery consumer；不手动重跑。300秒额外范围单列，原失败/时间不复活，后续失败不另开自动网络。
 
 原生206恢复仅按[新限定合同](paper_public_helmet_pilot_contract_20261030.md#原生206分页与只读coco恢复)使用freshv3，只读引用已完整COCO，继承最初clock，禁止递归恢复或重下COCO。两旧run/audit不可重跑。

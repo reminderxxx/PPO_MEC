@@ -1,3 +1,5 @@
+- `scripts/run_helmet_quality_pilot.py` / `scripts/audit_helmet_quality_pilot.py` / `tests/test_helmet_quality_pilot.py`：固定Helmet6 ROI的base/adapter成对质量pilot；私有`helmet_quality_pilot_20261030_v1/`，新run/crops、两臂原始case记录、独立audit/逐例CSV；不改公开输入原件。
+
 - `scripts/finish_public_helmet_pilot.py` / `scripts/audit_public_helmet_delivery.py`：只读引用已冻结GT/清单/6目标的固定原图收尾，freshraw=`data/raw/task_quality/public_helmet_delivery_20261030_v4/`，私有`final_delivery_v4/`，单次audit/CSV/GT输出。
 
 - `scripts/prepare_public_helmet_pilot.py` / `scripts/audit_public_helmet_pilot.py`：Helmet6原生GT有界获取与独立离线资格；raw=`data/raw/task_quality/public_helmet_pilot_20261030_v1/`，私有`quality_helmet_pilot_acquisition_20261030_v1/`，导出CSV/GT，0模型。
