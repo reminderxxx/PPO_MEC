@@ -302,3 +302,10 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 审查元数据：`reviewed_at=2026-10-30 12:18 Asia/Shanghai`；`literature_cutoff=2026-10-22`（本轮未新增联网检索）；`target_venue=CSCWD 2027; TMC internal claim policy`；`artifact_run_id=joint_stream_workloads_v3/20261015T172250Z_engineering; joint_stream_learning/20261016T162100Z_confirmation; confirmation_recovery_20261017; learning_effectiveness_stage1_20261017`；`policy_version=tmc_review_policy_v3_20260621`；修订起点 Git `577842477c501ee5f69dcbe502daec1001f49b24`；`evidence_level=development raw data recalculated, formal/holdout/support E0_UNAVAILABLE / Unverifiable`。本轮没有重训、调参、公开方法复现实验或正式/holdout 结论。
 - 验证：R21 干净稿和标注稿的 DOCX ZIP 均完整、正文文字彼此相同；与 R20 相比，两表全部单元格、三张媒体字节、25 条参考文献原文相同，参考文献有效 run 均 Times New Roman 8 pt。两份 DOCX 均经 bundled `render_docx.py --emit_pdf` 渲染为 Letter 六页；逐页原尺寸检查无裁切、叠字或图表漂移，标注版与干净版六页 PNG 逐像素相同。Fig. 2 仍在 IV-A 首段之后。Word 批注 27 条全部匹配定位。
 - 待核验：`Performative Evaluation` 按用户原词保留，是否改为学术惯用 `Performance Evaluation` 由作者终审确定；第三/第四作者和基金真实信息仍待填写。公开方法复现、非重叠时间区间及组件因果检验尚未开展，V-D 写的是匹配协议而非完成结果。老师稿视觉格式已核对，未声称与其全部 Word section XML 节点逐一相同。论文产物在 Git 忽略的 `artifacts/` 中，台账提交与推送不包含 DOCX。
+
+## R22 实验节英文标题确认（2026-10-30）
+
+- 用户确认采用常见术语 `Performance Evaluation`。本轮新要求覆盖 R21 在第 V 节标题保留 `Performative Evaluation` 的暂定处理，仅更改该标题及标注稿对应批注；R21 原稿保留作历史基线。
+- 基线：R21 干净稿 SHA-256 `cde437ab6c9c1442c5e71a8cc63ec31caf6d62be9f1f04c810b42cbabd77e466`，标注稿 SHA-256 `a40884624e5494dd464d8f6416ab08cdfea2c766fe66678d0ace9375e38f92d6`。新稿位于 `artifacts/manuscript/r22_20261030/`：干净稿 SHA-256 `252cecbbde04b34158a7a7b2be1a53453aa54e36794bffc1fdd68dc625ee3b8e`，标注稿 SHA-256 `78e38c83d7005e445164dfbb3dfdd62db254bb5ea68e486f15d61f967fda083b`。
+- 精准位置和前后对照：第 V 节标题、R21 成稿段落索引 49（原 R20 段落索引 46），`V. Performative Evaluation` → `V. Performance Evaluation`。标注稿第 15 条批注从“英文术语待作者最后核定”改为“按用户确认改用标准学术术语”；其余 26 条批注未改。完整记录见本地 `heading_change_log.md`。
+- 验证：DOCX ZIP 包完整；R21→R22 干净稿只有 `word/document.xml` 不同，标注稿只有 `word/document.xml` 与 `word/comments.xml` 不同；两份 DOCX 皆仅上述标题段文字变化，27 条批注保留。bundled `render_docx.py --emit_pdf` 均为 Letter 六页；逐页像素对比仅第 4 页标题字形区域变化，其他五页与 R21 完全一致，第 4 页原尺寸目视无裁切或重排。论文图表、作者栏、文献和实验数据未改；本轮无需运行算法测试，R21 原有正式评估与公开算法复现待办保持。
