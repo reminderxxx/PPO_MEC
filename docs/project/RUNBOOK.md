@@ -7,8 +7,10 @@
 终端只单次`audit_public_task_metadata.py --root <raw> --plan_sha256 <sha> --decision <reason> --output <fresh_audit>`。
 现有audit/terminal复用；M余额不是图像或Q资格，D不能从满额重新起算。全程0模型/训练/评价。
 本轮v1/v2/v3现均终端封存：累计7HTTP、图像0，v3在GET前原600秒deadline耗尽。
-不得使用上面的CLI续写任何旧目录；[单次追加时间方案](paper_public_task_metadata_implementation_20261030.md#待明确批准只追加一次公开文件清单查询)
-待明确答复及独立软件/计划冻结，不是已经运行或可直接复制启动的恢复命令。
+不得使用上面的CLI续写任何旧目录。单次追加时间已明确批准；[新执行合同](paper_public_task_metadata_implementation_20261030.md#单次追加已明确批准后的执行合同2026-10-30)
+需独立软件资格/clean source/plan/grant冻结。新入口为
+`run_public_task_metadata_extension.py --plan <new_plan> --sha256 <plan_sha> --grant <new_grant>`，
+只创建fresh extension root，自动单次独立终端audit，严禁再次手动运行consumer或GET。
 
 ## 2026-10-29 终端复用与强化后软件任务
 

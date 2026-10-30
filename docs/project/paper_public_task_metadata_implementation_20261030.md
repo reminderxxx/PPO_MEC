@@ -76,3 +76,30 @@ CCPD demo仅0.jpg–4.jpg，未带牌照文字标签；EdgeVision文件列表由
 如果返回只有大归档，报告小样本入口未闭合；此批不取图像、不自动开D或Q。
 私有`single_route_extension_proposal.json` SHA为
 `258cc36483cb7219073911e6ac6a0083dc961b942f3b7c42a77e817b00905818`；尚未执行，不从旧批准或时间经过推导追加许可。
+
+### 单次追加已明确批准后的执行合同（2026-10-30）
+
+人工明确答复“允许追加这一次查询”，新grant独立绑定上述追加proposal SHA和本次精确plan SHA。
+原M超时事实不改写，新时间不是旧M/D续算：一次固定URL、1MiB含不确定读取上界、120秒含收据及独立消费者，
+累计cap精确固定8请求/1980613B，新旧全部存储仍256MiB。不下载图像或归档、不自动开D/Q。
+`run_public_task_metadata_extension.py`只启动一次，自动初始化、查询和单次终端消费；任何错误都保存失败prefix。
+新的raw为`data/raw/task_quality/public_task_metadata_extension_20261030_v1/`，旧v1/v2/v3均只读封存。
+
+生产与消费分别核v2成功账本→v3零HTTP超时terminal→追加proposal/grant/新plan；
+v3继承原7请求，不能与v2再加成14。原641.769310秒已包含旧264.193802秒，两者也不相加。
+首轮新增8离线案例3通过/5失败：旧`kern.boottime`包含的微秒字符串发生变化，使旧live比较拦下全部正路径，
+没有真实HTTP；此变化既不证明重启，也不证明未重启。原记录和字段全部保留。
+新明确授权任务独立采用`kern.bootsessionuuid`（无fallback）和共享`clock_gettime(CLOCK_MONOTONIC)`；
+plan/新claim绑定稳定UUID，GET及consumer实时核同UUID。历史boot仅在祖先之间核内部一致，不与新live身份比较。
+新120秒从init claim开始，不能从GET重启，也不与旧clock相减或宣称跨boot连续历时。
+请求阶段保留10秒给收据与consumer；`D_wall_remaining=null`，不以新clock重置旧M+D账面时间。
+
+独立静态审查另拦下audit落盘前误报成功、坏claim使completion缺失两项；新有限修正仅3新fixture/300秒/8MiB，
+实际3通过、首8全部deselect、旧20不重跑。新测试覆盖稳定UUID完整链、terminal写失败不得报audit成功、
+部分claim损坏仍须保存未审计prefix。audit和terminal均create-only保存完成后才记成功；失败prefix按新1MiB保守上界，
+不重跑consumer。软件原资格、首8与新3分版记录，不能合称最终版本31项全链路。
+此前软件准备记录跨进程保存/比较`time.monotonic`值，不能据此认证跨进程时长；原字段保留并另作更正，
+约0本身不否定同进程差值。新修正资格和真实任务均采用共享CLOCK_MONOTONIC，不借此暂停或重置真实120秒。
+
+匹配离线资格、独立复核、clean commit、source/plan/grant冻结及一次push尝试完成之后才单次启动新任务。
+只有JSON元数据容器返回成功仍不等于图像/标签/版本内容已认证；实际原件留给终端解读，来源字段缺失标UNVERIFIED。

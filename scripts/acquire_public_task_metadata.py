@@ -17,6 +17,46 @@ SEEDS = {'https://data.mendeley.com/datasets/j82bnw7gsr/1',
          'https://api.github.com/repos/detectRecog/CCPD/commits/master'}
 HOSTS = {'data.mendeley.com', 'static.data.mendeley.com', 'api.github.com', 'github.com'}
 PUBLIC_FILES = 'https://data.mendeley.com/public-api/datasets/j82bnw7gsr/files?version=1'
+EXTENSION_SHA = '258cc36483cb7219073911e6ac6a0083dc961b942f3b7c42a77e817b00905818'
+
+
+def extension_ledger(plan, ancestor):
+    """Accept only the explicitly authorized, zero-HTTP deadline predecessor."""
+    e = plan['single_route_extension']; proposal_path = Path(e['proposal'])
+    if e['proposal_sha256'] != EXTENSION_SHA or digest(proposal_path) != EXTENSION_SHA:
+        raise ValueError('extension proposal binding')
+    proposal = json.loads(proposal_path.read_text())
+    ap = Path(proposal['sealed_parent_audit']); old = json.loads(ap.read_text())
+    previous_path = Path(e['predecessor_plan']); previous = json.loads(previous_path.read_text())
+    parent = Path(previous['raw_root']); terminal = json.loads((parent/'terminal.json').read_text())
+    claim = json.loads((parent/'claim.json').read_text())
+    if (digest(ap) != proposal['sealed_parent_audit_sha256'] or
+            digest(previous_path) != old['plan_sha256'] or digest(parent/'plan.json') != old['plan_sha256'] or
+            terminal['sha256'] != digest(ap) or Path(terminal['audit']).resolve() != ap.resolve() or
+            claim['plan_sha256'] != old['plan_sha256'] or claim['grant_sha256'] != digest(parent/'grant.json') or
+            claim['boot_id'] != ancestor['boot_id'] or 'single_route_extension' in previous or
+            previous['parent_metadata'] != plan['parent_metadata'] or list(parent.glob('request_*')) or
+            old['request_receipt_sha256'] or old['request_failures'] or old['within_metadata_deadline'] or
+            old['status'] != 'FAILED_METADATA_DEADLINE_LEDGER_RETAINED' or
+            old['elapsed_seconds'] <= 600 or old['run_start_clock'] != ancestor['run_start_clock'] or
+            old['boot_id'] != ancestor['boot_id'] or
+            any(old[k] != ancestor[k] for k in ('requests', 'body_bytes', 'interrupted_read_upper_bound')) or
+            (old['requests'], old['body_bytes'], old['interrupted_read_upper_bound']) != (7, 932037, 0)):
+        raise ValueError('extension predecessor identity/accounting')
+    pre = previous['prelaunch_predecessor']; prefix = json.loads(Path(pre['audit']).read_text())
+    if digest(Path(pre['audit'])) != pre['sha256'] or prefix['requests'] or prefix['body_bytes'] or prefix['interrupted_read_upper_bound']:
+        raise ValueError('zero-HTTP prelaunch predecessor changed')
+    if (proposal['new_url'] != PUBLIC_FILES or proposal['new_caps'] != {
+            'http_requests': 1, 'body_and_interrupted_read_upper_bound_bytes': 1048576,
+            'wall_seconds_including_producer_and_consumer': 120, 'images': 0, 'model_calls': 0}):
+        raise ValueError('extension fixed scope')
+    # The failed child inherits its parent's costs; do not add the same seven twice.
+    result = dict(ancestor, old_deadline_elapsed_seconds=old['elapsed_seconds'], old_deadline_pass=False)
+    fresh_claim = Path(plan['raw_root'])/'claim.json'
+    result['run_start_clock'] = json.loads(fresh_claim.read_text())['extension_start_clock'] if fresh_claim.exists() else None
+    if result['run_start_clock'] is not None and not 0 <= result['run_start_clock'] <= clock():
+        raise ValueError('extension clock outside authorized fresh interval')
+    return result
 
 
 def parent_ledger(plan):
@@ -28,7 +68,8 @@ def parent_ledger(plan):
     ledger = json.loads(audit_path.read_text()); previous = json.loads(parent_plan.read_text())
     if (digest(parent_plan) != ledger['plan_sha256'] or 'parent_metadata' in previous or
             ledger['status'] != 'AUDITED_METADATA_LEDGER_ONLY' or ledger['request_failures'] or
-            not ledger['within_metadata_deadline'] or ledger['boot_id'] != boot_id()):
+            not ledger['within_metadata_deadline'] or
+            ('single_route_extension' not in plan and ledger['boot_id'] != boot_id())):
         raise ValueError('ineligible/recursive parent metadata ledger')
     root = Path(p['root']); terminal = json.loads((root/'terminal.json').read_text())
     if digest(root/'plan.json') != ledger['plan_sha256'] or previous['raw_root'] != str(root) or terminal['sha256'] != p['audit_sha256'] or Path(terminal['audit']).resolve() != audit_path.resolve():
@@ -37,7 +78,7 @@ def parent_ledger(plan):
         rp = root/('request_%03d'%index)/'receipt.json'; record=json.loads(rp.read_text())
         if digest(rp) != ledger['request_receipt_sha256'][index] or record['url'] != url or record['status'] != 'complete' or record['body_sha256'] != p[key]:
             raise ValueError('parent official-response identity mismatch')
-    return ledger
+    return extension_ledger(plan, ledger) if 'single_route_extension' in plan else ledger
 
 
 def published_files_url(plan):
@@ -61,6 +102,13 @@ def boot_id():
     return subprocess.check_output(['/usr/sbin/sysctl', '-n', 'kern.boottime'], text=True).strip()
 
 
+def extension_boot_id():
+    value = subprocess.check_output(['/usr/sbin/sysctl', '-n', 'kern.bootsessionuuid'], text=True).strip()
+    if not re.fullmatch('[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}', value):
+        raise ValueError('stable boot UUID unavailable; no fallback')
+    return value
+
+
 def validate_schema(plan):
     c = plan['metadata_caps']
     if not (type(c['http_requests']) is int and 0 < c['http_requests'] <= 12 and
@@ -75,6 +123,10 @@ def validate_schema(plan):
         raise ValueError('source freeze incomplete')
     if not Path(plan['worktree']).is_absolute() or not plan['storage_roots'] or not all(Path(p).is_absolute() for p in plan['storage_roots']):
         raise ValueError('absolute worktree/accounting roots required')
+    if 'single_route_extension' in plan and (c != {'http_requests': 8, 'body_bytes': 1980613, 'wall_seconds': 120} or
+                                           plan['storage_cap'] != 268435456 or 'parent_metadata' not in plan or
+                                           plan.get('extension_boot_session_uuid') != extension_boot_id()):
+        raise ValueError('exact extension cumulative caps required')
 
 
 def stored_bytes(plan):
@@ -94,8 +146,12 @@ def check_binding(root, plan):
             grant['proposal_sha256'] != PROPOSAL_SHA or not grant.get('allow_metadata') or
             grant.get('allow_image_downloads') is not False):
         raise ValueError('plan/grant binding mismatch')
-    if claim['boot_id'] != boot_id():
+    if claim['boot_id'] != (extension_boot_id() if 'single_route_extension' in plan else boot_id()):
         raise ValueError('boot identity changed')
+    if 'single_route_extension' in plan and (grant.get('extension_proposal_sha256') != EXTENSION_SHA or
+                                           grant.get('allow_single_route_extension') is not True or
+                                           'extension_start_clock' not in claim or claim.get('boot_id_kind') != 'kern.bootsessionuuid'):
+        raise ValueError('explicit extension grant/clock binding')
     parent_ledger(plan)
 
 
@@ -129,6 +185,7 @@ def source_check(plan):
 
 
 def initialize(plan_path, expected, grant_path, root):
+    entered = clock()
     if digest(plan_path) != expected:
         raise ValueError('plan SHA mismatch')
     plan = json.loads(Path(plan_path).read_text())
@@ -137,12 +194,21 @@ def initialize(plan_path, expected, grant_path, root):
     parent_ledger(plan)
     if grant['plan_sha256'] != expected or grant['proposal_sha256'] != plan['proposal_sha256'] or not grant.get('allow_metadata') or grant.get('allow_image_downloads') is not False:
         raise ValueError('grant binding mismatch')
+    if 'single_route_extension' in plan and (str(root) != plan['raw_root'] or
+                                           grant.get('extension_proposal_sha256') != EXTENSION_SHA or
+                                           grant.get('allow_single_route_extension') is not True):
+        raise ValueError('explicit extension init grant/root')
     source_check(plan)
     root.mkdir(parents=True, exist_ok=False)
     for name, source in [('plan.json', plan_path), ('grant.json', grant_path)]:
         with (root / name).open('xb') as f:f.write(Path(source).read_bytes())
-    save(root / 'claim.json', {'plan_sha256': expected, 'grant_sha256': digest(grant_path),
-                              'created_unix': time.time(), 'boot_id': boot_id(), 'model_calls': 0, 'image_bytes': 0})
+    claim = {'plan_sha256': expected, 'grant_sha256': digest(grant_path),
+             'created_unix': time.time(), 'boot_id': extension_boot_id() if 'single_route_extension' in plan else boot_id(),
+             'model_calls': 0, 'image_bytes': 0}
+    if 'single_route_extension' in plan:
+        claim['extension_start_clock'] = entered
+        claim['boot_id_kind'] = 'kern.bootsessionuuid'
+    save(root / 'claim.json', claim)
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -218,6 +284,8 @@ def acquire_one(root, intent_path, expected, *, opener=None, verify_source=True)
     if prior and (clock() < prior[-1]['finished_clock'] or started > clock()):
         raise ValueError('monotonic clock moved backwards')
     remaining_time = caps['wall_seconds'] - (clock() - started)
+    if 'single_route_extension' in plan:
+        remaining_time -= 10  # Reserved for receipt finalization and the single independent consumer.
     if remaining_time <= 0:
         raise TimeoutError('metadata total deadline')
     if stored_bytes(plan) > plan['storage_cap'] - caps['body_bytes'] - 1048576:
@@ -249,6 +317,8 @@ def acquire_one(root, intent_path, expected, *, opener=None, verify_source=True)
             allowed = content_type.startswith('text/') or content_type in ('application/json', 'application/xml', 'application/javascript')
             if not allowed:
                 raise ValueError('metadata MIME gate; image/archive bytes not consumed')
+            if 'single_route_extension' in plan and not diagnostic and content_type != 'application/json':
+                raise ValueError('extension requires published JSON response')
             if response.headers.get('Content-Encoding', 'identity').lower() not in ('', 'identity'):
                 raise ValueError('unexpected encoding')
             length = response.headers.get('Content-Length')
@@ -272,6 +342,8 @@ def acquire_one(root, intent_path, expected, *, opener=None, verify_source=True)
             if length is not None and r['bytes'] != length:
                 raise ValueError('truncated declared response')
         (folder / 'body.bin').read_bytes().decode('utf-8')
+        if 'single_route_extension' in plan and not isinstance(json.loads((folder/'body.bin').read_text()), (dict, list)):
+            raise ValueError('extension JSON inventory container')
         r['status'] = 'complete'
     except BaseException as error:
         r.update(status='failed', error_type=type(error).__name__, error=str(error))

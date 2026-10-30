@@ -27,7 +27,8 @@ def audit(root, plan_sha, decision):
     grant = json.loads((root / 'grant.json').read_text())
     assert grant['plan_sha256'] == plan_sha and grant['proposal_sha256'] == plan['proposal_sha256'], 'authorization binding'
     assert grant.get('allow_metadata') and grant.get('allow_image_downloads') is False, 'metadata-only grant'
-    assert claim['boot_id'] == subprocess.check_output(['/usr/sbin/sysctl', '-n', 'kern.boottime'], text=True).strip(), 'boot identity'
+    boot_kind = 'kern.bootsessionuuid' if 'single_route_extension' in plan else 'kern.boottime'
+    assert claim['boot_id'] == subprocess.check_output(['/usr/sbin/sysctl', '-n', boot_kind], text=True).strip(), 'boot identity'
     ancestor = {'requests': 0, 'body_bytes': 0, 'interrupted_read_upper_bound': 0, 'run_start_clock': None}
     derived_url = None
     if 'parent_metadata' in plan:
@@ -35,7 +36,7 @@ def audit(root, plan_sha, decision):
         assert digest(ap) == p['audit_sha256'], 'parent audit hash'
         ancestor = json.loads(ap.read_text()); old_plan = json.loads(pp.read_text())
         assert digest(pp) == ancestor['plan_sha256'] and 'parent_metadata' not in old_plan, 'nonrecursive parent'
-        assert ancestor['status'] == 'AUDITED_METADATA_LEDGER_ONLY' and not ancestor['request_failures'] and ancestor['within_metadata_deadline'] and ancestor['boot_id'] == claim['boot_id'], 'eligible parent'
+        assert ancestor['status'] == 'AUDITED_METADATA_LEDGER_ONLY' and not ancestor['request_failures'] and ancestor['within_metadata_deadline'] and ('single_route_extension' in plan or ancestor['boot_id'] == claim['boot_id']), 'eligible parent'
         parent = Path(p['root']); page = parent/'request_000/body.bin'; docs = parent/'request_002/body.bin'
         terminal=json.loads((parent/'terminal.json').read_text())
         assert digest(parent/'plan.json')==ancestor['plan_sha256'] and old_plan['raw_root']==str(parent) and terminal['sha256']==p['audit_sha256'] and Path(terminal['audit']).resolve()==ap.resolve(), 'parent root/terminal'
@@ -49,6 +50,27 @@ def audit(root, plan_sha, decision):
         method=d['paths']['/datasets/{id}/files']['get']
         assert d['servers'][0]['url']=='https://api.data.mendeley.com' and 'public-datasets' in method['tags'] and any(v.get('name')=='version' and v.get('in')=='query' for v in method['parameters']), 'published GET route'
         derived_url='https://data.mendeley.com/public-api/datasets/j82bnw7gsr/files?version=1'
+    old_failed = None
+    if 'single_route_extension' in plan:
+        e=plan['single_route_extension']; ep=Path(e['proposal'])
+        approved_sha='258cc36483cb7219073911e6ac6a0083dc961b942f3b7c42a77e817b00905818'
+        assert digest(ep)==e['proposal_sha256']==approved_sha, 'extension proposal hash'
+        assert grant.get('extension_proposal_sha256')==approved_sha and grant.get('allow_single_route_extension') is True, 'explicit extension grant'
+        assert plan['metadata_caps']=={'http_requests':8,'body_bytes':1980613,'wall_seconds':120} and plan['storage_cap']==268435456, 'exact extension caps'
+        proposal=json.loads(ep.read_text()); ap=Path(proposal['sealed_parent_audit'])
+        old_failed=json.loads(ap.read_text()); previous_path=Path(e['predecessor_plan']); previous=json.loads(previous_path.read_text())
+        parent=Path(previous['raw_root']); terminal=json.loads((parent/'terminal.json').read_text()); old_claim=json.loads((parent/'claim.json').read_text())
+        assert digest(ap)==proposal['sealed_parent_audit_sha256'] and digest(previous_path)==digest(parent/'plan.json')==old_failed['plan_sha256'], 'failed predecessor hash'
+        assert terminal['sha256']==digest(ap) and Path(terminal['audit']).resolve()==ap.resolve(), 'failed predecessor terminal'
+        assert old_claim['plan_sha256']==old_failed['plan_sha256'] and old_claim['grant_sha256']==digest(parent/'grant.json') and old_claim['boot_id']==ancestor['boot_id'], 'failed predecessor claim'
+        assert 'single_route_extension' not in previous and previous['parent_metadata']==plan['parent_metadata'] and not list(parent.glob('request_*')), 'nonrecursive zero-attempt predecessor'
+        assert not old_failed['request_receipt_sha256'] and not old_failed['request_failures'] and not old_failed['within_metadata_deadline'] and old_failed['status']=='FAILED_METADATA_DEADLINE_LEDGER_RETAINED' and old_failed['elapsed_seconds']>600, 'old deadline FAIL retained'
+        assert old_failed['run_start_clock']==ancestor['run_start_clock'] and old_failed['boot_id']==ancestor['boot_id'] and all(old_failed[k]==ancestor[k] for k in ('requests','body_bytes','interrupted_read_upper_bound')), 'ancestor costs counted once'
+        assert (ancestor['requests'],ancestor['body_bytes'],ancestor['interrupted_read_upper_bound'])==(7,932037,0), 'approved fixed prefix'
+        pre=previous['prelaunch_predecessor']; prefix=json.loads(Path(pre['audit']).read_text())
+        assert digest(Path(pre['audit']))==pre['sha256'] and prefix['requests']==prefix['body_bytes']==prefix['interrupted_read_upper_bound']==0, 'zero-HTTP prelaunch prefix'
+        assert proposal['new_url']==derived_url and proposal['new_caps']=={'http_requests':1,'body_and_interrupted_read_upper_bound_bytes':1048576,'wall_seconds_including_producer_and_consumer':120,'images':0,'model_calls':0}, 'fixed extension scope'
+        assert claim.get('boot_id_kind')=='kern.bootsessionuuid' and plan['extension_boot_session_uuid']==claim['boot_id'], 'fresh stable boot identity'
     folders = sorted(root.glob('request_[0-9][0-9][0-9]'))
     calls = body_bytes = upper = 0
     rows = []
@@ -84,6 +106,8 @@ def audit(root, plan_sha, decision):
             assert headers.get('content-encoding', 'identity').lower() in ('', 'identity'), 'encoding'
             declared = headers.get('content-length')
             assert declared is None or int(declared) == actual, 'content length'
+            if old_failed is not None:
+                assert mime=='application/json' and isinstance(json.loads(path.read_text()), (dict,list)), 'extension JSON response'
         else:
             assert i == len(folders) - 1, 'requests after failure'
         assert not r['automatic_retry'] and r['image_bytes'] == 0, 'input-only metadata'
@@ -105,8 +129,8 @@ def audit(root, plan_sha, decision):
     assert calls <= cap['http_requests'] and body_bytes + upper <= cap['body_bytes'], 'M limits'
     now = time.clock_gettime(time.CLOCK_MONOTONIC)
     assert not rows or now >= rows[-1]['finished_clock'], 'monotonic clock moved backwards'
-    start = ancestor['run_start_clock'] or (rows[0]['run_start_clock'] if rows else None)
-    assert not rows or not ancestor['run_start_clock'] or rows[0]['run_start_clock']==ancestor['run_start_clock'], 'parent deadline reset'
+    start = claim['extension_start_clock'] if old_failed is not None else ancestor['run_start_clock'] or (rows[0]['run_start_clock'] if rows else None)
+    assert not rows or not start or rows[0]['run_start_clock']==start, 'parent/extension deadline reset'
     elapsed = now - start if start is not None else 0
     # A deadline failure may finish just after its cap; it is retained, not PASS input.
     assert elapsed >= 0, 'monotonic clock moved backwards'
@@ -122,9 +146,13 @@ def audit(root, plan_sha, decision):
             'within_metadata_deadline': within_time, 'retained_bytes_before_audit': stored,
             'request_failures': sum(r['status'] != 'complete' for r in rows),
             'D_request_remaining': 32 - calls, 'D_body_remaining': 67108864 - body_bytes - upper,
-            'D_wall_remaining': max(0, 1800 - elapsed), 'model_calls': 0, 'image_bytes': 0,
+            'D_wall_remaining': None if old_failed is not None else max(0, 1800 - elapsed), 'model_calls': 0, 'image_bytes': 0,
             'D_storage_remaining_conservative': plan['storage_cap'] - stored - 1048576,
             'run_start_clock': start, 'boot_id': claim['boot_id'],
+            'timing_scope': 'new explicitly granted120s only; old M FAIL preserved; not total M+D elapsed' if old_failed is not None else 'original M deadline',
+            'old_metadata_deadline_elapsed_seconds': old_failed['elapsed_seconds'] if old_failed is not None else None,
+            'old_metadata_deadline_pass': False if old_failed is not None else None,
+            'new_requests': len(rows),
             'D_balance_note': 'Nominal unspent balance, not permission to continue a failed/sealed run; total wall includes orchestration/audit.1MiB terminal reserve charged.',
             'input_qualified': False, 'paper_goal_complete': False,
             'request_receipt_sha256': [digest(p / 'receipt.json') for p in folders]}
