@@ -309,3 +309,12 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 基线：R21 干净稿 SHA-256 `cde437ab6c9c1442c5e71a8cc63ec31caf6d62be9f1f04c810b42cbabd77e466`，标注稿 SHA-256 `a40884624e5494dd464d8f6416ab08cdfea2c766fe66678d0ace9375e38f92d6`。新稿位于 `artifacts/manuscript/r22_20261030/`：干净稿 SHA-256 `252cecbbde04b34158a7a7b2be1a53453aa54e36794bffc1fdd68dc625ee3b8e`，标注稿 SHA-256 `78e38c83d7005e445164dfbb3dfdd62db254bb5ea68e486f15d61f967fda083b`。
 - 精准位置和前后对照：第 V 节标题、R21 成稿段落索引 49（原 R20 段落索引 46），`V. Performative Evaluation` → `V. Performance Evaluation`。标注稿第 15 条批注从“英文术语待作者最后核定”改为“按用户确认改用标准学术术语”；其余 26 条批注未改。完整记录见本地 `heading_change_log.md`。
 - 验证：DOCX ZIP 包完整；R21→R22 干净稿只有 `word/document.xml` 不同，标注稿只有 `word/document.xml` 与 `word/comments.xml` 不同；两份 DOCX 皆仅上述标题段文字变化，27 条批注保留。bundled `render_docx.py --emit_pdf` 均为 Letter 六页；逐页像素对比仅第 4 页标题字形区域变化，其他五页与 R21 完全一致，第 4 页原尺寸目视无裁切或重排。论文图表、作者栏、文献和实验数据未改；本轮无需运行算法测试，R21 原有正式评估与公开算法复现待办保持。
+
+## 2026-10-30 强化学习研究定位讨论与修订手册同步规则
+
+- 本轮范围：用户先讨论强化学习/高性能计算与论文主方向的结合难点，要求在 `agent.md` 加入“论文结构与文章同步修改”；没有授权据讨论改写论文正文、图、实验或固定 25 条正式引文。R22 仍是最新论文基线，干净稿 SHA-256 `252cecbbde04b34158a7a7b2be1a53453aa54e36794bffc1fdd68dc625ee3b8e`，本轮复核文件哈希一致。
+- 精准位置与前后对照：`agent.md`“自主控制修改范围”原只要求冻结未指向位置和必要交叉引用 → 新增已授权结构调整时先建立“问题/难点→模型/目标→方法→实验→结论”锚点，再同步受影响的标题、过渡、编号、引文、摘要/贡献/结论，并逐处记录；讨论本身不触发改稿。手册的“最新版本 R20”→“已验证 R22”，“待确认 Performative/Performance Evaluation”→“已确认 Performance Evaluation”；移除已过时的“本轮先交研究问题段落”单轮指令；独立候选图的“未回写 R20”改为“未回写当前稿”。
+- 文献登记：依据公开出版页面/官方摘要，`literature_reference_table.md` 增加 SATS、ODCO、PRAISE、Toppings、参数共享 MEC 缓存及 SERRANO 六条，补充“车辆 DAG + RL”“持续请求 + 准备成本”“共享基础模型”“HPC continuum”已有覆盖的边界。新条目仅供研究定位，不自动并入论文参考文献，也不代表完成全文机制复核。
+- 研究判断：候选 RL 难点是因果可见的持续 DAG 请求、跨 RSU 移动和多车共享缓存/传输所形成的可行动作耦合及跨请求收益归因；应在后续获授权的 Introduction、Related Work、Problem/Method/Evaluation 对应位置论证。当前模型没有显式 HPC tier、GPU/CPU 并行或运行时测量，故 HPC 是可讨论的后续扩展，而非已解决的本稿主空缺；当前轮不对创新性或性能作晋级判断。
+- 审查元数据：`reviewed_at=2026-10-30 14:23 Asia/Shanghai`；`literature_cutoff=2026-10-30`；`target_venue=CSCWD 2027; TMC internal claim policy`；`artifact_run_id=none (manual/literature positioning only)`；`policy_version=tmc_review_policy_v3_20260621`；起点 Git `bc08b43d4da198789799becdb67e3c80ed77a5cb`；`evidence_level=public primary abstracts + local R22/manual; formal/holdout/support E0_UNAVAILABLE / Unverifiable`。未审计正式性能、未给 paper-ready 评分或 verdict。
+- 验证：R22 DOCX SHA-256 复核一致；`git diff --check` 通过。`agent.md` 与文献表定向差异检查确认未触及 DOCX、算法、实验产物。未完成事项：待作者确认研究定位后，才按新同步规则对相应论文段落作定点修订；近邻全文、可比 baseline、组件消融及 HPC 运行时合同均未在本轮落实。

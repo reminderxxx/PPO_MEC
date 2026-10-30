@@ -11,6 +11,19 @@
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
+### 2026-10-30：强化学习结合难点与高性能计算边界
+
+本轮仅据公开出版页面/官方摘要增量核验近邻，讨论研究定位；未修改论文正文、25 条正式引文、算法或实验。摘要层信息不支持“首次提出”或排除全文中可能存在的机制，正式比较前仍需定向阅读全文。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 连续到达与容器准备 | [Sequence-Aware Online Container Scheduling With Reinforcement Learning in Parked Vehicle Edge Computing](https://ieeexplore.ieee.org/document/10938380/) | IEEE TVT 74(8):12921–12934, 2025；DOI 10.1109/TVT.2025.3554595；IEEE 官方摘要核验，全文未读 | SATS 已研究变化的任务到达、容器镜像下载成本与序列感知策略梯度调度，说明“连续请求 + 预备成本 + RL”本身不是独占空缺。 | 本项目候选增量须具体落在移动车辆跨 RSU 的已释放 DAG、base/adapter closure、持久共享缓存与传输日历的联合可行动作；需同权限比较与组件证据，不能只凭场景拼接宣称优势。 | Related Work / 序贯请求近邻；实验 baseline 选择时核对代码与合同。 |
+| DAG 依赖与分布式 DRL | [Towards Efficient Task Offloading With Dependency Guarantees in Vehicular Edge Networks Through Distributed Deep Reinforcement Learning](https://ieeexplore.ieee.org/document/10496897/) | IEEE TVT 73(9):13665–13681, 2024；DOI 10.1109/TVT.2024.3387548；IEEE 官方摘要核验，全文未读 | 已将车辆 DAG 子任务优先级与分布式 DRL 卸载结合，不能把“车辆 DAG + RL”当作新颖性。 | 候选问题更聚焦请求间 adapter/base 对象驻留与 handoff 准备对多车共享资源的跨期影响；其信息和动作合同需阅读全文后精确对照。 | Related Work / RL 与 DAG 的直接近邻。 |
+| 依赖感知资源优化 | [Dependency-Aware Task Reconfiguration and Offloading in Multi-Access Edge Cloud Networks](https://ieeexplore.ieee.org/document/10418555/) | IEEE TMC 23(10):9271–9288, 2024；DOI 10.1109/TMC.2024.3360978；IEEE 官方摘要核验，全文未读 | PRAISE 对依赖任务联合计算、通信与时隙资源分配，说明资源因果顺序已有成熟问题基础。 | 本项目可检验移动接触变化及持久 adapter 对象加入后，服务站点、共享传输预约和可选预备的联动；不能以“考虑计算通信时隙”作为本稿新贡献。 | Related Work / Problem Formulation；规则基线候选。 |
+| 多 adapter 系统成本 | [Toppings: CPU-Assisted, Rank-Aware Adapter Serving for LLM Inference](https://www.usenix.org/conference/atc25/presentation/li-suyi-toppings) | USENIX ATC, 2025:613–629；USENIX 官方页面及摘要核验，全文未读 | 实际系统已研究 adapter 装载与 GPU 计算/CPU 辅助计算重叠及请求调度；adapter 装载成本不是本项目首先发现。 | 当前模型关注 RSU 间缓存和链路预约，不包含 GPU/CPU 重叠执行；若主张 HPC 贡献，需另建硬件/运行时和实测指标。 | Motivation / Related Work / Discussion 中界定系统成本与 HPC 边界。 |
+| 参数共享的大模型 MEC 缓存 | [Collaborative Large Model Caching and Inference Offloading With Parameter Sharing in MEC](https://ieeexplore.ieee.org/abstract/document/11672295/) | IEEE TPDS 37(11):2476–2493, 2026（online 2026-09-01）；DOI 10.1109/TPDS.2026.3728847；IEEE 官方摘要核验，全文未读 | 已研究边缘大模型/变体参数共享、协同缓存和推理卸载；“共享基础模型减少缓存冗余”不能孤立宣称新颖。 | 本稿需说明 base/adapter closure 在移动车辆、持续 DAG 与跨 RSU 可见性约束下的具体决策合同；该文的市场/联盟目标与本项目目标不同，全文差异待核。 | Related Work / base-adapter 对象建模；不自动加入固定稿参考文献。 |
+| Edge–Cloud–HPC continuum | [Integrating Heterogeneous Hardware and Software Platforms towards the Edge-Cloud-HPC Continuum](https://ieeexplore.ieee.org/abstract/document/11006662) | IEEE Communications Standards Magazine, 2025 early access；DOI 10.1109/MCOMSTD.2025.3571130；IEEE 官方摘要核验，最终卷期待核 | SERRANO 将真实异构 edge/cloud/HPC 资源作为平台层统一编排，给出“HPC 结合”应涉及的计算层与跨层调度语义。 | 当前 PPO_MEC 仅抽象 RSU 计算工作量、缓存和传输日历；未显式建模 HPC tier、GPU/CPU 并行与运行时，因此 HPC 适合作为后续扩展方向，不宜列为当前已解决的主空缺。 | Discussion / Future Work；不是本稿已复现 baseline。 |
+
 ### 2026-10-30：系统子问题讨论中的缓存依赖补充
 
 本轮为研究结构与复现路线讨论，未修改论文、算法或实验结论。既有 COHCTO、POLAR、S-LoRA、dLoRA 与依赖感知迁移条目不重复登记；公开摘要不能证明其未处理某机制，适配实现也不能冒充原论文忠实复现。
