@@ -1,3 +1,7 @@
+## 2026-10-30：Helmet6单次输入任务
+
+先读[精确合同](paper_public_helmet_pilot_contract_20261030.md)。原M12已消费，继承12HTTP/1588374B。clean源码、独立复核、plan/grant SHA和一次push后，单次`prepare_public_helmet_pilot.py --plan <plan> --plan_sha256 <sha> --grant <grant> --root <fresh_raw> --audit_output <fresh_audit>`；包括一次自动consumer，勿手动重跑audit。共享900秒最后30秒用于独立消费。只有exit0、无consumer_failure及匹配audit/terminal同时成立才接受Helmet6输入，Q/模型仍0。
+
 ## 2026-10-30 公开任务小样本M门
 
 最新独立同源诊断先读[参数排查合同](paper_public_task_metadata_implementation_20261030.md#最新继续找办法独立来源支持的参数排查)。

@@ -1,3 +1,5 @@
+- `scripts/prepare_public_helmet_pilot.py` / `scripts/audit_public_helmet_pilot.py`：Helmet6原生GT有界获取与独立离线资格；raw=`data/raw/task_quality/public_helmet_pilot_20261030_v1/`，私有`quality_helmet_pilot_acquisition_20261030_v1/`，导出CSV/GT，0模型。
+
 ## 2026-10-30 公开任务小样本元数据
 
 - `scripts/acquire_public_task_metadata.py` / `scripts/audit_public_task_metadata.py`：M元数据生产/独立终端消费；不读取图像或加载模型。

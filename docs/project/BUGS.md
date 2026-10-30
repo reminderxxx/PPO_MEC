@@ -1,3 +1,7 @@
+## 2026-10-30：官方folder与COCO入口已解析，图像资格待执行
+
+同来源脚本/root/folder诊断已取得官方COCO文件ID、size、SHA及单文件URL，累计12HTTP/1588374B。历史HTTP200/APIerror400和641.769310秒FAIL保留，不追认为当时成功。新[Helmet6输入合同](paper_public_helmet_pilot_contract_20261030.md)解决入口后的有界获取，当前未下载实际图像、未作Q；ALPR无牌/文字GT、训练独立性及底层权利链仍缺。
+
 ## 2026-10-30：文件清单入口返回API错误（OPEN）
 
 人工另批单次查询已完成：固定URL返回HTTP200而JSON为`{"error":400}`，13B；不是HTTP400，也不提供文件清单。

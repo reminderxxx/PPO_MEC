@@ -1,3 +1,5 @@
+最新官方folder清单已取得独立COCO文件身份。现按[Helmet6输入合同](docs/project/paper_public_helmet_pilot_contract_20261030.md)准备固定6图与原生GT，原M12封存、累计总账不重置；模型/Q仍0。
+
 ## 2026-10-30 公开任务小样本输入
 
 用户已允许按[小样本方案](docs/project/paper_public_task_sample_acquisition_proposal_20261029.md)下载。

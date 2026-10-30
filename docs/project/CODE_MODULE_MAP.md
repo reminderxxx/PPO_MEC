@@ -954,3 +954,5 @@ Delivery v2保留predeparture交付prefix、对已完成请求禁准备，模型
 `acquire_public_task_metadata.py`负责授权/来源/祖先费用/稳定boot与请求硬限；
 `audit_public_task_metadata.py`从原件独立核账。三者都不加载模型或执行任务质量评价。
 传输/JSON账本完成与API文件清单/图像输入资格分开，实际`{"error":400}`由终端交付审查保留为输入未资格。
+
+`prepare_public_helmet_pilot.py`只负责固定官方COCO/images metadata与6目标的有界获取；`audit_public_helmet_pilot.py`独立重建选择/GT/hash/账单，消费端不联网、不调用producer选择逻辑，不依赖模型/环境。仅共享预定选择规则字符串。
