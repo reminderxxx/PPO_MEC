@@ -1,3 +1,10 @@
+## 2026-10-30：用户批准下载，先补M元数据生产/消费门
+
+绑定昨日公开小样本方案；M12请求/5MiB/600秒扣除M+D共同32请求/64MiB/1800秒，不重置预算。
+首实现14合成检查通过后，独立审查拦下执行前预算、grant、错误MIME、来源身份和时钟/账单缺口。
+6增量fixture单轮通过，累计20，分别绑定旧/新源而非同一最终版全链路20项；真实请求尚待clean freeze。
+[实现合同](paper_public_task_metadata_implementation_20261030.md)不授予推理/训练/hidden或论文完成资格。
+
 ## 2026-10-29：用户选择公开数据小样本方案，获取未启动
 
 已核作者CCPD说明及Mendeley原始EdgeVision发布页，形成[公开数据获取方案](paper_public_task_sample_acquisition_proposal_20261029.md)。

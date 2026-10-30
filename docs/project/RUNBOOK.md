@@ -1,3 +1,12 @@
+## 2026-10-30 公开任务小样本M门
+
+先读[实现合同](paper_public_task_metadata_implementation_20261030.md)。clean source、plan/grant/proposal SHA冻结后，
+`acquire_public_task_metadata.py init --root <fresh_raw> --plan <plan> --grant <grant> --sha256 <plan_sha>`只初始化一次。
+每次`get --root <raw> --intent <create_only_intent> --sha256 <intent_sha>`仅发一个元数据请求；
+后续URL须有前一原件中的固定链接证明并通过来源/类型门。一次失败立即停止，不换源/重试。
+终端只单次`audit_public_task_metadata.py --root <raw> --plan_sha256 <sha> --decision <reason> --output <fresh_audit>`。
+现有audit/terminal复用；M余额不是图像或Q资格，D不能从满额重新起算。全程0模型/训练/评价。
+
 ## 2026-10-29 终端复用与强化后软件任务
 
 本地组件成本T现已完成，直接复用`local_cost_execution/audit.json`与`delivery.json`，不为画图重跑测量/审计。

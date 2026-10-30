@@ -1,3 +1,9 @@
+## 2026-10-30 公开任务小样本M门
+
+`acquire_public_task_metadata.py`只依赖stdlib，负责源/授权/clean-source/budget前置门与create-only网络收据；
+`audit_public_task_metadata.py`独立从原件核算，既不调用producer也不访问网络，不依赖agent/environment/model。
+它们不修改旧下载器或旧审计。实际标签与图像的D消费者在取得具体身份后另立，不能把M账本当质量结果。
+
 ## 2026-10-29 强化后的统计与本地成本软件
 
 `analyze_stream_statistics.py`只依赖明确schema、hash绑定原生行及NumPy/stdlib，不依赖环境、agent或旧统计脚本；

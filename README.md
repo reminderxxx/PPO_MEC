@@ -1,3 +1,9 @@
+## 2026-10-30 公开任务小样本输入
+
+用户已允许按[小样本方案](docs/project/paper_public_task_sample_acquisition_proposal_20261029.md)下载。
+先用[元数据门](docs/project/paper_public_task_metadata_implementation_20261030.md)核官方文件身份/标签入口，
+M支出计入M+D共同上限；实际图像与模型质量未获资格前不启动推理或训练，不改论文稿位。
+
 ## 2026-10-29 论文证据强化
 
 四方法×五seed奖励图已实际交付；[结果与负例](docs/project/paper_reward_curve_result_20261028.md)
