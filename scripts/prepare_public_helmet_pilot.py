@@ -25,7 +25,8 @@ FOLDER = '39245ed4-43d6-497c-9fd9-45adca1a6ca0'
 ANNOTATION = {'filename': 'annotations.json', 'id': '425f058b-dd8f-4ce5-a761-d9522649e018',
               'size': 2065913, 'sha256': '5e77fea3d8f1cd93cac42d45065456eeb97a54c31b7534ef453051c9d8853c91',
               'url': 'https://data.mendeley.com/public-files/datasets/j82bnw7gsr/files/425f058b-dd8f-4ce5-a761-d9522649e018/file_downloaded'}
-CAPS = {'http': 20, 'body': 65520490, 'wall': 900, 'storage': 268435456}
+INITIAL_CAPS = {'http': 20, 'body': 65520490, 'wall': 900, 'storage': 268435456}
+CAPS = {'http': 17, 'body': 62699503, 'wall': 900, 'storage': 268435456}
 PRIOR = (12, 1588374, 0)
 RESERVE = 8 * 1024 * 1024
 READ = 65536
@@ -95,6 +96,18 @@ def allowed(url, initial=False):
     require(not initial or u.hostname == 'data.mendeley.com', 'initial publisher URL')
 
 
+def transport_headers(pairs):
+    result = {}
+    for key, value in pairs:
+        name = key.lower()
+        if name == 'set-cookie' and name in result:
+            result[name] += '\n' + value
+        else:
+            require(name not in result or result[name] == value, 'conflicting response header')
+            result[name] = value
+    return result
+
+
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
@@ -129,7 +142,7 @@ class Capture:
             headers['Accept'] = 'application/vnd.mendeley-public-dataset.1+json'
         r = {'url': url, 'role': role, 'redirect_from': redirect_from, 'started': clock(),
              'status': 'failed', 'status_code': 0, 'bytes': 0, 'upper': 0, 'retained_bytes': 0,
-             'body_sha256': None, 'headers': {}, 'request_headers': headers, 'final_url': url}
+             'body_sha256': None, 'headers': {}, 'header_pairs': [], 'request_headers': headers, 'final_url': url}
         save(directory / 'claim.json', dict(r))
         response = None
         failure = None
@@ -141,15 +154,20 @@ class Capture:
             except HTTPError as error:
                 response = error
             r['status_code'] = response.code
-            r['headers'] = dict(response.headers.items())
+            r['header_pairs'] = list(response.headers.items())
+            r['headers'] = dict(r['header_pairs'])
             r['final_url'] = response.geturl()
             require(r['final_url'] == url, 'automatic redirect')
-            h = {k.lower(): v for k, v in r['headers'].items()}
+            h = transport_headers(r['header_pairs'])
             require(h.get('content-encoding', 'identity').strip().lower() in ('', 'identity'), 'encoded response')
             length = h.get('content-length')
             if length is not None:
                 require(length.isdecimal() and int(length) <= min(cap, CAPS['body'] - used), 'Content-Length/cap')
-            if r['status_code'] == 200:
+            paged = role.startswith('image_metadata_page_') and r['status_code'] == 206
+            if paged:
+                page = int(role.rsplit('_', 1)[1]); start = page * 1000
+                require(h.get('content-range') == 'items %d-%d/2392' % (start, min(start + 999, 2391)), 'native metadata items range')
+            if r['status_code'] == 200 or paged:
                 mime = h.get('content-type', '').split(';')[0].strip().lower()
                 valid = (mime.startswith('image/') or mime == 'application/octet-stream') if role.startswith('image_sample_') else (
                     mime in ('application/json', 'application/octet-stream') if role == 'annotation' else mime == 'application/json')
@@ -190,7 +208,7 @@ class Capture:
                 require(bool(re.fullmatch(r'prod-dcd-datasets-public-files-[a-z0-9-]+\.s3(?:[.-][a-z0-9-]+)*\.amazonaws\.com', urlsplit(target).hostname or '')), 'only public-files S3 Location')
                 r['status'] = 'redirect'
             else:
-                require(r['status_code'] == 200, 'HTTP status ' + str(r['status_code']))
+                require(r['status_code'] == 200 or paged, 'HTTP status ' + str(r['status_code']))
                 mime = h.get('content-type', '').split(';')[0].strip().lower()
                 valid = (mime.startswith('image/') or mime == 'application/octet-stream') if role.startswith('image_sample_') else (
                     mime in ('application/json', 'application/octet-stream') if role == 'annotation' else mime == 'application/json')
@@ -343,7 +361,7 @@ def zero_http_parent(plan):
     previous, audit, terminal = load(root/'plan.json'), load(parent['audit']), load(root/'terminal.json')
     claim, failure, control = load(root/'claim.json'), load(root/'producer_failure.json'), load(root/'consumer_process.json')
     require('zero_http_predecessor' not in previous and previous['source_commit'] == 'b619c885281eb0493d290cbacac8589b84e85c36' and
-            previous['new_caps'] == CAPS and previous['raw_root'] == str(root) and previous['parent_audit'] == plan['parent_audit'], 'only direct initial failed scope')
+            previous['new_caps'] == INITIAL_CAPS and previous['raw_root'] == str(root) and previous['parent_audit'] == plan['parent_audit'], 'only direct initial failed scope')
     require(not list(root.glob('request_*')) and failure['requests'] == 0 and failure['error'] == 'storage symlink' and
             audit['failure_bill']['attempt_directory_count'] == 0 and audit['input_qualified'] is False and
             control['returncode'] == 1 and terminal['input_qualified'] is False and
@@ -351,6 +369,37 @@ def zero_http_parent(plan):
             claim['plan_sha'] == parent['plan_sha256'] and claim['boot_uuid'] == boot(), 'exact zero-HTTP failure provenance')
     require(0 <= clock() - claim['start_clock'] < 868, 'original absolute producer deadline already exhausted')
     return claim
+
+
+def pagination_parent(plan):
+    item = plan['pagination_recovery']; root = Path(item['root'])
+    for name, field in [('plan.json','plan_sha256'),('claim.json','claim_sha256'),('terminal.json','terminal_sha256'),
+                        ('producer_failure.json','producer_failure_sha256'),('consumer_process.json','consumer_process_sha256')]:
+        require(not (root/name).is_symlink() and sha(root/name) == item[field], 'pagination parent SHA')
+    require(sha(item['audit']) == item['audit_sha256'], 'pagination failure audit SHA')
+    previous, oldclaim, terminal, audit = load(root/'plan.json'), load(root/'claim.json'), load(root/'terminal.json'), load(item['audit'])
+    require('pagination_recovery' not in previous and previous['source_commit'] == '1d336c9798314958cdc82e52cab70f4d6bc0d5c2' and
+            previous['raw_root'] == str(root) and previous['parent_audit'] == plan['parent_audit'], 'direct exact pagination predecessor only')
+    initial = zero_http_parent(previous)
+    require(initial and oldclaim['start_clock'] == initial['start_clock'] and oldclaim['boot_uuid'] == initial['boot_uuid'] == boot() and
+            oldclaim['plan_sha'] == item['plan_sha256'] and terminal['sha256'] == item['audit_sha256'] and
+            Path(terminal['audit']).resolve() == Path(item['audit']).resolve() and audit['input_qualified'] is False,
+            'inherited initial clock and failed terminal')
+    dirs = sorted(root.glob('request_*')); require(len(dirs) == 3, 'exact three ancestor attempts')
+    records = []
+    for n, folder in enumerate(dirs):
+        require(folder.name == 'request_%03d' % n and sha(folder/'receipt.json') == item['receipt_sha256'][n], 'ancestor receipt pin')
+        r = load(folder/'receipt.json'); require(sha(folder/'body.bin') == r['body_sha256'] and (folder/'body.bin').stat().st_size == r['bytes'] == r['retained_bytes'], 'ancestor body bill')
+        records.append(r)
+    require([r['status_code'] for r in records] == [302,200,206] and [r['status'] for r in records] == ['redirect','complete','failed'] and
+            sum(r['bytes'] for r in records) == 2131583 and sum(r['upper'] for r in records) == 0, 'all three costs inherited once')
+    hdr = {k.lower():v for k,v in records[2]['headers'].items()}
+    require(hdr['content-range'] == 'items 0-999/2392' and int(hdr['content-length']) - records[2]['bytes'] == 689404,
+            'conservative declared unread entity reserve')
+    ref = plan['annotation_reference']; body = root/'request_001/body.bin'
+    require(Path(ref['path']).resolve() == body.resolve() and not body.is_symlink() and sha(body) == ref['sha256'] == ANNOTATION['sha256'] and
+            body.stat().st_size == ref['size'] == ANNOTATION['size'], 'readonly complete COCO reference')
+    return oldclaim
 
 
 def preflight(plan, expected, grant):
@@ -382,7 +431,7 @@ def run(plan_path, expected, grant_path, root, audit_output):
     require(sha(plan_path) == expected, 'external plan SHA')
     plan, grant = load(plan_path), load(grant_path)
     preflight(plan, expected, grant)
-    predecessor = zero_http_parent(plan)
+    predecessor = pagination_parent(plan)
     root = Path(root)
     require(str(root) == plan['raw_root'] and str(audit_output) == plan['audit_output'], 'fixed output paths')
     root.mkdir(parents=True, exist_ok=False)
@@ -396,8 +445,8 @@ def run(plan_path, expected, grant_path, root, audit_output):
     previous = signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError('producer shared deadline')))
     signal.setitimer(signal.ITIMER_REAL, max(0.001, 868 - (clock() - claim['start_clock'])))
     try:
-        a = cap.asset(ANNOTATION['url'], 'annotation', ANNOTATION['size'] + READ, ANNOTATION['size'], ANNOTATION['sha256'])
-        coco = load(cap.body(a))
+        a = None
+        coco = load(plan['annotation_reference']['path'])
         entries, pages = [], []
         for page in range(3):
             query = urlencode({'folder_id': FOLDER, 'version': 1, '$start': page * 1000, '$limit': 1000})

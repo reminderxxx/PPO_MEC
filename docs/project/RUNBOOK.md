@@ -1,3 +1,5 @@
+原生206恢复仅按[新限定合同](paper_public_helmet_pilot_contract_20261030.md#原生206分页与只读coco恢复)使用freshv3，只读引用已完整COCO，继承最初clock，禁止递归恢复或重下COCO。两旧run/audit不可重跑。
+
 首Helmet run因旧测试链接计账0HTTP失败已封存；仅[合同中的direct0HTTP恢复](paper_public_helmet_pilot_contract_20261030.md#首次0http存储拒绝与原deadline恢复)允许freshv2继承原clock。不得为v2另开新900秒或修改旧目录。
 
 ## 2026-10-30：Helmet6单次输入任务

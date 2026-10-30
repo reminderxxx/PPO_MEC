@@ -47,3 +47,13 @@ clean b619c88首次启动被全局旧software_fixture的pytest `*current`符号�
 新增1个微型tree案例（普通文件、目录别名、文件链接）单轮核producer和consumer计账一致，旧5case不重跑。
 fresh `public_helmet_pilot_20261030_v2/`绑定首失败plan/audit/terminal/producer_failure/control SHA且验证0attempt；只接受这一直接首失败，拒绝递归恢复。
 v2继承首run原`claim.start_clock`和同boot，仍是原900秒绝对deadline，连修复/等待都扣除，绝不开新的899/900秒。producer最多用到原870秒，最后30秒仍给consumer。原HTTP/body余额因0新增不变，所有失败原件继续计磁盘。
+
+## 原生206分页与只读COCO恢复
+
+v2完成302跳转134B和完整COCO 2065913B，发布方SHA匹配；COCO实际2392images/8275annotations、原生Helmet/NoHelmet类已核。
+images清单合法返回HTTP206、`Content-Range: items 0-999/2392`、Content-Length754940，旧客户端误当错误，仅保留65536B后主动停止；不是服务器断流。旧consumer也误拒了HTTP合法重复Set-Cookie。三收据与失败audit封存。
+独立诊断后另立v3：仅metadata分页可接受206，必须JSON、精确原生items start/end/2392与完整页/末页/count核对；附件仍只200+固定一次publicS3跳转。只有Set-Cookie多值可合并保留，绝不发送；长度/范围/Location冲突仍拒。
+完整COCO原件只读SHA引用，不再下载、复制、改写；不完整metadata前缀不拼接。重新获取完整页的费用另计，不续写原run。
+前缀累计15HTTP/3719957B返回body/读取上界0；另外保守扣未读声明实体754940−65536=689404B，不能把旧upper0改写或称精确wire总量。
+新上限17HTTP/62699503B（累计32HTTP/64MiB含该额外声明上界），存储256MiB。仍继承最初900秒绝对deadline，修复等待也扣除，不另开时间。
+只允许固定1d336三收据/原件及其b619零请求祖先链，逐SHA核对并拒绝重复恢复；新raw `public_helmet_pilot_20261030_v3/`、私有`native_pagination_v3/`。两纯内存header/算术检查和AST增量通过，0新fixture，不重跑旧case/audit。模型/Q/训练仍0。

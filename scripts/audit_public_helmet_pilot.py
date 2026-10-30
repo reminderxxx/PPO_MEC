@@ -33,7 +33,10 @@ ANNOTATION = {
            "425f058b-dd8f-4ce5-a761-d9522649e018/file_downloaded",
 }
 PRIOR = (12, 1588374, 0)
-NEW_CAPS = {"http": 20, "body": 65520490, "wall": 900, "storage": 268435456}
+INITIAL_CAPS = {"http": 20, "body": 65520490, "wall": 900, "storage": 268435456}
+NEW_CAPS = {"http": 17, "body": 62699503, "wall": 900, "storage": 268435456}
+CURRENT_PRIOR = (15, 3719957, 0)
+UNREAD_ENTITY_UPPER = 689404
 CLASS_ORDER = ("Helmet", "NoHelmet")
 SELECTION_RULE = (
     "sha256(j82bnw7gsr/1|fileID|annotationID|categoryName);"
@@ -196,7 +199,8 @@ def parent_binding(plan):
             prior["new_interrupted_upper"] == 0 and prior["failures"] == 0 and
             prior["new300s_pass"] is True and prior["input_qualified"] is False and
             prior["images"] == prior["model_calls"] == 0, "sealed folder parent ledger")
-    return actual
+    pagination_provenance(plan)
+    return CURRENT_PRIOR
 
 
 def zero_http_provenance(plan, current_claim):
@@ -214,7 +218,7 @@ def zero_http_provenance(plan, current_claim):
     stopped, control = load(oldroot / "producer_failure.json"), load(oldroot / "consumer_process.json")
     require("zero_http_predecessor" not in prior_plan and
             prior_plan["source_commit"] == "b619c885281eb0493d290cbacac8589b84e85c36" and
-            prior_plan["new_caps"] == NEW_CAPS and prior_plan["raw_root"] == str(oldroot) and prior_plan["parent_audit"] == plan["parent_audit"],
+            prior_plan["new_caps"] == INITIAL_CAPS and prior_plan["raw_root"] == str(oldroot) and prior_plan["parent_audit"] == plan["parent_audit"],
             "only initial direct zero-HTTP predecessor allowed")
     require(not list(oldroot.glob("request_*")) and stopped["requests"] == 0 and stopped["error"] == "storage symlink" and
             prior_audit["failure_bill"]["attempt_directory_count"] == 0 and prior_audit["input_qualified"] is False and
@@ -227,15 +231,66 @@ def zero_http_provenance(plan, current_claim):
             "original absolute deadline/boot must be inherited without reset")
 
 
+def pagination_provenance(plan):
+    item = plan["pagination_recovery"]; oldroot = Path(item["root"])
+    for filename, field in {"plan.json":"plan_sha256","claim.json":"claim_sha256","terminal.json":"terminal_sha256",
+                            "producer_failure.json":"producer_failure_sha256","consumer_process.json":"consumer_process_sha256"}.items():
+        require(digest(safe_file(oldroot/filename)) == item[field], "pagination predecessor file SHA")
+    require(digest(safe_file(item["audit"])) == item["audit_sha256"], "pagination predecessor audit SHA")
+    previous, prior_claim, terminal, prior_audit = load(oldroot/"plan.json"), load(oldroot/"claim.json"), load(oldroot/"terminal.json"), load(item["audit"])
+    require("pagination_recovery" not in previous and previous["source_commit"] == "1d336c9798314958cdc82e52cab70f4d6bc0d5c2" and
+            previous["raw_root"] == str(oldroot) and previous["parent_audit"] == plan["parent_audit"], "one fixed direct pagination predecessor")
+    zero_http_provenance(previous, prior_claim)
+    current = load(Path(plan["raw_root"])/"claim.json")
+    require(current["start_clock"] == prior_claim["start_clock"] and current["boot_uuid"] == prior_claim["boot_uuid"] == boot_uuid() and
+            prior_claim["plan_sha"] == item["plan_sha256"] and terminal["sha256"] == item["audit_sha256"] and
+            Path(terminal["audit"]).resolve() == Path(item["audit"]).resolve() and prior_audit["input_qualified"] is False,
+            "original absolute clock and failed parent terminal")
+    paths = sorted(oldroot.glob("request_*")); require(len(paths) == 3, "exact three previous requests")
+    records = []
+    for n, folder in enumerate(paths):
+        require(folder.name == "request_%03d" % n and digest(safe_file(folder/"receipt.json")) == item["receipt_sha256"][n], "previous receipt SHA")
+        row = load(folder/"receipt.json"); body = safe_file(folder/"body.bin")
+        require(digest(body) == row["body_sha256"] and body.stat().st_size == row["bytes"] == row["retained_bytes"], "previous actual body bill")
+        records.append(row)
+    require([r["status_code"] for r in records] == [302,200,206] and [r["status"] for r in records] == ["redirect","complete","failed"] and
+            sum(r["bytes"] for r in records) == 2131583 and sum(r["upper"] for r in records) == 0, "previous requests charged exactly once")
+    hdr = lower_headers(records[2]["headers"])
+    require(hdr["content-range"] == "items 0-999/2392" and int(hdr["content-length"]) - records[2]["bytes"] == UNREAD_ENTITY_UPPER,
+            "declared unread entity separately reserved")
+    ref = plan["annotation_reference"]; body = safe_file(ref["path"])
+    require(body.resolve() == (oldroot/"request_001/body.bin").resolve() and digest(body) == ref["sha256"] == ANNOTATION["sha256"] and
+            body.stat().st_size == ref["size"] == ANNOTATION["size"], "complete original COCO readonly reference")
+
+
 def lower_headers(headers):
     require(isinstance(headers, dict), "headers object required")
     result = {}
     for key, value in headers.items():
         require(isinstance(key, str) and isinstance(value, str), "header strings")
         name = key.lower()
+        if name == "set-cookie" and name in result:
+            result[name] += "\n" + value
+            continue
         require(name not in result or result[name] == value, "conflicting case-insensitive header")
         result[name] = value
     return result
+
+
+def retained_header_pairs(receipt):
+    pairs = receipt["header_pairs"]
+    require(isinstance(pairs, list), "raw response header pairs required")
+    normalized = {}
+    for pair in pairs:
+        require(isinstance(pair, list) and len(pair) == 2 and all(isinstance(v, str) for v in pair), "header pair strings")
+        key, value = pair; name = key.lower()
+        if name == "set-cookie" and name in normalized:
+            normalized[name] += "\n" + value
+        else:
+            require(name not in normalized or normalized[name] == value, "conflicting critical raw header")
+            normalized[name] = value
+    require(dict(pairs) == receipt["headers"], "raw header pair/dict provenance")
+    return normalized
 
 
 def receipt_inventory(root, plan, claim):
@@ -265,7 +320,7 @@ def receipt_inventory(root, plan, claim):
         require(not any(name in sent for name in ("authorization", "proxy-authorization",
                                                   "cookie", "range", "content-encoding")),
                 "authentication/Range/request encoding forbidden")
-        headers = lower_headers(r["headers"])
+        headers = retained_header_pairs(r)
         require(headers.get("content-encoding", "identity").strip().lower() in ("", "identity"),
                 "response identity encoding")
         for key in ("bytes", "retained_bytes", "upper"):
@@ -317,7 +372,7 @@ def receipt_inventory(root, plan, claim):
             require(location, "redirect Location missing")
             publisher_location(urljoin(r["url"], location))
         elif r["status"] == "complete":
-            require(r["status_code"] == 200, "complete HTTP 200 required")
+            require(r["status_code"] == 200 or (r["status_code"] == 206 and r["role"].startswith("image_metadata_page_")), "complete200 or native metadata206 required")
             mime = headers.get("content-type", "").split(";", 1)[0].strip().lower()
             if r["role"].startswith("image_sample_"):
                 require(mime.startswith("image/") or mime == "application/octet-stream",
@@ -334,7 +389,7 @@ def receipt_inventory(root, plan, claim):
     require(len(records) == len(directories), "every attempt billed")
     new_body, upper = sum(r["bytes"] for r in records), sum(r["upper"] for r in records)
     require(new_body + upper <= NEW_CAPS["body"] and
-            PRIOR[0] + len(records) <= 32 and PRIOR[1] + new_body + upper <= 64 * 1024 * 1024,
+            CURRENT_PRIOR[0] + len(records) <= 32 and CURRENT_PRIOR[1] + UNREAD_ENTITY_UPPER + new_body + upper <= 64 * 1024 * 1024,
             "new and cumulative request/body caps")
     return records, logical
 
@@ -369,12 +424,10 @@ def file_metadata(entry):
 
 
 def metadata_and_coco(root, plan, index, records, logical):
-    a = complete_role(records, logical, "annotation", index["annotation_request"])
-    require(records[logical["annotation"][0]]["url"] == ANNOTATION["url"],
-            "fixed annotation source")
-    require(a["bytes"] == ANNOTATION["size"] and a["body_sha256"] == ANNOTATION["sha256"],
-            "annotation publisher size/SHA")
-    coco = load(a["body_path"])
+    require(index["annotation_request"] is None and "annotation" not in logical, "no annotation redownload")
+    ref = plan["annotation_reference"]
+    require(digest(safe_file(ref["path"])) == ANNOTATION["sha256"], "referenced COCO exact publisher SHA")
+    coco = load(ref["path"])
     require(isinstance(coco, dict) and all(isinstance(coco.get(k), list) for k in
             ("images", "annotations", "categories")), "COCO native lists")
     pages = index["image_metadata_requests"]
@@ -395,6 +448,10 @@ def metadata_and_coco(root, plan, index, records, logical):
                 not (isinstance(obj, dict) and "error" in obj), "official list page schema")
         require(len(data) == 1000 if page < len(pages) - 1 else len(data) < 1000,
                 "full prefix pages and terminal page below 1000")
+        headers = lower_headers(r["headers"])
+        if r["status_code"] == 206 or "content-range" in headers:
+            require(headers.get("content-range") == "items %d-%d/%d" % (page*1000, page*1000+len(data)-1, len(coco["images"])),
+                    "native item pagination exact offsets/count")
         entries.extend(data)
     require(len(entries) == len(coco["images"]), "complete images list count equals COCO images")
     by_filename, file_ids = {}, set()
@@ -511,7 +568,7 @@ def inspect_images(root, plan, index, records, logical, coco, metadata):
     require(isinstance(selected, list) and len(selected) == 6 and
             isinstance(index["selected"], list) and len(index["selected"]) == 6,
             "exactly six frozen samples")
-    require(set(logical) == {"annotation"} | {
+    require(set(logical) == {
         "image_metadata_page_%d" % i for i in range(len(index["image_metadata_requests"]))
     } | {"image_sample_%d" % i for i in range(6)}, "exact logical asset inventory")
     from PIL import Image
@@ -603,9 +660,9 @@ def conservative_bill(root):
             "actual_retained_body_bytes": sum(r["actual_retained_bytes"] for r in rows),
             "reported_new_body_bytes_unverified": reported_bytes,
             "reported_new_interrupted_upper_unverified": reported_upper,
-            "cumulative_attempt_count_conservative": PRIOR[0] + len(rows),
+            "cumulative_attempt_count_conservative": CURRENT_PRIOR[0] + len(rows),
             "unverified_new_body_upper_conservative": NEW_CAPS["body"],
-            "fixed_parent_costs_not_readded_recursively": list(PRIOR)}
+            "fixed_parent_costs_not_readded_recursively": list(CURRENT_PRIOR), "prior_declared_unread_entity_upper": UNREAD_ENTITY_UPPER}
 
 
 def audit(root, output):
@@ -673,6 +730,7 @@ def audit(root, output):
                       cumulative_requests=prior[0] + len(records),
                       cumulative_body_bytes=prior[1] + sum(r["bytes"] for r in records),
                       cumulative_interrupted_upper=prior[2] + sum(r["upper"] for r in records),
+                      prior_declared_unread_entity_upper=UNREAD_ENTITY_UPPER,
                       receipt_sha256=[r["receipt_sha256"] for r in records],
                       request_failures=sum(r["status"] == "failed" for r in records),
                       storage_before_exports=storage, parent_audit_sha256=plan["parent_audit"]["sha256"])

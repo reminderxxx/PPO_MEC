@@ -1,3 +1,7 @@
+## 2026-10-30：完整原生COCO取得，精确206分页恢复
+
+v2取得完整2065913B COCO及publisherSHA，2392图/8275标注；分页HTTP206被本地200-only门误拒，partial65536B与原失败audit封存。v3只读引用完整标签、仅metadata206接受原生items范围，Set-Cookie多值保留不发送；继承原900秒绝对deadline。累计15HTTP/3719957B返回body，额外未读声明上界689404另扣，新17HTTP/62699503B，仍0实际图像/0Q。
+
 ## 2026-10-30：首Helmet输入启动0HTTP封存，原deadline最小恢复
 
 首run在本地全局storage拒绝pytest链接，producer/consumer各一次失败，新请求/body均0。独立诊断后只修lstat计账（不跟随链接），原body/source no-symlink门保持；1个22B软件tree案例通过。v2只绑定b619直接0HTTP失败，继承原900秒绝对CLOCK_MONOTONIC和同UUID，修复等待也计时，不重置HTTP/body/deadline；尚无图像/Q。
