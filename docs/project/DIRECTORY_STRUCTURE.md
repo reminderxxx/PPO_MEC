@@ -1,3 +1,5 @@
+- `scripts/run_helmet_orientation_choice.py` / `audit_helmet_orientation_choice.py`：EXIF坐标修复、固定A/B选择与灰图诊断的新生产/消费入口；原件只入私有新目录。
+
 - `docs/project/paper_helmet_quality_pilot_result_20261030.md`：Helmet6真实Q负结果、实际账单与claim边界；私有逐例原件不入Git。
 
 - `scripts/run_helmet_quality_pilot.py` / `scripts/audit_helmet_quality_pilot.py` / `tests/test_helmet_quality_pilot.py`：固定Helmet6 ROI的base/adapter成对质量pilot；私有`helmet_quality_pilot_20261030_v1/`，新run/crops、两臂原始case记录、独立audit/逐例CSV；不改公开输入原件。

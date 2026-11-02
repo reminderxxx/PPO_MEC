@@ -1,3 +1,8 @@
+## 2026-11-02：已定位Helmet输入语义ROI方向漏验
+
+- 原JPEG q02/q03 EXIF6，COCO尺寸为raw方向而bbox对应display；旧无EXIF处理导致栏杆/草地进入分类。旧输入资格只证明结构/哈希，应撤回六例headROI语义认证。
+- 新诊断只按EXIF指定变换，不试角度/手改框，保留旧原件；此约定仅在已核6例接受，不能外推整个数据源。见`paper_helmet_orientation_repair_20261102.md`。
+
 ## 2026-10-30：Helmet固定6ROI任务质量资格未通过
 
 - 12真实生成/独立audit完整，但base及Helmet各严格0/6、各6格式错；Helmet对3正3负均输出NO_HELMET内容。严格格式门与内容错误分别保留，不做事后parser/prompt修补。

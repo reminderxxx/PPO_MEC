@@ -1,3 +1,5 @@
+> 2026-11-02独立勘误：旧q02/q03因EXIF坐标方向漏验，裁到背景；应撤回六例均为合格headROI的解释。旧输出/严格0分/账单不变，不能据该六例评价识别能力。新独立修复诊断见[合同](paper_helmet_orientation_repair_20261102.md)。
+
 # Helmet6 paired quality pilot：完整执行、质量门失败（2026-10-30）
 
 reviewed_at=2026-10-30；literature_cutoff=2026-10-29既有矩阵（本轮无新检索）；target_venue=CSCWD2027（TMC仅内部证据规范）；policy_version=tmc_review_policy_v3_20260621；evidence_level=E2_ARTIFACT_AUDITED，仅本固定fixture。

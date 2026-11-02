@@ -1,3 +1,5 @@
+2026-11-02已独立定位Helmet旧2ROI方向漏验；按[新修复诊断](docs/project/paper_helmet_orientation_repair_20261102.md)另立4生成+56评分，不覆盖旧负结果。
+
 最新人工“继续推进”进入独立[Helmet6成对质量pilot](docs/project/paper_helmet_quality_pilot_contract_20261030.md)：固定原生ROI/两臂12generate/无下载训练，不等待ALPR、不把输入资格当质量结论。软件冻结后仅单次执行。
 
 Helmet6实际输入已交付：6原图的发布方哈希/尺寸/原生ROI通过单次独立审计，3+3目标固定；[结果及边界](docs/project/paper_public_helmet_pilot_contract_20261030.md#实际交付helmet6输入资格通过2026-10-30)。模型/Q仍0，ALPR及论文目标未完成。

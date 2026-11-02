@@ -1,3 +1,5 @@
+2026-11-02 Helmet修复：先读`paper_helmet_orientation_repair_20261102.md`；clean/freeze/grant后仅一次`run_helmet_orientation_choice.py --plan PLAN --plan_sha256 SHA --grant GRANT`，自动一次新consumer，勿手动重复worker/audit。
+
 2026-10-30 Helmet Q已单次终端，结果见`paper_helmet_quality_pilot_result_20261030.md`；直接复用私有audit/terminal/CSV，协议审计PASS与质量门FAIL分开，不重跑或补测。
 
 ## 2026-10-30：Helmet6固定ROI质量pilot

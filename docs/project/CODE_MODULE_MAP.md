@@ -1,3 +1,5 @@
+- Helmet orientation/choice独立脚本负责原生EXIF变换及全logits诊断；复用旧harness的source/PG/预算，独立消费者复算像素、完整向量和计账，不调用旧audit主流程。
+
 ## 2026-10-30 公开任务小样本M门
 
 `acquire_public_task_metadata.py`只依赖stdlib，负责源/授权/clean-source/budget前置门与create-only网络收据；
