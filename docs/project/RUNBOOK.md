@@ -2136,3 +2136,7 @@ python scripts/launch_joint_stream_learning.py --output_root artifacts/joint_str
 完成五cell后自动运行匹配collector。两任务合计最多3worker，运行中tracked源码冻结。
 每20分钟至多核对身份、终端状态和完成单元数；失败保留原件，不能原地重试、改变门或追加候选。
 终端核对实际初始/最终与成本/负seed，再交数据、图与接受门；局部通过仍不晋级canonical或称论文完成。
+
+### 2026-11-02 Helmet24前瞻验证
+
+先读[固定合同](paper_helmet_prospective_contract_20261102.md)。selection及evaluation_scope在旧六例结果读取前冻结；获取脚本`--create-plan`只离线验证，不等于已经下载。独立验收、clean commit/源SHA/新grant和有界外部launcher冻结后，单次获取CLI `acquire_helmet_prospective.py --plan <plan> --plan-sha256 <sha>` 自动新audit，不手工补跑。24原件/EXIF裁剪contact sheet全部视觉资格后，固定`run_helmet_prospective_choice.py --plan <plan> --plan_sha256 <sha> --grant <grant>`，自动新audit；用外层1500/5100秒完整CLI和PG清理监督。已有terminal只复用，任何失败先独立诊断，原样封存、不重试/补例/按成绩换规则。

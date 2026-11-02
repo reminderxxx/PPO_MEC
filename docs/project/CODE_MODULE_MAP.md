@@ -962,3 +962,7 @@ Delivery v2保留predeparture交付prefix、对已完成请求禁准备，模型
 `finish_public_helmet_pilot.py`仅复用Capture下载固定6文件，不重新GET输入清单；`audit_public_helmet_delivery.py`独立消费旧库存provenance与新图片，复用独立consumer纯GT解析函数，不调用producer选择/网络。
 
 `run_helmet_quality_pilot.py`负责无GT两worker的CPU离线固定12次生成与有界parent，`audit_helmet_quality_pilot.py`独立重构GT/ROI/tensor/输出后缀/参数与账单，不调用producer判分或模型generate；tokenizer/safetensors只作读取。
+
+### 2026-11-02 Helmet24固定任务边界
+
+`acquire_helmet_prospective`只复用旧HTTP捕获小工具，新独立`audit_helmet_prospective`核完整24原件/nativeGT/EXIF及账单；`run_helmet_prospective_choice`复用已验收Q预算/PG/runtime小工具，新增24只评分worker；`audit_helmet_prospective_choice`只复用纯数值/身份/PNG小函数，不调用旧audit入口。模型GT与opaque worker字段隔离，不进入算法registry或原stream环境。

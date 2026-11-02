@@ -1,3 +1,8 @@
+## 2026-11-02：方向问题修复不消除Helmet分类与映射偏好（OPEN）
+
+- 真实修复实验两臂均3/6且全部预测Helmet；base6/6、adapter5/6两映射类别冲突。旧严格自由输出格式门仍失败。
+- 单例图像分数变化不证明语义识别或任务收益；六消费例不认证总体准确率。见[实际结果](paper_helmet_orientation_result_20261102.md)。
+
 ## 2026-11-02：已定位Helmet输入语义ROI方向漏验
 
 - 原JPEG q02/q03 EXIF6，COCO尺寸为raw方向而bbox对应display；旧无EXIF处理导致栏杆/草地进入分类。旧输入资格只证明结构/哈希，应撤回六例headROI语义认证。
