@@ -702,4 +702,6 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 
 2026-11-02新增Helmet24前瞻固定样本输入/评分链路：`scripts/acquire_helmet_prospective.py`（自动单次`audit_helmet_prospective.py`）、`run_helmet_prospective_choice.py`（自动单次`audit_helmet_prospective_choice.py`）；见[合同](docs/project/paper_helmet_prospective_contract_20261102.md)。六例方向诊断[实际结果](docs/project/paper_helmet_orientation_result_20261102.md)为两臂3/6，不支持质量提升。
 
-Helmet24首次获取遇到HTTP200 body超时，尚未进入模型；同固定清单的一次恢复见[合同](docs/project/paper_helmet_prospective_recovery_20261102.md)，不改旧失败原件。
+Helmet24首次获取时遇到HTTP200 body超时，当时尚未进入模型；同固定清单的一次恢复见[合同](docs/project/paper_helmet_prospective_recovery_20261102.md)，不改旧失败原件。
+
+Helmet24恢复与96次真实评分现已完成：[全量结果](docs/project/paper_helmet_prospective_result_20261102.md)。Base与Helmet均12/24，adapter全判有盔，当前接口不支持质量增益；图/CSV/完整负例与费用留在本地，论文目标未完成。
