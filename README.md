@@ -701,3 +701,5 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 2026-10-28:20 valid TGSIM pages were acquired before a transport stall. The separate [remaining-page contract](docs/project/paper_tgsim_remaining_pages_recovery_20261028.md) retains complete pages and deducts prior resource spend;45 software checks pass. No complete-input or paper benefit claim yet.
 
 2026-11-02新增Helmet24前瞻固定样本输入/评分链路：`scripts/acquire_helmet_prospective.py`（自动单次`audit_helmet_prospective.py`）、`run_helmet_prospective_choice.py`（自动单次`audit_helmet_prospective_choice.py`）；见[合同](docs/project/paper_helmet_prospective_contract_20261102.md)。六例方向诊断[实际结果](docs/project/paper_helmet_orientation_result_20261102.md)为两臂3/6，不支持质量提升。
+
+Helmet24首次获取遇到HTTP200 body超时，尚未进入模型；同固定清单的一次恢复见[合同](docs/project/paper_helmet_prospective_recovery_20261102.md)，不改旧失败原件。

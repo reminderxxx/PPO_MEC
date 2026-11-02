@@ -2140,3 +2140,5 @@ python scripts/launch_joint_stream_learning.py --output_root artifacts/joint_str
 ### 2026-11-02 Helmet24前瞻验证
 
 先读[固定合同](paper_helmet_prospective_contract_20261102.md)。selection及evaluation_scope在旧六例结果读取前冻结；获取脚本`--create-plan`只离线验证，不等于已经下载。独立验收、clean commit/源SHA/新grant和有界外部launcher冻结后，单次获取CLI `acquire_helmet_prospective.py --plan <plan> --plan-sha256 <sha>` 自动新audit，不手工补跑。24原件/EXIF裁剪contact sheet全部视觉资格后，固定`run_helmet_prospective_choice.py --plan <plan> --plan_sha256 <sha> --grant <grant>`，自动新audit；用外层1500/5100秒完整CLI和PG清理监督。已有terminal只复用，任何失败先独立诊断，原样封存、不重试/补例/按成绩换规则。
+
+Helmet24首输入FAIL后只按[恢复合同](paper_helmet_prospective_recovery_20261102.md)用新`recover_helmet_prospective.py --plan <newplan> --plan-sha256 <sha>`单次启动；必须绑定原失败与明示+1请求/+400执行秒。外层1384秒PG监督、新scope/source/grant冻结，自动一次新consumer；24成功后视觉QC和模型规则仍按原评分合同，不手工重复旧audit或拼partial。

@@ -966,3 +966,5 @@ Delivery v2保留predeparture交付prefix、对已完成请求禁准备，模型
 ### 2026-11-02 Helmet24固定任务边界
 
 `acquire_helmet_prospective`只复用旧HTTP捕获小工具，新独立`audit_helmet_prospective`核完整24原件/nativeGT/EXIF及账单；`run_helmet_prospective_choice`复用已验收Q预算/PG/runtime小工具，新增24只评分worker；`audit_helmet_prospective_choice`只复用纯数值/身份/PNG小函数，不调用旧audit入口。模型GT与opaque worker字段隔离，不进入算法registry或原stream环境。
+
+Helmet24恢复入口只处理固定单一父失败的6原件只读引用＋18剩余HTTP文件；新consumer共享既有纯GT/EXIF/HTTP头小函数，不调用旧audit入口，不修改96score或算法/环境/provider。

@@ -583,3 +583,5 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 
 - `scripts/acquire_helmet_prospective.py` / `audit_helmet_prospective.py`：固定原24图、EXIF/native ROI资格；新raw位于`data/raw/task_quality/helmet_prospective_20261102_v1`（Git忽略）。
 - `scripts/run_helmet_prospective_choice.py` / `audit_helmet_prospective_choice.py`：只读资格PNG，固定96score/0generate；主目录私有`artifacts/analysis/paper_helmet_prospective_20261102_v1/evaluation`，不与旧六例run合并。
+
+Helmet24剩余恢复新raw：`data/raw/task_quality/helmet_prospective_recovery_20261102_v1`；新私有包`artifacts/analysis/paper_helmet_prospective_recovery_20261102_v1/`（主目录）。前6只读指向旧raw，旧partial封存；新`recover_helmet_prospective.py`/`audit_helmet_prospective_recovery.py`与旧执行入口分开。
