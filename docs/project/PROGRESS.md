@@ -2143,3 +2143,12 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - `docs/project/literature_reference_table.md` 新增 10 篇相关近邻，包含 TMC delay-reliability/cache-assisted offloading、TITS multi-edge/multi-vehicle orchestration、IoTJ DAG meta-RL、FGCS DT dual-timescale cache/offload、JSA agentic workflow scheduling 等；查重审计为 119 entries、title/DOI/URL duplicate 均为 0。
 - 新增 `docs/project/top_journal_paper_structure_gap_review_20260928.md`，逐段拆解 Introduction、全文论证链、可模仿写法和 PPO_MEC 缺口，并给出 9 段 Introduction 模板。
 - 当前 TMC-ready verdict 仍为 `Unverifiable / E1_DOCUMENTED`：G14C v16 formal/holdout/support 未闭环，仓库未发现 integrated manuscript；本轮没有修改算法、配置或实验结果。
+
+## 2026-11-09 CSCWD 2027 投稿缺口评估与补齐顺序
+
+- 独立重算 `artifacts/joint_stream_learning/20261016T162100Z_confirmation/results.jsonl` 1152 行：SAGH 210.400/88.889%，与论文 Table II 一致，确认未选择性挑选。
+- 按训练种子拆开后 3 个种子中 1 个反向：seed 7 +7.67、seed 17 −6.51、seed 27 +18.71（相对 MAPPO）。144 对配对 bootstrap 得 +6.626 [2.616, 11.148]，但 48 个 case 全部嵌套在 2 个时间窗口内，按 `top_journal_review_policy.md` 的窗口独立性条款属低统计功效，不能作为显著性证据。
+- 历史证据盘点：`joint_stream_learning` 仅 development(v1, e96d8315) 与 confirmation(v2, 35975cb3) 两轮，种子相同、协议不同，历史从未出现第 4 个训练种子。
+- 确定性实测：同协议同 seed 两次独立 smoke 训练产出逐字节相同 checkpoint（SHA-256 前缀 `2b992b485a1308769ad967a2937797f4`），推论 run-to-run 噪声约为 0、方差全部来自训练种子；限制是仅 4-episode smoke，未在 64-episode 全长验证。
+- 结论：缺口为统计可辨识性（3 seeds / 2 窗口 / 无区间），非算法无效；工程严格度高于多数顶会论文而统计功效低于顶会线。补齐顺序 P0–P7、判决树与排除项见 `docs/project/cscwd2027_readiness_gap_and_fill_order_20261109.md`。
+- 本轮未修改算法、配置、checkpoint 或论文正文，未启动正式训练；evidence level `E2_ARTIFACT_AUDITED`。
