@@ -185,3 +185,14 @@
 - `git_commit`: `6b0bf3f354cacfdf0402f3359339dae9e25d14c2`（main）
 - `evidence_level`: `E2_ARTIFACT_AUDITED`（原始 `results.jsonl` 逐行重算并与论文 Table II 交叉一致；未重跑整包完整性审计，未达 E3）
 - 本轮未修改算法、配置、checkpoint 或论文正文；未启动正式训练。
+
+---
+
+## 十一、执行进展（2026-11-10）
+
+- **P0 完成**：8 种子协议生成于工作区 `runs/seed_ext8_protocol/`。核验结果：`protocol.pt`、`predictor.pt`、seeds 7/17/27 的 `training_schedule`、72/48 个 case 全部与冻结 v2 相同，唯一差异是 `seeds` 列表。
+- **P1 完成**：SAGH 与 MAPPO 各跑满 8 种子，seed 7 的 48 个 dev case 与旧确认结果逐条一致（差 < 1e-9），确认全长可复现。
+- **P2 完成**：按 seed 为外层单位重算，SAGH 在 7/8 种子上优于 MAPPO，平均 +10.76 reward、+2.69pp 完成率，seed 级 95% CI 分别为 [+4.07, +17.00] 与 [+0.93, +4.35]，精确符号检验 p = 0.0703。判据落于「≥6/8 正向」分支。
+- 结果记录见 `docs/project/seed_extension_8_results_20261110.md`。
+- **P3 进行中**：DAG 与 PPO 的 8 种子扩展已启动；其余四个消融变体仍为 3 种子，主表口径需在 P6 前统一决定。
+- 未执行：P4 非重叠窗口、P5 容量敏感性、P6/P7 论文改写与终检。

@@ -2152,3 +2152,12 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 确定性实测：同协议同 seed 两次独立 smoke 训练产出逐字节相同 checkpoint（SHA-256 前缀 `2b992b485a1308769ad967a2937797f4`），推论 run-to-run 噪声约为 0、方差全部来自训练种子；限制是仅 4-episode smoke，未在 64-episode 全长验证。
 - 结论：缺口为统计可辨识性（3 seeds / 2 窗口 / 无区间），非算法无效；工程严格度高于多数顶会论文而统计功效低于顶会线。补齐顺序 P0–P7、判决树与排除项见 `docs/project/cscwd2027_readiness_gap_and_fill_order_20261109.md`。
 - 本轮未修改算法、配置、checkpoint 或论文正文，未启动正式训练；evidence level `E2_ARTIFACT_AUDITED`。
+
+## 2026-11-10 8 种子扩展实验：SAGH 优势在 7/8 种子上成立
+
+- 预注册式扩展：新协议 `runs/seed_ext8_protocol/` 于 `2026-11-09T09:23:23Z` 生成、`09:23:43Z` 启动训练，种子 `[7,17,27,37,47,57,67,77]` 在看到结果前冻结。与冻结 v2 的 `protocol.pt`/`predictor.pt`/seeds 7-27 的 schedule/72-48 个 case 全部相同，唯一差异是 `seeds`。
+- 全长复现：seed 7 的 48 个 dev case 与 `20261016T162100Z_confirmation` 逐条一致（差 < 1e-9），面板均值 219.4164/91.6667% 完全相同；确定 run-to-run 噪声约为 0，方差全部来自种子。
+- 主结果（每 agent 384 cell）：SAGH 209.458 reward / 88.36%，MAPPO 198.700 / 85.68%；逐种子 Δreward 为 +7.67、−6.51、+18.71、+18.64、+21.46、+4.52、+3.64、+17.92，7/8 正向；平均 +10.76，seed 级 bootstrap 95% CI [+4.07, +17.00]；完成率 +2.69pp，CI [+0.93, +4.35]；精确配对符号检验 p = 0.0703（n=8 时上限为 0.0078，属边际）；两窗口同向（+7.91 / +13.61）。
+- 结论：落入 `cscwd2027_readiness_gap_and_fill_order_20261109.md` 判决树的「≥6/8 正向」分支，可写「小幅但跨种子一致」，不得写 stable convergence 或 all baselines。证据等级 `E2_ARTIFACT_AUDITED`。
+- 产物在工作区 `runs/seed_ext8`、`runs/seed_ext8_protocol`、`runs/seed_ext8_analysis.json`，尚未迁入 `artifacts/`。完整记录见 `docs/project/seed_extension_8_results_20261110.md`。
+- 未修改算法、配置、checkpoint 或论文正文；DAG 与 PPO 的 8 种子扩展进行中。
