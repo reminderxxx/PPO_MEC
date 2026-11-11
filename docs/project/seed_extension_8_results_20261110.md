@@ -123,3 +123,49 @@ seed 7 的 48 个 dev case 与 `20261016T162100Z_confirmation` 逐条对比：**
 - `git_commit`: `66ca0ad`（文档基线）；实验代码 `4bc39b9`（`codex/eight-vehicle-simulation`，未合并 main）
 - `evidence_level`: `E2_ARTIFACT_AUDITED`（原始 dev 行重算 + 与冻结 v2 的资产哈希逐项核对 + 全长 48/48 复现；未做整包 audit 脚本的完整重跑，未达 E3）
 - 本轮未修改算法、配置、checkpoint 或论文正文。
+
+---
+
+## 十、全部 8 个控制器的最终结果（2026-11-11）
+
+8 个控制器 × 8 种子 × 48 case = 3072 个 dev cell，全部在固定协议 `runs/seed_ext8_protocol` 下完成。面板均值（reward / 完成率）：
+
+| agent | reward | 完成率 |
+|---|---:|---:|
+| sa_ghmappo | **209.458** | **88.36%** |
+| cache_offload_drl | 206.116 | 87.53% |
+| sa_no_prediction | 203.494 | 86.46% |
+| dag_offload_drl | 202.912 | 86.90% |
+| dt_handoff_drl | 201.932 | 86.39% |
+| mappo | 198.700 | 85.68% |
+| ppo | 194.179 | 84.60% |
+| dqn | 164.944 | 75.99% |
+
+SAGH 相对每个对照的种子级统计（reward 差 + 完成率差，seed 级 bootstrap 95% CI，精确配对符号检验）：
+
+| 对照 | Δreward [CI] | Δ完成率 [CI] | 正向种子 | p |
+|---|---|---|---|---|
+| dqn | +44.51 [+39.58, +49.73] | +12.37 [+10.73, +14.23] | 8/8 | 0.0078 |
+| ppo | +15.28 [+11.72, +19.01] | +3.76 [+2.44, +5.00] | 8/8 | 0.0078 |
+| mappo | +10.76 [+4.07, +17.01] | +2.69 [+0.93, +4.35] | 7/8 | 0.0703 |
+| dt_handoff_drl | +7.53 [+0.92, +14.45] | +1.97 [−0.26, +4.20] | 6/8 | 0.2891 |
+| dag_offload_drl | +6.55 [+0.75, +12.66] | +1.46 [−0.59, +3.50] | 6/8 | 0.2891 |
+| sa_no_prediction | +5.96 [+0.14, +11.74] | +1.90 [+0.21, +3.65] | 6/8 | 0.2891 |
+| cache_offload_drl | +3.34 [−4.04, +11.74] | +0.83 [−1.43, +3.24] | 4/8 | 1.0000 |
+
+### 最终 claim 结构（写作时必须遵守）
+
+1. **可以写显著**：SAGH 显著优于 flat PPO 与 DQN（8/8，p=0.0078，CI 远离 0）。
+2. **可以写方向一致**：SAGH 一致优于 MAPPO（7/8，p=0.0703，reward CI 不含 0，完成率 CI 不含 0）。
+3. **不得写显著/稳定优势**：SAGH 相对 cache_offload_drl（4/8，p=1.0）、sa_no_prediction（6/8，p=0.29）、dag_offload_drl（6/8，p=0.29）、dt_handoff_drl（6/8，p=0.29）**不构成可支持的显著差异**。
+4. **对贡献的定性影响**：`cache_offload_drl` 在 8 种子下冲到 206.116（3 种子时为 200.245），与 SAGH 仅差 3.34 分且不可分。这迫使论文把贡献收窄到「执行站点选择 + 联合可行性 + handoff 的协调机制」，而不是笼统的「全面领先」；预测与 DAG 上下文是辅助组件，其增量（相对 no-prediction 的 +5.96）未达到显著。
+
+### 与 3 种子版 Table II 的差异（务必写进论文的方法或结果说明）
+
+- 主表从 3 种子改为 8 种子口径；均值、排序、CI 均以本表为准，不得混用两套口径。
+- `cache_offload_drl` 排序从 3 种子的第 6 升至第 2，`sa_no_prediction` 从第 4 升至第 3，`dag_offload_drl` 从第 2 降至第 4。排序对种子数敏感，进一步说明点估计不可靠。
+
+### 产物位置
+
+`runs/seed_ext8/`（8 个 agent 子目录，各含 `dev.jsonl` 480 行）、`runs/seed_ext8_protocol/`、`runs/seed_ext8_full_panel.json`、`runs/seed_ext8_analysis.json`。
+

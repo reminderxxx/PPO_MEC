@@ -2161,3 +2161,11 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 结论：落入 `cscwd2027_readiness_gap_and_fill_order_20261109.md` 判决树的「≥6/8 正向」分支，可写「小幅但跨种子一致」，不得写 stable convergence 或 all baselines。证据等级 `E2_ARTIFACT_AUDITED`。
 - 产物在工作区 `runs/seed_ext8`、`runs/seed_ext8_protocol`、`runs/seed_ext8_analysis.json`，尚未迁入 `artifacts/`。完整记录见 `docs/project/seed_extension_8_results_20261110.md`。
 - 未修改算法、配置、checkpoint 或论文正文；DAG 与 PPO 的 8 种子扩展进行中。
+
+## 2026-11-11 8 种子扩展全部完成：统一 Table II 与最终 claim 结构
+
+- 8 个控制器全部完成 8 种子（各 384 dev cell，共 3072）。面板均值：SAGH 209.458/88.36% 居首；cache_offload_drl 206.116 次之；sa_no_prediction 203.494；dag 202.912；dt 201.932；mappo 198.700；ppo 194.179；dqn 164.944。
+- SAGH 种子级对比：显著优于 PPO（8/8，p=0.0078）与 DQN（8/8，p=0.0078）；一致优于 MAPPO（7/8，p=0.0703）；与 cache_offload_drl（4/8，p=1.0）、sa_no_prediction（6/8，p=0.29）、dag（6/8，p=0.29）、dt（6/8，p=0.29）**无显著差异**。
+- 关键变化：cache_offload_drl 从 3 种子 200.245 升至 8 种子 206.116，与 SAGH 差 3.34 分且不可分；论文贡献须收窄为「执行站点选择 + 联合可行性 + handoff 的协调」，不得写「全面领先」或「显著优于全部对照」。
+- 主表从 3 种子口径切换为 8 种子口径，不得混用。完整表与 claim 结构见 `docs/project/seed_extension_8_results_20261110.md` 第十节。
+- 未修改算法、配置、checkpoint 或论文正文；证据等级 `E2_ARTIFACT_AUDITED`。
