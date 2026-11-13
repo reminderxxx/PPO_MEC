@@ -2169,3 +2169,10 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 关键变化：cache_offload_drl 从 3 种子 200.245 升至 8 种子 206.116，与 SAGH 差 3.34 分且不可分；论文贡献须收窄为「执行站点选择 + 联合可行性 + handoff 的协调」，不得写「全面领先」或「显著优于全部对照」。
 - 主表从 3 种子口径切换为 8 种子口径，不得混用。完整表与 claim 结构见 `docs/project/seed_extension_8_results_20261110.md` 第十节。
 - 未修改算法、配置、checkpoint 或论文正文；证据等级 `E2_ARTIFACT_AUDITED`。
+
+## 2026-11-13 CSCWD 2027 官方投稿信息核实
+
+- 官方站点确认：截稿 2026-11-30（原 10-31 延期），6 页 IEEE proceedings 格式（含参考文献与插图），PDF 投稿，EasyChair `https://easychair.org/conferences/?conf=cscwd2027`，通知 2027-01-31，camera-ready 2027-02-28，会期 2027-05-26~28 Brisbane。
+- R23 候选稿已完成（8 种子实验节 + Fig.3 种子带 + 35 条批注，SHA-256 f483e691…），数字审计全部通过；内容/结构检查通过，视觉检查因当前模型不支持读图未完成。
+- 投稿前阻塞项为作者侧：版式目检、claim 措辞确认、两个删减确认、作者/基金信息、v4 是否合并。清单见 `docs/project/cscwd2027_submission_checklist_20261113.md`。
+- 未修改算法、配置、checkpoint 或论文正文（R23 为待确认候选，R22 基线未覆盖）。
