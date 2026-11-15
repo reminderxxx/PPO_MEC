@@ -29,3 +29,11 @@
 - 作者与基金仍为占位；用户确认、独立窗口和公开方法公平复现未完成。本轮候选不覆盖已确认 R22，不赋下一正式 R 号。
 
 审查元数据：`reviewed_at=2026-11-15 Asia/Shanghai`；`literature_cutoff=2026-10-30 inherited (no new search)`；`target_venue=CSCWD 2027`；`artifact_run_id=runs/seed_ext8; teacher_merge_review_20261115`；`policy_version=tmc_review_policy_v3_20260621`；工作起点 Git `ddc85fbbfe1e24e94a02c5f9951b697bb72759b9`；`evidence_level=TARGETED_RAW_DEVELOPMENT_RECOMPUTATION_AND_DOCX_MERGE_VALIDATION`；formal/holdout/support 未审计，readiness `Unverifiable`，不作评分或晋级。
+
+## 后续四处叙事闭环
+
+用户随后要求自主完成四处优化。最新候选为本地 `artifacts/manuscript/narrative_closure_review_20261115/sagh_narrative_closure_tracked_candidate.docx`，SHA-256 `ef9a0f4a88c9347815c695d54952406f04f0ae52612d4043f377503595af2df1`，尚未正式确认。旧合并稿与老师原件不变；仅在工作副本接受旧建议，保留54条批注后，以本轮独立修订标出九个目标段落/标题和九条新批注。
+
+四项均已完成：引言与工程比较形成问题发现—验证呼应；方法明确三项难点与现有机制的对应；贡献、指标交叉引用与实验小节标题对齐；未来工作从独立验证和组件归因逐步延伸到更广服务条件，世界模型仅作后续可选资源/服务预测。复读三篇已登记本地论文的引言段落功能，未新增文献、实验或性能断言。
+
+接受/拒绝投影、63条批注锚点、修订ID、限定九处差异核验通过；图表媒体、数值及25条引用不变。`render_docx.py --emit_pdf --dpi 144`渲染接受后6页、显示修订7页，13页逐页目检通过。完整前后对照和验收只存本地 `editorial_closure_record.md`、`revision_change_log.json`、`validation.json`。既有待确认、占位信息、统计与独立窗口限制未改变，不构成正式晋版或paper-ready判定。

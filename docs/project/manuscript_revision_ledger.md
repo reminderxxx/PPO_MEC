@@ -2,7 +2,7 @@
 
 本文件是 CSCWD 2027 论文的长期修订台账。每次开始论文修改，先核对本文件；完成一轮后追加该轮的目标位置、修改前后内容、版面验证和已固定位置。只记录可追溯的要求与状态，不把未核验的差异写成事实。
 
-> 2026-11-15 当前状态索引：已确认正式底稿仍为 R22 标注稿；用户本轮指定新的老师返修稿，产生 `teacher_merge_review_20261115` 审阅合并候选，未确认、未赋正式 R 号。10 月 30 日 v4 与 11 月八种子候选的改动已在本轮候选中重施，不等于旧候选获追认。详情见文末及 `manuscript_teacher_merge_20261115.md`；以下旧“当前”表述仅属于对应历史轮次。
+> 2026-11-15 当前状态索引：已确认正式底稿仍为 R22 标注稿；最新待确认候选为 `narrative_closure_review_20261115`，按用户要求在老师返修合并候选上完成四处叙事优化。老师原件与上一完整修订稿保留，不赋正式 R 号。10 月 30 日 v4 与 11 月八种子变更均已合入候选，不等于旧候选获追认。详情见文末及 `manuscript_teacher_merge_20261115.md`；以下旧“当前”表述仅属于对应历史轮次。
 
 ## 持续生效的修订规则
 
@@ -377,3 +377,16 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 验证：本地 `build_review.py` 的版本归一化、接受全部→目标内容/媒体、拒绝全部→老师改后内容/媒体断言通过；ZIP、唯一修订 ID、无嵌套插删、54 条批注锚点、媒体关系、25 条引文及有效 8 pt 字号检查通过。bundled `render_docx.py --emit_pdf --dpi 144` 得接受后 6 页、显示修订 10 页，全部目检，最终格式差异另作像素对照。`sagh_merged_reading_preview.pdf` 仅作阅读，不作后续底稿。桌面 Word 接受/拒绝按钮未实际点击测试；原有黄色作者高亮保留，不是投稿净稿。
 - 元数据：`reviewed_at=2026-11-15 Asia/Shanghai`；`literature_cutoff=2026-10-30 inherited; no new search`；`target_venue=CSCWD 2027`；`artifact_run_id=runs/seed_ext8; teacher_merge_review_20261115`；`policy_version=tmc_review_policy_v3_20260621`；起点 Git `ddc85fbbfe1e24e94a02c5f9951b697bb72759b9`；`evidence_level=TARGETED_RAW_DEVELOPMENT_RECOMPUTATION_AND_DOCX_MERGE_VALIDATION`；formal/holdout/support 未审计，readiness `Unverifiable`，不评分或晋级。
 - 待办：作者确认候选、作者/基金占位、继承统计与独立窗口等边界。论文、原件与详细对照仅本地；GitHub 只同步长期规则、状态与证据指针。详情见 `manuscript_teacher_merge_20261115.md`。
+
+## 2026-11-15 四处叙事问题自主闭环
+
+- 用户明确要求将上一轮指出的四处优化自行完成；授权范围为问题发现衔接、难点与机制对应、标题/贡献与证据对齐、未来工作承接。本轮从老师合并审阅候选继续，不表示正式确认或晋版；原输入 SHA-256 `5fb4347edefeb804a628d15d6c0ec291a201d1b1abd017f212638f44b4cd9546` 完整保留。
+- 新候选 `artifacts/manuscript/narrative_closure_review_20261115/sagh_narrative_closure_tracked_candidate.docx`，SHA-256 `ef9a0f4a88c9347815c695d54952406f04f0ae52612d4043f377503595af2df1`，仍为 `pending_author_confirmation`。仅在工作副本接受上一轮建议，保留原54条批注，再以独立身份新增本轮插删及9条批注；拒绝本轮全部修订恢复上一候选接受后的内容，不伪称在此文件中保留了上一轮全部插删标记。
+- F1：I难点段索引11与V-C工程比较索引66互相指向，说明固定准备规则的正负表现如何暴露时机问题，继而引出按当前状态决定准入；引言不报实验数字，既有56/72与16/72不变。
+- F2：IV-A图2后索引40明确三项难点与既有机制对应：已释放依赖/接触信息识别目标，共同预约/mask约束共享资源，共享actor/中心critic以团队回报学习当前成本及后续结果；不新增算法机制或因果收益。
+- F3：贡献3索引16区分完整控制器比较与对象使用审计；III-B末索引34同步V-B/V-C的指标职责。索引56改为 `B. Reward and Request Completion`，索引59改为 `C. Learning Behavior and Preparation Outcomes`；标题与正文证据一致。
+- F4：V-D索引69按独立窗口/DAG、公平近邻对照和组件干预、较长会话/变化请求展开；VI索引71先明确近期补证，再将世界模型作为可选的准备动作后续资源/服务预测，保留[24]/[25]，不宣称已实现或可控制车辆接触。
+- 文献表达准备：复读本地既有Liang dependent-task/service caching、POLAR、MAPPO原文PDF页1–2，只学习问题—耦合难点—设计/贡献的段落功能，未新检索或增删引用。来源hash、概念对应与九处完整前后对照仅本地 `editorial_closure_record.md` / `revision_change_log.json`。
+- 验证：`revise_narrative.py`的接受/拒绝投影断言及定向结构检查通过；恰九个段落/标题变化，两表、三图媒体、实验数值和25条参考文献保持；有效参考文献8pt，原54批注逐条保留、新9批注锚点完整，254个修订ID唯一、无嵌套插删。bundled `render_docx.py --emit_pdf --dpi 144`得接受后6页、显示修订7页，共13页原尺寸目检通过。阅读导出不作下一轮底稿，桌面Word按钮未实际逐项点验。
+- 元数据：`reviewed_at=2026-11-15 Asia/Shanghai`；`literature_cutoff=2026-10-30 inherited; local recorded sources revisited 2026-11-15`；`target_venue=CSCWD 2027`；`artifact_run_id=narrative_closure_review_20261115; inherited runs/seed_ext8`；`policy_version=tmc_review_policy_v3_20260621`；起点Git `aa90f06`；`evidence_level=DOCX_EDITORIAL_VERIFICATION_WITH_INHERITED_DEVELOPMENT_EVIDENCE`。只完成四项编辑闭环，不重算或晋级实验/novelty/readiness。
+- 四项编辑事项已完成；用户确认、作者/基金信息、原黄色高亮和既有统计/独立窗口边界仍保留。仅长期状态记录进入GitHub，未公开正文与原始材料不上传。
