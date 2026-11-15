@@ -2,7 +2,7 @@
 
 本文件是 CSCWD 2027 论文的长期修订台账。每次开始论文修改，先核对本文件；完成一轮后追加该轮的目标位置、修改前后内容、版面验证和已固定位置。只记录可追溯的要求与状态，不把未核验的差异写成事实。
 
-> 2026-11-15 当前状态索引：已确认正式底稿仍为 R22 标注稿；最新待确认候选为 `narrative_closure_review_20261115`，按用户要求在老师返修合并候选上完成四处叙事优化。老师原件与上一完整修订稿保留，不赋正式 R 号。10 月 30 日 v4 与 11 月八种子变更均已合入候选，不等于旧候选获追认。详情见文末及 `manuscript_teacher_merge_20261115.md`；以下旧“当前”表述仅属于对应历史轮次。
+> 2026-11-15 当前状态索引：已确认正式底稿仍为 R22 标注稿；最新待确认候选为 `fixed_names_review_20261115`，保留四处正文优化，按用户纠正恢复固定小节名与完整题名文件名。老师原件与上一完整修订稿保留，不赋正式 R 号。10 月 30 日 v4 与 11 月八种子变更均已合入候选，不等于旧候选获追认。详情见文末及 `manuscript_teacher_merge_20261115.md`；以下旧“当前”表述仅属于对应历史轮次。
 
 ## 持续生效的修订规则
 
@@ -390,3 +390,13 @@ R1 已完成内容与逐页检查，R2 按最新要求覆盖参考文献数量�
 - 验证：`revise_narrative.py`的接受/拒绝投影断言及定向结构检查通过；恰九个段落/标题变化，两表、三图媒体、实验数值和25条参考文献保持；有效参考文献8pt，原54批注逐条保留、新9批注锚点完整，254个修订ID唯一、无嵌套插删。bundled `render_docx.py --emit_pdf --dpi 144`得接受后6页、显示修订7页，共13页原尺寸目检通过。阅读导出不作下一轮底稿，桌面Word按钮未实际逐项点验。
 - 元数据：`reviewed_at=2026-11-15 Asia/Shanghai`；`literature_cutoff=2026-10-30 inherited; local recorded sources revisited 2026-11-15`；`target_venue=CSCWD 2027`；`artifact_run_id=narrative_closure_review_20261115; inherited runs/seed_ext8`；`policy_version=tmc_review_policy_v3_20260621`；起点Git `aa90f06`；`evidence_level=DOCX_EDITORIAL_VERIFICATION_WITH_INHERITED_DEVELOPMENT_EVIDENCE`。只完成四项编辑闭环，不重算或晋级实验/novelty/readiness。
 - 四项编辑事项已完成；用户确认、作者/基金信息、原黄色高亮和既有统计/独立窗口边界仍保留。仅长期状态记录进入GitHub，未公开正文与原始材料不上传。
+
+
+## 2026-11-15 固定名称纠偏
+
+- 用户指出名称及大部分内容已固定，要求遵守agent约束。核查确认正文题名、SAGH方法名和作者姓名均未改变；上轮交付文件主名称被改为内部工作标签，V-B/V-C两个小节被改名。上轮把标题/证据对齐落实为改名，范围过宽；本轮按最新纠正覆盖该两处改名建议，其他正文优化保留。
+- V-B恢复`B. Service Delivery and Resource Use`；V-C恢复`C. Preparation Timing and Learning Behavior`。不回滚此前已明确指定的Related Work、算法章标题或老师Problem Formulation标题。完整题名作为交付文件主名称，候选/标注只用后缀，版本日期留在目录；旧文件保留审计，不覆盖。
+- 新候选目录`artifacts/manuscript/fixed_names_review_20261115/`，文件为完整论文题名加`_marked_candidate.docx`，SHA-256 `f975971cf322bd46f694a908f7747f7ff9f96bd277b97472cf9a2a3c875449b2`。输入为上轮候选`ef9a0f4a88c9347815c695d54952406f04f0ae52612d4043f377503595af2df1`，状态仍待确认、不晋正式R号。
+- 只撤回两个小节标题的待接受改名标记；原63批注保留，其中两条旧改名批注追加撤回说明，新增两条纠偏批注，共65条。文件属性遗留旧题名也同步为固定完整题名，正文题名/作者不变。其他正文、图表、参考文献、数值不动。
+- `agent.md`已补明确名称冻结规则：一般行文优化/结构对应/自行闭环不自动授权改名，优先在原名称下优化正文；交付文件不得用工作标签替代固定主名称，该专用规则优先于通用snake_case默认。
+- 验证：`restore_names.py`定向断言、源hash不变、正文恰两处标题差异、65批注锚点与媒体一致检查通过；bundled`render_docx.py --emit_pdf --dpi 144`得阅读6页/修订7页，仅两种视图第5页有像素差异并已目检，其余11页与此前核验图逐像素相同。桌面Word未逐项点击点验；占位信息和既有研究证据边界继续生效。完整对照在本地`revision_change_log.json`，论文不上传GitHub。
