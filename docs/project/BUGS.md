@@ -813,3 +813,10 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
   claim-to-artifact 映射，故 TMC-ready 只能判为 `Unverifiable`。
 - 后续必须保持 controller-level MARL、`semantic_discrete_5`、受控 adapter mapping、policy guard 和 learned predictor
   的归因边界；不得把 `NGSIM + Alibaba` 写成真实 adapter request trace，或把 readiness/checkpoint inventory 写成性能证据。
+
+
+## 2026-11-15 论文合并与统计措辞边界
+
+- 新老师稿来自R20，不含后续v4和八种子变更；本轮已制作真实修订合并候选，但未获确认，R22正式底稿未变。历史`r23`目录名不构成晋版。
+- 八种子记录中的显著性措辞不能只依据未校正p值。若比较族为七个对照，最小符号检验p=0.0078125，经Holm为0.0546875；比较族须事前明确，不能为获得显著性事后缩减。本轮候选只标明unadjusted检验、报告方向和幅度，不作校正后优势或formal/canonical晋级。
+- bootstrap区间和旧三种子对象收据未在本轮完整重审；后者已与八种子主表明确分开。Word修订经OOXML与投影检查、6页阅读/10页修订渲染目检，但未在桌面Word逐项点击测试；作者/基金与原黄色高亮仍待最终处理。详见`manuscript_teacher_merge_20261115.md`。

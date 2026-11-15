@@ -1,3 +1,5 @@
+> 2026-11-15 论文老师返修合并候选完成：新稿定位为R20基础老师修订，原件完整保留；现有v4与八种子修改已用真实Word修订合并，17处老师修改/原因推断单列记录。接受后6页、显示修订10页，结构与逐页检查通过；未获确认，不替代R22。详见[本轮记录](manuscript_teacher_merge_20261115.md)及修订台账。
+
 > 2026-10-26 handoff/state 可选执行链与独立实时中断、源端继续/转发诊断已完成并核验；源6b7bd94/536ce87/1d6c9f7，完整数据、负例与复现仅本地主工作区 artifacts/analysis/handoff_state_runtime_20261026_v1/。共享物理主机与重叠开发事件限制推断；主方法formal readiness仍Unverifiable，训练门禁关闭。用户明确授权后，codex/handoff-state-runtime（c6fabdf）已快进合入main，原有七个修改文件完整保留。见[证据索引](handoff_mainline_evidence_20261026.md)。
 
 > 2026-10-26 独立联合控制固定研究链路已完成，匹配测试及输入、更新、物理轨迹、统计报告的独立重建通过。科学源 `d3af8e4`、消费源 `640daaa`；详细数值、全部负结果、原始训练图和审查仅本地 `artifacts/analysis/event_joint_control_20261026_v1/`。组件 E3 不代表完整系统 readiness，未晋级主方法整体领先、图增益或收敛；见 [索引](event_joint_control_evidence_20261026.md)。
