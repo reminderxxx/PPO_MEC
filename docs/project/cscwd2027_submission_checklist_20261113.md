@@ -2,6 +2,8 @@
 
 用途：记录从官方站点核实的投稿要求、当前稿件状态与投稿前待办。供后续 agent 与作者复读。
 
+状态更新：2026-11-18。稿件状态按 11-15 最新台账校正；下列官网信息保留 11-13 核查日期，本轮未重新联网核验，未确认具体时区/AoE。版本与证据见[来源映射](manuscript_source_map.md)，作者决定集中在[需求清单](requirements_backlog.md)。
+
 ## 一、官方信息（已从官网核实）
 
 - 会议：30th International Conference on Computer Supported Cooperative Work in Design (CSCWD 2027)，May 26–28 2027，Brisbane, Australia（Hybrid）。
@@ -15,18 +17,17 @@
 
 ## 二、当前稿件状态
 
-- 候选稿：`artifacts/manuscript/r23_20261111/Multi-agent SAGH reinforcement learning for Workflow-Aware Adapter Preparation in Vehicular Edge Computing_marked_candidate.docx`（SHA-256 `f483e6913c85628379b92da997c5449f4f27d318ea2dc6b00773cdb0dcd730da`）。
-- 6 页；Table II 为 8 行×3 列；Fig.3 为 8 种子带图；35 条 Word 批注。
-- 数字审计：所有 reward/completion/CI/符号检验数值均已从 `runs/seed_ext8/*/dev.jsonl` 独立重算并逐字比对通过。
-- 内容与结构检查通过；**视觉检查未完成**（当前模型不支持读图）。
+- 正式底稿仍为 R22 标注稿；最新候选为 `artifacts/manuscript/fixed_names_review_20261115/` 中完整题名加 `_marked_candidate.docx`，SHA-256 `f975971cf322bd46f694a908f7747f7ff9f96bd277b97472cf9a2a3c875449b2`，待确认、不赋正式 R23。
+- 已合并老师返修、v4、八种子实验与四处叙事优化，并恢复固定小节名称。旧 `r23_20261111` 只是历史候选，目录名不构成正式版本。
+- 既有验收记录：阅读 6 页、显示修订 7 页、65 条批注；11-15 已完成逐页目检。11-18 重核候选 hash，未重渲染或逐项点击桌面 Word。
+- 均值、符号检验与七对照 Holm 已对照原始最终开发行；继承 bootstrap CI 与旧机制收据未在本轮完成全包复审，不能写成“所有统计均已完整审计”。
 
 ## 三、投稿前必须由作者完成（阻塞项）
 
-1. 目检 6 页版式（渲染 PDF 已生成：`runs/r23_candidate_v2.pdf` 与 `runs/r23_pages/` 六页 PNG）。
-2. 确认 claim 措辞（摘要/结论：显著优于 PPO 8/8、一致优于 MAPPO 7/8、对 cache 无显著优势）。
-3. 确认两个删减：删除 Table II 的 Model KiB 列；删除 §V-B/C 的 init/32/64 轨迹句。
-4. 作者与基金信息：`Third Aughor`、第四作者邮箱、基金号（当前均为占位）。
-5. v4 候选是否合并（Related Work 三线分层 + `IV. SAGH-Based Joint Scheduling Algorithm` 标题）；不合并则以 R22 结构为准。
+1. 审阅并明确确认最新整合标注候选，或定位需修改的具体位置；确认前仍以 R22 为正式底稿。
+2. 提供第三/四作者、邮箱、基金及源码公开说明所需真实信息。
+
+以下编辑已完成于候选，不再单独重复索取授权：Model KiB 列与旧 init/32/64 轨迹删除、v4 合并、历史三种子对象收据来源单列。候选沿用未校正 p 的明确标注，不直接宣称 PPO/DQN 显著；七对照 Holm 最小值为 0.0546875。确认候选不代替独立证据补验。
 
 ## 四、投稿前技术检查
 
@@ -37,11 +38,12 @@
 
 ## 五、关键风险
 
-- 6 页上限：R23 恰为 6 页，无余量，任何新增内容都会超页。
-- 截稿 11-30（约 17 天），时间紧；作者信息与 v4 合并需尽快定。
+- 阅读候选恰为 6 页；作者信息或正文新增后须重新渲染核对，不能沿用旧页数验收。
+- 具体截止时刻/时区需核定；不依据附件换算自行延后提交。作者信息与候选确认仍待处理，v4 合并已完成。
 
 ## 六、已落地的产物索引
 
 - 8 种子实验：`runs/seed_ext8/`（8 控制器 × 8 种子 dev/training/events/receipts）、`runs/seed_ext8_protocol/`。
 - 统计：`runs/seed_ext8_full_panel.json`、`runs/seed_ext8_analysis.json`、`runs/seed_ext8_fig3_curves.json`。
 - 文档：`docs/project/cscwd2027_readiness_gap_and_fill_order_20261109.md`、`docs/project/seed_extension_8_results_20261110.md`、本清单。
+- 2026-11-18 本地部分快照：`artifacts/analysis/manuscript_support_20261118_v1/`，含路径/hash 清单与复算验证；原大包仍在外部工作区，排除的事件/收据/checkpoint 未归档。

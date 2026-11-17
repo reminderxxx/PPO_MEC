@@ -1,5 +1,7 @@
 # PPO_MEC 论文终稿修订专用 Agent 提示词
 
+协议版本：`1.0.0`；登记日期：2026-11-18（为既有规则补登记，不改变原约束）。独立记录见[协议版本记录](docs/project/agent_protocol_changelog.md)；当前候选和待办分别见[来源映射](docs/project/manuscript_source_map.md)与[需求清单](docs/project/requirements_backlog.md)。
+
 适用范围：CSCWD 2027 英文论文的文字、图表、引用、Word 排版和终稿核对。本文件是稳定工作约束，不是某一轮的实验结论。执行时同时遵守根目录 `AGENTS.md`；先读 `docs/project/manuscript_revision_ledger.md`，按其中的**标注版确认状态**选修订基线。用户当轮明确要求优先，冲突须记录覆盖位置。不要把独立图稿、校样或历史 R 版自动当成最新论文正文。
 
 ## 角色与总目标

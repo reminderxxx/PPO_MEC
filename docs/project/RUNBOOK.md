@@ -1,3 +1,9 @@
+## 论文证据定位与归档检查 2026-11-18
+
+先读[来源映射](manuscript_source_map.md)与[需求清单](requirements_backlog.md)，避免把旧候选当正式 R23 或重复合并。当前本地部分快照为 `artifacts/analysis/manuscript_support_20261118_v1/`；查看 `snapshot_manifest.json` 的原路径/hash/排除项和 `snapshot_validation.json` 的复算范围。可用 `python3 -m json.tool artifacts/analysis/manuscript_support_20261118_v1/snapshot_validation.json` 查看回执。
+
+完整归档按 REQ-009 单独闭环：核对原目录与可用空间，复制到新的 create-only 目录，逐文件校验来源/目标 SHA-256，核对 protocol/command/checkpoint 引用与消费者后再更新指针；原件保留。当前事件/收据/checkpoint 尚在外部原目录，不能把部分快照称为完整包。`export_paper_artifacts.py` 只适用于其 benchmark summary schema，不接受此轮 `dev.jsonl`。以下旧训练监控记录按各自日期解释，执行前核对实际进程，勿重复启动。
+
 > 2026-10-22 当前仅监控repaired_fair_reward_continuation_20261022_v1：独立启动层已运行，禁止重复run。完成先用冻结launcher的verify核验parent现场与contract，再用原45c8c88 source的audit/plot入口；同PROJECT env，主.venv Python。详细绝对命令及20分钟监控见fair_reward_resource_continuation_20261022.md。
 
 > 2026-10-21 当前只监控新repaired_fair_reward_training_20261021_v1，命令/source/env/审核及绘图链见fair_reward_contract_repair_20261021.md。冻结源码在独立worktree45c8c88，禁止改变其HEAD或重复启动；旧long v1按用户暂停不得恢复。

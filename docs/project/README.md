@@ -1,3 +1,10 @@
+## 论文维护快速入口 2026-11-18
+
+- [当前版本与证据来源](manuscript_source_map.md)：正式底稿/最新候选、科学代码、外部原件、本地部分快照与统计来源顺序。
+- [需求与作者决定](requirements_backlog.md)：稳定 ID、完成状态、覆盖关系和当前真实待办。
+- [修订台账](manuscript_revision_ledger.md)与[协议版本记录](agent_protocol_changelog.md)：原始授权、逐轮差异及稳定约束的追溯。
+- 下文研究与训练入口保留各期记录；日期较早的运行状态不代表当前仍有进程。
+
 > 2026-10-25 决策瓶颈续查已完成：代码位于独立 `codex/decision-bottleneck` 分支（科学版本 `a5686e2`），主工作区原有修改未覆盖。就绪调度、图消息同权重对照、梯度干预与请求级 PPO 的完整本地证据见 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`。请求级原型仅有有限学习信号，强缓存规则仍更优，不能晋级图结构、长期收敛、原 SA-GHMAPPO 或 formal/canonical 结论。新入口与合同说明在该独立分支的 RUNBOOK。
 
 > 2026-10-25自主恢复入口：独立`codex/workflow-recovery`，科学版本36bc755；本地`artifacts/analysis/workflow_recovery_execution_20261025_v1/`含完整结果、验证与图，图结构特定增量和formal/holdout结论仍须独立证据。主工作区已有代码修改未覆盖，默认registry/canonical未更新。

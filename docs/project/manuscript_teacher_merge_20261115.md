@@ -1,5 +1,7 @@
 # 老师返修稿定位与审阅合并记录
 
+> 2026-11-18 当前入口：本页保留合并与叙事优化过程；最新名称纠偏候选为 `fixed_names_review_20261115`，仍待确认。准确路径/hash 与后续覆盖见[来源映射](manuscript_source_map.md)及[修订台账](manuscript_revision_ledger.md)，下文“最新”按各段日期解释。
+
 日期：2026-11-15 Asia/Shanghai。状态：`pending_author_confirmation`。本文件只记录版本、流程与验证，不公开未发表正文或逐段差异。
 
 ## 来源与授权

@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 近期决策导航 2026-11-18
+
+- 来源顺序：原始结果与协议 → 有范围的独立核对 → 当轮改写规格 → 展示摘要；旧规格的“唯一”不能覆盖较新台账。见[来源映射](manuscript_source_map.md)。
+- 需求状态集中在[需求清单](requirements_backlog.md)，已完成的候选合并/删列不反复列为决策；正式确认仍按原有规则。
+- 协议只补版本追踪，不把本轮统计、待办或截止日期写成永久规则；`AGENTS.md` 不变。
+- 本地先复制可复算的轻量证据并绑定 SHA-256，完整大包原位保留；部分快照不等于完整 provenance。
+- 历史执行决定保留在下文。handoff 的 opt-in 边界、机制优先与不自动晋级原则未变。
+
 ## 2026-10-26: optional measured handoff execution
 
 Use an explicitly injected, single-episode backend to connect native association

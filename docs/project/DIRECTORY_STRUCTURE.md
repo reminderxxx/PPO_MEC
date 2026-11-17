@@ -1,3 +1,10 @@
+## 论文来源与部分快照 2026-11-18
+
+- `docs/project/manuscript_source_map.md`、`requirements_backlog.md`、`agent_protocol_changelog.md`：来源职责、需求状态与协议追溯，不复制未公开正文。
+- `artifacts/manuscript/`：正式稿、候选、阅读预览及本地详细对照；正式确认以修订台账为准。
+- `artifacts/analysis/manuscript_support_20261118_v1/`：45 文件的可复算部分快照，含 `runs/`、`historical_specs/`、`prior_review/`、路径/hash 清单和验证回执；不含事件/收据/checkpoint。
+- 完整八种子原件仍在外部工作区 `runs/seed_ext8/`，绝对位置与科学代码 commit 见[来源映射](manuscript_source_map.md)。本轮不移动历史产物、不增加 live 训练入口，私有产物均不进 Git。
+
 > 2026-10-22 新续作root artifacts/analysis/repaired_fair_reward_continuation_20261022_v1包含原样scientific plan、独立continuation_contract、10原完整cell的只读symlink、20待fresh cell及attempt receipts。代码仅在独立fair-reward-resource-guard worktree；旧root和partial原位保留。
 
 > 2026-10-21 当前独立run：artifacts/analysis/repaired_fair_reward_training_20261021_v1；全算法小预算预检：repaired_fair_reward_preflight_20261021_v1；旧long v1停止回执和文件hash原位保留。算法修复及配置只在独立分支worktree，主工作区不合并；入口docs/project/fair_reward_contract_repair_20261021.md。

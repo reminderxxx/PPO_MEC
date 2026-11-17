@@ -1,3 +1,5 @@
+> 2026-11-18 论文维护入口：[当前版本与证据来源](docs/project/manuscript_source_map.md)、[需求及作者决定](docs/project/requirements_backlog.md)。R22 标注稿仍为正式底稿，11-15 名称纠偏稿待确认；已合并老师/v4/八种子变更。可复算的部分快照在 `artifacts/analysis/manuscript_support_20261118_v1/`，完整大包原位保留，未改算法或晋级结论。
+
 > 2026-10-26 联合控制组件研究已完成并独立复核；代码在 `codex/event-joint-control`，科学训练/消费版本 `d3af8e4` / `640daaa`。真实图、数据和有边界结论仅本地，入口见 [证据索引](docs/project/event_joint_control_evidence_20261026.md)。整体强基线优势、图增益、严格收敛与 formal/canonical 均不晋级。
 
 > 2026-10-25 决策瓶颈续查已完成：代码位于独立 `codex/decision-bottleneck` 分支（科学版本 `a5686e2`），主工作区原有修改未覆盖。就绪调度、图消息同权重对照、梯度干预与请求级 PPO 的完整本地证据见 `artifacts/analysis/workflow_decision_bottleneck_20261025_v1/`。请求级原型仅有有限学习信号，强缓存规则仍更优，不能晋级图结构、长期收敛、原 SA-GHMAPPO 或 formal/canonical 结论。新入口与合同说明在该独立分支的 RUNBOOK。

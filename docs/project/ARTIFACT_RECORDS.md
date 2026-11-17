@@ -1,3 +1,13 @@
+## 近期产物导航 2026-11-18
+
+1. `artifacts/analysis/manuscript_support_20261118_v1/`：八种子结果、训练日志、协议与继承审查的部分快照；45 文件哈希与 3072 条最终行复算通过，非完整训练包。
+2. `artifacts/manuscript/fixed_names_review_20261115/`：最新待确认标注候选，R22 正式底稿不变；路径/hash 见[来源映射](manuscript_source_map.md)。
+3. `artifacts/manuscript/teacher_merge_review_20261115/`：老师原件、三方合并与独立统计核对；后续叙事和名称纠偏以台账串联。
+4. handoff/state 完成包见[证据索引](handoff_mainline_evidence_20261026.md)；保留局限，不与论文八种子面板混用。
+5. 联合控制完成包见[证据索引](event_joint_control_evidence_20261026.md)；组件结果不等于主方法晋级。
+
+完整历史记录见下文；原始产物仍为本地私有，GitHub 只同步规则与来源指针。
+
 > 2026-10-26 本地handoff/state完成包：主工作区artifacts/analysis/handoff_state_runtime_20261026_v1/，含固定输入、真实模型/原生事件/实际TCP原件、加速与真实时钟分列结果、独立源端转发诊断、所有负例、图、source archive与逐字节重建回执。仅源码与维护索引推送；组件E2不代表主方法formal/holdout或整体优势。见[证据索引](handoff_mainline_evidence_20261026.md)。
 
 > 2026-10-26 本地完成包：`artifacts/analysis/event_joint_control_20261026_v1/`。固定实验、输入/检查点冻结、原确认与完整组合支持组、全部负例、真实训练/固定评估图、重放/物理/统计复现及顶刊规则只读审查均保留。只发布源码和维护索引；详细结果与 artifact 不推送。入口 [证据索引](event_joint_control_evidence_20261026.md)。
