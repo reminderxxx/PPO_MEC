@@ -11,6 +11,13 @@
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
+### 2026-11-18 独立交通采集来源与时钟
+
+| 方向 | 论文或原始技术报告 | Venue / Year | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 多场景车辆轨迹采集 | [Introduction to the Third Generation Simulation Dataset: Data Collection and Trajectory Extraction](https://doi.org/10.1177/03611981241257257) | Transportation Research Record 2679(1), 2025, 1768–1784，2024 online；作者机构出版记录核验 | 区分定点航拍、跟车航拍和路侧相机三种采集方式，讨论各方式的轨迹提取和观测限制。[作者机构记录](https://experts.illinois.edu/en/publications/introduction-to-the-third-generation-simulation-dataset-data-coll/) | 以采集场次和原生时钟约束独立性；车流轨迹尚需与给定的合成 RSU 几何及 Alibaba 工作流分别建立映射。 | 后续跨采集测试的数据来源和外推范围。 |
+| TGSIM 原始采集日期与物理单位 | [Third Generation Simulation Data (TGSIM): A Closer Look at the Impacts of Automated Driving Systems on Human Behavior](https://rosap.ntl.bts.gov/view/dot/74647) | USDOT/FHWA，2024，FHWA-JPO-24-133，原始技术报告，第 4 章 | I-90/I-94 定点航拍为 2021-10-06 当地 16–18 时，跟车航拍为 2022-05-27 当地 15–17 时；官方数据目录另列每个 run 的参考图与米制车道几何。[定点数据目录](https://catalog.data.gov/dataset/third-generation-simulation-data-tgsim-i-90-i-94-stationary-trajectories) | 可将定点资产作为一场外部采集候选；资产内六个 run 的绝对时间与相互独立性仍须单独核查，RSU 覆盖与链路开销仍属仿真假设。 | 外部验证设计与局限。 |
+
 ### 2026-11-18 DAG 提前准备与按需模型加载
 
 | 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 论文写作位置 |
