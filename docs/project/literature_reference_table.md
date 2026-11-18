@@ -16,6 +16,9 @@
 | 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 论文写作位置 |
 |---|---|---|---|---|---|
 | 车联网 MEC 工程实现 | [On the implementation of an ETSI MEC using open source solutions](https://arxiv.org/abs/2208.08674) | arXiv, 2022，DOI 10.48550/arXiv.2208.08674；作者备注标注 Virtual ITS European Congress 2020，正式出版信息待核验 | 以车载边缘应用为背景，讨论用开源组件搭建 ETSI MEC 环境与移动性支持，可供原型分层及接口设计参考。 | PPO_MEC 的工作重点是已启动的依赖型任务跨路侧节点接续，以及所需模型缓存与调度协同。开源实现的复用可行性及具体接口匹配待验证。 | 大创国内外研究现状及工程路线参考。 |
+| 车载任务结果缓存与卸载 | [Joint optimization of task caching and computation offloading in vehicular edge computing](https://doi.org/10.1007/s12083-021-01252-w) | *Peer-to-Peer Networking and Applications*, 2021 online；卷期页码待核验 | 作者版描述将可复用的任务执行结果纳入缓存，与计算卸载联合优化服务时间和能耗。 | 缓存结果与缓存模型权重是不同的资源对象。本项目关注可跨请求复用的模型组件和同一请求跨站接续的中间状态。 | 大创国内研究现状；缓存对象区分。 |
+| 多用户 MEC 服务缓存与资源公平 | [Collaborative Service Caching, Task Offloading, and Resource Allocation in Caching-Assisted Mobile Edge Computing](https://doi.org/10.1109/TSC.2025.3586093) | IEEE TSC 18(4), 2025；作者机构存档版核验 | 联合考虑服务缓存、任务卸载和多资源分配，并把用户间的资源公平纳入建模。 | 其缓存对象示例为任务所需数据库与库文件。本项目重点是基础模型与适配器兼容性、路侧接触时间和已执行工作流的状态接续，具体可比性待核验。 | 大创国内研究现状；资源调度参考。 |
+| 依赖任务与协同服务缓存 | [Joint Optimization for Dependency-Aware Computation-Offloading and Cooperative Service-Caching in Edge Computing](https://doi.org/10.53941/jmlis.2026.100011) | *Journal of Machine Learning and Information Security* 2(2):11, 2026；出版社题名页与摘要核验 | 以 DAG 建模 IoT 任务并联合优化卸载、服务缓存和资源分配，提供多节点依赖调度的相邻建模参考。 | PPO_MEC 聚焦移动车辆跨路侧覆盖区时的剩余执行与状态传递，以及模型组件的提前准备。场景和资源合同差异待全文核对。 | 大创相关研究背景；未复现或入稿。 |
 
 ### 2026-11-18：CSCWD 2027 选题与对照续查
 
