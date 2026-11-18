@@ -11,6 +11,23 @@
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
+### 2026-11-18：CSCWD 2027 选题与对照续查
+
+按题名、DOI 和出版页查重。下列条目用于厘清状态、调度动作和实验证据的区别，不改变当前稿的 25 条参考文献。只核对摘要的条目不据此排除全文机制。原已登记的 COHCTO、LDMCO、在线移动 DAG 卸载和 V2V 缓存卸载不重复录入。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| VEC 服务供给与联邦 PPO | [Caching-Enabled Load Balancing-Aware Task Offloading in Vehicular Edge Computing: A Federated Reinforcement Learning Approach](https://ieeexplore.ieee.org/abstract/document/11775965) | IEEE IoT Journal Early Access，2026-11-05，DOI 10.1109/JIOT.2026.3750846；IEEE 摘要与在线元数据检索核验，卷页待核验 | 联合服务缓存、卸载、镜像获取和 CPU 分配，显式建模多 RSU 负载不均。 | 与本稿同有跨 RSU 资源竞争。本稿的差异应测量 released DAG 前缀、base/adapter 依赖和反应性预约如何约束后续准备；按摘要不能判断对方是否有同类链路约束。 | 协同资源与强缓存对照候选。 |
+| 轨迹预测与 DAG 图策略 | [Dependent Task Offloading in Vehicular Edge Computing Using Trajectory-Aware Deep Reinforcement Learning](https://doi.org/10.1109/ICC59461.2026.11587413) | IEEE ICC 2026，DOI 10.1109/ICC59461.2026.11587413；作者全文核对系统与方法 | 用短时轨迹 Transformer 推导 RSU 覆盖，以 GAT-PPO 为 DAG 子任务选本地或 RSU，采用真实移动轨迹与合成 DAG。 | 本稿重心是持续到达的 DAG、可跨请求驻留的 base/adapter 对象和多车共享预约下的准备顺序。应在同可见信息下比较选站和准备的独立作用。 | 最直接的移动预测和图策略近邻。 |
+| DAG 依赖与服务缓存 | [Dependency-Aware Task Offloading and Service Caching in Vehicular Edge Computing](https://ieeexplore.ieee.org/abstract/document/9850402) | IEEE TVT 71(12)，2022；IEEE 摘要检索核验，DOI/页码待核验 | 允许边缘服务器缓存已执行服务以供后续任务复用，提供依赖卸载与缓存耦合的来源。 | 本稿关注按已释放 DAG 前瞻准备 typed adapter/base，需量化共享传输预约和移动退出时间对可用性与成本的影响。 | 依赖缓存相关工作。 |
+| 时限、依赖 DAG 与资源分配 | [An Offloading Scheme for Diverse Inter-Dependent Tasks in Vehicle Edge Computing](https://doi.org/10.1109/SWC62898.2024.00062) | IEEE SWC 2024，2025 收录，DOI 10.1109/SWC62898.2024.00062；IEEE 摘要核验 | 按 DAG 依赖及期限选择卸载时点和位置，利用空闲车辆和 VEC 算力。 | 本稿的共享 RSU 模型资源与准备时机应独立于一般依赖排序测量；V2V 可用算力与本稿四 RSU 设置是不同资源合同。 | 依赖卸载与可行性对照。 |
+| 以时延和能耗为目标的 DAG 卸载 | [Dependency-Aware and Energy Efficient Task Offloading in Vehicular Edge Computing Systems](https://xplorestaging.ieee.org/document/11321198) | IEEE TVT 75(6)，2026；IEEE 摘要检索核验，DOI/页码待核验 | DESR 将依赖卸载和资源分配组合，用迭代分解处理时延与能耗目标。 | 作为同信息的优化式选站参照候选；需先适配本稿可选对象、共享链路和原生业务目标，再比较算法收益。 | DAG 规划对照。 |
+| 任务特征与连接机会 | [Task-Adaptive Offloading Strategy in Vehicular Edge Computing](https://ieeexplore.ieee.org/abstract/document/11666916) | IEEE IoT Journal 13(22)，2026；IEEE 摘要检索核验，DOI/页码待核验 | 明确把任务异质性、RSU 覆盖和移动机会联合用于上传下载决策。 | 本稿测试该连接窗口是否足以完成 typed cache 准备和后续实际服务，相关实验应区分接触机会与共享缓存压力。 | 移动性与服务时序。 |
+| 硬截止期 VEC 调度 | [Task Offloading and Scheduling Under Hard Deadlines in Vehicular Edge Computing Systems](https://ieeexplore.ieee.org/abstract/document/10878130) | IEEE TVT 74(6)，2025；IEEE 摘要检索核验，DOI/页码待核验 | 表明卸载和调度可以直接采用硬截止期作为业务约束，支持用完成率和时间分开评估。 | 本稿会话结束前完成率是固定评估终点，不能等同该文逐任务硬期限；可扩展对照须先补齐统一 deadline 合同。 | 指标含义与外推限制。 |
+| RSU 中继与动态优先级 | [A Dynamic Priority-Aware Task Offloading and Resource Allocation Strategy Assisted by RSU-Relay in Vehicular Edge Computing](https://doi.org/10.1109/OJCOMS.2025.3649533) | IEEE OJ-COMS 7，2026（online 2025），DOI 10.1109/OJCOMS.2025.3649533；出版全文核对摘要 | 在 RSU 中继协作条件下联立卸载、动态优先级和资源分配。 | 本稿用共享预约处理可选模型与现有请求的冲突；应把排队优先级贡献与对象驻留贡献分别验证。 | 联合调度近邻。 |
+| 多 RSU 联邦协同学习 | [Federated MADDPG-Based Collaborative Scheduling Strategy in Vehicular Edge Computing](https://cam.tju.edu.cn/homepage/wuhuaming/PDF/TMC_lei.pdf) | IEEE TMC，online 2025；作者版首页核验，DOI/卷页待核验 | 以联邦 MADDPG 协同训练卸载与资源分配，强调不共享各站私有训练数据。 | SAGH 共享策略且使用集中 critic 与公共预约，其信息权限不同。对照应对齐可见状态，不能把本稿表述成联邦或无中央协调。 | 多智能体合同与公平性。 |
+| 有限期车联网内容缓存 | [Efficient Content Delivery in User-Centric and Cache-Enabled Vehicular Edge Networks with Deadline-Constrained Heterogeneous Demands](https://doi.org/10.1109/TVT.2023.3300954) | IEEE TVT 73(1)，2024（online 2023），DOI 10.1109/TVT.2023.3300954；出版全文核对摘要 | DRL 负责内容放置，优先级和匹配负责交付调度，共同考虑异质需求与期限。 | 内容命中与本稿 base/adapter 闭包、跨节点 ready 状态及后续使用寿命不同；可借鉴超期与成本表述。 | 缓存机制与运营指标。 |
+
 ### 2026-11-18：大创申报前景定位的 Physical AI 背景
 
 本轮为大创命名和应用前景讨论，仅登记检索发现的公开论文。已核对 arXiv 题名及提交年份，未阅读全文、复现或评价文献水平；不改论文、算法、实验及既有审查结论。下列联系为未来应用与工作负载扩展方向，不表示 PPO_MEC 已集成 Cosmos 或验证自动驾驶能力。

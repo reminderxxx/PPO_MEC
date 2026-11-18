@@ -1,5 +1,8 @@
 ## 最新进展导航 2026-11-18
 
+- CSCWD 2027 论文只读复评完成。官网重验、六页阅读稿目检、八种子原始结果、训练与 checkpoint provenance、实际账本及对象生命周期复算均已记录。最新候选满足选题和页数，作者信息、净稿清理与候选确认仍待处理。本稿开发证据经审计，独立 formal/holdout 与强缓存对照的稳定优势仍待验证。详细复评仅保存在本地 `artifacts/analysis/cscwd2027_submission_review_20261118_v1/`。状态见[投稿清单](cscwd2027_submission_checklist_20261113.md)。
+- 独立优化分支 `codex/stream-candidate-filtering`（`4fca508`）完成两阶段调度候选构造加速。固定 checkpoint 的六对完整回放及一次随机采样/更新达到数值一致，139 项相关回归通过。共享算法使用者保持相同候选位置与输出。性能记录在同一本地审查目录，尚无新训练或服务收益晋级。
+
 - 项目本身优化已补齐：[实现与验证](project_quick_optimization_20261118.md)。两个 trainer 每步复用已有 value；数据检查新增 mainline/strict/JSON，拒绝不可用 CSV 与 LFS 指针。工作区 309 测试、排除原七个 dirty 文件的独立源码 305 测试通过；三算法 toy 采样及一次更新参数一致，真实 sample/dry-run 通过。后续见[项目清单](project_optimization_backlog.md)，未晋级算法效果。
 
 1. 本轮完成[来源映射](manuscript_source_map.md)、[需求追踪](requirements_backlog.md)和[协议版本记录](agent_protocol_changelog.md)；只整理状态，不改论文或算法。

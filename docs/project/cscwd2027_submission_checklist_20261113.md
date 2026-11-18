@@ -2,7 +2,7 @@
 
 用途：记录从官方站点核实的投稿要求、当前稿件状态与投稿前待办。供后续 agent 与作者复读。
 
-状态更新：2026-11-18。稿件状态按 11-15 最新台账校正；下列官网信息保留 11-13 核查日期，本轮未重新联网核验，未确认具体时区/AoE。版本与证据见[来源映射](manuscript_source_map.md)，作者决定集中在[需求清单](requirements_backlog.md)。
+状态更新：2026-11-18。复核了官网和六页阅读候选，官网仍未列明截止的具体时刻和时区。版本与证据见[来源映射](manuscript_source_map.md)，作者决定集中在[需求清单](requirements_backlog.md)。[CSCWD 2027 官网](https://cscwd2027.dailyeliteevents.com.au/)
 
 ## 一、官方信息（已从官网核实）
 
@@ -20,7 +20,7 @@
 - 正式底稿仍为 R22 标注稿；最新候选为 `artifacts/manuscript/fixed_names_review_20261115/` 中完整题名加 `_marked_candidate.docx`，SHA-256 `f975971cf322bd46f694a908f7747f7ff9f96bd277b97472cf9a2a3c875449b2`，待确认、不赋正式 R23。
 - 已合并老师返修、v4、八种子实验与四处叙事优化，并恢复固定小节名称。旧 `r23_20261111` 只是历史候选，目录名不构成正式版本。
 - 既有验收记录：阅读 6 页、显示修订 7 页、65 条批注；11-15 已完成逐页目检。11-18 重核候选 hash，未重渲染或逐项点击桌面 Word。
-- 均值、符号检验与七对照 Holm 已对照原始最终开发行；继承 bootstrap CI 与旧机制收据未在本轮完成全包复审，不能写成“所有统计均已完整审计”。
+- 11-18 复算了固定面板、种子 bootstrap、两种 Holm 检验族及原始时间区间。原件哈希、checkpoint 张量和 SAGH/缓存对照帧账本已核对，并复算三种子及八种子对象生命周期。稿件仍报告原有三种子机制数据。独立正式验证仍缺。详细结果仅在本地 `artifacts/analysis/cscwd2027_submission_review_20261118_v1/`。
 
 ## 三、投稿前必须由作者完成（阻塞项）
 
@@ -33,7 +33,7 @@
 
 1. 格式核对：当前 docx 为 Letter 双栏、题名 24pt / 摘要 9pt / 正文 10pt / 参考文献 8pt Times New Roman，与 IEEE 会议样式一致；投稿前建议用 IEEE PDF eXpress（或等效）校验，或按 EasyChair 要求确认。
 2. 匿名化：官网未明示 double-blind；若 EasyChair 系统标注 double-blind，需删除作者栏、致谢与基金信息后再投稿。
-3. PDF 导出：已用 LibreOffice Kit 验证可导出 6 页 PDF；正式投稿建议用 Word 导出或按 IEEE 校验工具生成最终 PDF。
+3. PDF 导出：现有阅读版核验为 6 页 Letter。定稿后移除第二页残留的黄色标记并核对 PDF 作者及主题元数据，再做逐页检查。
 4. EasyChair 提交：标题、摘要、关键词、作者信息、PDF 上传；通讯作者邮箱与机构需与论文一致。
 
 ## 五、关键风险

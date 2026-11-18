@@ -11,5 +11,6 @@
 | PRJ-005 | P1 | 九维学习式预测的缓存身份别名 | 已有零交互见证，尚未实现版本化新输入。先核对实际启用 profile，再冻结单因素输入及 checkpoint/评估 contract；见[主方法方案](main_method_optimization_plan_20261026.md)，不直接堆叠世界模型或重训至赢 |
 | PRJ-006 | P1 | 实验生命周期、成本和完整归档 | 当前有资源让出/续作工具；旧“运行中”不是 live 状态。八种子完整事件/收据/checkpoint 仍在外部原件，部分快照见来源映射；后续按 run_id、命令、版本和 hash 核对完整包，保留失败/负结果 |
 | PRJ-007 | P1 | 稳定效果、公平对照与泛化证据 | 尚未由本轮解决；按独立 review 与冻结 protocol 做窗口、机制和 baseline 验证。工程加速不自动改变 canonical 或 paper-ready 状态 |
+| PRJ-008 | P1 | 八车持续工作流调度候选构造 | 在论文科学代码的独立分支 `codex/stream-candidate-filtering`（`4fca508`）完成。执行站点先算，待共享传输日历重建后再构造后续候选；匹配回放与回归通过，测时与结果仅在本地 `artifacts/analysis/cscwd2027_submission_review_20261118_v1/`。 |
 
 本轮 PRJ-001/002 已完成，PRJ-003 已执行。后续优先定位具体运行瓶颈和已启用路径，再安排匹配的小预算验证；不把管理入口补齐当作算法收益，也不把论文临时截止安排写成项目永久规则。
