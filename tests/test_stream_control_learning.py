@@ -42,6 +42,29 @@ def test_all_stream_algorithms_probabilities_update_checkpoint_replay(name,tmp_p
     assert x==y and json.dumps(a.events,sort_keys=True)==json.dumps(b.events,sort_keys=True)
 
 
+def test_execution_pass_defers_cache_and_event_candidates(monkeypatch):
+    import numpy as np
+    from src.envs.core import joint_stream_rules
+
+    learner = policy()
+    decision = env().decision_states()['v']
+    full, candidates, *identity = learner._coordinated_features(decision, 0, {})
+
+    def unexpected_cache_check(*args):
+        pytest.fail('execution pass should not check optional cache protection')
+
+    monkeypatch.setattr(joint_stream_rules, 'protects_current_models', unexpected_cache_check)
+    execution, execution_candidates, *execution_identity = learner._coordinated_features(
+        decision, 0, {}, execution_only=True,
+    )
+    assert execution_candidates == (candidates[0], [], [])
+    assert execution_identity == identity
+    later_keys = {f'{prefix}{head}' for prefix in ('f', 'm', 'node') for head in (1, 2)}
+    assert execution.keys() == full.keys() - later_keys
+    for key, value in execution.items():
+        np.testing.assert_array_equal(value, full[key])
+
+
 def test_queue_candidate_identity_and_unreleased_graph_hidden():
     e=env();p=policy(prediction_enabled=False);d=e.decision_states()['v']
     # The queued request is now within the bounded preparation horizon.

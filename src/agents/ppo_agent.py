@@ -1044,10 +1044,10 @@ class StreamControlPPO(DeliveryControlPPO):
         super().reset_controller()
         self.request_memory = {}
 
-    def _coordinated_features(self, decision, frame, reservations):
+    def _coordinated_features(self, decision, frame, reservations, *, execution_only=False):
         from math import ceil
         from src.envs.core.joint_link_reservation import service_scale
-        from src.envs.core.joint_delivery_planning import fresh_model_span, node_delivery_times
+        from src.envs.core.joint_delivery_planning import fresh_model_span
         from src.envs.core.joint_stream_rules import protects_current_models
         from src.envs.core.joint_stream_refinement import state_restore_frames, optional_cache_value
         if decision.get('action_contract') != self.action_contract:
@@ -1137,42 +1137,80 @@ class StreamControlPPO(DeliveryControlPPO):
                 min(1.,frequencies.get(site,{}).get(f"adapter:{n['required_adapter']}",0)/8),min(4.,risk),scale(delivery_offsets.get(n['node_id'],0.)),
                 (len(nodes)-len(done))/64,scale(span),np.clip((horizon-work-queue.get(site,0)-relocation)/max(1,horizon),-1,1),
                 scale(n['output_size']*rates['profile_unit_bytes']/rates['output_bytes_per_frame'])]
-        targets=[None,*ids,'vehicle']; cache=[(None,None,'adapter')]; event=[(r,p) for r in [None,*ids] for p in range(4)]
+        targets=[None,*ids,'vehicle']
         f0=[feature(r) for r in targets]; mask=[r in decision['control_space']['execution_targets'] or (r=='vehicle' and decision['control_space']['vehicle_execution_available']) for r in targets]
         if any(mask[1:]):mask[0]=False
         old=self.target_memory.get(vid)
         if old and old[0]==current['node_id'] and old[1] in s['reachable_execution_rsu_ids'] and (s['current_node_work_units_progress']>0 or s['output_pending'] or frame-old[2]<8):mask=[r==old[1] for r in targets]
-        f1=[feature()]; m1=[True]; ni1=[-1]
-        for request,n in nodes:
-            for site in ids:
-                row=rows[site]
-                for kind in ('base_model','adapter'):
-                    cache.append((site,n['node_id'],kind));ni1.append(index[n['node_id']])
-                    ready=n['required_base_model'] in row.get('ready_base_model_ids',[]) if kind=='base_model' else n['required_adapter'] in row.get('cached_adapter_ids',[]) or n['required_adapter'] in row.get('loading_adapter_ids',[])
-                    reactive=request==rid and n['node_id']==current['node_id'] and getattr(self,'_team_targets',{}).get(vid)==site and not s['output_pending']
-                    grant=calendar[site][0]
-                    valid=not ready and (request!=rid or n['node_id'] not in done) and (reactive or frame%4==0)
-                    valid &= grant is None or (reactive and grant==(vid,'model'))
-                    base=catalog[f"base:{n['required_base_model']}"];adapter=catalog[f"adapter:{n['required_adapter']}"]
-                    alt=dict(s,control_cost_parameters=dict(rates,base_size_bytes=base['transfer_size_bytes'],adapter_size_bytes=adapter['transfer_size_bytes']))
-                    span=fresh_model_span(alt,row,n,kind)
-                    valid &= not span or (span<=len(calendar[site]) and all(x is None or (reactive and x==(vid,'model')) for x in calendar[site][:span]))
-                    value = None
-                    if not reactive:
-                        valid &= protects_current_models(alt,row,n,getattr(self,'_delivery_decisions',{}),getattr(self,'_team_targets',{}),catalog)
-                        # A completed current node awaiting output is not future model demand.
-                        valid &= not (request==rid and n['node_id']==current['node_id'] and bool(s['output_pending']))
+        current_index = index[current['node_id']]
+        candidate_groups = [(f0, mask, [current_index] * len(targets))]
+        cache, event = [], []
+        # The first pass selects execution sites. Cache and handoff legality
+        # must use the rebuilt fleet calendar in the second pass.
+        if not execution_only:
+            cache = [(None, None, 'adapter')]
+            event = [(site, priority) for site in [None, *ids] for priority in range(4)]
+            cache_features, cache_mask, cache_indices = [feature()], [True], [-1]
+            execution_site = getattr(self, '_team_targets', {}).get(vid)
+            for request, n in nodes:
+                active_node = request == rid and n['node_id'] == current['node_id']
+                for site in ids:
+                    row = rows[site]
+                    reactive = active_node and execution_site == site and not s['output_pending']
+                    grant = calendar[site][0]
+                    for kind in ('base_model', 'adapter'):
+                        cache.append((site, n['node_id'], kind))
+                        cache_indices.append(index[n['node_id']])
+                        if kind == 'base_model':
+                            ready = n['required_base_model'] in row.get('ready_base_model_ids', [])
+                        else:
+                            adapter_id = n['required_adapter']
+                            ready = (adapter_id in row.get('cached_adapter_ids', [])
+                                     or adapter_id in row.get('loading_adapter_ids', []))
+                        valid = (not ready and (request != rid or n['node_id'] not in done)
+                                 and (reactive or frame % 4 == 0)
+                                 and (grant is None or (reactive and grant == (vid, 'model')))
+                                 and not (active_node and s['output_pending']))
                         if valid:
-                            demand=demands.get(site,set()) | {f"base:{n['required_base_model']}",f"adapter:{n['required_adapter']}"}
-                            value=optional_cache_value(s,row,n,span,getattr(self,'_team_targets',{}).get(vid),
-                                sum(catalog[k]['resident_size_bytes'] for k in demand),
-                                prediction_enabled=self.prediction_enabled,horizon=self.planning_horizon,
-                                use_after_override=opportunities[site].get('eta_frames') if request==rid and n['node_id']==current['node_id'] and site in opportunities and opportunities[site].get('cache_net_reward_proxy',0)>0 else None)
-                            valid &= value['eligible']
-                    if value is not None:self._cache_values[site,n['node_id'],kind]=value
-                    m1.append(valid)
-                    f1.append(feature(site,n,kind) if valid else [0.]*32)
-        m2=[r is None or opportunities.get(r,{}).get('prepare_feasible',False) for r,p in event]
+                            base = catalog[f"base:{n['required_base_model']}"]
+                            adapter = catalog[f"adapter:{n['required_adapter']}"]
+                            alt = dict(s, control_cost_parameters=dict(
+                                rates, base_size_bytes=base['transfer_size_bytes'],
+                                adapter_size_bytes=adapter['transfer_size_bytes'],
+                            ))
+                            span = fresh_model_span(alt, row, n, kind)
+                            valid = not span or (span <= len(calendar[site]) and all(
+                                slot is None or (reactive and slot == (vid, 'model'))
+                                for slot in calendar[site][:span]
+                            ))
+                        if valid and not reactive:
+                            valid = protects_current_models(
+                                alt, row, n, getattr(self, '_delivery_decisions', {}),
+                                getattr(self, '_team_targets', {}), catalog,
+                            )
+                            if valid:
+                                demand = demands[site] | {f"base:{n['required_base_model']}", f"adapter:{n['required_adapter']}"}
+                                opportunity = opportunities.get(site, {})
+                                use_after = (opportunity.get('eta_frames')
+                                             if active_node and opportunity.get('cache_net_reward_proxy', 0) > 0
+                                             else None)
+                                value = optional_cache_value(
+                                    s, row, n, span, execution_site,
+                                    sum(catalog[key]['resident_size_bytes'] for key in demand),
+                                    prediction_enabled=self.prediction_enabled,
+                                    horizon=self.planning_horizon, use_after_override=use_after,
+                                )
+                                self._cache_values[site, n['node_id'], kind] = value
+                                valid = value['eligible']
+                        cache_mask.append(valid)
+                        cache_features.append(feature(site, n, kind) if valid else [0.] * 32)
+            candidate_groups.extend((
+                (cache_features, cache_mask, cache_indices),
+                ([feature(site, priority=priority) for site, priority in event],
+                 [site is None or opportunities.get(site, {}).get('prepare_feasible', False)
+                  for site, _ in event],
+                 [current_index] * len(event)),
+            ))
         critic=list(own)
         c=decision['centralized_critic_state']
         for row in sorted(c['rsus'],key=lambda r:r['rsu_id']):
@@ -1198,7 +1236,7 @@ class StreamControlPPO(DeliveryControlPPO):
             overflow=max(0.,sum(catalog[k]['resident_size_bytes'] for k in closure|peer)/max(1,row.get('capacity_bytes') or model_byte_scale)-1)
             conflict=overflow*sum(ceil(catalog[k]['transfer_size_bytes']/rates['model_bytes_per_frame']) for k in peer-closure)
             data['prior0'][i]-=(cold+conflict)/max(1.,max(4,horizon)/4)
-        for j,(features,masks,indices) in enumerate([(f0,mask,[index[current['node_id']]]*6),(f1,m1,ni1),([feature(r,priority=p) for r,p in event],m2,[index[current['node_id']]]*20)]):
+        for j,(features,masks,indices) in enumerate(candidate_groups):
             data[f'f{j}']=np.asarray(features,np.float32);data[f'm{j}']=np.asarray(masks,bool);data[f'node{j}']=np.asarray(indices,np.int64)
         return data,(targets,cache,event),vid,current['node_id'],work
 
@@ -1221,7 +1259,7 @@ class StreamControlPPO(DeliveryControlPPO):
         ids=sorted(decisions);shift=frame%len(ids);ids=ids[shift:]+ids[:shift]
         reservations={};first={};chosen={}
         for vid in ids:
-            data,candidates,_,node,work=self._coordinated_features(decisions[vid],frame,reservations)
+            data,candidates,_,node,work=self._coordinated_features(decisions[vid],frame,reservations,execution_only=True)
             batch={k:torch.as_tensor(v).unsqueeze(0) for k,v in data.items()}
             actions,*_=self._evaluate(batch,deterministic=deterministic,execution_only=True)
             chosen[vid]=actions[:,0];targets[vid]=candidates[0][int(actions[0,0])];first[vid]=data

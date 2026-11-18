@@ -173,8 +173,10 @@ class CaptureTap:
 
     def __enter__(self):
         agent=self.agent;original_act=agent.act_controls;original_features=agent._coordinated_features;original_evaluate=agent._evaluate
-        def features(this,decision,frame,reservations):
-            answer=original_features(decision,frame,reservations)
+        def features(this,decision,frame,reservations,*,execution_only=False):
+            # Captures keep the complete first-pass candidate layout for legacy consumers.
+            answer=original_features(decision,frame,reservations,
+                                     execution_only=execution_only and not self._tracing)
             if self._tracing:
                 data,candidates,vid,node,work=answer;s=decision['semantic_state']
                 self._feature=dict(frame=int(frame),vehicle_id=vid,node_id=node,work=float(work),candidates=deepcopy(candidates),
