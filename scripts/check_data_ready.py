@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -12,6 +13,19 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from src.data.model_catalog.model_cache_dataset_registry import validate_registry_payload
+
+
+def _is_readable_data_file(path: Path) -> bool:
+    try:
+        if not path.is_file():
+            return False
+        with path.open("rb") as file:
+            header = file.read(256)
+        return bool(header) and not header.startswith(
+            b"version https://git-lfs.github.com/spec/v1"
+        )
+    except OSError:
+        return False
 
 
 def _check_lust() -> dict[str, Any]:
@@ -40,12 +54,15 @@ def _check_lust() -> dict[str, Any]:
 
 def _check_ngsim() -> dict[str, Any]:
     ngsim_root = ROOT_DIR / "data" / "raw" / "mobility" / "ngsim"
-    csv_files = sorted(path.name for path in ngsim_root.glob("*.csv")) if ngsim_root.exists() else []
+    csv_files = sorted(path.name for path in ngsim_root.glob("*.csv"))
     missing_items: list[str] = []
     if not ngsim_root.exists():
         missing_items.append("NGSIM 根目录")
     if not csv_files:
-        missing_items.append("官方车辆轨迹 CSV")
+        missing_items.append("可读取、非空且已还原的官方车辆轨迹 CSV")
+    elif not _is_readable_data_file(ngsim_root / csv_files[0]):
+        # Match the default selection in real_sample_support and run_ngsim_sample.
+        missing_items.append(f"默认首个 NGSIM CSV 不可读取、为空或仍为 Git LFS 指针: {csv_files[0]}")
     return {
         "dataset_name": "NGSIM",
         "ready": len(missing_items) == 0,
@@ -87,8 +104,8 @@ def _check_alibaba_batch_task() -> dict[str, Any]:
     missing_items: list[str] = []
     if not workflow_root.exists():
         missing_items.append("Alibaba workflow 根目录")
-    if not csv_path.exists():
-        missing_items.append("batch_task.csv")
+    if not _is_readable_data_file(csv_path):
+        missing_items.append("可读取、非空且非 Git LFS 指针的 batch_task.csv")
     return {
         "dataset_name": "Alibaba batch task",
         "ready": len(missing_items) == 0,
@@ -173,16 +190,31 @@ def _check_model_cache_dataset_registry() -> dict[str, Any]:
     }
 
 
-def main() -> None:
-    results = [
-        _check_lust(),
-        _check_ngsim(),
-        _check_highd(),
-        _check_alibaba_batch_task(),
-        _check_huggingface_model_cache_sources(),
-        _check_model_cache_dataset_registry(),
-    ]
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="只读检查本地真实数据是否就绪")
+    parser.add_argument(
+        "--scope", choices=("all", "mainline"), default="all",
+        help="mainline 仅检查 NGSIM + Alibaba；默认保留全部六项检查",
+    )
+    parser.add_argument(
+        "--strict", action="store_true",
+        help="所选范围内任一数据未就绪时返回非零退出码",
+    )
+    parser.add_argument("--json", action="store_true", help="仅输出 JSON，便于脚本消费")
+    args = parser.parse_args(argv)
+    checks = (
+        [_check_ngsim, _check_alibaba_batch_task]
+        if args.scope == "mainline"
+        else [
+            _check_lust, _check_ngsim, _check_highd, _check_alibaba_batch_task,
+            _check_huggingface_model_cache_sources, _check_model_cache_dataset_registry,
+        ]
+    )
+    results = [check() for check in checks]
     ready_count = sum(1 for item in results if item["ready"])
+    if args.json:
+        print(json.dumps({"results": results}, ensure_ascii=False, indent=2))
+        return int(args.strict and ready_count != len(results))
     print("数据就绪检查完成")
     print(f"ready_count: {ready_count}/{len(results)}")
     for item in results:
@@ -194,7 +226,8 @@ def main() -> None:
             print(f"[{item['dataset_name']}] missing_items: {item['missing_items']}")
     print("JSON 摘要:")
     print(json.dumps({"results": results}, ensure_ascii=False, indent=2))
+    return int(args.strict and ready_count != len(results))
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

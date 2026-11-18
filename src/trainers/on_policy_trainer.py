@@ -44,7 +44,11 @@ class OnPolicyTrainer(BaseTrainer):
             decision_info = dict(info)
             action, action_info = self._agent.act(observation, info)
             next_observation, reward, terminated, truncated, next_info = self._env.step(action)
-            estimated_value = float(action_info.get("value", self._estimate_value(observation, info)))
+            estimated_value = (
+                float(action_info["value"])
+                if "value" in action_info
+                else self._estimate_value(observation, info)
+            )
             buffer.add_step(
                 observation=observation,
                 action=int(action),

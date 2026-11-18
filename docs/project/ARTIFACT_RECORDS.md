@@ -1,5 +1,7 @@
 ## 近期产物导航 2026-11-18
 
+- `artifacts/analysis/project_quick_optimization_20261118_v1/`：trainer 基线/候选的 toy 采样与一次更新参数对照、309 项工作区与 305 项独立源码测试及文件保护回执；见[实现记录](project_quick_optimization_20261118.md)。属于工程验证，不是算法效果或正式 benchmark。
+
 1. `artifacts/analysis/manuscript_support_20261118_v1/`：八种子结果、训练日志、协议与继承审查的部分快照；45 文件哈希与 3072 条最终行复算通过，非完整训练包。
 2. `artifacts/manuscript/fixed_names_review_20261115/`：最新待确认标注候选，R22 正式底稿不变；路径/hash 见[来源映射](manuscript_source_map.md)。
 3. `artifacts/manuscript/teacher_merge_review_20261115/`：老师原件、三方合并与独立统计核对；后续叙事和名称纠偏以台账串联。

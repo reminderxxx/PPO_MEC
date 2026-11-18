@@ -1,3 +1,14 @@
+## 主线运行前预检与 trainer 优化 2026-11-18
+
+```bash
+.venv/bin/python scripts/check_data_ready.py --scope mainline --strict
+# 机器消费时追加 --json，仅输出 {"results": [...]}。
+```
+
+`mainline` 只检查 NGSIM + Alibaba，缺失、空文件、不可读、目录或 Git LFS 指针时退出 1；检查默认目录，NGSIM 与加载器都选排序首个 CSV。通过后再执行本手册的 sample/dry-run；此检查不验证 CSV schema、正式 split 或显式指定的其他路径。默认不带参数仍盘点六项且返回 0，LuST/highD 不阻塞 mainline。脚本只读，不下载原始数据。
+
+两个 trainer 已消除动作结果中存在 value 时的重复估值，终止/截断 bootstrap 不变；训练入口和 checkpoint schema 不变。验证及后续算法任务见[本轮记录](project_quick_optimization_20261118.md)、[项目优化清单](project_optimization_backlog.md)。
+
 ## 论文证据定位与归档检查 2026-11-18
 
 先读[来源映射](manuscript_source_map.md)与[需求清单](requirements_backlog.md)，避免把旧候选当正式 R23 或重复合并。当前本地部分快照为 `artifacts/analysis/manuscript_support_20261118_v1/`；查看 `snapshot_manifest.json` 的原路径/hash/排除项和 `snapshot_validation.json` 的复算范围。可用 `python3 -m json.tool artifacts/analysis/manuscript_support_20261118_v1/snapshot_validation.json` 查看回执。

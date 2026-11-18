@@ -2,6 +2,8 @@
 
 ## 近期决策导航 2026-11-18
 
+- 项目快速优化先处理已复现的重复推理与运行门禁；复用 actor value，缺失时仍 fallback，保留 bootstrap。数据检查默认六项盘点兼容，mainline/strict 显式启用；算法输入/目标/schema 不随工程优化切换。后续任务见[项目清单](project_optimization_backlog.md)。
+
 - 来源顺序：原始结果与协议 → 有范围的独立核对 → 当轮改写规格 → 展示摘要；旧规格的“唯一”不能覆盖较新台账。见[来源映射](manuscript_source_map.md)。
 - 需求状态集中在[需求清单](requirements_backlog.md)，已完成的候选合并/删列不反复列为决策；正式确认仍按原有规则。
 - 协议只补版本追踪，不把本轮统计、待办或截止日期写成永久规则；`AGENTS.md` 不变。

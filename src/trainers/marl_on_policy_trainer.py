@@ -177,7 +177,11 @@ class MARLOnPolicyTrainer(BaseTrainer):
                 )
                 action_info["option_gate"] = option_gate_info
             next_observation, reward, terminated, truncated, next_info = self._env.step(int(action))
-            estimated_value = float(action_info.get("value", self._estimate_value(observation, policy_info)))
+            estimated_value = (
+                float(action_info["value"])
+                if "value" in action_info
+                else self._estimate_value(observation, policy_info)
+            )
             next_estimated_value = (
                 0.0
                 if terminated

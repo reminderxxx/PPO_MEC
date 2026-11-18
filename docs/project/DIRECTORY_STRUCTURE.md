@@ -1,3 +1,10 @@
+## 项目优化记录 2026-11-18
+
+- `docs/project/project_optimization_backlog.md`：项目级运行、候选算法和数据/实验待办；论文需求另见原有清单。
+- `docs/project/project_quick_optimization_20261118.md`：trainer 重复估值与主线严格预检的实现/验证记录。
+- `tests/test_trainer_value_reuse.py`、`tests/test_data_ready_cli.py`：采样值复用/截断 bootstrap、主线范围与失败退出码回归测试。
+- `artifacts/analysis/project_quick_optimization_20261118_v1/`：本地基线/候选对照及独立源码测试回执；不进 Git，不替代正式实验产物。
+
 ## 论文来源与部分快照 2026-11-18
 
 - `docs/project/manuscript_source_map.md`、`requirements_backlog.md`、`agent_protocol_changelog.md`：来源职责、需求状态与协议追溯，不复制未公开正文。

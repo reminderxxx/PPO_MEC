@@ -1,5 +1,7 @@
 ## 最新进展导航 2026-11-18
 
+- 项目本身优化已补齐：[实现与验证](project_quick_optimization_20261118.md)。两个 trainer 每步复用已有 value；数据检查新增 mainline/strict/JSON，拒绝不可用 CSV 与 LFS 指针。工作区 309 测试、排除原七个 dirty 文件的独立源码 305 测试通过；三算法 toy 采样及一次更新参数一致，真实 sample/dry-run 通过。后续见[项目清单](project_optimization_backlog.md)，未晋级算法效果。
+
 1. 本轮完成[来源映射](manuscript_source_map.md)、[需求追踪](requirements_backlog.md)和[协议版本记录](agent_protocol_changelog.md)；只整理状态，不改论文或算法。
 2. 本仓库 HEAD/index 可读，`git fsck --connectivity-only --no-dangling` 通过；未复现附件的 Git 损坏，不做破坏性修复。
 3. 本地 `artifacts/analysis/manuscript_support_20261118_v1/` 保存 45 文件约 84.9 MB 的部分快照；哈希与 3072 条最终开发行均值/符号检验/Holm 对照通过。事件、收据和 checkpoint 原位保留，非完整训练归档。

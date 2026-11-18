@@ -2,6 +2,12 @@
 
 # Code Module Map
 
+## 2026-11-18 trainer 与数据预检
+
+- `src/trainers/on_policy_trainer.py` / `marl_on_policy_trainer.py`：优先使用本次 `agent.act()` 返回的 value，仅缺少该 key 时 fallback；下一状态与末状态 bootstrap 仍由原路径估值，不改 PPO buffer/schema。
+- `scripts/check_data_ready.py`：只读文件可用性盘点；mainline 模式只检查实际默认选择的 NGSIM CSV 与 Alibaba，strict/JSON 支持调用方门禁。不拥有下载、CSV 解析、split 审核或训练职责。
+- 回归测试与证据范围见[项目优化记录](project_quick_optimization_20261118.md)。
+
 ## Native handoff measured execution backend
 
 - `VecWorkflowCoreEnv` accepts optional `execution_backend`: binds on reset,
