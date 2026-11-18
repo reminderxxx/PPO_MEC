@@ -11,6 +11,12 @@
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
+### 2026-11-18：大创申报研究现状补充
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 车联网 MEC 工程实现 | [On the implementation of an ETSI MEC using open source solutions](https://arxiv.org/abs/2208.08674) | arXiv, 2022，DOI 10.48550/arXiv.2208.08674；作者备注标注 Virtual ITS European Congress 2020，正式出版信息待核验 | 以车载边缘应用为背景，讨论用开源组件搭建 ETSI MEC 环境与移动性支持，可供原型分层及接口设计参考。 | PPO_MEC 的工作重点是已启动的依赖型任务跨路侧节点接续，以及所需模型缓存与调度协同。开源实现的复用可行性及具体接口匹配待验证。 | 大创国内外研究现状及工程路线参考。 |
+
 ### 2026-11-18：CSCWD 2027 选题与对照续查
 
 按题名、DOI 和出版页查重。下列条目用于厘清状态、调度动作和实验证据的区别，不改变当前稿的 25 条参考文献。只核对摘要的条目不据此排除全文机制。原已登记的 COHCTO、LDMCO、在线移动 DAG 卸载和 V2V 缓存卸载不重复录入。
