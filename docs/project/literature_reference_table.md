@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-30
+更新日期：2026-11-18
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -10,6 +10,17 @@
 - 正式投稿前需要再次核对 IEEE Xplore、ACM DL、USENIX 或会议官网的最终卷期、页码和 BibTeX。
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
+
+### 2026-11-18：大创申报前景定位的 Physical AI 背景
+
+本轮为大创命名和应用前景讨论，仅登记检索发现的公开论文。已核对 arXiv 题名及提交年份，未阅读全文、复现或评价文献水平；不改论文、算法、实验及既有审查结论。下列联系为未来应用与工作负载扩展方向，不表示 PPO_MEC 已集成 Cosmos 或验证自动驾驶能力。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| Physical AI 世界模型 | [Cosmos World Foundation Model Platform for Physical AI](https://arxiv.org/abs/2501.03575) | arXiv, 2025；正式 venue / DOI 待核验 | 世界模型与 Physical AI 开发平台的公开背景，可支持机器人及自动驾驶应用方向的动机。 | PPO_MEC 研究移动环境中的工作流执行、模型缓存及状态衔接；世界模型服务可作为未来工作负载，实际接入与收益待验证。 | 大创应用前景；不自动入稿。 |
+| 具身推理 | [Cosmos-Reason1: From Physical Common Sense To Embodied Reasoning](https://arxiv.org/abs/2503.15558) | arXiv, 2025；正式 venue / DOI 待核验 | 摘要提出物理常识、具身推理及自然语言下一步动作，可作为多阶段智能任务的背景。 | 本项目关注执行资源和跨节点连续性；具身推理的任务质量、实时性及物理安全能力需独立验证。 | 大创未来扩展；不作为既有机制收益证据。 |
+| 多模态世界模型 | [Cosmos 3: Omnimodal World Models for Physical AI](https://arxiv.org/abs/2606.02800) | arXiv, 2026；正式 venue / DOI 待核验 | 多模态 Physical AI 模型的公开方向线索；具体能力、成本与部署要求待全文核验。 | 可研究此类工作负载的边缘资源需求与模型驻留，当前未实现模型接入或跨 RSU 部署。 | 前景背景候选；不自动入稿。 |
+| 交互式世界仿真 | [Interactive World Simulation with Cosmos for Physical AI](https://arxiv.org/abs/2611.06627) | arXiv, 2026；正式 venue / DOI 待核验 | 交互式世界仿真的公开方向线索；具体实时性与仿真协议待全文核验。 | 可作为未来场景构建与测试工具候选，不能替代本项目交通轨迹、真实执行成本及独立评估。 | 未来验证工具候选；未接入。 |
 
 ### 2026-10-30：Related Work 分层核对时发现的交叉近邻
 
