@@ -1,3 +1,14 @@
+## 八车会话的请求驻留时间
+
+在有逐帧 `request_rewards` 的八车 stream 评价包中，从 `result.json` 和同一策略的收据复算每个请求在系统中的观测帧数。脚本校验收据哈希、配对身份、每帧实际待交付的请求集合和完整会话长度。输出按释放帧分组，包含排队时间和未完成请求至窗口截止的时间。完成帧计入。下例适用于已冻结的 480 帧 I-80 会话，其他协议需按计划传入对应窗口长度。
+
+```bash
+cell=artifacts/analysis/cscwd2027_dual_family_transfer_20261118_v1/pairs/i80_0_short_4096_seed7
+.venv/bin/python scripts/audit_stream_request_exposure.py "$cell/result.json" "$cell/sa_ghmappo_receipts.jsonl.gz" --agent sa_ghmappo --horizon 480
+```
+
+支持原成对结果包及单臂干预结果包。逐帧数据仅用于核对时间，独立性和统计区间按各自实验协议判断。
+
 ## 主线运行前预检与 trainer 优化 2026-11-18
 
 ```bash

@@ -1,3 +1,7 @@
+## 八车会话证据复算
+
+- `scripts/audit_stream_request_exposure.py` 逐帧核对请求身份，输出释放至交付或窗口截止的观测帧数；对应回归见 `tests/test_stream_request_exposure.py`。
+
 ## 项目优化记录 2026-11-18
 
 - `docs/project/project_optimization_backlog.md`：项目级运行、候选算法和数据/实验待办；论文需求另见原有清单。

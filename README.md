@@ -1,3 +1,5 @@
+> 八车工作流的请求驻留时间可从逐帧收据复算，包含已释放的排队请求和窗口截止仍未完成的请求。使用方法见[运行手册](docs/project/RUNBOOK.md#八车会话的请求驻留时间)。
+
 > 2026-11-18 项目优化已落地：两个 trainer 复用动作返回的 value，主线数据预检支持严格退出码、JSON 及 LFS 指针识别。见[实现与验证](docs/project/project_quick_optimization_20261118.md)、[项目优化清单](docs/project/project_optimization_backlog.md)。运行前可执行 `.venv/bin/python scripts/check_data_ready.py --scope mainline --strict`。
 
 > 2026-11-18 论文维护入口：[当前版本与证据来源](docs/project/manuscript_source_map.md)、[需求及作者决定](docs/project/requirements_backlog.md)。R22 标注稿仍为正式底稿，11-15 名称纠偏稿待确认；已合并老师/v4/八种子变更。可复算的部分快照在 `artifacts/analysis/manuscript_support_20261118_v1/`，完整大包原位保留，未改算法或晋级结论。

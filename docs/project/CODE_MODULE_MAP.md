@@ -2,6 +2,10 @@
 
 # Code Module Map
 
+## 八车请求驻留时间复算
+
+- `scripts/audit_stream_request_exposure.py` 读取已完成会话和逐帧收据，核验释放、排队、完成及截尾时刻，按到达批次输出观测时间。可独立于训练环境运行。[运行示例](RUNBOOK.md#八车会话的请求驻留时间)
+
 ## 2026-11-18 trainer 与数据预检
 
 - `src/trainers/on_policy_trainer.py` / `marl_on_policy_trainer.py`：优先使用本次 `agent.act()` 返回的 value，仅缺少该 key 时 fallback；下一状态与末状态 bootstrap 仍由原路径估值，不改 PPO buffer/schema。
