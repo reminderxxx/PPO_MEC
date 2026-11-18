@@ -1,5 +1,7 @@
 ## 近期产物导航 2026-11-18
 
+- `artifacts/analysis/cscwd2027_dual_family_transfer_20261118_v1/`：双模型族迁移评价的输入合同、12 个原始 DAG 身份、16 个冻结 checkpoint 绑定、96 对完整评价、事件与成本收据审计、种子条件区间和四场精确复现。原结果、图与正文候选措辞仅本地保留。评价源码 `4fca508`，原训练源码 `4bc39b9`。
+
 - `artifacts/analysis/project_quick_optimization_20261118_v1/`：trainer 基线/候选的 toy 采样与一次更新参数对照、309 项工作区与 305 项独立源码测试及文件保护回执；见[实现记录](project_quick_optimization_20261118.md)。属于工程验证，不是算法效果或正式 benchmark。
 
 1. `artifacts/analysis/manuscript_support_20261118_v1/`：八种子结果、训练日志、协议与继承审查的部分快照；45 文件哈希与 3072 条最终行复算通过，非完整训练包。
