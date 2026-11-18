@@ -11,6 +11,15 @@
 - 不能把外部论文的 service cache、model checkpoint cache、KV cache 直接等同于本项目的 adapter cache；若写作中做类比，必须说明抽象层级差异。
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
+### 2026-11-18 DAG 提前准备与按需模型加载
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| DAG 后继预热时机 | [ORION and the Three Rights: Sizing, Bundling, and Prewarming for Serverless DAGs](https://www.usenix.org/conference/osdi22/presentation/mahgoub) | USENIX OSDI 2022，303–320，会议页面与摘要核验 | 在 AWS Lambda 的 DAG 应用中选择后续函数的 VM 预热提前量，并以端到端尾时延及费用评价。 | 可借鉴成对报告交付指标和准备成本的设计。本文的准备对象是路侧的基座和适配器，另受移动接触时间及共享传输槽约束。 | Related Work，提前准备的已有方法；Discussion，准备时机。 |
+| 按需模型加载 | [Torpor: GPU-Enabled Serverless Computing for Low-Latency, Resource-Efficient Inference](https://www.usenix.org/conference/atc25/presentation/yu) | USENIX ATC 2025，597–612，会议页面与摘要核验 | 模型留在主存，收到请求后调入 GPU，以交换、流水和请求调度控制时延。 | 支持在相同需求路径下考察额外准备的边际价值。GPU 内部交换与路侧站点间的模型传输具有不同资源约束。 | 机制消融设计依据；部署限制。 |
+| 基座和任务参数分离 | [PetS: A Unified Framework for Parameter-Efficient Transformers Serving](https://www.usenix.org/conference/atc22/presentation/zhou-zhe) | USENIX ATC 2022，489–504，会议页面与摘要核验 | 多任务共享预训练参数，分别管理任务特有参数，并在多类 GPU 上测量执行能力。 | 可用于解释同基座任务之间的复用；路侧切换后目标基座与适配器是否均已驻留，需要本项目的本地账本验证。 | 模型缓存对象定义。 |
+| 推理张量复用 | [Tetris: Memory-efficient Serverless Inference through Tensor Sharing](https://www.usenix.org/conference/atc22/presentation/li-jie) | USENIX ATC 2022，会议页面与摘要核验 | 通过张量映射跨推理实例共享内存，并衡量实例密度和内存占用。 | 可用来区分驻留空间节省与传输流量节省；RSU 账本上的字节仍需按模型对象和站点独立计量。 | Related Work，资源计量。 |
+
 ### 2026-11-18：大创申报研究现状补充
 
 | 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 优化点 / 差异点 | 论文写作位置 |
