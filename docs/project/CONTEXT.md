@@ -3,7 +3,7 @@
 - 项目优化入口为[项目清单](project_optimization_backlog.md)；本轮已落地 trainer value 复用与主线严格数据预检，[实现/验证](project_quick_optimization_20261118.md)独立记录，不与论文确认混为一项。
 
 - 长期文档以 `/Users/howen/Projects/PPO_MEC` 为维护入口；论文版本、科学代码 commit、外部完整原件与本地快照职责见[来源映射](manuscript_source_map.md)。
-- 正式底稿仍为 R22 标注稿；最新待确认候选为 `fixed_names_review_20261115`，已合并老师稿、v4 与八种子变更，不因目录名或一般优化自动晋版。
+- 正式底稿仍为 R22 标注稿；最新待确认候选为 `teacher_figures_20261120`，承接 11-15 名称纠偏稿，已合并老师稿、v4 与八种子变更，不因目录名或一般优化自动晋版。
 - 当前需求及仅需作者处理的决定集中在[需求清单](requirements_backlog.md)，不再重复已完成的合并/删列任务。
 - 下文保留历史上下文；其中各期“唯一 live”“当前”“未创建”须结合日期及后续勘误解释，不作为今天的运行状态快照。论文开发面板与 typed-cache 正式协议分开追溯。
 

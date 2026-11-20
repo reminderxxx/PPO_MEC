@@ -1,17 +1,17 @@
 # 论文当前版本与证据来源
 
-核对日期：2026-11-18 Asia/Shanghai；核对起点 Git：`2051f4d00e60af89571c0edd92f0f284dd4b7056`。本页负责快速定位；确认依据与逐处变更仍以[修订台账](manuscript_revision_ledger.md)为准。
+稿件指针核对：2026-11-20 Asia/Shanghai；本地实验证据快照核对：2026-11-18。本页负责快速定位；确认依据与逐处变更仍以[修订台账](manuscript_revision_ledger.md)为准。
 
 ## 当前版本
 
 | 用途 | 位置与状态 |
 | --- | --- |
 | 已确认正式修订底稿 | `artifacts/manuscript/r22_20261030/` 中完整题名加 `_marked.docx`；SHA-256 `78e38c83d7005e445164dfbb3dfdd62db254bb5ea68e486f15d61f967fda083b` |
-| 最新待确认候选 | `artifacts/manuscript/fixed_names_review_20261115/` 中完整题名加 `_marked_candidate.docx`；SHA-256 `f975971cf322bd46f694a908f7747f7ff9f96bd277b97472cf9a2a3c875449b2` |
+| 最新待确认候选 | `artifacts/manuscript/teacher_figures_20261120/` 中完整题名加 `_marked_candidate.docx`；SHA-256 `cc869e56262eb7b93f0e7dd396569a3938e9db074c27d81fef1d7883c67a3d94`，同目录 `figures.pptx` 为两图可编辑源件 |
 | 阅读预览 | 同一候选目录中完整题名加 `_reading_preview.pdf`；仅供阅读，不作修订底稿 |
 | 历史候选 | `rl_alignment_review_20261030` v4、`r23_20261111`、`teacher_merge_review_20261115`、`narrative_closure_review_20261115`；保留追溯，不重新并行改写 |
 
-最新候选已包含老师返修、v4、八种子实验和四处叙事优化，并恢复固定小节名称。11 月 18 日重新计算以上两个 DOCX 的哈希，与台账一致；本轮未改正文。已有 `validation.json` 记录阅读 6 页、修订 7 页及 65 条批注的检查，本轮没有重新渲染或追认正式 R23。
+11-20 图表候选承接 11-15 名称纠偏稿，六页阅读预览与七页标注渲染均已核验。11-15 候选已包含老师返修、v4、八种子实验和四处叙事优化，并恢复固定小节名称。11 月 18 日重新计算 R22 和 11-15 名称纠偏稿的哈希，与当时台账一致。已有 `validation.json` 记录阅读 6 页、修订 7 页及 65 条批注的检查，11-18 没有重新渲染或追认正式 R23。
 
 ## 工作区职责
 
