@@ -1,3 +1,7 @@
+## 2026-11-21 论文插图与变量排版
+
+对照公开论文重画两张可编辑图，按单栏宽度检查了跨站切换示例、请求时间线和训练反馈路径，修正 III-B 数学字形。最新待确认文件与图例见[来源映射](manuscript_source_map.md)，具体位置与核验见[修订台账](manuscript_revision_ledger.md)。
+
 ## 2026-11-20 论文图表修订
 
 图 1、图 2 的可编辑 PPT 及表 I 修改已进入待确认候选，阅读版六页。文件、版本与实际栏宽验收见[修订台账](manuscript_revision_ledger.md)和[来源映射](manuscript_source_map.md)。

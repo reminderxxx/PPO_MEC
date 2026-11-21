@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-11-18
+更新日期：2026-11-21
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -303,6 +303,7 @@ POLAR 的录用状态已于本轮由会议官方 accepted-papers/program 页增�
 
 | 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
 |---|---|---:|---|---|---|
+| 多用户车联网容器迁移 | [Multi-User Layer-Aware Online Container Migration in Edge-Assisted Vehicular Networks](https://doi.org/10.1109/TNET.2023.3330255) | IEEE/ACM Transactions on Networking, 32(2), 1807–1822, 2024（online 2023） | Tang 等将车辆运动、边缘节点已有容器层及跨用户镜像层复用纳入在线迁移决策。图 1 以车辆轨迹与节点部署说明目标站的已有层如何改变下载量。 | 八车模拟器迁移每车 DAG 的执行进度，并单独处理 RSU 端可供后续请求复用的 base/adapter。可比较两种连续服务的对象与粒度。 | Related Work 的移动服务连续性、表 I 的 State migration，以及图 1 的车站关联表达。 |
 | VEC DRL offloading survey | [Intelligent Offloading in Vehicular Edge Computing: A Comprehensive Review of Deep Reinforcement Learning Approaches and Architectures](https://arxiv.org/abs/2502.06963) | arXiv, 2025；v3 revised 2026；综述，venue 待核验 | 综述 VEC offloading 中 single-agent / multi-agent、centralized / distributed / hierarchical DRL 架构，以及 latency、energy、fairness 等 reward/objective 设计趋势；可用于说明 DRL offloading 已是拥挤方向。 | PPO_MEC 不能把“DRL/MARL 用于 VEC offloading”写成创新；差异必须落在跨 RSU 连续 DAG workflow、adapter warm-state cache、predictive handoff prepare/state migration 和三时间尺度联合控制，并由 artifact 指标证明。 | Introduction / Related Work 背景综述；不作为主 baseline 或 novelty 核心证据。 |
 | service migration + resource allocation | [Service Satisfaction-Aware Adaptive Service Migration and Resource Allocation in Vehicular Edge Computing](https://doi.org/10.1109/TMC.2025.3596342) | IEEE TMC, 2026（online 2025） | 把 service migration 作为 VEC 中保障高速车辆 service continuity 的核心问题；联合迁移和资源分配，并以服务满意度刻画迁移收益。 | PPO_MEC 的迁移对象不只是服务实例，而是跨 RSU DAG workflow 执行状态、adapter cache warm state 和 handoff prepare/prefetch 机制；优化目标同时覆盖 continuity、handoff failure、backhaul 和 workflow reward。 | Related Work 中对比 service migration；Method 中支撑 handoff-event controller 和 state migration 设计。 |
 | digital twin VEC caching/offloading | [VECO: A Digital Twin-Empowered Framework for Efficient Vehicular Edge Caching and Computation Offloading](https://doi.org/10.1109/TITS.2025.3548661) | IEEE TITS, 2025 | Digital Twin 监控 VEC 网络条件和资源状态；DT2C 机制联合 data caching 与 computation offloading；PPO 用于动态任务 offloading。 | PPO_MEC 可引用其支撑 DT/surrogate + caching/offloading 的最新 TITS 口径；差异在于 PPO_MEC 显式处理跨 RSU DAG workflow、adapter cache、handoff state migration 和多控制器 action contract。 | Related Work 中对比 DT-assisted VEC caching/offloading；Method 中说明 surrogate prediction 与 handoff/cache 控制边界。 |
