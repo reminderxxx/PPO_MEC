@@ -7,11 +7,11 @@
 | 用途 | 位置与状态 |
 | --- | --- |
 | 已确认正式修订底稿 | `artifacts/manuscript/r22_20261030/` 中完整题名加 `_marked.docx`；SHA-256 `78e38c83d7005e445164dfbb3dfdd62db254bb5ea68e486f15d61f967fda083b` |
-| 最新待确认候选 | `artifacts/manuscript/figure_redesign_20261121/` 中完整题名加 `_marked_candidate.docx`；SHA-256 `f7a639315bc37fd5fd072ec11b7b1e50a17b2daa67ea9a0b4ce8c12b577a0fcc`，同目录 `figures.pptx` 为两图可编辑源件 |
-| 阅读预览 | 同一候选目录中完整题名加 `_reading_preview.pdf`；仅供阅读，不作修订底稿 |
+| 最新待确认候选 | `artifacts/manuscript/full_notation_20261121/` 中完整题名加 `_marked_candidate.docx`；SHA-256 `9218b8a2d43e15c090d1b0c499fadd0ea7f22200dfe90c97f1498c4dae1ba3a8`，同目录 `figures.pptx` 为两图可编辑源件 |
+| 阅读预览 | 同目录完整题名 `.docx` 和 `_reading_preview.pdf` 为交老师的阅读稿；标注候选另存 |
 | 历史候选 | `rl_alignment_review_20261030` v4、`r23_20261111`、`teacher_merge_review_20261115`、`narrative_closure_review_20261115`；保留追溯，不重新并行改写 |
 
-11-21 图表候选承接 11-20 版，含 III-B 数学排版校正；上一轮 11-20 图表候选承接 11-15 名称纠偏稿，六页阅读预览与七页标注渲染均已核验。11-15 候选已包含老师返修、v4、八种子实验和四处叙事优化，并恢复固定小节名称。11 月 18 日重新计算 R22 和 11-15 名称纠偏稿的哈希，与当时台账一致。已有 `validation.json` 记录阅读 6 页、修订 7 页及 65 条批注的检查，11-18 没有重新渲染或追认正式 R23。
+本轮全文核查从 11-21 图表候选继续，完整交付指针见上表。11-21 图表候选承接 11-20 版，含 III-B 数学排版校正；上一轮 11-20 图表候选承接 11-15 名称纠偏稿，六页阅读预览与七页标注渲染均已核验。11-15 候选已包含老师返修、v4、八种子实验和四处叙事优化，并恢复固定小节名称。11 月 18 日重新计算 R22 和 11-15 名称纠偏稿的哈希，与当时台账一致。已有 `validation.json` 记录阅读 6 页、修订 7 页及 65 条批注的检查，11-18 没有重新渲染或追认正式 R23。
 
 ## 工作区职责
 

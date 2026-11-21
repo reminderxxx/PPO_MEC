@@ -2,7 +2,7 @@
 
 > 2026-11-18 项目优化已落地：两个 trainer 复用动作返回的 value，主线数据预检支持严格退出码、JSON 及 LFS 指针识别。见[实现与验证](docs/project/project_quick_optimization_20261118.md)、[项目优化清单](docs/project/project_optimization_backlog.md)。运行前可执行 `.venv/bin/python scripts/check_data_ready.py --scope mainline --strict`。
 
-> 2026-11-18 论文维护入口：[当前版本与证据来源](docs/project/manuscript_source_map.md)、[需求及作者决定](docs/project/requirements_backlog.md)。R22 标注稿仍为正式底稿，11-21 图表与数学排版候选承接 11-20 图表稿，待确认；已合并老师/v4/八种子变更。可复算的部分快照在 `artifacts/analysis/manuscript_support_20261118_v1/`，完整大包原位保留，未改算法或晋级结论。
+> 2026-11-18 论文维护入口：[当前版本与证据来源](docs/project/manuscript_source_map.md)、[需求及作者决定](docs/project/requirements_backlog.md)。R22 标注稿仍为正式底稿，11-21 全文变量排版候选承接同日重绘的论文图，待确认；已合并老师/v4/八种子变更。可复算的部分快照在 `artifacts/analysis/manuscript_support_20261118_v1/`，完整大包原位保留，未改算法或晋级结论。
 
 > 2026-10-26 联合控制组件研究已完成并独立复核；代码在 `codex/event-joint-control`，科学训练/消费版本 `d3af8e4` / `640daaa`。真实图、数据和有边界结论仅本地，入口见 [证据索引](docs/project/event_joint_control_evidence_20261026.md)。整体强基线优势、图增益、严格收敛与 formal/canonical 均不晋级。
 
